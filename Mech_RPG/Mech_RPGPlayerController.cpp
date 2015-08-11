@@ -11,12 +11,14 @@ AMech_RPGPlayerController::AMech_RPGPlayerController()
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 }
 
+/**
+ * Begin PlayerController interface
+ */
 void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
 	if (bAttackTarget){
-
 	}
 	else if (bMoveToMouseCursor)
 	{
@@ -37,6 +39,9 @@ void AMech_RPGPlayerController::SetupInputComponent()
 
 }
 
+/**
+ * Navigate player to the current mouse cursor location.
+ */
 void AMech_RPGPlayerController::MoveToMouseCursor()
 {
 	// Trace to see what is under the mouse cursor
@@ -50,6 +55,9 @@ void AMech_RPGPlayerController::MoveToMouseCursor()
 		SetNewMoveDestination(Hit.ImpactPoint);
 	}
 }
+/**
+ * Navigate player to the given world location.
+ */
 void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
 	APawn* const Pawn = GetPawn();
@@ -66,6 +74,9 @@ void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation
 	}
 }
 
+/**
+ * Input handlers for SetDestination action.
+ */
 void AMech_RPGPlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
@@ -78,6 +89,9 @@ void AMech_RPGPlayerController::OnSetDestinationReleased()
 	bMoveToMouseCursor = false;
 }
 
+/**
+ * Input handlers for Attack action.
+ */
 void AMech_RPGPlayerController::OnAttackPressed()
 {
 	FHitResult Hit;
@@ -95,6 +109,7 @@ void AMech_RPGPlayerController::OnAttackPressed()
 		if (targetFound && targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())){
 			target = Cast<AMech_RPGCharacter>(targetFound);
 			bAttackTarget = true;
+			StopMovement();
 		}
 	}
 }
@@ -102,4 +117,14 @@ void AMech_RPGPlayerController::OnAttackPressed()
 void AMech_RPGPlayerController::OnAttackReleased()
 {
 	bAttackTarget = false;
+}
+
+
+AMech_RPGCharacter* AMech_RPGPlayerController::GetOwner(){
+	return owner;
+}
+
+
+void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal){
+	owner = newVal;
 }

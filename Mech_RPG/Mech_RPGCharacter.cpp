@@ -31,5 +31,28 @@ AMech_RPGCharacter::AMech_RPGCharacter()
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+}
+
+float AMech_RPGCharacter::GetEnergy(){
+	return energy;
+}
+
+
+float AMech_RPGCharacter::GetHealth(){
+	return health;
+}
+
+
+void AMech_RPGCharacter::SetEnergy(float newVal){
+	energy = newVal;
+}
+
+
+void AMech_RPGCharacter::SetHealth(float newVal){
+	health = newVal;
+}
+
+
+void AMech_RPGCharacter::Hit(TArray<FTag> tags){
 
 }

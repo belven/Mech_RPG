@@ -3,13 +3,20 @@
 #include "GameFramework/PlayerController.h"
 #include "Mech_RPGPlayerController.generated.h"
 
+class AMech_RPGCharacter;
+
 UCLASS()
 class AMech_RPGPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+private:
+	class AMech_RPGCharacter* owner;
+
 
 public:
 	AMech_RPGPlayerController();
+	AMech_RPGCharacter* GetOwner();
+	void SetOwner(AMech_RPGCharacter* newVal);
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
@@ -18,7 +25,7 @@ protected:
 	/** True if the controlled character should attack thier target. */
 	uint32 bAttackTarget : 1;
 
-	class AMech_RPGCharacter* target;
+	AMech_RPGCharacter* target;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
