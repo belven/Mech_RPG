@@ -2,6 +2,8 @@
 
 #include "Mech_RPG.h"
 #include "Mech_RPGCharacter.h"
+#include "Engine.h"
+#include "Mech_RPGPlayerController.h"
 
 AMech_RPGCharacter::AMech_RPGCharacter()
 {
@@ -31,6 +33,19 @@ AMech_RPGCharacter::AMech_RPGCharacter()
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+}
+
+void AMech_RPGCharacter::PossessedBy(AController* NewController) {
+	AMech_RPGPlayerController* con = Cast<AMech_RPGPlayerController>(NewController);
+	if (con){
+		con->SetOwner(this);
+	}
+}
+
+void AMech_RPGCharacter::BeginPlay(){
+	weapons = *new TArray<AWeapon*>();
+	AddWeapon(AWeapon::CreateWeapon(this, 10, 500, 0.5));
 }
 
 float AMech_RPGCharacter::GetEnergy(){
@@ -53,6 +68,21 @@ void AMech_RPGCharacter::SetHealth(float newVal){
 }
 
 
-void AMech_RPGCharacter::Hit(TArray<FTag> tags){
+void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage, TArray<FTag>* tags){
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "Damage taken: " + FString::SanitizeFloat(damage));
+	health -= damage;
+}
 
+void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon){
+	if (newWeapon){
+		weapons.Add(newWeapon);
+	}
+}
+
+TArray<AWeapon*> AMech_RPGCharacter::GetWeapons(){
+	return weapons;
+}
+
+void AMech_RPGCharacter::SetWeapons(TArray<AWeapon*> newVal){
+	weapons = newVal;
 }

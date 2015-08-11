@@ -46,6 +46,7 @@ protected:
 	void OnAttackPressed();
 	void OnAttackReleased();
 
+	void AttackTarget(float DeltaTime);
 
 };
 
