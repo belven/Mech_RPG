@@ -17,6 +17,7 @@ public:
 	AMech_RPGPlayerController();
 	AMech_RPGCharacter* GetOwner();
 	void SetOwner(AMech_RPGCharacter* newVal);
+	void GetTargetUnderCursor();
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */

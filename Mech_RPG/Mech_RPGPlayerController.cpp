@@ -20,40 +20,13 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	FHitResult Hit;
-	FVector eyeLoc;
-	FRotator eyeRot;
-
-
-
 	if (bAttackTarget){
 		AttackTarget(DeltaTime);
 	}
 	else if (bMoveToMouseCursor)
 	{
-		target = NULL;
+		OnAttackReleased();
 		MoveToMouseCursor();
-	}
-	else if (!target) {
-		owner->GetActorEyesViewPoint(eyeLoc, eyeRot);
-
-		GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
-
-		if (Hit.bBlockingHit)
-		{
-			FVector traceTo = Hit.ImpactPoint;
-			FCollisionQueryParams collision;
-
-			GetWorld()->LineTraceSingle(Hit, eyeLoc * 20, traceTo, ECollisionChannel::ECC_Pawn, collision);
-
-			AActor* targetFound = Hit.GetActor();
-
-			if (targetFound &&targetFound != owner &&targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())){
-				target = Cast<AMech_RPGCharacter>(targetFound);
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "Target Found");
-				DefaultMouseCursor = EMouseCursor::Crosshairs;
-			}
-		}
 	}
 }
 
@@ -151,6 +124,7 @@ void AMech_RPGPlayerController::OnSetDestinationReleased()
  */
 void AMech_RPGPlayerController::OnAttackPressed()
 {
+	GetTargetUnderCursor();
 	if (target) {
 		bAttackTarget = true;
 	}
@@ -158,6 +132,7 @@ void AMech_RPGPlayerController::OnAttackPressed()
 
 void AMech_RPGPlayerController::OnAttackReleased()
 {
+	target = NULL;
 	bAttackTarget = false;
 	DefaultMouseCursor = EMouseCursor::Hand;
 }
@@ -170,4 +145,34 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetOwner(){
 
 void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal){
 	owner = newVal;
+}
+
+
+void AMech_RPGPlayerController::GetTargetUnderCursor(){
+	static FHitResult Hit;
+	GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		static FCollisionQueryParams collision;
+		collision.AddIgnoredActor(owner);
+
+		Hit.ImpactPoint.Y += 20;
+		Hit.ImpactPoint *= 1.2;
+		
+		GetWorld()->LineTraceSingleByChannel(Hit, owner->GetActorLocation(), Hit.ImpactPoint, ECollisionChannel::ECC_Pawn, collision);
+
+		AActor* targetFound = Hit.GetActor();
+
+		if (targetFound
+			&& targetFound != owner
+			&& targetFound->GetClass()
+			&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass()))
+		{
+			target = Cast<AMech_RPGCharacter>(targetFound);
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "Target Found");
+			DefaultMouseCursor = EMouseCursor::Crosshairs;
+		}
+	}
+
 }
