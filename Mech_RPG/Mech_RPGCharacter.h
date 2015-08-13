@@ -12,13 +12,13 @@ class AMech_RPGCharacter : public ACharacter
 	GENERATED_BODY()
 
 		/**
-		 * Top down camera
-		 */
+	 * Camera boom positioning the camera above the character
+	 */
 		 UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* TopDownCameraComponent;
 
 	/**
-	 * Camera boom positioning the camera above the character
+	 * Top down camera
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -26,6 +26,7 @@ private:
 	float energy;
 	float health;
 	TArray<AWeapon*> weapons;
+	bool isDead;
 
 public:
 	AMech_RPGCharacter();
@@ -45,6 +46,8 @@ public:
 	void SetWeapons(TArray<AWeapon*> newVal);
 
 	virtual	void BeginPlay() override;
+	bool IsDead();
+	void SetDead(bool newVal);
 
 };
 

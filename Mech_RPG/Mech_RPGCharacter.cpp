@@ -86,3 +86,15 @@ TArray<AWeapon*> AMech_RPGCharacter::GetWeapons(){
 void AMech_RPGCharacter::SetWeapons(TArray<AWeapon*> newVal){
 	weapons = newVal;
 }
+
+
+bool AMech_RPGCharacter::IsDead(){
+
+	return isDead;
+}
+
+
+void AMech_RPGCharacter::SetDead(bool newVal){
+
+	isDead = newVal;
+}

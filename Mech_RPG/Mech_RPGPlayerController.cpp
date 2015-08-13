@@ -20,6 +20,10 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+	if (!IsTargetValid()){
+		target = NULL;
+	}
+
 	if (bAttackTarget){
 		AttackTarget(DeltaTime);
 	}
@@ -31,7 +35,7 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 }
 
 void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
-	if (target && owner && owner->GetWeapons().Num() > 0){
+	if (owner && owner->GetWeapons().Num() > 0){
 		bool targetInRange = false;
 
 		for (AWeapon* weapon : owner->GetWeapons()) {
@@ -125,7 +129,7 @@ void AMech_RPGPlayerController::OnSetDestinationReleased()
 void AMech_RPGPlayerController::OnAttackPressed()
 {
 	GetTargetUnderCursor();
-	if (target) {
+	if (IsTargetValid()) {
 		bAttackTarget = true;
 	}
 }
@@ -150,19 +154,20 @@ void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal){
 
 void AMech_RPGPlayerController::GetTargetUnderCursor(){
 	static FHitResult Hit;
+	static AActor* targetFound;
+	static FCollisionQueryParams collision;
+	collision.AddIgnoredActor(owner);
+
 	GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
 
 	if (Hit.bBlockingHit)
 	{
-		static FCollisionQueryParams collision;
-		collision.AddIgnoredActor(owner);
-
 		Hit.ImpactPoint.Y += 20;
 		Hit.ImpactPoint *= 1.2;
 		
 		GetWorld()->LineTraceSingleByChannel(Hit, owner->GetActorLocation(), Hit.ImpactPoint, ECollisionChannel::ECC_Pawn, collision);
 
-		AActor* targetFound = Hit.GetActor();
+		targetFound = Hit.GetActor();
 
 		if (targetFound
 			&& targetFound != owner
@@ -170,9 +175,13 @@ void AMech_RPGPlayerController::GetTargetUnderCursor(){
 			&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass()))
 		{
 			target = Cast<AMech_RPGCharacter>(targetFound);
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "Target Found");
-			DefaultMouseCursor = EMouseCursor::Crosshairs;
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "Target Found");
+			//DefaultMouseCursor = EMouseCursor::Crosshairs;
 		}
 	}
+}
 
+
+bool AMech_RPGPlayerController::IsTargetValid(){
+	return target && !target->IsDead();
 }
