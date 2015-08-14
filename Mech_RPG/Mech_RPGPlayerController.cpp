@@ -23,11 +23,11 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 	if (!IsTargetValid()){
 		target = NULL;
 	}
-
-	if (bAttackTarget){
+	else if (bAttackTarget){
 		AttackTarget(DeltaTime);
 	}
-	else if (bMoveToMouseCursor)
+	
+	if (bMoveToMouseCursor)
 	{
 		OnAttackReleased();
 		MoveToMouseCursor();
@@ -164,7 +164,7 @@ void AMech_RPGPlayerController::GetTargetUnderCursor(){
 	{
 		Hit.ImpactPoint.Y += 20;
 		Hit.ImpactPoint *= 1.2;
-		
+
 		GetWorld()->LineTraceSingleByChannel(Hit, owner->GetActorLocation(), Hit.ImpactPoint, ECollisionChannel::ECC_Pawn, collision);
 
 		targetFound = Hit.GetActor();

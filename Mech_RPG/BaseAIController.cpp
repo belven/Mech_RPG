@@ -12,8 +12,12 @@ void ABaseAIController::Possess(APawn* InPawn) {
 }
 
 void ABaseAIController::Tick(float DeltaTime) {
+	//Super::Tick(DeltaTime);
+
 	if (GetOwner()){
-		FindTarget();
+		if (!IsTargetValid()){
+			FindTarget();
+		}
 
 		if (IsTargetValid()){
 			AttackTarget(DeltaTime);
@@ -22,7 +26,7 @@ void ABaseAIController::Tick(float DeltaTime) {
 }
 
 void ABaseAIController::AttackTarget(float DeltaTime){
-	if (owner && owner->GetWeapons().Num() > 0){
+	if (owner->GetWeapons().Num() > 0){
 		bool targetInRange = false;
 
 		for (AWeapon* weapon : owner->GetWeapons()) {
@@ -37,10 +41,10 @@ void ABaseAIController::AttackTarget(float DeltaTime){
 			}
 		}
 
-		if (!targetInRange && GetWorld()->GetNavigationSystem())
+		if (!targetInRange )//&& owner->GetWorld()->GetNavigationSystem())
 		{
-			SetFocus(target);
-			MoveToActor(target);
+			MoveToActor(GetTarget());
+			//owner->GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, target->GetActorLocation());
 		}
 		else {
 			StopMovement();

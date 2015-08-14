@@ -34,6 +34,8 @@ AMech_RPGCharacter::AMech_RPGCharacter()
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	SetHealth(1000000000);
+
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -71,6 +73,11 @@ void AMech_RPGCharacter::SetHealth(float newVal){
 void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage, TArray<FTag>* tags){
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "Damage taken: " + FString::SanitizeFloat(damage));
 	health -= damage;
+
+	if (health <= 0)
+	{
+		isDead = true;
+	}
 }
 
 void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon){
