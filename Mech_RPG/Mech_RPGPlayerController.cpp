@@ -20,13 +20,14 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	if (!IsTargetValid()){
+
+	if (bAttackTarget && !IsTargetValid()){
 		target = NULL;
 	}
 	else if (bAttackTarget){
 		AttackTarget(DeltaTime);
 	}
-	
+
 	if (bMoveToMouseCursor)
 	{
 		OnAttackReleased();
@@ -35,23 +36,24 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 }
 
 void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
-	if (owner && owner->GetWeapons().Num() > 0){
+	AWeapon* weapon = owner->GetCurrentWeapon();
+
+	if (weapon){
 		bool targetInRange = false;
 
-		for (AWeapon* weapon : owner->GetWeapons()) {
-			float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
+		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
-			if (dist <= weapon->GetRange()) {
-				if (weapon->CanFire(DeltaTime)){
-					target->Hit(owner, weapon->GetDamage(), NULL);
-				}
-
-				targetInRange = true;
+		if (dist <= weapon->GetRange()) {
+			if (weapon->CanFire(DeltaTime)){
+				target->Hit(owner, weapon->GetDamage());
 			}
+
+			targetInRange = true;
 		}
 
-		if (!targetInRange && GetWorld()->GetNavigationSystem())
+		if (!targetInRange  && GetWorld()->GetNavigationSystem())
 		{
+			//MoveToActor(GetTarget());
 			GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, target->GetActorLocation());
 		}
 		else {
@@ -183,5 +185,5 @@ void AMech_RPGPlayerController::GetTargetUnderCursor(){
 
 
 bool AMech_RPGPlayerController::IsTargetValid(){
-	return target && !target->IsDead();
+	return target && !target->IsDead() && target->GetGroup()->GetID() != owner->GetGroup()->GetID();
 }

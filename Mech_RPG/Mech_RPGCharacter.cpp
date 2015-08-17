@@ -34,8 +34,13 @@ AMech_RPGCharacter::AMech_RPGCharacter()
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	SetHealth(1000000000);
+	static int ID = 0;
 
+	SetID(ID++);
+
+	aoeDecetion = CreateDefaultSubobject<USphereComponent>(TEXT("AoeSphere"));
+	aoeDecetion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	aoeDecetion->SetSphereRadius(500);
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -46,8 +51,33 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 }
 
 void AMech_RPGCharacter::BeginPlay(){
+	SetHealth(10000);
+
 	weapons = *new TArray<AWeapon*>();
-	AddWeapon(AWeapon::CreateWeapon(this, 10, 500, 0.5));
+	AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 10, 500, 0.5));
+
+	static int ID = 0;
+
+	if (!GetGroup()) {
+		SetGroup(UGroup::CreateGroup(ID, *new TArray<AMech_RPGCharacter*>()));
+		GetGroup()->AddMemeber(this);
+		aoeDecetion->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+		TArray<AActor*> OutOverlappingActors;
+
+		aoeDecetion->GetOverlappingActors(OutOverlappingActors, GetClass());
+
+		if (OutOverlappingActors.Num() > 1){
+			for (AActor* actor : OutOverlappingActors){
+				if (actor != this) {
+					AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(actor);
+					character->SetGroup(GetGroup());
+				}
+			}
+		}
+		aoeDecetion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	ID++;
 }
 
 float AMech_RPGCharacter::GetEnergy(){
@@ -70,7 +100,7 @@ void AMech_RPGCharacter::SetHealth(float newVal){
 }
 
 
-void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage, TArray<FTag>* tags){
+void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage){
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "Damage taken: " + FString::SanitizeFloat(damage));
 	health -= damage;
 
@@ -94,14 +124,34 @@ void AMech_RPGCharacter::SetWeapons(TArray<AWeapon*> newVal){
 	weapons = newVal;
 }
 
-
 bool AMech_RPGCharacter::IsDead(){
-
 	return isDead;
 }
 
-
 void AMech_RPGCharacter::SetDead(bool newVal){
-
 	isDead = newVal;
+}
+
+AWeapon* AMech_RPGCharacter::GetCurrentWeapon(){
+	return currentWeapon;
+}
+
+void AMech_RPGCharacter::SetCurrentWeapon(AWeapon* newVal){
+	currentWeapon = newVal;
+}
+
+UGroup* AMech_RPGCharacter::GetGroup(){
+	return group;
+}
+
+void AMech_RPGCharacter::SetGroup(UGroup* newVal){
+	group = newVal;
+}
+
+int32 AMech_RPGCharacter::GetID(){
+	return id;
+}
+
+void AMech_RPGCharacter::SetID(int32 newVal){
+	id = newVal;
 }
