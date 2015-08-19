@@ -34,3 +34,8 @@ void UGroup::AddMemeber(AMech_RPGCharacter* memberToAdd){
 void UGroup::RemoveMember(AMech_RPGCharacter* memberToRemove){
 	members.Remove(memberToRemove);
 }
+
+
+bool UGroup::Compare(UGroup* inGroup){
+	return inGroup == this;
+}

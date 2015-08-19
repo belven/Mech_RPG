@@ -13,7 +13,7 @@ void ABaseAIController::Possess(APawn* InPawn) {
 }
 
 void ABaseAIController::Tick(float DeltaTime) {
-	//Super::Tick(DeltaTime);
+	Super::Tick(DeltaTime);
 
 	if (GetOwner()){
 		if (!IsTargetValid()){
@@ -42,10 +42,10 @@ void ABaseAIController::AttackTarget(float DeltaTime){
 			targetInRange = true;
 		}
 
-		if (!targetInRange  && GetWorld()->GetNavigationSystem())
+		if (!targetInRange && GetWorld()->GetNavigationSystem())
 		{
 			//MoveToActor(GetTarget());
-			GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, target->GetActorLocation());
+			GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, target);
 		}
 		else {
 			StopMovement();
@@ -56,12 +56,12 @@ void ABaseAIController::AttackTarget(float DeltaTime){
 void ABaseAIController::FindTarget(){
 	for (FConstPawnIterator iter = GetOwner()->GetWorld()->GetPawnIterator(); iter; iter++){
 		APawn* pawn = iter->Get();
-		if (iter->IsValid() 
+		if (iter->IsValid()
 			&& pawn != GetOwner()
 			&& pawn->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
 			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
-			if (!character->IsDead() && character->GetGroup()->GetID() != owner->GetGroup()->GetID()){
+			if (!character->IsDead() && !character->CompareGroup(owner)){
 				SetTarget(character);
 				break;
 			}
@@ -78,7 +78,7 @@ AMech_RPGCharacter* ABaseAIController::GetTarget(){
 }
 
 bool ABaseAIController::IsTargetValid(){
-		return target && !target->IsDead() && target->GetGroup()->GetID() != owner->GetGroup()->GetID();
+	return target && !target->IsDead() && !target->CompareGroup(owner);
 }
 
 void ABaseAIController::MoveToTarget(){

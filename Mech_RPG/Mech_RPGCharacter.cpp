@@ -41,6 +41,7 @@ AMech_RPGCharacter::AMech_RPGCharacter()
 	aoeDecetion = CreateDefaultSubobject<USphereComponent>(TEXT("AoeSphere"));
 	aoeDecetion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	aoeDecetion->SetSphereRadius(500);
+	aoeDecetion->SetWorldLocation(this->GetActorLocation());
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -51,33 +52,40 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 }
 
 void AMech_RPGCharacter::BeginPlay(){
+	static int32 ID = 0;
+
 	SetHealth(10000);
+	SetGroup(NULL);
+
+	aoeDecetion->SetWorldLocation(this->GetActorLocation());
 
 	weapons = *new TArray<AWeapon*>();
 	AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 10, 500, 0.5));
-
-	static int ID = 0;
-
+	
 	if (!GetGroup()) {
-		SetGroup(UGroup::CreateGroup(ID, *new TArray<AMech_RPGCharacter*>()));
-		GetGroup()->AddMemeber(this);
-		aoeDecetion->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
 		TArray<AActor*> OutOverlappingActors;
 
+		SetGroup(UGroup::CreateGroup(ID, *new TArray<AMech_RPGCharacter*>()));
+		GetGroup()->AddMemeber(this);
+
+		aoeDecetion->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		
 		aoeDecetion->GetOverlappingActors(OutOverlappingActors, GetClass());
 
-		if (OutOverlappingActors.Num() > 1){
+		aoeDecetion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+		if (OutOverlappingActors.Num() > 0){
 			for (AActor* actor : OutOverlappingActors){
 				if (actor != this) {
 					AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(actor);
 					character->SetGroup(GetGroup());
+					GetGroup()->AddMemeber(character);
 				}
 			}
 		}
-		aoeDecetion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		ID++;
 	}
-	ID++;
 }
 
 float AMech_RPGCharacter::GetEnergy(){
@@ -154,4 +162,14 @@ int32 AMech_RPGCharacter::GetID(){
 
 void AMech_RPGCharacter::SetID(int32 newVal){
 	id = newVal;
+}
+
+
+bool AMech_RPGCharacter::CompareGroup(UGroup* inGroup){
+	return GetGroup()->Compare(inGroup);
+}
+
+
+bool AMech_RPGCharacter::CompareGroup(AMech_RPGCharacter* inCharacter){
+	return CompareGroup(inCharacter->GetGroup());
 }

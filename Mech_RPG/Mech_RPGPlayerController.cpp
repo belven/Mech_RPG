@@ -185,5 +185,5 @@ void AMech_RPGPlayerController::GetTargetUnderCursor(){
 
 
 bool AMech_RPGPlayerController::IsTargetValid(){
-	return target && !target->IsDead() && target->GetGroup()->GetID() != owner->GetGroup()->GetID();
+	return target && !target->IsDead() && !target->CompareGroup(owner);
 }
