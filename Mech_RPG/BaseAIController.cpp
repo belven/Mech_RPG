@@ -5,17 +5,10 @@
 #include "Mech_RPGCharacter.h"
 #include "AI/Navigation/NavigationSystem.h"
 
-
-void ABaseAIController::Possess(APawn* InPawn) {
-	if (InPawn && InPawn->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
-		SetOwner(Cast<AMech_RPGCharacter>(InPawn));
-	}
-}
-
 void ABaseAIController::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	if (GetOwner()){
+	if (GetOwner() && GetOwner()->GetDemandedController() == NULL){
 		if (!IsTargetValid()){
 			FindTarget();
 		}

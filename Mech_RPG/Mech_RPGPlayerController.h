@@ -19,6 +19,12 @@ public:
 	void SetOwner(AMech_RPGCharacter* newVal);
 	void GetTargetUnderCursor();
 	bool IsTargetValid();
+	void SwapCharacter(int index);
+	FHitResult GetHitFromCursor();
+	void CharacterFour();
+	void CharacterOne();
+	void CharacterThree();
+	void CharacterTwo();
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */

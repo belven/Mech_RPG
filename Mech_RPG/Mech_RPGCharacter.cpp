@@ -4,6 +4,7 @@
 #include "Mech_RPGCharacter.h"
 #include "Engine.h"
 #include "Mech_RPGPlayerController.h"
+#include "BaseAIController.h"
 
 AMech_RPGCharacter::AMech_RPGCharacter()
 {
@@ -37,50 +38,44 @@ AMech_RPGCharacter::AMech_RPGCharacter()
 	static int ID = 0;
 
 	SetID(ID++);
-
-	aoeDecetion = CreateDefaultSubobject<USphereComponent>(TEXT("AoeSphere"));
-	aoeDecetion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	aoeDecetion->SetSphereRadius(500);
-	aoeDecetion->SetWorldLocation(this->GetActorLocation());
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
+	Super::PossessedBy(NewController);
 	AMech_RPGPlayerController* con = Cast<AMech_RPGPlayerController>(NewController);
+
 	if (con){
 		con->SetOwner(this);
 	}
+	else
+	{
+		ABaseAIController* con = Cast<ABaseAIController>(NewController);
+		if (con){
+			con->SetOwner(this);
+		}
+	}
+
+	Controller = NewController;
 }
 
 void AMech_RPGCharacter::BeginPlay(){
 	static int32 ID = 0;
-
-	SetHealth(10000);
+	SetHealth(1000);
 	SetGroup(NULL);
-
-	aoeDecetion->SetWorldLocation(this->GetActorLocation());
 
 	weapons = *new TArray<AWeapon*>();
 	AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 10, 500, 0.5));
-	
-	if (!GetGroup()) {
-		TArray<AActor*> OutOverlappingActors;
 
+	if (!GetGroup()) {
 		SetGroup(UGroup::CreateGroup(ID, *new TArray<AMech_RPGCharacter*>()));
 		GetGroup()->AddMemeber(this);
 
-		aoeDecetion->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		
-		aoeDecetion->GetOverlappingActors(OutOverlappingActors, GetClass());
-
-		aoeDecetion->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		
-		if (OutOverlappingActors.Num() > 0){
-			for (AActor* actor : OutOverlappingActors){
-				if (actor != this) {
-					AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(actor);
-					character->SetGroup(GetGroup());
-					GetGroup()->AddMemeber(character);
-				}
+		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++){
+			APawn* pawn = iter->Get();
+			if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 500){
+				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
+				character->SetGroup(GetGroup());
+				GetGroup()->AddMemeber(character);
 			}
 		}
 
@@ -115,6 +110,7 @@ void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage){
 	if (health <= 0)
 	{
 		isDead = true;
+		SetActorHiddenInGame(true);
 	}
 }
 
@@ -172,4 +168,14 @@ bool AMech_RPGCharacter::CompareGroup(UGroup* inGroup){
 
 bool AMech_RPGCharacter::CompareGroup(AMech_RPGCharacter* inCharacter){
 	return CompareGroup(inCharacter->GetGroup());
+}
+
+
+AController* AMech_RPGCharacter::GetDemandedController(){
+	return demandedController;
+}
+
+
+void AMech_RPGCharacter::SetDemandedController(AController* newVal){
+	demandedController = newVal;
 }

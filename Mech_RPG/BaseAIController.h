@@ -16,9 +16,6 @@ private:
 	AMech_RPGCharacter* owner;
 	AMech_RPGCharacter* target;
 	virtual void Tick(float DeltaTime) override;
-	virtual	void Possess(APawn* InPawn) override;
-	
-
 public:
 	void AttackTarget(float DeltaTime);
 	void FindTarget();
