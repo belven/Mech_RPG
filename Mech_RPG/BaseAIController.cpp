@@ -11,7 +11,7 @@ void ABaseAIController::Tick(float DeltaTime) {
 	if (GetOwner() && GetOwner()->GetDemandedController() == NULL){
 		if (GetOwner()->IsDead()){
 			UnPossess();
-			GetOwner()->Destroy();
+			GetOwner()->Destroy(true);
 		}
 		else {
 			if (!IsTargetValid()){
@@ -27,6 +27,12 @@ void ABaseAIController::Tick(float DeltaTime) {
 
 void ABaseAIController::AttackTarget(float DeltaTime){
 	AWeapon* weapon = owner->GetCurrentWeapon();
+
+	/*if (GetOwner()->GetAbilities().Num() > 0) {
+		if (!GetOwner()->GetAbilities()[0]->OnCooldown()) {
+			GetOwner()->GetAbilities()[0]->Activate(GetOwner(), target);
+		}
+	}*/
 
 	if (weapon){
 		bool targetInRange = false;

@@ -4,7 +4,6 @@
 #include "Ability.h"
 #include "Mech_RPGCharacter.h"
 
-
 void UAbility::SetOnCooldown(UWorld* const World){
 	onCooldown = true;
 	World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &UAbility::ResetOnCooldown, GetCooldown() > 0 ? GetCooldown() : 0.2);
@@ -12,10 +11,9 @@ void UAbility::SetOnCooldown(UWorld* const World){
 
 float UAbility::GetCooldown(){
 	return cooldown;
-
 }
 
-bool UAbility::GetOnCooldown(){
+bool UAbility::OnCooldown(){
 	return onCooldown;
 }
 
@@ -27,25 +25,6 @@ void UAbility::ResetOnCooldown(){
 	onCooldown = false;
 }
 
-UAbility* UAbility::CreateAbility(){
-	return NewObject<UAbility>(UAbility::StaticClass());
+UAbility* UAbility::CreateAbility(UClass* classType){
+	return ConstructObject<UAbility>(classType);
 }
-
-//void UAbility::Activate(AShip* owner){
-//	static TArray<AActor*>& tempActors = *new TArray<AActor*>();
-//
-//	owner->GetAoeDetection()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-//	owner->GetAoeDetection()->GetOverlappingActors(tempActors, AShip::StaticClass());
-//
-//	for (AActor* temp : tempActors)
-//	{
-//		AShip* ship = Cast<AShip>(temp);
-//		if (ship && ship != owner)
-//		{
-//			ship->TakeDamage(10);
-//		}
-//	}
-//
-//	owner->GetAoeDetection()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-//	tempActors.Empty();
-//}

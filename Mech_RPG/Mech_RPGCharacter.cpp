@@ -1,6 +1,7 @@
 
 #include "Mech_RPG.h"
 #include "Mech_RPGCharacter.h"
+#include "Snipe.h"
 #include "Engine.h"
 #include "Mech_RPGPlayerController.h"
 #include "BaseAIController.h"
@@ -75,11 +76,18 @@ void AMech_RPGCharacter::BeginPlay(){
 
 	if (startingGroupID == 0){
 		AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 20, 500, 0.5));
-		AddWeapon(AWeapon::CreateWeapon(this, 300, 2000, 1.5));
+		AddWeapon(AWeapon::CreateWeapon(this, 300, 2000, 0.1));
 	}
 	else {
 		AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 10, 500, 0.5));
 	}
+
+	USnipe* snipe;
+
+	abilities = *new TArray<UAbility*>();
+	abilities.Add(snipe = Cast<USnipe>(UAbility::CreateAbility(USnipe::StaticClass())));
+
+	snipe->SetCooldown(1.0F);
 
 	if (!GetGroup()) {
 		SetGroup(UGroup::CreateGroup(startingGroupID, *new TArray<AMech_RPGCharacter*>()));
@@ -114,6 +122,7 @@ void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage){
 	{
 		isDead = true;
 		SetActorHiddenInGame(true);
+		SetActorEnableCollision(false);
 	}
 }
 

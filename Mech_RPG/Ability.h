@@ -9,7 +9,7 @@
  *
  */
 UCLASS()
-class  UAbility : public UObject
+class UAbility : public UObject
 {
 	GENERATED_BODY()
 
@@ -19,15 +19,15 @@ private:
 
 public:
 	void SetOnCooldown(UWorld* const World);
-	bool GetOnCooldown();
+	bool OnCooldown();
 	void ResetOnCooldown();
 
 	float GetCooldown();
 	void SetCooldown(float newCooldown);
 
-	virtual void Activate(class AMech_RPGCharacter* owner) { check(0 && "You must override this") };
+	virtual void Activate(class AMech_RPGCharacter* owner, AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) { check(0 && "You must override this") };
 
-	static UAbility* CreateAbility();
+	static UAbility* CreateAbility(UClass* classType);
 
 	/** Handle for efficient management of ShotTimerExpired timer */
 	FTimerHandle TimerHandle_ShotTimerExpired;

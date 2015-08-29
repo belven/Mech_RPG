@@ -1,5 +1,3 @@
-// Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 #include "Mech_RPG.h"
 #include "Engine.h"
@@ -23,30 +21,26 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 
 	if (GetOwner()){
 		if (GetOwner()->GetDemandedController() != NULL) {
-			ABaseAIController* con = Cast<ABaseAIController>(GetOwner()->GetDemandedController());
-			AMech_RPGCharacter* other = con->GetOwner();
-
-			GetOwner()->SetDemandedController(NULL);
-			other->SetDemandedController(NULL);
-
-			if (con){
-				con->Possess(GetOwner());
-				Possess(other);
-			}
+			SwapCharacter();
 		}
 
 		if (!GetOwner()->IsDead()){
-
 			if (swapWeapons) {
 				GetOwner()->SwapWeapon();
 				swapWeapons = false;
 			}
 
-			if (bAttackTarget && !IsTargetValid()){
-				target = NULL;
+			GetTargetUnderCursor();
+
+			if (IsTargetValid()){
+				CurrentMouseCursor = EMouseCursor::Crosshairs;
+
+				if (bAttackTarget){
+					AttackTarget(DeltaTime);
+				}
 			}
-			else if (bAttackTarget){
-				AttackTarget(DeltaTime);
+			else {
+				CurrentMouseCursor = EMouseCursor::Hand;
 			}
 
 			if (bMoveToMouseCursor)
@@ -56,16 +50,7 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 			}
 		}
 		else {
-			for (int i = 0; i < GetOwner()->GetGroup()->GetMembers().Num(); i++){
-				AMech_RPGCharacter* character = GetOwner()->GetGroup()->GetMembers()[i];
-
-				if (!character->IsDead()){
-					SwapCharacter(i + 1);
-				}
-			}
-
-			UnPossess();
-			GetOwner()->Destroy();
+			PlayerDied();
 		}
 	}
 }
@@ -98,7 +83,6 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 
 void AMech_RPGPlayerController::SetupInputComponent()
 {
-	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AMech_RPGPlayerController::OnSetDestinationPressed);
@@ -113,27 +97,22 @@ void AMech_RPGPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Four", IE_Released, this, &AMech_RPGPlayerController::CharacterFour);
 
 	InputComponent->BindAction("SwapWeapons", IE_Released, this, &AMech_RPGPlayerController::SwapWeapons);
+	InputComponent->BindAction("ActivateAbility", IE_Released, this, &AMech_RPGPlayerController::ActivateAbility);
 }
 
-/**
- * Navigate player to the current mouse cursor location.
- */
+
 void AMech_RPGPlayerController::MoveToMouseCursor()
 {
-	// Trace to see what is under the mouse cursor
 	FHitResult Hit;
 
 	GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
 
 	if (Hit.bBlockingHit)
 	{
-		// We hit something, move there
 		SetNewMoveDestination(Hit.ImpactPoint);
 	}
 }
-/**
- * Navigate player to the given world location.
- */
+
 void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
 	APawn* const Pawn = GetPawn();
@@ -142,35 +121,25 @@ void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation
 		UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
 		float const Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
 
-		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if (NavSys && (Distance > 120.0f))
+		if (NavSys)
 		{
 			NavSys->SimpleMoveToLocation(this, DestLocation);
 		}
 	}
 }
 
-/**
- * Input handlers for SetDestination action.
- */
 void AMech_RPGPlayerController::OnSetDestinationPressed()
 {
-	// set flag to keep updating destination until released
 	bMoveToMouseCursor = true;
 }
 
 void AMech_RPGPlayerController::OnSetDestinationReleased()
 {
-	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
 }
 
-/**
- * Input handlers for Attack action.
- */
 void AMech_RPGPlayerController::OnAttackPressed()
 {
-	GetTargetUnderCursor();
 	if (IsTargetValid()) {
 		bAttackTarget = true;
 	}
@@ -180,7 +149,7 @@ void AMech_RPGPlayerController::OnAttackReleased()
 {
 	target = NULL;
 	bAttackTarget = false;
-	DefaultMouseCursor = EMouseCursor::Hand;
+	CurrentMouseCursor = EMouseCursor::Hand;
 }
 
 void AMech_RPGPlayerController::GetTargetUnderCursor(){
@@ -197,10 +166,14 @@ void AMech_RPGPlayerController::GetTargetUnderCursor(){
 
 		if (targetFound
 			&& targetFound != owner
-			&& targetFound->GetClass()
 			&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass()))
 		{
 			target = Cast<AMech_RPGCharacter>(targetFound);
+
+			if (!IsTargetValid()){
+				target = NULL;
+				CurrentMouseCursor = EMouseCursor::Hand;
+			}
 		}
 	}
 }
@@ -209,7 +182,7 @@ bool AMech_RPGPlayerController::IsTargetValid(){
 	return target && !target->IsDead() && !target->CompareGroup(owner);
 }
 
-void AMech_RPGPlayerController::SwapCharacter(int index){
+void AMech_RPGPlayerController::DemandSwapCharacter(int index){
 	// Do we have an owner
 	if (GetOwner()) {
 		UGroup* group = GetOwner()->GetGroup();
@@ -232,7 +205,6 @@ void AMech_RPGPlayerController::SwapCharacter(int index){
 	}
 }
 
-
 FHitResult AMech_RPGPlayerController::GetHitFromCursor(){
 	static FHitResult Hit;
 	GetHitResultUnderCursor(ECollisionChannel::ECC_Pawn, false, Hit);
@@ -243,30 +215,66 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetOwner(){
 	return owner;
 }
 
-
 void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal){
 	owner = newVal;
 }
 
 void AMech_RPGPlayerController::CharacterFour(){
-	SwapCharacter(4);
+	DemandSwapCharacter(4);
 }
 
 void AMech_RPGPlayerController::CharacterOne(){
-	SwapCharacter(1);
+	DemandSwapCharacter(1);
 }
 
 void AMech_RPGPlayerController::CharacterThree(){
-	SwapCharacter(3);
+	DemandSwapCharacter(3);
 }
 
 void AMech_RPGPlayerController::CharacterTwo(){
-	SwapCharacter(2);
+	DemandSwapCharacter(2);
 }
 
-
 void AMech_RPGPlayerController::SwapWeapons(){
-	if (GetOwner() && !GetOwner()->IsDead()){
+	if (IsOwnerValid()){
 		swapWeapons = true;
 	}
+}
+
+void AMech_RPGPlayerController::ActivateAbility(){
+	if (IsOwnerValid() && GetOwner()->GetAbilities().Num() > 0) {
+		if (!GetOwner()->GetAbilities()[0]->OnCooldown()) {
+			GetOwner()->GetAbilities()[0]->Activate(GetOwner(), target);
+		}
+	}
+}
+
+void AMech_RPGPlayerController::PlayerDied(){
+	for (int i = 0; i < GetOwner()->GetGroup()->GetMembers().Num(); i++){
+		AMech_RPGCharacter* character = GetOwner()->GetGroup()->GetMembers()[i];
+
+		if (!character->IsDead()){
+			DemandSwapCharacter(i + 1);
+		}
+	}
+
+	UnPossess();
+	GetOwner()->Destroy(true);
+}
+
+void AMech_RPGPlayerController::SwapCharacter(){
+	ABaseAIController* con = Cast<ABaseAIController>(GetOwner()->GetDemandedController());
+	AMech_RPGCharacter* other = con->GetOwner();
+
+	GetOwner()->SetDemandedController(NULL);
+	other->SetDemandedController(NULL);
+
+	if (con){
+		con->Possess(GetOwner());
+		Possess(other);
+	}
+}
+
+bool AMech_RPGPlayerController::IsOwnerValid(){
+	return GetOwner() && !GetOwner()->IsDead();
 }

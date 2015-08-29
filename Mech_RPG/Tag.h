@@ -9,9 +9,9 @@ struct FTag
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Name")
+	UPROPERTY(EditAnywhere prm1, BlueprintReadWrite prm2, Category prm3 = "Tag");
 		FString name;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tag")
+	UPROPERTY(EditAnywhere prm1, BlueprintReadWrite prm2, Category prm3 = "Name");
 		float value;
 };
