@@ -15,14 +15,17 @@ class MECH_RPG_API ABaseAIController : public AAIController
 private:	
 	AMech_RPGCharacter* owner;
 	AMech_RPGCharacter* target;
+
 	virtual void Tick(float DeltaTime) override;
 public:
 	void AttackTarget(float DeltaTime);
 	void FindTarget();
+
 	AMech_RPGCharacter* GetOwner();
 	AMech_RPGCharacter* GetTarget();
+
 	bool IsTargetValid();
-	void MoveToTarget();
+
 	void SetOwner(AMech_RPGCharacter* newVal);
 	void SetTarget(AMech_RPGCharacter* newVal);
 };

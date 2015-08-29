@@ -5,6 +5,7 @@
 #include "Weapon.h"
 #include "Group.h"
 #include "Array.h"
+#include "Ability.h"
 #include "Mech_RPGCharacter.generated.h"
 
 UCLASS(Blueprintable)
@@ -34,8 +35,13 @@ private:
 
 	UGroup* group;
 	AController* demandedController;
+	TArray<UAbility*> abilities;
+
 public:
 	AMech_RPGCharacter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
+		int32 startingGroupID;
 
 	virtual	void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
@@ -94,5 +100,12 @@ public:
 
 	AController* GetDemandedController();
 	void SetDemandedController(AController* newVal);
+
+	virtual void Tick(float DeltaTime) override;
+
+	TArray<UAbility*> GetAbilities();
+	void SetAbilities(TArray<UAbility*> newVal);
+
+	void SwapWeapon();
 };
 

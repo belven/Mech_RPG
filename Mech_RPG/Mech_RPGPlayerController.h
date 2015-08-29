@@ -11,6 +11,7 @@ class AMech_RPGPlayerController : public APlayerController
 	GENERATED_BODY()
 private:
 	class AMech_RPGCharacter* owner;
+	bool swapWeapons;
 
 
 public:
@@ -25,6 +26,7 @@ public:
 	void CharacterOne();
 	void CharacterThree();
 	void CharacterTwo();
+	void SwapWeapons();
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */

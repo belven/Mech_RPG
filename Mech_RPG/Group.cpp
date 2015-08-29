@@ -35,7 +35,6 @@ void UGroup::RemoveMember(AMech_RPGCharacter* memberToRemove){
 	members.Remove(memberToRemove);
 }
 
-
 bool UGroup::Compare(UGroup* inGroup){
-	return inGroup == this;
+	return inGroup->GetID() == this->GetID();
 }

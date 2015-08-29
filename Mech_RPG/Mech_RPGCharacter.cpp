@@ -1,4 +1,3 @@
-// Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 
 #include "Mech_RPG.h"
 #include "Mech_RPGCharacter.h"
@@ -58,16 +57,32 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 	Controller = NewController;
 }
 
+void AMech_RPGCharacter::Tick(float DeltaTime){
+	if (!isDead){
+		for (AWeapon* weapon : weapons){
+			if (weapon) {
+				weapon->Tick(DeltaTime);
+			}
+		}
+	}
+}
+
 void AMech_RPGCharacter::BeginPlay(){
-	static int32 ID = 0;
 	SetHealth(1000);
 	SetGroup(NULL);
 
 	weapons = *new TArray<AWeapon*>();
-	AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 10, 500, 0.5));
+
+	if (startingGroupID == 0){
+		AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 20, 500, 0.5));
+		AddWeapon(AWeapon::CreateWeapon(this, 300, 2000, 1.5));
+	}
+	else {
+		AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 10, 500, 0.5));
+	}
 
 	if (!GetGroup()) {
-		SetGroup(UGroup::CreateGroup(ID, *new TArray<AMech_RPGCharacter*>()));
+		SetGroup(UGroup::CreateGroup(startingGroupID, *new TArray<AMech_RPGCharacter*>()));
 		GetGroup()->AddMemeber(this);
 
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++){
@@ -78,30 +93,18 @@ void AMech_RPGCharacter::BeginPlay(){
 				GetGroup()->AddMemeber(character);
 			}
 		}
-
-		ID++;
 	}
 }
 
-float AMech_RPGCharacter::GetEnergy(){
-	return energy;
+
+void AMech_RPGCharacter::SwapWeapon(){
+	if (weapons[0] == currentWeapon){
+		currentWeapon = weapons[1];
+	}
+	else {
+		currentWeapon = weapons[0];
+	}
 }
-
-
-float AMech_RPGCharacter::GetHealth(){
-	return health;
-}
-
-
-void AMech_RPGCharacter::SetEnergy(float newVal){
-	energy = newVal;
-}
-
-
-void AMech_RPGCharacter::SetHealth(float newVal){
-	health = newVal;
-}
-
 
 void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage){
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "Damage taken: " + FString::SanitizeFloat(damage));
@@ -118,6 +121,22 @@ void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon){
 	if (newWeapon){
 		weapons.Add(newWeapon);
 	}
+}
+
+float AMech_RPGCharacter::GetEnergy(){
+	return energy;
+}
+
+float AMech_RPGCharacter::GetHealth(){
+	return health;
+}
+
+void AMech_RPGCharacter::SetEnergy(float newVal){
+	energy = newVal;
+}
+
+void AMech_RPGCharacter::SetHealth(float newVal){
+	health = newVal;
 }
 
 TArray<AWeapon*> AMech_RPGCharacter::GetWeapons(){
@@ -160,22 +179,26 @@ void AMech_RPGCharacter::SetID(int32 newVal){
 	id = newVal;
 }
 
-
 bool AMech_RPGCharacter::CompareGroup(UGroup* inGroup){
 	return GetGroup()->Compare(inGroup);
 }
-
 
 bool AMech_RPGCharacter::CompareGroup(AMech_RPGCharacter* inCharacter){
 	return CompareGroup(inCharacter->GetGroup());
 }
 
-
 AController* AMech_RPGCharacter::GetDemandedController(){
 	return demandedController;
 }
 
-
 void AMech_RPGCharacter::SetDemandedController(AController* newVal){
 	demandedController = newVal;
+}
+
+TArray<UAbility*> AMech_RPGCharacter::GetAbilities(){
+	return abilities;
+}
+
+void AMech_RPGCharacter::SetAbilities(TArray<UAbility*> newVal){
+	abilities = newVal;
 }

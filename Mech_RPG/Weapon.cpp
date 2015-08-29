@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Weapon.h"
+#include "Mech_RPGCharacter.h"
 
 float AWeapon::GetDamage(){
 	return damage;
@@ -19,15 +20,8 @@ void AWeapon::SetRange(float newVal){
 	range = newVal;
 }
 
-bool AWeapon::CanFire(float deltaTime) {
-	static float lastTime = 0;
-	lastTime += deltaTime;
-
-	if (lastTime >= fireRate){
-		lastTime = 0;
-		return true;
-	}
-	return false;
+bool AWeapon::CanFire() {
+	return canFire;
 }
 
 
@@ -37,11 +31,16 @@ AWeapon* AWeapon::CreateWeapon(AActor* owner, float damage, float range, float f
 		weapon->SetDamage(damage);
 		weapon->SetRange(range);
 		weapon->SetFireRate(fireRate);
+		weapon->canFire = true;
 		return weapon;
 	}
 	return NULL;
 }
 
+void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
+	target->Hit(owner, GetDamage());
+	canFire = false;
+}
 
 float AWeapon::GetFireRate(){
 	return fireRate;
@@ -50,4 +49,17 @@ float AWeapon::GetFireRate(){
 
 void AWeapon::SetFireRate(float newVal){
 	fireRate = newVal;
+}
+
+
+void AWeapon::Tick(float DeltaTime){
+	if (!canFire) {
+		static float lastTime = 0;
+		lastTime += DeltaTime;
+
+		if (lastTime >= fireRate){
+			lastTime = 0;
+			canFire = true;
+		}
+	}
 }

@@ -9,12 +9,18 @@ void ABaseAIController::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
 	if (GetOwner() && GetOwner()->GetDemandedController() == NULL){
-		if (!IsTargetValid()){
-			FindTarget();
+		if (GetOwner()->IsDead()){
+			UnPossess();
+			GetOwner()->Destroy();
 		}
+		else {
+			if (!IsTargetValid()){
+				FindTarget();
+			}
 
-		if (IsTargetValid()){
-			AttackTarget(DeltaTime);
+			if (IsTargetValid()){
+				AttackTarget(DeltaTime);
+			}
 		}
 	}
 }
@@ -28,8 +34,8 @@ void ABaseAIController::AttackTarget(float DeltaTime){
 		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
 		if (dist <= weapon->GetRange()) {
-			if (weapon->CanFire(DeltaTime)){
-				target->Hit(owner, weapon->GetDamage());
+			if (weapon->CanFire()){
+				weapon->Fire(target, GetOwner());
 			}
 
 			targetInRange = true;
@@ -37,7 +43,6 @@ void ABaseAIController::AttackTarget(float DeltaTime){
 
 		if (!targetInRange && GetWorld()->GetNavigationSystem())
 		{
-			//MoveToActor(GetTarget());
 			GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, target);
 		}
 		else {
@@ -72,10 +77,6 @@ AMech_RPGCharacter* ABaseAIController::GetTarget(){
 
 bool ABaseAIController::IsTargetValid(){
 	return target && !target->IsDead() && !target->CompareGroup(owner);
-}
-
-void ABaseAIController::MoveToTarget(){
-
 }
 
 void ABaseAIController::SetOwner(AMech_RPGCharacter* newVal){
