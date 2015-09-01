@@ -9,7 +9,7 @@ UGroup* UGroup::CreateGroup(int32 inID, TArray<AMech_RPGCharacter*> inMemebrs) {
 	UGroup* newGroup = NewObject<UGroup>(UGroup::StaticClass());
 	newGroup->SetID(inID);
 	newGroup->SetMembers(inMemebrs);
-	return  newGroup;
+	return newGroup;
 }
 
 int32 UGroup::GetID() {
@@ -40,15 +40,13 @@ bool UGroup::Compare(UGroup* inGroup) {
 	return inGroup && this ? inGroup->GetID() == this->GetID() : false;
 }
 
-
 AMech_RPGCharacter* UGroup::GetMember(int index) {
 	return  members[index - 1];
 }
 
-
 AMech_RPGCharacter* UGroup::GetPlayer() {
 	for (AMech_RPGCharacter* character : members) {
-		if (character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
+		if (character != NULL && character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
 			return character;
 		}
 	}

@@ -18,7 +18,7 @@ public:
 	AMech_RPGPlayerController();
 	AMech_RPGCharacter* GetOwner();
 	void SetOwner(AMech_RPGCharacter* newVal);
-	void GetTargetUnderCursor();
+	AMech_RPGCharacter* GetTargetUnderCursor();
 	bool IsTargetValid();
 	void DemandSwapCharacter(int index);
 	FHitResult GetHitFromCursor();
@@ -40,6 +40,7 @@ public:
 	void CtrlReleased();
 	void ShiftPressed();
 	void ShiftReleased();
+	void PerformAllyCommand(int index);
 
 protected:
 	/**

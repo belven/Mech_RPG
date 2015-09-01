@@ -5,6 +5,7 @@
 #include "Mech_RPGCharacter.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "BaseAIController.h"
+#include "AllyAIController.h"
 
 AMech_RPGPlayerController::AMech_RPGPlayerController() {
 	bShowMouseCursor = true;
@@ -159,7 +160,7 @@ void AMech_RPGPlayerController::OnAttackReleased() {
 	bAttackTarget = false;
 }
 
-void AMech_RPGPlayerController::GetTargetUnderCursor() {
+AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 	static FHitResult Hit;
 	FCollisionQueryParams collision;
 	collision.AddIgnoredActor(owner);
@@ -179,8 +180,11 @@ void AMech_RPGPlayerController::GetTargetUnderCursor() {
 				target = NULL;
 				CurrentMouseCursor = EMouseCursor::Hand;
 			}
+
+			return target;
 		}
 	}
+	return NULL;
 }
 
 bool AMech_RPGPlayerController::IsTargetValid() {
@@ -213,7 +217,7 @@ void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 FHitResult AMech_RPGPlayerController::GetHitFromCursor() {
 	static FHitResult Hit;
 	GetHitResultUnderCursor(ECollisionChannel::ECC_Pawn, false, Hit);
-	return  Hit;
+	return Hit;
 }
 
 AMech_RPGCharacter* AMech_RPGPlayerController::GetOwner() {
@@ -225,19 +229,39 @@ void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
 }
 
 void AMech_RPGPlayerController::CharacterFour() {
-	DemandSwapCharacter(4);
+	int index = 4;
+	PerformAllyCommand(index);
 }
 
 void AMech_RPGPlayerController::CharacterOne() {
-	DemandSwapCharacter(1);
+	int index = 1;
+	PerformAllyCommand(index);
 }
 
 void AMech_RPGPlayerController::CharacterThree() {
-	DemandSwapCharacter(3);
+	int index = 3;
+	PerformAllyCommand(index);
 }
 
 void AMech_RPGPlayerController::CharacterTwo() {
-	DemandSwapCharacter(2);
+	int index = 2;
+	PerformAllyCommand(index);
+}
+
+void AMech_RPGPlayerController::PerformAllyCommand(int index) {
+	if (shiftPressed) {
+		AllyMove(index);
+	}
+	else if (altPressed) {
+		AllyAbility(index);
+	}
+	else if (ctrlPressed) {
+		AllyAttack(index);
+	}
+	else {
+		DemandSwapCharacter(index);
+	}
+
 }
 
 void AMech_RPGPlayerController::SwapWeapons() {
@@ -289,33 +313,72 @@ void AMech_RPGPlayerController::AllyAbility(int index) {
 }
 
 void AMech_RPGPlayerController::AllyAttack(int index) {
+	static FHitResult Hit;
+	UGroup* group = GetOwner()->GetGroup();
 
+	if (group) {
+		AMech_RPGCharacter* character = group->GetMember(index);
+		if (!character->IsDead() && character != GetOwner()) {
+			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
+			
+			Hit = GetHitFromCursor();
+
+			if (Hit.bBlockingHit) {
+				static AActor* targetFound;
+				targetFound = Hit.GetActor();
+
+				if (targetFound
+					&& targetFound != owner
+					&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
+					AMech_RPGCharacter*	tempTarget = Cast<AMech_RPGCharacter>(targetFound);
+
+					if (tempTarget && !tempTarget->IsDead() && !tempTarget->CompareGroup(owner)) {
+						con->SetPlayerControlledLocation(FVector::ZeroVector);
+						con->SetTarget(tempTarget);
+					}
+				}
+			}
+		}
+	}
 }
 
 void AMech_RPGPlayerController::AllyMove(int index) {
+	UGroup* group = GetOwner()->GetGroup();
+	if (group) {
+		AMech_RPGCharacter* character = group->GetMember(index);
+		if (!character->IsDead() && character != GetOwner()) {
+			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
+			static FHitResult Hit;
 
+			GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
+
+			if (Hit.bBlockingHit) {
+				con->SetPlayerControlledLocation(Hit.ImpactPoint);
+			}
+		}
+	}
 }
 
 void AMech_RPGPlayerController::AltPressed() {
-
+	altPressed = true;
 }
 
 void AMech_RPGPlayerController::AltReleased() {
-
+	altPressed = false;
 }
 
 void AMech_RPGPlayerController::CtrlPressed() {
-
+	ctrlPressed = true;
 }
 
 void AMech_RPGPlayerController::CtrlReleased() {
-
+	ctrlPressed = false;
 }
 
 void AMech_RPGPlayerController::ShiftPressed() {
-
+	shiftPressed = true;
 }
 
 void AMech_RPGPlayerController::ShiftReleased() {
-
+	shiftPressed = false;
 }

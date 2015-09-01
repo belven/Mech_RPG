@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Mech_RPG.h"
 #include "AllyAIController.h"
 #include "Mech_RPGCharacter.h"
@@ -7,7 +5,6 @@
 #include "AI/Navigation/NavigationSystem.h"
 
 void AAllyAIController::Tick(float DeltaTime) {
-
 	if (GetOwner() && GetOwner()->GetDemandedController() == NULL) {
 		if (GetOwner()->IsDead()) {
 			UnPossess();
@@ -49,7 +46,6 @@ void AAllyAIController::BeginPlay() {
 FVector AAllyAIController::GetPlayerControlledLocation() {
 	return playerControlledLocation;
 }
-
 
 void AAllyAIController::SetPlayerControlledLocation(FVector newVal) {
 	playerControlledLocation = newVal;
