@@ -17,29 +17,39 @@ private:
 public:
 	AMech_RPGPlayerController();
 	AMech_RPGCharacter* GetOwner();
+
 	void SetOwner(AMech_RPGCharacter* newVal);
 	AMech_RPGCharacter* GetTargetUnderCursor();
+
 	bool IsTargetValid();
+
 	void DemandSwapCharacter(int index);
 	FHitResult GetHitFromCursor();
+
 	void CharacterFour();
 	void CharacterOne();
 	void CharacterThree();
 	void CharacterTwo();
+
 	void SwapWeapons();
 	void ActivateAbility();
 	void PlayerDied();
 	void SwapCharacter();
 	bool IsOwnerValid();
+
 	void AllyAbility(int index);
 	void AllyAttack(int index);
 	void AllyMove(int index);
+
 	void AltPressed();
 	void AltReleased();
+
 	void CtrlPressed();
 	void CtrlReleased();
+
 	void ShiftPressed();
 	void ShiftReleased();
+
 	void PerformAllyCommand(int index);
 
 protected:

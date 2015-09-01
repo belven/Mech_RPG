@@ -70,12 +70,23 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 				weapon->Tick(DeltaTime);
 			}
 		}
+
+		if (GetHealth() < GetMaxHealth()) {
+			health += healthRegen * DeltaTime;
+
+			if (GetHealth() > GetMaxHealth()) {
+				health = GetMaxHealth();
+			}
+		}
 	}
 }
 
 void AMech_RPGCharacter::BeginPlay() {
 	SetHealth(1000);
+	SetMaxHealth(1000);
 	SetGroup(NULL);
+
+	SetHealthRegen(10.0);
 
 	weapons = *new TArray<AWeapon*>();
 
@@ -115,7 +126,6 @@ void AMech_RPGCharacter::SwapWeapon() {
 }
 
 void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage) {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "Damage taken: " + FString::SanitizeFloat(damage));
 	health -= damage;
 
 	if (health <= 0) {
@@ -217,4 +227,20 @@ USphereComponent* AMech_RPGCharacter::GetAOE() {
 
 void AMech_RPGCharacter::SetAOE(USphereComponent* newVal) {
 	aoe = newVal;
+}
+
+float AMech_RPGCharacter::GetHealthRegen(){
+	return healthRegen;
+}
+
+void AMech_RPGCharacter::SetHealthRegen(float newVal){
+	healthRegen = newVal;
+}
+
+float AMech_RPGCharacter::GetMaxHealth(){
+	return maxHealth;
+}
+
+void AMech_RPGCharacter::SetMaxHealth(float newVal){
+	maxHealth = newVal;
 }

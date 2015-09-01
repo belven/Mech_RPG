@@ -33,6 +33,7 @@ AWeapon* AWeapon::CreateWeapon(AActor* owner, float damage, float range, float f
 		weapon->SetFireRate(fireRate);
 		weapon->canFire = true;
 		weapon->AttachRootComponentToActor(owner);
+		weapon->lastTime = 0;
 		return weapon;
 	}
 	return NULL;
@@ -55,7 +56,6 @@ void AWeapon::SetFireRate(float newVal){
 
 void AWeapon::Tick(float DeltaTime){
 	if (!canFire) {
-		static float lastTime = 0;
 		lastTime += DeltaTime;
 
 		if (lastTime >= fireRate){

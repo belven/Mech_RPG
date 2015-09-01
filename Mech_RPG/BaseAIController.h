@@ -8,7 +8,7 @@
 class AMech_RPGCharacter;
 
 UCLASS()
-class ABaseAIController : public AAIController {
+class MECH_RPG_API ABaseAIController : public AAIController {
 	GENERATED_BODY()
 
 private:

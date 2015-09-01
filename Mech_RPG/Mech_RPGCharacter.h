@@ -36,6 +36,8 @@ private:
 	AController* demandedController;
 	TArray<UAbility*> abilities;
 	USphereComponent* aoe;
+	float healthRegen;
+	float maxHealth;
 public:
 	AMech_RPGCharacter();
 
@@ -66,10 +68,10 @@ public:
 		void SetDead(bool newVal);
 
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		void AddWeapon(AWeapon* newWeapon);
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		TArray<AWeapon*> GetWeapons();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
@@ -82,19 +84,26 @@ public:
 		void SetCurrentWeapon(AWeapon* newVal);
 
 
-	UFUNCTION(BlueprintCallable, Category = "Group")
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		UGroup* GetGroup();
 
-	UFUNCTION(BlueprintCallable, Category = "Group")
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		void SetGroup(UGroup* newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "ID")
+	UFUNCTION(BlueprintCallable, Category = "Group")
 		int32 GetID();
 
-	UFUNCTION(BlueprintCallable, Category = "ID")
+	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetID(int32 newVal);
 
+	UFUNCTION(BlueprintCallable, Category = "ID")
+		float GetHealthRegen();
+
+	UFUNCTION(BlueprintCallable, Category = "ID")
+		void SetHealthRegen(float newVal);
+
 	bool CompareGroup(UGroup* inGroup);
+
 	bool CompareGroup(AMech_RPGCharacter* inCharacter);
 
 	AController* GetDemandedController();
@@ -109,5 +118,7 @@ public:
 
 	USphereComponent* GetAOE();
 	void SetAOE(USphereComponent* newVal);
+	float GetMaxHealth();
+	void SetMaxHealth(float newVal);
 };
 

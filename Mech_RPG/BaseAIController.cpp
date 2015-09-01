@@ -34,7 +34,7 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 
 	AWeapon* weapon = owner->GetCurrentWeapon();
 
-	if (weapon) {
+	if (weapon != NULL) {
 		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
 		if (dist <= weapon->GetRange()) {
@@ -47,12 +47,15 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 			GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, target->GetActorLocation());
 		}
 	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Weapon NULL"));
+	}
 }
 
 void ABaseAIController::FindTarget() {
 	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 		APawn* pawn = iter->Get();
-		if (pawn && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= GetOwner()->GetAOE()->GetUnscaledSphereRadius()) {
+		if (pawn != NULL && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= GetOwner()->GetAOE()->GetUnscaledSphereRadius()) {
 			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 			if (!character->IsDead() && !character->CompareGroup(GetOwner())) {
 				SetTarget(character);
@@ -106,7 +109,7 @@ AMech_RPGCharacter* ABaseAIController::GetTarget() {
 }
 
 bool ABaseAIController::IsTargetValid() {
-	return target && !target->IsDead() && !target->CompareGroup(owner);
+	return target != NULL && !target->IsDead() && !target->CompareGroup(owner);
 }
 
 void ABaseAIController::SetOwner(AMech_RPGCharacter* newVal) {

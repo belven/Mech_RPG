@@ -17,6 +17,7 @@ private:
 	float range;	
 	float fireRate;
 	bool canFire;
+	float lastTime;
 
 public:
 	float GetDamage();

@@ -31,7 +31,7 @@ void AAllyAIController::Tick(float DeltaTime) {
 				AttackTarget(DeltaTime);
 			}
 			else {
-				if (GetOwner()->GetGroup()->GetPlayer()) {
+				if (GetOwner()->GetGroup()->GetPlayer() && GetOwner()->GetGroup()->GetPlayer()->GetDistanceTo(GetOwner()) > 400) {
 					GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, GetOwner()->GetGroup()->GetPlayer());
 				}
 			}

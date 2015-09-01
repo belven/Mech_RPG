@@ -67,12 +67,13 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 	AWeapon* weapon = owner->GetCurrentWeapon();
 
-	if (weapon) {
+	if (weapon != NULL) {
 		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
 		if (dist <= weapon->GetRange()) {
 			if (weapon->CanFire()) {
 				weapon->Fire(target, GetOwner());
+				UE_LOG(LogTemp, Log, TEXT(" Player Attacked Bot"));
 			}
 			StopMovement();
 		}
@@ -171,7 +172,7 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 		static AActor* targetFound;
 		targetFound = Hit.GetActor();
 
-		if (targetFound
+		if (targetFound != NULL
 			&& targetFound != owner
 			&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
 			target = Cast<AMech_RPGCharacter>(targetFound);
@@ -188,16 +189,16 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 }
 
 bool AMech_RPGPlayerController::IsTargetValid() {
-	return target && !target->IsDead() && !target->CompareGroup(owner);
+	return target != NULL && !target->IsDead() && !target->CompareGroup(owner);
 }
 
 void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 	// Do we have an owner
-	if (GetOwner()) {
+	if (GetOwner() != NULL) {
 		UGroup* group = GetOwner()->GetGroup();
 
 		// Does the owner have a group and is there more than 1 other person
-		if (group && group->GetMembers().Num() > 1) {
+		if (group != NULL &&  group->GetMembers().Num() > 1) {
 
 			// Does the character we want to swawp to exist
 			if (group->GetMembers().Num() > index - 1) {
@@ -298,14 +299,14 @@ void AMech_RPGPlayerController::SwapCharacter() {
 	GetOwner()->SetDemandedController(NULL);
 	other->SetDemandedController(NULL);
 
-	if (con) {
+	if (con != NULL) {
 		con->Possess(GetOwner());
 		Possess(other);
 	}
 }
 
 bool AMech_RPGPlayerController::IsOwnerValid() {
-	return GetOwner() && !GetOwner()->IsDead();
+	return GetOwner() != NULL && !GetOwner()->IsDead();
 }
 
 void AMech_RPGPlayerController::AllyAbility(int index) {
@@ -316,7 +317,7 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 	static FHitResult Hit;
 	UGroup* group = GetOwner()->GetGroup();
 
-	if (group) {
+	if (group != NULL) {
 		AMech_RPGCharacter* character = group->GetMember(index);
 		if (!character->IsDead() && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
@@ -327,7 +328,7 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 				static AActor* targetFound;
 				targetFound = Hit.GetActor();
 
-				if (targetFound
+				if (targetFound != NULL
 					&& targetFound != owner
 					&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
 					AMech_RPGCharacter*	tempTarget = Cast<AMech_RPGCharacter>(targetFound);
@@ -344,7 +345,7 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 
 void AMech_RPGPlayerController::AllyMove(int index) {
 	UGroup* group = GetOwner()->GetGroup();
-	if (group) {
+	if (group != NULL) {
 		AMech_RPGCharacter* character = group->GetMember(index);
 		if (!character->IsDead() && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
