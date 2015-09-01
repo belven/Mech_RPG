@@ -49,7 +49,7 @@ AMech_RPGCharacter* UGroup::GetMember(int index) {
 }
 
 AMech_RPGCharacter* UGroup::GetPlayer() {
-	if (members.Num() > 0) {
+	if (&members != NULL && members.Num() > 0) {
 		for (AMech_RPGCharacter* character : members) {
 			if (character != NULL && character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
 				return character;

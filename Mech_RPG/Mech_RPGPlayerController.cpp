@@ -198,7 +198,7 @@ void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 		UGroup* group = GetOwner()->GetGroup();
 
 		// Does the owner have a group and is there more than 1 other person
-		if (group != NULL &&  group->GetMembers().Num() > 1) {
+		if (group != NULL && &group->GetMembers() != NULL && group->GetMembers().Num() > 1) {
 
 			// Does the character we want to swawp to exist
 			if (group->GetMembers().Num() > index - 1) {
