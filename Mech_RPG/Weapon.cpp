@@ -32,6 +32,7 @@ AWeapon* AWeapon::CreateWeapon(AActor* owner, float damage, float range, float f
 		weapon->SetRange(range);
 		weapon->SetFireRate(fireRate);
 		weapon->canFire = true;
+		weapon->AttachRootComponentToActor(owner);
 		return weapon;
 	}
 	return NULL;

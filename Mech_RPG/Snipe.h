@@ -15,5 +15,5 @@ class MECH_RPG_API USnipe : public UAbility
 public:
 	void Activate(class AMech_RPGCharacter* owner, AMech_RPGCharacter* target, FVector targetLocation) override;
 
-	static USnipe* CreateAbility(UClass* classType);
+	static USnipe* CreateAbility(float cooldown);
 };

@@ -29,4 +29,6 @@ public:
 	void AddMemeber(AMech_RPGCharacter* memberToAdd);
 	void RemoveMember(AMech_RPGCharacter* memberToRemove);
 	bool Compare(UGroup* inGroup);
+	AMech_RPGCharacter* GetMember(int index);
+	AMech_RPGCharacter* GetPlayer();
 };

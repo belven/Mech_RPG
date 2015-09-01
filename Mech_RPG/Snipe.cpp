@@ -8,3 +8,9 @@ void USnipe::Activate(AMech_RPGCharacter* owner, AMech_RPGCharacter* target, FVe
 		SetOnCooldown(owner->GetWorld());
 	}
 }
+
+USnipe* USnipe::CreateAbility(float cooldown) {
+	USnipe* ability = NewObject<USnipe>(StaticClass());
+	ability->SetCooldown(cooldown);
+	return ability;
+}

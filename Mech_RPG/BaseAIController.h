@@ -4,15 +4,14 @@
 
 #include "AIController.h"
 #include "BaseAIController.generated.h"
-  
+
 class AMech_RPGCharacter;
 
 UCLASS()
-class MECH_RPG_API ABaseAIController : public AAIController
-{
+class ABaseAIController : public AAIController {
 	GENERATED_BODY()
-	
-private:	
+
+private:
 	AMech_RPGCharacter* owner;
 	AMech_RPGCharacter* target;
 
@@ -28,4 +27,11 @@ public:
 
 	void SetOwner(AMech_RPGCharacter* newVal);
 	void SetTarget(AMech_RPGCharacter* newVal);
+
+	UFUNCTION()
+		void OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 };

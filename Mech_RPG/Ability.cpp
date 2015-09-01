@@ -4,27 +4,23 @@
 #include "Ability.h"
 #include "Mech_RPGCharacter.h"
 
-void UAbility::SetOnCooldown(UWorld* const World){
+void UAbility::SetOnCooldown(UWorld* const World) {
 	onCooldown = true;
-	World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &UAbility::ResetOnCooldown, GetCooldown() > 0 ? GetCooldown() : 0.2);
+	World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &UAbility::ResetOnCooldown, GetCooldown());
 }
 
-float UAbility::GetCooldown(){
+float UAbility::GetCooldown() {
 	return cooldown;
 }
 
-bool UAbility::OnCooldown(){
+bool UAbility::OnCooldown() {
 	return onCooldown;
 }
 
-void UAbility::SetCooldown(float newCooldown){
+void UAbility::SetCooldown(float newCooldown) {
 	cooldown = newCooldown;
 }
 
-void UAbility::ResetOnCooldown(){
+void UAbility::ResetOnCooldown() {
 	onCooldown = false;
-}
-
-UAbility* UAbility::CreateAbility(UClass* classType){
-	return ConstructObject<UAbility>(classType);
 }

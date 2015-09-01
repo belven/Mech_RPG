@@ -5,12 +5,14 @@
 class AMech_RPGCharacter;
 
 UCLASS()
-class AMech_RPGPlayerController : public APlayerController
-{
+class AMech_RPGPlayerController : public APlayerController {
 	GENERATED_BODY()
 private:
 	class AMech_RPGCharacter* owner;
 	bool swapWeapons;
+	bool altPressed;
+	bool ctrlPressed;
+	bool shiftPressed;
 
 public:
 	AMech_RPGPlayerController();
@@ -29,6 +31,15 @@ public:
 	void PlayerDied();
 	void SwapCharacter();
 	bool IsOwnerValid();
+	void AllyAbility(int index);
+	void AllyAttack(int index);
+	void AllyMove(int index);
+	void AltPressed();
+	void AltReleased();
+	void CtrlPressed();
+	void CtrlReleased();
+	void ShiftPressed();
+	void ShiftReleased();
 
 protected:
 	/**
