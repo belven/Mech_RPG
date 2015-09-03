@@ -13,13 +13,13 @@ class AMech_RPGCharacter : public ACharacter {
 	GENERATED_BODY()
 private:
 	/**
-	 * Top down camera
+	 * Camera boom positioning the camera above the character
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* TopDownCameraComponent;
 
 	/**
-	 * Camera boom positioning the camera above the character
+	 * Top down camera
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -27,7 +27,14 @@ private:
 	bool isDead;
 	float energy;
 	float health;
+	float healthRegen;
+	float maxHealth;
+	float damageModifier;
+	float defenceModifier;
+
 	int32 id;
+	int32 canAttack;
+	int32 canMove;
 
 	TArray<AWeapon*> weapons;
 	AWeapon* currentWeapon;
@@ -36,8 +43,6 @@ private:
 	AController* demandedController;
 	TArray<UAbility*> abilities;
 	USphereComponent* aoe;
-	float healthRegen;
-	float maxHealth;
 public:
 	AMech_RPGCharacter();
 
@@ -47,59 +52,59 @@ public:
 	virtual	void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable , Category  = "ID")
 		float GetEnergy();
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable , Category  = "ID")
 		float GetHealth();
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable , Category  = "Group")
 		void SetEnergy(float newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable , Category  = "Group")
 		void SetHealth(float newVal);
 
 	void Hit(AMech_RPGCharacter* other, float damage);
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable , Category  = "Weapons")
 		bool IsDead();
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable , Category  = "Weapons")
 		void SetDead(bool newVal);
 
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable , Category  = "Weapons")
 		void AddWeapon(AWeapon* newWeapon);
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable , Category  = "Weapons")
 		TArray<AWeapon*> GetWeapons();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		void SetWeapons(TArray<AWeapon*> newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable , Category  = "Health")
 		AWeapon* GetCurrentWeapon();
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable , Category  = "Health")
 		void SetCurrentWeapon(AWeapon* newVal);
 
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable , Category  = "Health")
 		UGroup* GetGroup();
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable , Category  = "Health")
 		void SetGroup(UGroup* newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "Group")
+	UFUNCTION(BlueprintCallable , Category  = "Health")
 		int32 GetID();
 
-	UFUNCTION(BlueprintCallable, Category = "Group")
+	UFUNCTION(BlueprintCallable , Category  = "Health")
 		void SetID(int32 newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "ID")
+	UFUNCTION(BlueprintCallable , Category  = "Health")
 		float GetHealthRegen();
 
-	UFUNCTION(BlueprintCallable, Category = "ID")
+	UFUNCTION(BlueprintCallable , Category  = "Health")
 		void SetHealthRegen(float newVal);
 
 	bool CompareGroup(UGroup* inGroup);
@@ -118,7 +123,20 @@ public:
 
 	USphereComponent* GetAOE();
 	void SetAOE(USphereComponent* newVal);
+
 	float GetMaxHealth();
 	void SetMaxHealth(float newVal);
+
+	bool CanAttack();
+	bool CanMove();
+
+	float GetDamageModifier();
+	float GetDefenceModifier();
+
+	void SetCanAttack(int32 newVal);
+	void SetCanMove(int32 newVal);
+
+	void SetDamageModifier(float newVal);
+	void SetDefenceModifier(float newVal);
 };
 

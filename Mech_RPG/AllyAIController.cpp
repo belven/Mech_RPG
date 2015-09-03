@@ -11,7 +11,7 @@ void AAllyAIController::Tick(float DeltaTime) {
 			GetOwner()->Destroy(true);
 		}
 		else if (GetPlayerControlledLocation() != FVector::ZeroVector) {
-			if (GetOwner()->GetActorLocation() != GetPlayerControlledLocation()) {
+			if (FVector::Dist(GetPlayerControlledLocation(), GetOwner()->GetActorLocation()) > 200) {
 				GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, GetPlayerControlledLocation());
 			}
 			else {
@@ -31,8 +31,12 @@ void AAllyAIController::Tick(float DeltaTime) {
 				AttackTarget(DeltaTime);
 			}
 			else {
-				if (GetOwner()->GetGroup()->GetPlayer() && GetOwner()->GetGroup()->GetPlayer()->GetDistanceTo(GetOwner()) > 400) {
-					GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, GetOwner()->GetGroup()->GetPlayer());
+				AMech_RPGCharacter* player = GetOwner()->GetGroup()->GetPlayer();
+				if (player != NULL && player->GetDistanceTo(GetOwner()) > 400) {
+					GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, player);
+				}
+				else {
+					StopMovement();
 				}
 			}
 		}
@@ -52,11 +56,22 @@ void AAllyAIController::SetPlayerControlledLocation(FVector newVal) {
 }
 
 void AAllyAIController::FindTargetInWeaponRage() {
-	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
-		APawn* pawn = iter->Get();
-		if (pawn && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= GetOwner()->GetCurrentWeapon()->GetRange()) {
-			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-			if (!character->IsDead() && !character->CompareGroup(GetOwner())) {
+	if (!GetOwner()->GetCurrentWeapon()->Heals()) {
+		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
+			APawn* pawn = iter->Get();
+			if (pawn != NULL && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= GetOwner()->GetCurrentWeapon()->GetRange()) {
+				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
+
+				if (!character->IsDead() && !character->CompareGroup(GetOwner())) {
+					SetTarget(character);
+					break;
+				}
+			}
+		}
+	}
+	else {
+		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
+			if (!character->IsDead() && character->GetHealth() < character->GetMaxHealth()) {
 				SetTarget(character);
 				break;
 			}

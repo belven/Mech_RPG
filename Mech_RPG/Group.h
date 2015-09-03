@@ -14,15 +14,15 @@ class MECH_RPG_API UGroup : public UObject
 	GENERATED_BODY()
 private:
 	int32 id;
-	TArray<AMech_RPGCharacter*>& members = *new TArray<AMech_RPGCharacter*>();
+	TArray<AMech_RPGCharacter*> members = *new TArray<AMech_RPGCharacter*>();
 
 public:
 	UGroup();
 	UFUNCTION(BlueprintCallable, Category = "Group")
 	static UGroup* CreateGroup(int32 inID, TArray<AMech_RPGCharacter*> inMemebrs);
 
-	TArray<AMech_RPGCharacter*>& GetMembers();
-	void SetMembers(TArray<AMech_RPGCharacter*>& newVal);
+	TArray<AMech_RPGCharacter*> GetMembers();
+	void SetMembers(TArray<AMech_RPGCharacter*> newVal);
 
 	void SetID(int32 newVal);
 	int32 GetID();

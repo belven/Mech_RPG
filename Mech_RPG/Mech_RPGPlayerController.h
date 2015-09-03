@@ -17,14 +17,14 @@ private:
 public:
 	AMech_RPGPlayerController();
 	AMech_RPGCharacter* GetOwner();
-
 	void SetOwner(AMech_RPGCharacter* newVal);
+
 	AMech_RPGCharacter* GetTargetUnderCursor();
+	FHitResult GetHitFromCursor();
 
 	bool IsTargetValid();
 
 	void DemandSwapCharacter(int index);
-	FHitResult GetHitFromCursor();
 
 	void CharacterFour();
 	void CharacterOne();

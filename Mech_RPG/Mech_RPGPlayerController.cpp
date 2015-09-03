@@ -36,10 +36,11 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			}
 
 			if (IsTargetValid() && bAttackTarget) {
+				CurrentMouseCursor = EMouseCursor::Crosshairs;
 				AttackTarget(DeltaTime);
 			}
 			else {
-				GetTargetUnderCursor();
+				target = GetTargetUnderCursor();
 
 				if (IsTargetValid()) {
 					CurrentMouseCursor = EMouseCursor::Crosshairs;
@@ -73,7 +74,6 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 		if (dist <= weapon->GetRange()) {
 			if (weapon->CanFire()) {
 				weapon->Fire(target, GetOwner());
-				UE_LOG(LogTemp, Log, TEXT(" Player Attacked Bot"));
 			}
 			StopMovement();
 		}
@@ -175,21 +175,25 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 		if (targetFound != NULL
 			&& targetFound != owner
 			&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
-			target = Cast<AMech_RPGCharacter>(targetFound);
-
-			if (!IsTargetValid()) {
-				target = NULL;
-				CurrentMouseCursor = EMouseCursor::Hand;
-			}
-
-			return target;
+			return Cast<AMech_RPGCharacter>(targetFound);
 		}
 	}
 	return NULL;
 }
 
 bool AMech_RPGPlayerController::IsTargetValid() {
-	return target != NULL && !target->IsDead() && !target->CompareGroup(owner);
+	if (target != NULL && !target->IsDead()) {
+		if (GetOwner()->GetCurrentWeapon()) {
+			if (GetOwner()->GetCurrentWeapon()->Heals()) {
+				return target->CompareGroup(owner) && target->GetHealth() < target->GetMaxHealth();
+			}
+			else {
+				return !target->CompareGroup(owner);
+			}
+		}
+		return false;
+	}
+	return false;
 }
 
 void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
@@ -198,7 +202,7 @@ void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 		UGroup* group = GetOwner()->GetGroup();
 
 		// Does the owner have a group and is there more than 1 other person
-		if (group != NULL && &group->GetMembers() != NULL && group->GetMembers().Num() > 1) {
+		if (group != NULL && group->GetMembers().Num() > 1) {
 
 			// Does the character we want to swawp to exist
 			if (group->GetMembers().Num() > index - 1) {
@@ -230,23 +234,19 @@ void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
 }
 
 void AMech_RPGPlayerController::CharacterFour() {
-	int index = 4;
-	PerformAllyCommand(index);
+	PerformAllyCommand(4);
 }
 
 void AMech_RPGPlayerController::CharacterOne() {
-	int index = 1;
-	PerformAllyCommand(index);
+	PerformAllyCommand(1);
 }
 
 void AMech_RPGPlayerController::CharacterThree() {
-	int index = 3;
-	PerformAllyCommand(index);
+	PerformAllyCommand(3);
 }
 
 void AMech_RPGPlayerController::CharacterTwo() {
-	int index = 2;
-	PerformAllyCommand(index);
+	PerformAllyCommand(2);
 }
 
 void AMech_RPGPlayerController::PerformAllyCommand(int index) {
@@ -262,7 +262,6 @@ void AMech_RPGPlayerController::PerformAllyCommand(int index) {
 	else {
 		DemandSwapCharacter(index);
 	}
-
 }
 
 void AMech_RPGPlayerController::SwapWeapons() {
@@ -321,23 +320,12 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 		AMech_RPGCharacter* character = group->GetMember(index);
 		if (!character->IsDead() && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
-			
-			Hit = GetHitFromCursor();
 
-			if (Hit.bBlockingHit) {
-				static AActor* targetFound;
-				targetFound = Hit.GetActor();
+			AMech_RPGCharacter*	tempTarget = GetTargetUnderCursor();
 
-				if (targetFound != NULL
-					&& targetFound != owner
-					&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
-					AMech_RPGCharacter*	tempTarget = Cast<AMech_RPGCharacter>(targetFound);
-
-					if (tempTarget && !tempTarget->IsDead() && !tempTarget->CompareGroup(owner)) {
-						con->SetPlayerControlledLocation(FVector::ZeroVector);
-						con->SetTarget(tempTarget);
-					}
-				}
+			if (tempTarget && !tempTarget->IsDead() && !tempTarget->CompareGroup(owner)) {
+				con->SetPlayerControlledLocation(FVector::ZeroVector);
+				con->SetTarget(tempTarget);
 			}
 		}
 	}

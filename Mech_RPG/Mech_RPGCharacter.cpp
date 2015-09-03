@@ -39,7 +39,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	aoe->SetSphereRadius(1000);
 	aoe->SetWorldLocation(GetActorLocation());
 
-	static int ID = 0;
+	static int32 ID = 0;
 
 	SetID(ID++);
 }
@@ -92,7 +92,7 @@ void AMech_RPGCharacter::BeginPlay() {
 
 	if (startingGroupID == 0) {
 		AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 20, 500, 0.3));
-		AddWeapon(AWeapon::CreateWeapon(this, 300, 2000, 0.3));
+		AddWeapon(AWeapon::CreateWeapon(this, 100, 2000, 4, true));
 	}
 	else {
 		AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 10, 500, 0.5));
@@ -198,11 +198,11 @@ void AMech_RPGCharacter::SetID(int32 newVal) {
 }
 
 bool AMech_RPGCharacter::CompareGroup(UGroup* inGroup) {
-	return GetGroup()->Compare(inGroup);
+	return GetGroup() != NULL ? GetGroup()->Compare(inGroup) : true;
 }
 
 bool AMech_RPGCharacter::CompareGroup(AMech_RPGCharacter* inCharacter) {
-	return CompareGroup(inCharacter->GetGroup());
+	return inCharacter != NULL &&  inCharacter->GetGroup() != NULL ? CompareGroup(inCharacter->GetGroup()) : true;
 }
 
 AController* AMech_RPGCharacter::GetDemandedController() {
@@ -229,18 +229,50 @@ void AMech_RPGCharacter::SetAOE(USphereComponent* newVal) {
 	aoe = newVal;
 }
 
-float AMech_RPGCharacter::GetHealthRegen(){
+float AMech_RPGCharacter::GetHealthRegen() {
 	return healthRegen;
 }
 
-void AMech_RPGCharacter::SetHealthRegen(float newVal){
+void AMech_RPGCharacter::SetHealthRegen(float newVal) {
 	healthRegen = newVal;
 }
 
-float AMech_RPGCharacter::GetMaxHealth(){
+float AMech_RPGCharacter::GetMaxHealth() {
 	return maxHealth;
 }
 
-void AMech_RPGCharacter::SetMaxHealth(float newVal){
+void AMech_RPGCharacter::SetMaxHealth(float newVal) {
 	maxHealth = newVal;
+}
+
+bool AMech_RPGCharacter::CanAttack() {
+	return canAttack == 0;
+}
+
+bool AMech_RPGCharacter::CanMove() {
+	return canMove == 0;
+}
+
+float AMech_RPGCharacter::GetDamageModifier() {
+	return damageModifier;
+}
+
+float AMech_RPGCharacter::GetDefenceModifier() {
+	return defenceModifier;
+}
+
+void AMech_RPGCharacter::SetCanAttack(int32 newVal) {
+	canAttack = newVal;
+}
+
+void AMech_RPGCharacter::SetCanMove(int32 newVal) {
+	canMove = newVal;
+}
+
+void AMech_RPGCharacter::SetDamageModifier(float newVal) {
+	damageModifier = newVal;
+}
+
+void AMech_RPGCharacter::SetDefenceModifier(float newVal) {
+	defenceModifier = newVal;
 }

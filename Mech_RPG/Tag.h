@@ -5,13 +5,12 @@
 #include "Tag.generated.h"
 
 USTRUCT(BlueprintType)
-struct FTag
-{
+struct FTag {
 	GENERATED_USTRUCT_BODY()
 public:
-	UPROPERTY(EditAnywhere prm1, BlueprintReadWrite prm2, Category prm3 = "Tag");
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tag")
 		FString name;
 
-	UPROPERTY(EditAnywhere prm1, BlueprintReadWrite prm2, Category prm3 = "Name");
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Name")
 		float value;
 };

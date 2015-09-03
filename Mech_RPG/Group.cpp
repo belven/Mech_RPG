@@ -20,7 +20,7 @@ int32 UGroup::GetID() {
 	return id;
 }
 
-TArray<AMech_RPGCharacter*>& UGroup::GetMembers() {
+TArray<AMech_RPGCharacter*> UGroup::GetMembers() {
 	return members;
 }
 
@@ -28,7 +28,7 @@ void UGroup::SetID(int32 newVal) {
 	id = newVal;
 }
 
-void UGroup::SetMembers(TArray<AMech_RPGCharacter*>& newVal) {
+void UGroup::SetMembers(TArray<AMech_RPGCharacter*> newVal) {
 	members = newVal;
 }
 
@@ -49,7 +49,7 @@ AMech_RPGCharacter* UGroup::GetMember(int index) {
 }
 
 AMech_RPGCharacter* UGroup::GetPlayer() {
-	if (&members != NULL && members.Num() > 0) {
+	if (members.Num() > 0) {
 		for (AMech_RPGCharacter* character : members) {
 			if (character != NULL && character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
 				return character;

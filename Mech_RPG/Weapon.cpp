@@ -24,8 +24,7 @@ bool AWeapon::CanFire() {
 	return canFire;
 }
 
-
-AWeapon* AWeapon::CreateWeapon(AActor* owner, float damage, float range, float fireRate){
+AWeapon* AWeapon::CreateWeapon(AActor* owner, float damage, float range, float fireRate, bool heals){
 	if (owner && owner->GetWorld()){
 		AWeapon* weapon = owner->GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass());
 		weapon->SetDamage(damage);
@@ -34,13 +33,14 @@ AWeapon* AWeapon::CreateWeapon(AActor* owner, float damage, float range, float f
 		weapon->canFire = true;
 		weapon->AttachRootComponentToActor(owner);
 		weapon->lastTime = 0;
+		weapon->SetHeals(heals);
 		return weapon;
 	}
 	return NULL;
 }
 
 void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
-	target->Hit(owner, GetDamage());
+	target->Hit(owner, heals ? -GetDamage() : GetDamage());
 	canFire = false;
 }
 
@@ -53,7 +53,6 @@ void AWeapon::SetFireRate(float newVal){
 	fireRate = newVal;
 }
 
-
 void AWeapon::Tick(float DeltaTime){
 	if (!canFire) {
 		lastTime += DeltaTime;
@@ -63,4 +62,12 @@ void AWeapon::Tick(float DeltaTime){
 			canFire = true;
 		}
 	}
+}
+
+bool AWeapon::Heals(){
+	return heals;
+}
+
+void AWeapon::SetHeals(bool newVal){
+	heals = newVal;
 }

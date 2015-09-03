@@ -18,6 +18,7 @@ private:
 	float fireRate;
 	bool canFire;
 	float lastTime;
+	bool heals;
 
 public:
 	float GetDamage();
@@ -29,10 +30,12 @@ public:
 	bool CanFire();
 	void Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner);
 
-	static AWeapon* CreateWeapon(AActor* owner, float damage, float range, float fireRate);
+	static AWeapon* CreateWeapon(AActor* owner, float damage, float range, float fireRate, bool heals = false);
 
 	float GetFireRate();
 	void SetFireRate(float newVal);
 
 	void Tick(float DeltaTime);
+	bool Heals();
+	void SetHeals(bool newVal);
 };
