@@ -35,14 +35,14 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 				swapWeapons = false;
 			}
 
-			if (IsTargetValid() && bAttackTarget) {
+			if (IsTargetValid(target) && bAttackTarget) {
 				CurrentMouseCursor = EMouseCursor::Crosshairs;
 				AttackTarget(DeltaTime);
 			}
 			else {
 				target = GetTargetUnderCursor();
 
-				if (IsTargetValid()) {
+				if (IsTargetValid(target)) {
 					CurrentMouseCursor = EMouseCursor::Crosshairs;
 
 					if (bAttackTarget) {
@@ -173,7 +173,6 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 		targetFound = Hit.GetActor();
 
 		if (targetFound != NULL
-			&& targetFound != owner
 			&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
 			return Cast<AMech_RPGCharacter>(targetFound);
 		}
@@ -181,14 +180,14 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 	return NULL;
 }
 
-bool AMech_RPGPlayerController::IsTargetValid() {
-	if (target != NULL && !target->IsDead()) {
+bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
+	if (inTarget != NULL && !inTarget->IsDead()) {
 		if (GetOwner()->GetCurrentWeapon()) {
 			if (GetOwner()->GetCurrentWeapon()->Heals()) {
-				return target->CompareGroup(owner) && target->GetHealth() < target->GetMaxHealth();
+				return inTarget->CompareGroup(owner) && inTarget->GetHealth() < inTarget->GetMaxHealth();
 			}
 			else {
-				return !target->CompareGroup(owner);
+				return !inTarget->CompareGroup(owner);
 			}
 		}
 		return false;
@@ -288,7 +287,7 @@ void AMech_RPGPlayerController::PlayerDied() {
 	}
 
 	UnPossess();
-	GetOwner()->Destroy(true);
+	//GetOwner()->Destroy(true);
 }
 
 void AMech_RPGPlayerController::SwapCharacter() {
@@ -323,7 +322,7 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 
 			AMech_RPGCharacter*	tempTarget = GetTargetUnderCursor();
 
-			if (tempTarget && !tempTarget->IsDead() && !tempTarget->CompareGroup(owner)) {
+			if (IsTargetValid(tempTarget)) {
 				con->SetPlayerControlledLocation(FVector::ZeroVector);
 				con->SetTarget(tempTarget);
 			}

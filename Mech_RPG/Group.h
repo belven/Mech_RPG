@@ -1,5 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
+UENUM(BlueprintType)
+namespace GroupEnums {
+	enum Role {
+		DPS,
+		Healer,
+		Tank
+	};
+}
 #pragma once
 
 #include "Object.h"
@@ -14,12 +21,14 @@ class MECH_RPG_API UGroup : public UObject
 	GENERATED_BODY()
 private:
 	int32 id;
-	TArray<AMech_RPGCharacter*> members = *new TArray<AMech_RPGCharacter*>();
+
+	UPROPERTY()
+	TArray<AMech_RPGCharacter*> members;
 
 public:
 	UGroup();
 	UFUNCTION(BlueprintCallable, Category = "Group")
-	static UGroup* CreateGroup(int32 inID, TArray<AMech_RPGCharacter*> inMemebrs);
+	static UGroup* CreateGroup(int32 inID);
 
 	TArray<AMech_RPGCharacter*> GetMembers();
 	void SetMembers(TArray<AMech_RPGCharacter*> newVal);
@@ -30,6 +39,7 @@ public:
 	void AddMemeber(AMech_RPGCharacter* memberToAdd);
 	void RemoveMember(AMech_RPGCharacter* memberToRemove);
 	bool Compare(UGroup* inGroup);
+
 	AMech_RPGCharacter* GetMember(int index);
 	AMech_RPGCharacter* GetPlayer();
 };

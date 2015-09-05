@@ -48,7 +48,6 @@ float AWeapon::GetFireRate(){
 	return fireRate;
 }
 
-
 void AWeapon::SetFireRate(float newVal){
 	fireRate = newVal;
 }
@@ -70,4 +69,26 @@ bool AWeapon::Heals(){
 
 void AWeapon::SetHeals(bool newVal){
 	heals = newVal;
+}
+
+AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* owner, TEnumAsByte<WeaponEnums::WeaponType> type) {
+	switch (type) {
+	case WeaponEnums::SMG:
+		return CreateWeapon(owner, 20, 600, 0.3);
+		break;
+	case WeaponEnums::Bio_Repair:
+		return CreateWeapon(owner, 300, 1000, 2, true);
+		break;
+	case WeaponEnums::RPG:
+		return CreateWeapon(owner, 500, 1300, 2.5);
+		break;
+	case WeaponEnums::Shotgun:
+		return CreateWeapon(owner, 100, 300, 0.8);
+		break;
+	case WeaponEnums::Sniper:
+		return CreateWeapon(owner, 250, 2500, 2);
+		break;
+	}
+
+	return  NULL;
 }

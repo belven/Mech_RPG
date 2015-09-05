@@ -9,10 +9,9 @@ UGroup::UGroup()  {
 
 }
 
-UGroup* UGroup::CreateGroup(int32 inID, TArray<AMech_RPGCharacter*> inMemebrs) {
+UGroup* UGroup::CreateGroup(int32 inID) {
 	UGroup* newGroup = NewObject<UGroup>(UGroup::StaticClass());
 	newGroup->SetID(inID);
-	newGroup->SetMembers(inMemebrs);
 	return newGroup;
 }
 

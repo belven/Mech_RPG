@@ -22,7 +22,7 @@ public:
 	AMech_RPGCharacter* GetTargetUnderCursor();
 	FHitResult GetHitFromCursor();
 
-	bool IsTargetValid();
+	bool IsTargetValid(AMech_RPGCharacter* inTarget);
 
 	void DemandSwapCharacter(int index);
 

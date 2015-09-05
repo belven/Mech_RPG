@@ -7,6 +7,9 @@
 #include "BaseAIController.h"
 
 AMech_RPGCharacter::AMech_RPGCharacter() {
+	static int32 ID = 0;
+	SetID(ID++);
+
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -34,14 +37,13 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	aoe = CreateDefaultSubobject<USphereComponent>(TEXT("AOE"));
+	//aoe = CreateDefaultSubobject<USphereComponent>(TEXT("AOE"));
 	//aoe->AttachParent = RootComponent;
-	aoe->SetSphereRadius(1000);
-	aoe->SetWorldLocation(GetActorLocation());
+	//aoe->SetSphereRadius(1000);
+	//aoe->SetWorldLocation(GetActorLocation());
 
-	static int32 ID = 0;
+	startingRole = GroupEnums::DPS;
 
-	SetID(ID++);
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -82,27 +84,14 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 }
 
 void AMech_RPGCharacter::BeginPlay() {
+	CreatePresetRole(startingRole);
+	SetGroup(NULL);
 	SetHealth(1000);
 	SetMaxHealth(1000);
-	SetGroup(NULL);
-
 	SetHealthRegen(10.0);
 
-	weapons = *new TArray<AWeapon*>();
-
-	if (startingGroupID == 0) {
-		AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 20, 500, 0.3));
-		AddWeapon(AWeapon::CreateWeapon(this, 100, 2000, 4, true));
-	}
-	else {
-		AddWeapon(currentWeapon = AWeapon::CreateWeapon(this, 10, 500, 0.5));
-	}
-
-	abilities = *new TArray<UAbility*>();
-	abilities.Add(USnipe::CreateAbility(5.0F));
-
 	if (!GetGroup()) {
-		SetGroup(UGroup::CreateGroup(startingGroupID, *new TArray<AMech_RPGCharacter*>()));
+		SetGroup(UGroup::CreateGroup(startingGroupID));
 		GetGroup()->AddMemeber(this);
 
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
@@ -139,6 +128,33 @@ void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
 	if (newWeapon) {
 		weapons.Add(newWeapon);
 	}
+}
+
+void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> role) {
+	abilities.Empty();
+	weapons.Empty();
+
+	switch (role) {
+	case GroupEnums::DPS:
+		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
+		abilities.Add(USnipe::CreateAbility(15.0F));
+		break;
+
+	case GroupEnums::Healer:
+		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
+		break;
+
+	case GroupEnums::Tank:
+		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
+		break;
+
+	default:
+		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
+		abilities.Add(USnipe::CreateAbility(5.0F));
+		break;
+	}
+	currentWeapon = weapons[0];
+
 }
 
 float AMech_RPGCharacter::GetEnergy() {

@@ -1,6 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
+UENUM(BlueprintType)
+namespace WeaponEnums {
+	enum WeaponType {
+		Sniper,
+		Bio_Repair,
+		SMG,
+		Shotgun,
+		RPG
+	};
+}
+
 #pragma once
+
+
 
 #include "MechAttachment.h"
 #include "Weapon.generated.h"
@@ -38,4 +52,6 @@ public:
 	void Tick(float DeltaTime);
 	bool Heals();
 	void SetHeals(bool newVal);
+
+	static AWeapon* CreatePresetWeapon(AMech_RPGCharacter* owner, TEnumAsByte<WeaponEnums::WeaponType> type = WeaponEnums::SMG);
 };

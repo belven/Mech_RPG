@@ -11,7 +11,7 @@ void ABaseAIController::Tick(float DeltaTime) {
 	if (GetOwner() && GetOwner()->GetDemandedController() == NULL) {
 		if (GetOwner()->IsDead()) {
 			UnPossess();
-			GetOwner()->Destroy(true);
+			//GetOwner()->Destroy(true);
 		}
 		else {
 			if (!IsTargetValid()) {
@@ -27,12 +27,16 @@ void ABaseAIController::Tick(float DeltaTime) {
 
 void ABaseAIController::AttackTarget(float DeltaTime) {
 	AWeapon* weapon = owner->GetCurrentWeapon();
+	collision.AddIgnoredActor(GetOwner());
 
+	/*if (!collisionSet) {
+		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
+			collision.AddIgnoredActor(member);
+		}
+		collisionSet = true;
+	}
+	*/
 	if (weapon != NULL) {
-		static FHitResult hit;
-		FCollisionQueryParams collision;
-		collision.AddIgnoredActor(owner);
-
 		GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
 
 		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
@@ -53,10 +57,11 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 }
 
 void ABaseAIController::FindTarget() {
-	if (GetOwner()->GetCurrentWeapon() != NULL && !GetOwner()->GetCurrentWeapon()->Heals()) {
+	AWeapon* weapon = owner->GetCurrentWeapon();
+	if (weapon != NULL && !weapon->Heals()) {
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 			APawn* pawn = iter->Get();
-			if (pawn != NULL && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= GetOwner()->GetAOE()->GetUnscaledSphereRadius()) {
+			if (pawn != NULL && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= weapon->GetRange() * 1.3) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
 				if (!character->IsDead() && !character->CompareGroup(owner)) {
@@ -66,7 +71,7 @@ void ABaseAIController::FindTarget() {
 			}
 		}
 	}
-	else if (GetOwner()->GetCurrentWeapon() != NULL) {
+	else if (weapon != NULL) {
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
 			if (!character->IsDead() && character->GetHealth() < character->GetMaxHealth()) {
 				SetTarget(character);

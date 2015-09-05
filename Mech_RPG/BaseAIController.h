@@ -14,6 +14,9 @@ class MECH_RPG_API ABaseAIController : public AAIController {
 private:
 	AMech_RPGCharacter* owner;
 	AMech_RPGCharacter* target;
+	FCollisionQueryParams collision;
+	bool collisionSet = false;
+	FHitResult hit;
 
 	virtual void Tick(float DeltaTime) override;
 public:
