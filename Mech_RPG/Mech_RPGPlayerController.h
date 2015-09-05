@@ -51,6 +51,8 @@ public:
 	void ShiftReleased();
 
 	void PerformAllyCommand(int index);
+	AMech_RPGCharacter* GetTarget();
+	void SetTarget(AMech_RPGCharacter* newVal);
 
 protected:
 	/**

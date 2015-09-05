@@ -272,7 +272,7 @@ void AMech_RPGPlayerController::SwapWeapons() {
 void AMech_RPGPlayerController::ActivateAbility() {
 	if (IsOwnerValid() && GetOwner()->GetAbilities().Num() > 0) {
 		if (!GetOwner()->GetAbilities()[0]->OnCooldown()) {
-			GetOwner()->GetAbilities()[0]->Activate(GetOwner(), target);
+			GetOwner()->GetAbilities()[0]->Activate(target);
 		}
 	}
 }
@@ -369,4 +369,17 @@ void AMech_RPGPlayerController::ShiftPressed() {
 
 void AMech_RPGPlayerController::ShiftReleased() {
 	shiftPressed = false;
+}
+
+
+
+AMech_RPGCharacter* AMech_RPGPlayerController::GetTarget(){
+
+	return target;
+}
+
+
+void AMech_RPGPlayerController::SetTarget(AMech_RPGCharacter* newVal){
+
+	target = newVal;
 }

@@ -1,10 +1,13 @@
-
+#pragma once
 #include "Mech_RPG.h"
 #include "Mech_RPGCharacter.h"
+#include "Taunt.h"
+#include "Heal.h"
 #include "Snipe.h"
 #include "Engine.h"
 #include "Mech_RPGPlayerController.h"
 #include "BaseAIController.h"
+#include "DamageBoost.h"
 
 AMech_RPGCharacter::AMech_RPGCharacter() {
 	static int32 ID = 0;
@@ -43,7 +46,8 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	//aoe->SetWorldLocation(GetActorLocation());
 
 	startingRole = GroupEnums::DPS;
-
+	damageModifier = 1;
+	defenceModifier = 0;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -57,8 +61,6 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 		ABaseAIController* con = Cast<ABaseAIController>(NewController);
 		if (con) {
 			con->SetOwner(this);
-			//aoe->OnComponentBeginOverlap.AddDynamic(con, &ABaseAIController::OnOverlapBegin);
-			//aoe->OnComponentEndOverlap.AddDynamic(con, &ABaseAIController::OnOverlapEnd);
 		}
 	}
 
@@ -115,7 +117,7 @@ void AMech_RPGCharacter::SwapWeapon() {
 }
 
 void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage) {
-	health -= damage;
+	health -= damage * (1 - GetDefenceModifier());
 
 	if (health <= 0) {
 		isDead = true;
@@ -137,24 +139,35 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> role) {
 	switch (role) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(USnipe::CreateAbility(15.0F));
+		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 0.5));
 		break;
 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
+		abilities.Add(UHeal::CreateAbility(15.0F, this, 600));
 		break;
 
 	case GroupEnums::Tank:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
+		abilities.Add(UTaunt::CreateAbility(5.0F, this));
+		break;
+
+	case GroupEnums::Sniper:
+		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
+		abilities.Add(USnipe::CreateAbility(15.0F, this));
+		break;
+
+	case GroupEnums::RPG:
+		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
+		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 0.5));
 		break;
 
 	default:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(USnipe::CreateAbility(5.0F));
+		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 0.5));
 		break;
 	}
 	currentWeapon = weapons[0];
-
 }
 
 float AMech_RPGCharacter::GetEnergy() {

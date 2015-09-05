@@ -36,6 +36,13 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 		collisionSet = true;
 	}
 	*/
+
+	if (GetOwner()->startingGroupID == 0 && GetOwner()->GetAbilities().Num() > 0) {
+		if (!GetOwner()->GetAbilities()[0]->OnCooldown()) {
+			GetOwner()->GetAbilities()[0]->Activate(target);
+		}
+	}
+
 	if (weapon != NULL) {
 		GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
 

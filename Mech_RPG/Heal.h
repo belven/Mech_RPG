@@ -3,17 +3,20 @@
 #pragma once
 
 #include "Ability.h"
-#include "Snipe.generated.h"
+#include "Heal.generated.h"
 
 /**
- *
+ * 
  */
 UCLASS()
-class MECH_RPG_API USnipe : public UAbility
+class MECH_RPG_API UHeal : public UAbility
 {
 	GENERATED_BODY()
+private:
+	float healAmount;
+
 public:
 	void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
-
-	static USnipe* CreateAbility(float cooldown,class AMech_RPGCharacter* owner);
+	static UHeal* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inHealAmount);
+	
 };

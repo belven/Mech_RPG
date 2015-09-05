@@ -29,8 +29,6 @@ private:
 	float health;
 	float healthRegen;
 	float maxHealth;
-	float damageModifier;
-	float defenceModifier;
 
 	int32 id;
 	int32 canAttack;
@@ -41,16 +39,23 @@ private:
 
 	UGroup* group;
 	AController* demandedController;
+
 	TArray<UAbility*> abilities;
 	USphereComponent* aoe;
 public:
 	AMech_RPGCharacter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
-	TEnumAsByte<GroupEnums::Role> startingRole;
+		TEnumAsByte<GroupEnums::Role> startingRole;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
 		int32 startingGroupID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		float damageModifier;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		float defenceModifier;
 
 	virtual	void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;

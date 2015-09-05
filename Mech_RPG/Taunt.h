@@ -3,17 +3,18 @@
 #pragma once
 
 #include "Ability.h"
-#include "Snipe.generated.h"
+#include "Taunt.generated.h"
 
 /**
- *
+ * 
  */
 UCLASS()
-class MECH_RPG_API USnipe : public UAbility
+class MECH_RPG_API UTaunt : public UAbility
 {
 	GENERATED_BODY()
+	
 public:
 	void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
-
-	static USnipe* CreateAbility(float cooldown,class AMech_RPGCharacter* owner);
+	static UTaunt* CreateAbility(float cooldown, AMech_RPGCharacter* owner);
+	
 };

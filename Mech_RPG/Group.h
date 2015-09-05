@@ -4,7 +4,9 @@ namespace GroupEnums {
 	enum Role {
 		DPS,
 		Healer,
-		Tank
+		Tank,
+		Sniper,
+		RPG
 	};
 }
 #pragma once
