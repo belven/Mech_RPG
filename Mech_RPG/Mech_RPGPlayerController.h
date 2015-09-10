@@ -19,6 +19,8 @@ public:
 	AMech_RPGCharacter* GetOwner();
 	void SetOwner(AMech_RPGCharacter* newVal);
 
+	bool IsMechCharacter(AActor* character);
+
 	AMech_RPGCharacter* GetTargetUnderCursor();
 	FHitResult GetHitFromCursor();
 
@@ -54,6 +56,9 @@ public:
 	AMech_RPGCharacter* GetTarget();
 	void SetTarget(AMech_RPGCharacter* newVal);
 
+
+	void MoveToActor(AActor* target);
+	void MoveToLocation(FVector location);
 protected:
 	/**
 	 * True if the controlled character should navigate to the mouse cursor.

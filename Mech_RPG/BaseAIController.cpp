@@ -14,11 +14,11 @@ void ABaseAIController::Tick(float DeltaTime) {
 			//GetOwner()->Destroy(true);
 		}
 		else {
-			if (!IsTargetValid()) {
+			if (!IsTargetValid(GetTarget())) {
 				FindTarget();
 			}
 
-			if (IsTargetValid()) {
+			if (IsTargetValid(GetTarget())) {
 				AttackTarget(DeltaTime);
 			}
 		}
@@ -27,15 +27,17 @@ void ABaseAIController::Tick(float DeltaTime) {
 
 void ABaseAIController::AttackTarget(float DeltaTime) {
 	AWeapon* weapon = owner->GetCurrentWeapon();
-	collision.AddIgnoredActor(GetOwner());
+	collision.IgnoreComponents.Empty();
 
-	/*if (!collisionSet) {
+	if (!collisionSet && owner->GetGroup() != NULL) {
 		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
-			collision.AddIgnoredActor(member);
+			if (member != target) {
+				collision.AddIgnoredActor(member);
+			}
 		}
-		collisionSet = true;
+		//collisionSet = true;
 	}
-	*/
+
 
 	if (GetOwner()->startingGroupID == 0 && GetOwner()->GetAbilities().Num() > 0) {
 		if (!GetOwner()->GetAbilities()[0]->OnCooldown()) {
@@ -48,14 +50,14 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 
 		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
-		if (dist <= weapon->GetRange() && hit.GetActor() == target) {
-			if (weapon->CanFire()) {
+		if (dist <= weapon->GetRange() && hit.GetActor() != NULL && IsMechCharacter(hit.GetActor())) {
+			if (GetOwner()->CanAttack() && weapon->CanFire()) {
 				weapon->Fire(target, GetOwner());
 			}
 			StopMovement();
 		}
 		else if (GetWorld()->GetNavigationSystem()) {
-			GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, target->GetActorLocation());
+			MoveToLocation(target->GetActorLocation());
 		}
 	}
 	else {
@@ -63,12 +65,32 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 	}
 }
 
+void ABaseAIController::MoveToActor(AActor* target) {
+	if (GetOwner()->CanMove()) {
+		GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, target);
+	}
+}
+
+void ABaseAIController::MoveToLocation(FVector location) {
+	if (GetOwner()->CanMove()) {
+		GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, location);
+	}
+}
+
+bool ABaseAIController::IsMechCharacter(AActor* character) {
+	return character->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass());
+}
+
 void ABaseAIController::FindTarget() {
 	AWeapon* weapon = owner->GetCurrentWeapon();
+
 	if (weapon != NULL && !weapon->Heals()) {
+		float range = weapon->GetRange() * 1.3;
+		range = range < 1200 ? 1200 : range;
+
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 			APawn* pawn = iter->Get();
-			if (pawn != NULL && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= weapon->GetRange() * 1.3) {
+			if (pawn != NULL && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= range) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
 				if (!character->IsDead() && !character->CompareGroup(owner)) {
@@ -78,7 +100,7 @@ void ABaseAIController::FindTarget() {
 			}
 		}
 	}
-	else if (weapon != NULL) {
+	else if (weapon != NULL && GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->GetMembers().Num() > 0) {
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
 			if (!character->IsDead() && character->GetHealth() < character->GetMaxHealth()) {
 				SetTarget(character);
@@ -104,17 +126,16 @@ AMech_RPGCharacter* ABaseAIController::GetTarget() {
 	return target;
 }
 
-bool ABaseAIController::IsTargetValid() {
-	if (target != NULL && !target->IsDead()) {
+bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget) {
+	if (inTarget != NULL && !inTarget->IsDead()) {
 		if (GetOwner()->GetCurrentWeapon()) {
 			if (GetOwner()->GetCurrentWeapon()->Heals()) {
-				return target->CompareGroup(owner) && target->GetHealth() < target->GetMaxHealth();
+				return inTarget->CompareGroup(owner) && inTarget->GetHealth() < inTarget->GetMaxHealth();
 			}
 			else {
-				return !target->CompareGroup(owner);
+				return !inTarget->CompareGroup(owner);
 			}
 		}
-		return false;
 	}
 	return false;
 }
@@ -125,4 +146,15 @@ void ABaseAIController::SetOwner(AMech_RPGCharacter* newVal) {
 
 void ABaseAIController::SetTarget(AMech_RPGCharacter* newVal) {
 	target = newVal;
+}
+
+void ABaseAIController::GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
+	if (!GetTarget()) {
+		if (IsTargetValid(attacker)) {
+			SetTarget(attacker);
+		}
+		else if (IsTargetValid(damagedMember)) {
+			SetTarget(damagedMember);
+		}
+	}
 }

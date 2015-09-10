@@ -31,7 +31,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
 	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 900.f;
+	CameraBoom->TargetArmLength = 1500.0f;
 	CameraBoom->RelativeRotation = FRotator(-60.f, 0.f, 0.f);
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
@@ -48,6 +48,8 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	startingRole = GroupEnums::DPS;
 	damageModifier = 1;
 	defenceModifier = 0;
+	SetMaxHealth(1000);
+	SetHealth(GetMaxHealth());
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -88,8 +90,7 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 void AMech_RPGCharacter::BeginPlay() {
 	CreatePresetRole(startingRole);
 	SetGroup(NULL);
-	SetHealth(1000);
-	SetMaxHealth(1000);
+	SetHealth(GetMaxHealth());
 	SetHealthRegen(10.0);
 
 	if (!GetGroup()) {
@@ -100,24 +101,37 @@ void AMech_RPGCharacter::BeginPlay() {
 			APawn* pawn = iter->Get();
 			if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 500) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-				character->SetGroup(GetGroup());
-				GetGroup()->AddMemeber(character);
+				if (character != NULL) {
+					character->SetGroup(GetGroup());
+					GetGroup()->AddMemeber(character);
+				}
 			}
+		}
+	}
+
+	if (GetGroup()) {
+		ABaseAIController* con = Cast<ABaseAIController>(Controller);
+		if (con) {
+			GetGroup()->OnMemberDamageEvent.AddDynamic(con, &ABaseAIController::GroupMemberDamaged);
 		}
 	}
 }
 
 void AMech_RPGCharacter::SwapWeapon() {
-	if (weapons[0] == currentWeapon) {
-		currentWeapon = weapons[1];
-	}
-	else {
-		currentWeapon = weapons[0];
+	if (weapons.Num() > 1) {
+		if (weapons[0] == currentWeapon) {
+			currentWeapon = weapons[1];
+		}
+		else {
+			currentWeapon = weapons[0];
+		}
 	}
 }
 
-void AMech_RPGCharacter::Hit(AMech_RPGCharacter* other, float damage) {
-	health -= damage * (1 - GetDefenceModifier());
+void AMech_RPGCharacter::Hit(FDamage damage) {
+	GetGroup()->GroupMemberHit(damage.damager, this);
+
+	health -= damage.damagedDealt * (1 - GetDefenceModifier());
 
 	if (health <= 0) {
 		isDead = true;
@@ -140,31 +154,36 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> role) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
 		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 0.5));
+		SetDefenceModifier(0.2);
+		SetDamageModifier(1.5);
 		break;
 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
 		abilities.Add(UHeal::CreateAbility(15.0F, this, 600));
+		SetDefenceModifier(0.2);
+		SetDamageModifier(1.5);
 		break;
 
 	case GroupEnums::Tank:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
 		abilities.Add(UTaunt::CreateAbility(5.0F, this));
+		SetDefenceModifier(0.7);
+		SetDamageModifier(1);
 		break;
 
 	case GroupEnums::Sniper:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
 		abilities.Add(USnipe::CreateAbility(15.0F, this));
+		SetDefenceModifier(0);
+		SetDamageModifier(2);
 		break;
 
 	case GroupEnums::RPG:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
 		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 0.5));
-		break;
-
-	default:
-		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 0.5));
+		SetDefenceModifier(0.25);
+		SetDamageModifier(1.25);
 		break;
 	}
 	currentWeapon = weapons[0];
@@ -186,7 +205,7 @@ void AMech_RPGCharacter::SetHealth(float newVal) {
 	health = newVal;
 }
 
-TArray<AWeapon*> AMech_RPGCharacter::GetWeapons() {
+TArray<AWeapon*>& AMech_RPGCharacter::GetWeapons() {
 	return weapons;
 }
 
@@ -242,7 +261,7 @@ void AMech_RPGCharacter::SetDemandedController(AController* newVal) {
 	demandedController = newVal;
 }
 
-TArray<UAbility*> AMech_RPGCharacter::GetAbilities() {
+TArray<UAbility*>& AMech_RPGCharacter::GetAbilities() {
 	return abilities;
 }
 

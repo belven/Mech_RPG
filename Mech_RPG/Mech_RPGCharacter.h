@@ -1,3 +1,5 @@
+
+
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
@@ -7,6 +9,47 @@
 #include "Array.h"
 #include "Ability.h"
 #include "Mech_RPGCharacter.generated.h"
+
+USTRUCT(BlueprintType)
+struct FDamage {
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+		AMech_RPGCharacter* target;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+		AMech_RPGCharacter* damager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+		AWeapon* weaponUsed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+		float damagedDealt = 0;
+
+};
+
+
+struct FLoadout {
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		TArray<AWeapon*> weapons;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		TArray<UAbility*> abilities;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		float damageModifier;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		float defenceModifier;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		float maxHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		float healthRegen;
+};
 
 UCLASS(Blueprintable)
 class AMech_RPGCharacter : public ACharacter {
@@ -28,7 +71,6 @@ private:
 	float energy;
 	float health;
 	float healthRegen;
-	float maxHealth;
 
 	int32 id;
 	int32 canAttack;
@@ -57,6 +99,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float defenceModifier;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		float maxHealth;
+
 	virtual	void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 
@@ -72,7 +117,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		void SetHealth(float newVal);
 
-	void Hit(AMech_RPGCharacter* other, float damage);
+	void Hit(FDamage damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		bool IsDead();
@@ -85,7 +130,7 @@ public:
 		void AddWeapon(AWeapon* newWeapon);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		TArray<AWeapon*> GetWeapons();
+		TArray<AWeapon*>& GetWeapons();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		void SetWeapons(TArray<AWeapon*> newVal);
@@ -124,7 +169,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	TArray<UAbility*> GetAbilities();
+	TArray<UAbility*>& GetAbilities();
 	void SetAbilities(TArray<UAbility*> newVal);
 
 	void SwapWeapon();

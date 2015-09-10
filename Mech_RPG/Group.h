@@ -17,6 +17,8 @@ namespace GroupEnums {
 
 class AMech_RPGCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMemberDamageEvent, AMech_RPGCharacter*, attacker, AMech_RPGCharacter*, damagedMember);
+
 UCLASS()
 class MECH_RPG_API UGroup : public UObject
 {
@@ -32,7 +34,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Group")
 	static UGroup* CreateGroup(int32 inID);
 
-	TArray<AMech_RPGCharacter*> GetMembers();
+	TArray<AMech_RPGCharacter*>& GetMembers();
 	void SetMembers(TArray<AMech_RPGCharacter*> newVal);
 
 	void SetID(int32 newVal);
@@ -44,4 +46,6 @@ public:
 
 	AMech_RPGCharacter* GetMember(int index);
 	AMech_RPGCharacter* GetPlayer();
+	void GroupMemberHit(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
+	FMemberDamageEvent OnMemberDamageEvent;
 };

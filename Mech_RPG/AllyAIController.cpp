@@ -1,3 +1,4 @@
+#pragma once
 #include "Mech_RPG.h"
 #include "AllyAIController.h"
 #include "Mech_RPGCharacter.h"
@@ -11,29 +12,33 @@ void AAllyAIController::Tick(float DeltaTime) {
 			GetOwner()->Destroy(true);
 		}
 		else if (GetPlayerControlledLocation() != FVector::ZeroVector) {
-			if (FVector::Dist(GetPlayerControlledLocation(), GetOwner()->GetActorLocation()) > 200) {
-				GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, GetPlayerControlledLocation());
+			float dist = FVector::Dist(GetPlayerControlledLocation(), GetOwner()->GetActorLocation());
+			if (dist > 1800.0F) {
+				SetPlayerControlledLocation(FVector::ZeroVector);
+			}
+			else if (dist > 200) {
+				MoveToLocation(GetPlayerControlledLocation());
 			}
 			else {
 				FindTargetInWeaponRage();
 
-				if (IsTargetValid()) {
+				if (IsTargetValid(GetTarget())) {
 					AttackTarget(DeltaTime);
 				}
 			}
 		}
 		else {
-			if (!IsTargetValid()) {
+			if (!IsTargetValid(GetTarget())) {
 				FindTarget();
 			}
 
-			if (IsTargetValid()) {
+			if (IsTargetValid(GetTarget())) {
 				AttackTarget(DeltaTime);
 			}
 			else {
 				AMech_RPGCharacter* player = GetOwner()->GetGroup()->GetPlayer();
-				if (player != NULL && player->GetDistanceTo(GetOwner()) > 400) {
-					GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, player);
+				if (player != NULL && player->GetDistanceTo(GetOwner()) > 200.0F) {
+					MoveToActor(player);
 				}
 				else {
 					StopMovement();

@@ -6,23 +6,21 @@
 #include "AllyAIController.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
-class MECH_RPG_API AAllyAIController : public ABaseAIController
-{
+class MECH_RPG_API AAllyAIController : public ABaseAIController {
 	GENERATED_BODY()
 private:
 	FVector playerControlledLocation;
 
-	
-public:
 
+public:
 	virtual	void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	FVector GetPlayerControlledLocation();
 	void SetPlayerControlledLocation(FVector newVal);
 	void FindTargetInWeaponRage();
-	
-	
+
+
 };

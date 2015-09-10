@@ -1,10 +1,18 @@
+#pragma once
 #include "Mech_RPG.h"
 #include "Snipe.h"
 #include "Mech_RPGCharacter.h"
 
 void USnipe::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (target) {
-		target->Hit(owner, 1000);
+		FDamage damage;
+
+		damage.damager = owner;
+		damage.target = target;
+		damage.weaponUsed = NULL;
+		damage.damagedDealt = 400;
+
+		target->Hit(damage);
 		SetOnCooldown(owner->GetWorld());
 	}
 }

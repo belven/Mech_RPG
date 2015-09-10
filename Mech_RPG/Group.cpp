@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#pragma once
 #include "Mech_RPG.h"
 #include "Group.h"
 #include "Mech_RPGCharacter.h"
 #include "Mech_RPGPlayerController.h"
 
-UGroup::UGroup()  {
+UGroup::UGroup() : Super() {
 
 }
 
@@ -19,7 +19,7 @@ int32 UGroup::GetID() {
 	return id;
 }
 
-TArray<AMech_RPGCharacter*> UGroup::GetMembers() {
+TArray<AMech_RPGCharacter*>& UGroup::GetMembers() {
 	return members;
 }
 
@@ -50,11 +50,20 @@ AMech_RPGCharacter* UGroup::GetMember(int index) {
 AMech_RPGCharacter* UGroup::GetPlayer() {
 	if (members.Num() > 0) {
 		for (AMech_RPGCharacter* character : members) {
-			if (character != NULL && character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
+			if (character != NULL 
+				&& character->GetController() != NULL 
+				&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
 				return character;
 			}
 		}
 	}
 
 	return  NULL;
+}
+
+
+void UGroup::GroupMemberHit(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
+	if (OnMemberDamageEvent.IsBound() && attacker != NULL && !attacker->IsDead()) {
+		OnMemberDamageEvent.Broadcast(attacker, damagedMember);
+	}
 }

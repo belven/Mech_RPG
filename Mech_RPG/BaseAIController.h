@@ -23,18 +23,26 @@ public:
 	void AttackTarget(float DeltaTime);
 	void FindTarget();
 
+	bool IsMechCharacter(AActor* character);
+
 	AMech_RPGCharacter* GetOwner();
 	AMech_RPGCharacter* GetTarget();
 
-	bool IsTargetValid();
+	bool IsTargetValid(AMech_RPGCharacter* inTarget);
 
 	void SetOwner(AMech_RPGCharacter* newVal);
 	void SetTarget(AMech_RPGCharacter* newVal);
+
+	void MoveToActor(AActor* target);
+	void MoveToLocation(FVector location);
 
 	UFUNCTION()
 		void OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 		void OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		void GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
 
 };

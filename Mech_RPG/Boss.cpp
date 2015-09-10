@@ -1,3 +1,4 @@
+#pragma once
 #include "Mech_RPG.h"
 #include "Boss.h"
 

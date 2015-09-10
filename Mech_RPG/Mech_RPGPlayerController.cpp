@@ -65,6 +65,18 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 	}
 }
 
+void AMech_RPGPlayerController::MoveToActor(AActor* target) {
+	if (GetOwner()->CanMove()) {
+		GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, target);
+	}
+}
+
+void AMech_RPGPlayerController::MoveToLocation(FVector location) {
+	if (GetOwner()->CanMove()) {
+		GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, location);
+	}
+}
+
 void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 	AWeapon* weapon = owner->GetCurrentWeapon();
 
@@ -72,13 +84,13 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
 		if (dist <= weapon->GetRange()) {
-			if (weapon->CanFire()) {
+			if (GetOwner()->CanAttack() && weapon->CanFire()) {
 				weapon->Fire(target, GetOwner());
 			}
 			StopMovement();
 		}
 		else if (GetWorld()->GetNavigationSystem()) {
-			GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, target->GetActorLocation());
+			MoveToActor(target);
 		}
 	}
 }
@@ -134,7 +146,7 @@ void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation
 		float const Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
 
 		if (NavSys) {
-			NavSys->SimpleMoveToLocation(this, DestLocation);
+			MoveToLocation(DestLocation);
 		}
 	}
 }
@@ -172,12 +184,15 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 		static AActor* targetFound;
 		targetFound = Hit.GetActor();
 
-		if (targetFound != NULL
-			&& targetFound->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
+		if (targetFound != NULL	&& IsMechCharacter(targetFound)) {
 			return Cast<AMech_RPGCharacter>(targetFound);
 		}
 	}
 	return NULL;
+}
+
+bool AMech_RPGPlayerController::IsMechCharacter(AActor* character) {
+	return character->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass());
 }
 
 bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
@@ -190,7 +205,6 @@ bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 				return !inTarget->CompareGroup(owner);
 			}
 		}
-		return false;
 	}
 	return false;
 }
@@ -371,15 +385,10 @@ void AMech_RPGPlayerController::ShiftReleased() {
 	shiftPressed = false;
 }
 
-
-
-AMech_RPGCharacter* AMech_RPGPlayerController::GetTarget(){
-
+AMech_RPGCharacter* AMech_RPGPlayerController::GetTarget() {
 	return target;
 }
 
-
-void AMech_RPGPlayerController::SetTarget(AMech_RPGCharacter* newVal){
-
+void AMech_RPGPlayerController::SetTarget(AMech_RPGCharacter* newVal) {
 	target = newVal;
 }
