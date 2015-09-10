@@ -50,6 +50,11 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	defenceModifier = 0;
 	SetMaxHealth(1000);
 	SetHealth(GetMaxHealth());
+	
+	movementModifier = 1.0;
+	speed = CharacterMovement->MaxWalkSpeed;
+
+	CharacterMovement->bUseRVOAvoidance = true;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -71,6 +76,8 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 
 void AMech_RPGCharacter::Tick(float DeltaTime) {
 	if (!isDead) {
+		CharacterMovement->MaxWalkSpeed = speed * movementModifier;
+
 		for (AWeapon* weapon : weapons) {
 			if (weapon) {
 				weapon->Tick(DeltaTime);
@@ -131,7 +138,9 @@ void AMech_RPGCharacter::SwapWeapon() {
 void AMech_RPGCharacter::Hit(FDamage damage) {
 	GetGroup()->GroupMemberHit(damage.damager, this);
 
-	health -= damage.damagedDealt * (1 - GetDefenceModifier());
+	if (damage.damagedDealt < 0 || canBeDamaged == 0) {
+		health -= damage.damagedDealt * (1 - GetDefenceModifier());
+	}
 
 	if (health <= 0) {
 		isDead = true;
@@ -323,4 +332,29 @@ void AMech_RPGCharacter::SetDamageModifier(float newVal) {
 
 void AMech_RPGCharacter::SetDefenceModifier(float newVal) {
 	defenceModifier = newVal;
+}
+
+bool AMech_RPGCharacter::GetCanBeDamaged(){
+	return canBeDamaged == 0;
+}
+
+float AMech_RPGCharacter::GetMovementModifier(){
+	return movementModifier;
+}
+
+
+float AMech_RPGCharacter::GetSpeed(){
+	return speed;
+}
+
+void AMech_RPGCharacter::SetCanBeDamaged(int32 newVal){
+	canBeDamaged = newVal;
+}
+
+void AMech_RPGCharacter::SetMovementModifier(float newVal){
+	movementModifier = newVal;
+}
+
+void AMech_RPGCharacter::SetSpeed(float newVal){
+	speed = newVal;
 }

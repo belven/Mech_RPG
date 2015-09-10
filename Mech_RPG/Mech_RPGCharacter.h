@@ -50,6 +50,24 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		float healthRegen = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		int32 startingGroupID = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		int32 canAttack = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		int32 canMove = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		int32 canBeDamaged = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		float speed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		float movementModifier;
 };
 
 UCLASS(Blueprintable)
@@ -57,13 +75,13 @@ class AMech_RPGCharacter : public ACharacter {
 	GENERATED_BODY()
 private:
 	/**
-	 * Top down camera
+	 * Camera boom positioning the camera above the character
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* TopDownCameraComponent;
 
 	/**
-	 * Camera boom positioning the camera above the character
+	 * Top down camera
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -76,6 +94,7 @@ private:
 	int32 id;
 	int32 canAttack;
 	int32 canMove;
+	int32 canBeDamaged;
 
 	TArray<AWeapon*> weapons;
 	AWeapon* currentWeapon;
@@ -88,77 +107,82 @@ private:
 public:
 	AMech_RPGCharacter();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 		TEnumAsByte<GroupEnums::Role> startingRole;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 		int32 startingGroupID;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float damageModifier;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float defenceModifier;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float maxHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
+		float speed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
+		float movementModifier;
 
 	virtual	void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "ID")
 		float GetEnergy();
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "ID")
 		float GetHealth();
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetEnergy(float newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetHealth(float newVal);
 
 	void Hit(FDamage damage);
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		bool IsDead();
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		void SetDead(bool newVal);
 
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		void AddWeapon(AWeapon* newWeapon);
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		TArray<AWeapon*>& GetWeapons();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		void SetWeapons(TArray<AWeapon*> newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		AWeapon* GetCurrentWeapon();
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		void SetCurrentWeapon(AWeapon* newVal);
 
-
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		UGroup* GetGroup();
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		void SetGroup(UGroup* newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "Group")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		int32 GetID();
 
-	UFUNCTION(BlueprintCallable, Category = "Group")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		void SetID(int32 newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "ID")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		float GetHealthRegen();
 
-	UFUNCTION(BlueprintCallable, Category = "ID")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		void SetHealthRegen(float newVal);
 
 	bool CompareGroup(UGroup* inGroup);
@@ -194,5 +218,14 @@ public:
 	void SetDefenceModifier(float newVal);
 
 	void CreatePresetRole(TEnumAsByte<GroupEnums::Role> role = GroupEnums::DPS);
+
+	bool GetCanBeDamaged();
+	void SetCanBeDamaged(int32 newVal);
+
+	float GetMovementModifier();
+	float GetSpeed();
+
+	void SetMovementModifier(float newVal);
+	void SetSpeed(float newVal);
 };
 
