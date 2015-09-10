@@ -108,6 +108,10 @@ void AMech_RPGCharacter::BeginPlay() {
 		SetupWithLoadout();
 	}
 
+	if (weapons.Num() > 0) {
+		currentWeapon = weapons[0];
+	}
+
 	SetUpGroup();
 }
 
@@ -168,8 +172,6 @@ void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
 }
 
 void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
-	abilities.Empty();
-	weapons.Empty();
 	SetHealth(GetMaxHealth());
 	SetHealthRegen(10.0);
 
@@ -210,9 +212,6 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		break;
 	}
 
-	if (weapons.Num() > 0) {
-		currentWeapon = weapons[0];
-	}
 }
 
 void AMech_RPGCharacter::SetupWithLoadout() {

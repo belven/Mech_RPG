@@ -331,7 +331,7 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 
 	if (group != NULL) {
 		AMech_RPGCharacter* character = group->GetMember(index);
-		if (!character->IsDead() && character != GetOwner()) {
+		if (character != NULL && !character->IsDead() && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 
 			AMech_RPGCharacter*	tempTarget = GetTargetUnderCursor();
@@ -348,7 +348,7 @@ void AMech_RPGPlayerController::AllyMove(int index) {
 	UGroup* group = GetOwner()->GetGroup();
 	if (group != NULL) {
 		AMech_RPGCharacter* character = group->GetMember(index);
-		if (!character->IsDead() && character != GetOwner()) {
+		if (character != NULL && !character->IsDead() && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 			static FHitResult Hit;
 

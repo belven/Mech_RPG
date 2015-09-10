@@ -34,10 +34,10 @@ struct FLoadout {
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		TArray<AWeapon*> weapons();
+		TArray<AWeapon*> weapons;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		TArray<UAbility*> abilities();
+		TArray<UAbility*> abilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		float damageModifier = 1;
