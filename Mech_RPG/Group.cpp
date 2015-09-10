@@ -44,7 +44,7 @@ bool UGroup::Compare(UGroup* inGroup) {
 }
 
 AMech_RPGCharacter* UGroup::GetMember(int index) {
-	return members[index - 1];
+	return members.IsValidIndex(index - 1) ? members[index - 1] : NULL;
 }
 
 AMech_RPGCharacter* UGroup::GetPlayer() {

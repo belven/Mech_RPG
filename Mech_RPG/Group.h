@@ -2,6 +2,7 @@
 UENUM(BlueprintType)
 namespace GroupEnums {
 	enum Role {
+		None,
 		DPS,
 		Healer,
 		Tank,

@@ -28,6 +28,7 @@ public:
 	float GetCooldown();
 	void SetCooldown(float newCooldown);
 
+	UFUNCTION(BlueprintCallable, Category = "Ability")
 	virtual void Activate( AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) { check(0 && "You must override this") };
 	
 	/** Handle for efficient management of ShotTimerExpired timer */

@@ -44,7 +44,8 @@ public:
 	bool CanFire();
 	void Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner);
 
-	static AWeapon* CreateWeapon(AActor* owner, float damage, float range, float fireRate, bool heals = false);
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		static AWeapon* CreateWeapon(AActor* inOwner, float damage, float range, float fireRate, bool heals = false);
 
 	float GetFireRate();
 	void SetFireRate(float newVal);
@@ -53,5 +54,6 @@ public:
 	bool Heals();
 	void SetHeals(bool newVal);
 
-	static AWeapon* CreatePresetWeapon(AMech_RPGCharacter* owner, TEnumAsByte<WeaponEnums::WeaponType> type = WeaponEnums::SMG);
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		static AWeapon* CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type = WeaponEnums::SMG);
 };

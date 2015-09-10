@@ -12,6 +12,7 @@
 AMech_RPGCharacter::AMech_RPGCharacter() {
 	static int32 ID = 0;
 	SetID(ID++);
+	SetActorTickEnabled(true);
 
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -48,13 +49,14 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	startingRole = GroupEnums::DPS;
 	damageModifier = 1;
 	defenceModifier = 0;
+	movementModifier = 1.0;
+
 	SetMaxHealth(1000);
 	SetHealth(GetMaxHealth());
-	
-	movementModifier = 1.0;
-	speed = CharacterMovement->MaxWalkSpeed;
 
-	CharacterMovement->bUseRVOAvoidance = true;
+	speed = GetCharacterMovement()->MaxWalkSpeed;
+
+	GetCharacterMovement()->bUseRVOAvoidance = true;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -75,8 +77,9 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 }
 
 void AMech_RPGCharacter::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
 	if (!isDead) {
-		CharacterMovement->MaxWalkSpeed = speed * movementModifier;
+		GetCharacterMovement()->MaxWalkSpeed = speed * movementModifier;
 
 		for (AWeapon* weapon : weapons) {
 			if (weapon) {
@@ -95,18 +98,27 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 }
 
 void AMech_RPGCharacter::BeginPlay() {
-	CreatePresetRole(startingRole);
+	Super::BeginPlay();
 	SetGroup(NULL);
-	SetHealth(GetMaxHealth());
-	SetHealthRegen(10.0);
 
+	if (!UseLoadout) {
+		CreatePresetRole(startingRole);
+	}
+	else {
+		SetupWithLoadout();
+	}
+
+	SetUpGroup();
+}
+
+void AMech_RPGCharacter::SetUpGroup() {
 	if (!GetGroup()) {
 		SetGroup(UGroup::CreateGroup(startingGroupID));
 		GetGroup()->AddMemeber(this);
 
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 			APawn* pawn = iter->Get();
-			if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 500) {
+			if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 700) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 				if (character != NULL) {
 					character->SetGroup(GetGroup());
@@ -155,14 +167,16 @@ void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
 	}
 }
 
-void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> role) {
+void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
 	abilities.Empty();
 	weapons.Empty();
+	SetHealth(GetMaxHealth());
+	SetHealthRegen(10.0);
 
-	switch (role) {
+	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 0.5));
+		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 1));
 		SetDefenceModifier(0.2);
 		SetDamageModifier(1.5);
 		break;
@@ -190,12 +204,31 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> role) {
 
 	case GroupEnums::RPG:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
-		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 0.5));
+		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 1));
 		SetDefenceModifier(0.25);
 		SetDamageModifier(1.25);
 		break;
 	}
-	currentWeapon = weapons[0];
+
+	if (weapons.Num() > 0) {
+		currentWeapon = weapons[0];
+	}
+}
+
+void AMech_RPGCharacter::SetupWithLoadout() {
+	SetAbilities(startingLoadout.abilities);
+	SetMaxHealth(startingLoadout.maxHealth);
+	SetHealth(GetMaxHealth());
+	SetWeapons(startingLoadout.weapons);
+	SetDefenceModifier(startingLoadout.defenceModifier);
+	SetDamageModifier(startingLoadout.damageModifier);
+	SetCanMove(startingLoadout.canMove);
+	SetCanAttack(startingLoadout.canAttack);
+	SetCanBeDamaged(startingLoadout.canBeDamaged);
+	SetHealthRegen(startingLoadout.healthRegen);
+	startingGroupID = startingLoadout.startingGroupID;
+	SetMovementModifier(startingLoadout.movementModifier);
+	SetSpeed(startingLoadout.speed);
 }
 
 float AMech_RPGCharacter::GetEnergy() {
@@ -334,27 +367,27 @@ void AMech_RPGCharacter::SetDefenceModifier(float newVal) {
 	defenceModifier = newVal;
 }
 
-bool AMech_RPGCharacter::GetCanBeDamaged(){
+bool AMech_RPGCharacter::GetCanBeDamaged() {
 	return canBeDamaged == 0;
 }
 
-float AMech_RPGCharacter::GetMovementModifier(){
+float AMech_RPGCharacter::GetMovementModifier() {
 	return movementModifier;
 }
 
 
-float AMech_RPGCharacter::GetSpeed(){
+float AMech_RPGCharacter::GetSpeed() {
 	return speed;
 }
 
-void AMech_RPGCharacter::SetCanBeDamaged(int32 newVal){
+void AMech_RPGCharacter::SetCanBeDamaged(int32 newVal) {
 	canBeDamaged = newVal;
 }
 
-void AMech_RPGCharacter::SetMovementModifier(float newVal){
+void AMech_RPGCharacter::SetMovementModifier(float newVal) {
 	movementModifier = newVal;
 }
 
-void AMech_RPGCharacter::SetSpeed(float newVal){
+void AMech_RPGCharacter::SetSpeed(float newVal) {
 	speed = newVal;
 }

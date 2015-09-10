@@ -16,7 +16,11 @@ private:
 	float healAmount;
 
 public:
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
 	void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
 	static UHeal* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inHealAmount);
 	
 };

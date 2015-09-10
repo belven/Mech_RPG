@@ -29,19 +29,20 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 	AWeapon* weapon = owner->GetCurrentWeapon();
 	collision.IgnoreComponents.Empty();
 
-	if (!collisionSet && owner->GetGroup() != NULL) {
+	if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
 		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
 			if (member != target) {
 				collision.AddIgnoredActor(member);
 			}
 		}
-		//collisionSet = true;
 	}
 
 
-	if (GetOwner()->startingGroupID == 0 && GetOwner()->GetAbilities().Num() > 0) {
-		if (!GetOwner()->GetAbilities()[0]->OnCooldown()) {
-			GetOwner()->GetAbilities()[0]->Activate(target);
+	if (GetOwner()->GetAbilities().Num() > 0) {
+		for (UAbility* ability : GetOwner()->GetAbilities()) {
+			if (!ability->OnCooldown()) {
+				ability->Activate(target);
+			}
 		}
 	}
 
@@ -90,7 +91,7 @@ void ABaseAIController::FindTarget() {
 
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 			APawn* pawn = iter->Get();
-			if (pawn != NULL && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= range) {
+			if (pawn != NULL && IsMechCharacter(pawn) && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= range) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
 				if (!character->IsDead() && !character->CompareGroup(owner)) {

@@ -34,10 +34,10 @@ struct FLoadout {
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		TArray<AWeapon*> weapons;
+		TArray<AWeapon*> weapons();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		TArray<UAbility*> abilities;
+		TArray<UAbility*> abilities();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		float damageModifier = 1;
@@ -64,10 +64,10 @@ public:
 		int32 canBeDamaged = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		float speed;
+		float speed = 600;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		float movementModifier;
+		float movementModifier = 1;
 };
 
 UCLASS(Blueprintable)
@@ -107,25 +107,35 @@ private:
 public:
 	AMech_RPGCharacter();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+	void SetUpGroup();
+
+	int32 canUseAbilities;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		FLoadout startingLoadout;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		bool UseLoadout = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
 		TEnumAsByte<GroupEnums::Role> startingRole;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
 		int32 startingGroupID;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float damageModifier;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float defenceModifier;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float maxHealth;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 		float speed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 		float movementModifier;
 
 	virtual	void BeginPlay() override;
@@ -202,7 +212,8 @@ public:
 	USphereComponent* GetAOE();
 	void SetAOE(USphereComponent* newVal);
 
-	float GetMaxHealth();
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		float GetMaxHealth();
 	void SetMaxHealth(float newVal);
 
 	bool CanAttack();
@@ -217,7 +228,11 @@ public:
 	void SetDamageModifier(float newVal);
 	void SetDefenceModifier(float newVal);
 
-	void CreatePresetRole(TEnumAsByte<GroupEnums::Role> role = GroupEnums::DPS);
+	UFUNCTION(BlueprintCallable, Category = "Role")
+		void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS);
+
+	UFUNCTION(BlueprintCallable, Category = "Role")
+		void SetupWithLoadout();
 
 	bool GetCanBeDamaged();
 	void SetCanBeDamaged(int32 newVal);
@@ -227,5 +242,7 @@ public:
 
 	void SetMovementModifier(float newVal);
 	void SetSpeed(float newVal);
+
+
 };
 

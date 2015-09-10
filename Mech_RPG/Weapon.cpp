@@ -24,14 +24,14 @@ bool AWeapon::CanFire() {
 	return canFire;
 }
 
-AWeapon* AWeapon::CreateWeapon(AActor* owner, float damage, float range, float fireRate, bool heals){
-	if (owner && owner->GetWorld()){
-		AWeapon* weapon = owner->GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass());
+AWeapon* AWeapon::CreateWeapon(AActor* inOwner, float damage, float range, float fireRate, bool heals){
+	if (inOwner && inOwner->GetWorld()) {
+		AWeapon* weapon = inOwner->GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass());
 		weapon->SetDamage(damage);
 		weapon->SetRange(range);
 		weapon->SetFireRate(fireRate);
 		weapon->canFire = true;
-		weapon->AttachRootComponentToActor(owner);
+		weapon->AttachRootComponentToActor(inOwner);
 		weapon->lastTime = 0;
 		weapon->SetHeals(heals);
 		return weapon;
@@ -80,22 +80,22 @@ void AWeapon::SetHeals(bool newVal){
 	heals = newVal;
 }
 
-AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* owner, TEnumAsByte<WeaponEnums::WeaponType> type) {
+AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type) {
 	switch (type) {
 	case WeaponEnums::SMG:
-		return CreateWeapon(owner, 30, 1000, 0.3);
+		return CreateWeapon(inOwner, 30, 1000, 0.3);
 		break;
 	case WeaponEnums::Bio_Repair:
-		return CreateWeapon(owner, 400, 1000, 2, true);
+		return CreateWeapon(inOwner, 400, 1000, 2, true);
 		break;
 	case WeaponEnums::RPG:
-		return CreateWeapon(owner, 250, 1300, 2.5);
+		return CreateWeapon(inOwner, 250, 1300, 2.5);
 		break;
 	case WeaponEnums::Shotgun:
-		return CreateWeapon(owner, 70, 350, 0.8);
+		return CreateWeapon(inOwner, 70, 350, 0.8);
 		break;
 	case WeaponEnums::Sniper:
-		return CreateWeapon(owner, 250, 1500, 2);
+		return CreateWeapon(inOwner, 250, 1500, 2);
 		break;
 	}
 
