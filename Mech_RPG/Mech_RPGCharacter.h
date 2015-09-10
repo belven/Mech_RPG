@@ -29,6 +29,7 @@ public:
 };
 
 
+USTRUCT(BlueprintType)
 struct FLoadout {
 	GENERATED_USTRUCT_BODY()
 public:
@@ -39,16 +40,16 @@ public:
 		TArray<UAbility*> abilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		float damageModifier;
+		float damageModifier = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		float defenceModifier;
+		float defenceModifier = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		float maxHealth;
+		float maxHealth = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		float healthRegen;
+		float healthRegen = 10;
 };
 
 UCLASS(Blueprintable)
