@@ -9,6 +9,7 @@
 #include "BaseAIController.h"
 #include "DamageBoost.h"
 #include "ChannelledAbility.h"
+#include "OrbitalStrike.h"
 
 AMech_RPGCharacter::AMech_RPGCharacter() {
 	static int32 ID = 0;
@@ -57,7 +58,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 
 	speed = GetCharacterMovement()->MaxWalkSpeed;
 	GetCharacterMovement()->bCanWalkOffLedges = false;
-	GetCharacterMovement()->bUseRVOAvoidance = true;
+	GetCharacterMovement()->bUseRVOAvoidance = false;
 	GetCharacterMovement()->AvoidanceConsiderationRadius = 180;
 	bCanAffectNavigationGeneration = false;
 }
@@ -208,7 +209,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		abilities.Add(UTaunt::CreateAbility(5.0F, this));
 		SetDefenceModifier(0.5);
 		SetDamageModifier(1);
-		SetMovementModifier(1.3);
+		SetMovementModifier(1.2);
 		break;
 
 	case GroupEnums::Sniper:
@@ -220,7 +221,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 
 	case GroupEnums::RPG:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
-		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 1));
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
 		SetDefenceModifier(0);
 		SetDamageModifier(1.25);
 		break;

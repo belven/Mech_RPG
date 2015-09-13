@@ -27,33 +27,32 @@ void ABaseAIController::Tick(float DeltaTime) {
 
 void ABaseAIController::AttackTarget(float DeltaTime) {
 	AWeapon* weapon = owner->GetCurrentWeapon();
+	collision.IgnoreComponents.Empty();
 
-	if (GetOwner()->GetAbilities().Num() > 0) {
-		for (UAbility* ability : GetOwner()->GetAbilities()) {
-			if (!ability->OnCooldown()) {
-				ability->Activate(target);
-				break;
+	if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
+		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
+			if (member != target) {
+				collision.AddIgnoredActor(member);
 			}
 		}
+		owner->GetGroup()->GroupMemberHit(target, owner);
 	}
 
-	if (weapon != NULL) {
-		collision.IgnoreComponents.Empty();
+	GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
 
-		if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
-			for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
-				if (member != target) {
-					collision.AddIgnoredActor(member);
+	float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
+
+	if (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor()))) {
+		if (GetOwner()->GetAbilities().Num() > 0) {
+			for (UAbility* ability : GetOwner()->GetAbilities()) {
+				if (ability != NULL && !ability->OnCooldown()) {
+					ability->Activate(target);
+					break;
 				}
 			}
-
-			owner->GetGroup()->GroupMemberHit(target, owner);
 		}
-		GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
 
-		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
-
-		if (dist <= weapon->GetRange() && (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor())))) {
+		if (weapon != NULL && dist <= weapon->GetRange()) {
 			if (GetOwner()->CanAttack() && weapon->CanFire()) {
 				weapon->Fire(target, GetOwner());
 			}
@@ -64,8 +63,8 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 			MoveToLocation(target->GetActorLocation());
 		}
 	}
-	else {
-		UE_LOG(LogTemp, Log, TEXT("Weapon NULL"));
+	else if (GetWorld()->GetNavigationSystem()) {
+		MoveToLocation(target->GetActorLocation());
 	}
 }
 

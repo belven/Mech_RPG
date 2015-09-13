@@ -1,33 +1,30 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Mech_RPG.h"
-#include "TestAOE.h"
+#include "OrbitalStrike.h"
 #include "Mech_RPGCharacter.h"
 #include "TestAOE_Temp.h"
 
 
-
-void UTestAOE::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
+void UOrbitalStrike::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (target != NULL) {
 		FTempAOESettings settings;
-		settings.duration = 5;
 		settings.affectedTeam = owner->startingGroupID == 1 ? 0 : 1;
 		settings.healthChange = damage;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
-		settings.location = target->GetActorLocation();
 		settings.rate = 1;
 		settings.radius = 300;
-		settings.target = NULL;
-		settings.usesTarget = false;
+		settings.target = target;
+		settings.duration = 5;
 		UTestAOE_Temp::CreateTestAOE(settings);
 		SetOnCooldown(owner->GetWorld());
 	}
 }
 
 
-UTestAOE* UTestAOE::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDamage) {
-	UTestAOE* ability = NewObject<UTestAOE>(StaticClass());
+UOrbitalStrike* UOrbitalStrike::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDamage) {
+	UOrbitalStrike* ability = NewObject<UOrbitalStrike>(StaticClass());
 	ability->SetCooldown(cooldown);
 	ability->damage = inDamage;
 	ability->owner = owner;
