@@ -14,6 +14,8 @@ private:
 	bool ctrlPressed;
 	bool shiftPressed;
 
+	FCollisionQueryParams collision;
+	FHitResult hit;
 public:
 	AMech_RPGPlayerController();
 	AMech_RPGCharacter* GetOwner();
@@ -59,6 +61,12 @@ public:
 
 	void MoveToActor(AActor* target);
 	void MoveToLocation(FVector location);
+
+	void ZoomIn();
+	void ZoomOut();
+	void ResetZoom();
+	//void UpdateRotation();
+
 protected:
 	/**
 	 * True if the controlled character should navigate to the mouse cursor.

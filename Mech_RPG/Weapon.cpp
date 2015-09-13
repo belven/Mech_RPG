@@ -4,19 +4,19 @@
 #include "Weapon.h"
 #include "Mech_RPGCharacter.h"
 
-float AWeapon::GetDamage(){
+float AWeapon::GetDamage() {
 	return damage;
 }
 
-float AWeapon::GetRange(){
+float AWeapon::GetRange() {
 	return range;
 }
 
-void AWeapon::SetDamage(float newVal){
+void AWeapon::SetDamage(float newVal) {
 	damage = newVal;
 }
 
-void AWeapon::SetRange(float newVal){
+void AWeapon::SetRange(float newVal) {
 	range = newVal;
 }
 
@@ -24,7 +24,7 @@ bool AWeapon::CanFire() {
 	return canFire;
 }
 
-AWeapon* AWeapon::CreateWeapon(AActor* inOwner, float damage, float range, float fireRate, bool heals){
+AWeapon* AWeapon::CreateWeapon(AActor* inOwner, float damage, float range, float fireRate, bool heals) {
 	if (inOwner && inOwner->GetWorld()) {
 		AWeapon* weapon = inOwner->GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass());
 		weapon->SetDamage(damage);
@@ -46,37 +46,37 @@ void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 	damage.damager = owner;
 	damage.target = target;
 	damage.weaponUsed = this;
-	
+
 	damage.damagedDealt = heals ? -damageDealt : damageDealt;
 
 	target->Hit(damage);
 	canFire = false;
 }
 
-float AWeapon::GetFireRate(){
+float AWeapon::GetFireRate() {
 	return fireRate;
 }
 
-void AWeapon::SetFireRate(float newVal){
+void AWeapon::SetFireRate(float newVal) {
 	fireRate = newVal;
 }
 
-void AWeapon::Tick(float DeltaTime){
+void AWeapon::Tick(float DeltaTime) {
 	if (!canFire) {
 		lastTime += DeltaTime;
 
-		if (lastTime >= fireRate){
+		if (lastTime >= fireRate) {
 			lastTime = 0;
 			canFire = true;
 		}
 	}
 }
 
-bool AWeapon::Heals(){
+bool AWeapon::Heals() {
 	return heals;
 }
 
-void AWeapon::SetHeals(bool newVal){
+void AWeapon::SetHeals(bool newVal) {
 	heals = newVal;
 }
 
@@ -86,7 +86,7 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 		return CreateWeapon(inOwner, 30, 1000, 0.3);
 		break;
 	case WeaponEnums::Bio_Repair:
-		return CreateWeapon(inOwner, 400, 1000, 2, true);
+		return CreateWeapon(inOwner, 60, 600, 0.2, true);
 		break;
 	case WeaponEnums::RPG:
 		return CreateWeapon(inOwner, 250, 1300, 2.5);
@@ -95,7 +95,7 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 		return CreateWeapon(inOwner, 70, 350, 0.8);
 		break;
 	case WeaponEnums::Sniper:
-		return CreateWeapon(inOwner, 250, 1500, 2);
+		return CreateWeapon(inOwner, 200, 1500, 2);
 		break;
 	}
 

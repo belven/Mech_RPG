@@ -37,7 +37,7 @@ void AAllyAIController::Tick(float DeltaTime) {
 			}
 			else {
 				AMech_RPGCharacter* player = GetOwner()->GetGroup()->GetPlayer();
-				if (player != NULL && player->GetDistanceTo(GetOwner()) > 200.0F) {
+				if (player != NULL && player->GetDistanceTo(GetOwner()) > 300.0F) {
 					MoveToActor(player);
 				}
 				else {

@@ -10,7 +10,7 @@ void USnipe::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		damage.damager = owner;
 		damage.target = target;
 		damage.weaponUsed = NULL;
-		damage.damagedDealt = 400;
+		damage.damagedDealt = 300;
 
 		target->Hit(damage);
 		SetOnCooldown(owner->GetWorld());

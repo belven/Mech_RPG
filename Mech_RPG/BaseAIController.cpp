@@ -27,34 +27,37 @@ void ABaseAIController::Tick(float DeltaTime) {
 
 void ABaseAIController::AttackTarget(float DeltaTime) {
 	AWeapon* weapon = owner->GetCurrentWeapon();
-	collision.IgnoreComponents.Empty();
-
-	if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
-		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
-			if (member != target) {
-				collision.AddIgnoredActor(member);
-			}
-		}
-	}
-
 
 	if (GetOwner()->GetAbilities().Num() > 0) {
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
 			if (!ability->OnCooldown()) {
 				ability->Activate(target);
+				break;
 			}
 		}
 	}
 
 	if (weapon != NULL) {
+		collision.IgnoreComponents.Empty();
+
+		if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
+			for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
+				if (member != target) {
+					collision.AddIgnoredActor(member);
+				}
+			}
+
+			owner->GetGroup()->GroupMemberHit(target, owner);
+		}
 		GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
 
 		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
-		if (dist <= weapon->GetRange() && hit.GetActor() != NULL && IsMechCharacter(hit.GetActor())) {
+		if (dist <= weapon->GetRange() && (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor())))) {
 			if (GetOwner()->CanAttack() && weapon->CanFire()) {
 				weapon->Fire(target, GetOwner());
 			}
+			SetFocus(target);
 			StopMovement();
 		}
 		else if (GetWorld()->GetNavigationSystem()) {
@@ -85,13 +88,26 @@ bool ABaseAIController::IsMechCharacter(AActor* character) {
 void ABaseAIController::FindTarget() {
 	AWeapon* weapon = owner->GetCurrentWeapon();
 
+	collision.IgnoreComponents.Empty();
+
+	if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
+		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
+			if (member != target) {
+				collision.AddIgnoredActor(member);
+			}
+		}
+	}
+
 	if (weapon != NULL && !weapon->Heals()) {
 		float range = weapon->GetRange() * 1.3;
 		range = range < 1200 ? 1200 : range;
 
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 			APawn* pawn = iter->Get();
-			if (pawn != NULL && IsMechCharacter(pawn) && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= range) {
+
+			GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), pawn->GetActorLocation(), collision, NULL);
+
+			if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(GetOwner()) <= range && hit.GetActor() == pawn) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
 				if (!character->IsDead() && !character->CompareGroup(owner)) {
@@ -150,7 +166,7 @@ void ABaseAIController::SetTarget(AMech_RPGCharacter* newVal) {
 }
 
 void ABaseAIController::GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
-	if (!GetTarget()) {
+	if (!GetTarget() || !IsTargetValid(GetTarget())) {
 		if (IsTargetValid(attacker)) {
 			SetTarget(attacker);
 		}

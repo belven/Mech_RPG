@@ -55,8 +55,10 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	SetHealth(GetMaxHealth());
 
 	speed = GetCharacterMovement()->MaxWalkSpeed;
-
+	GetCharacterMovement()->bCanWalkOffLedges = false;
 	GetCharacterMovement()->bUseRVOAvoidance = true;
+	GetCharacterMovement()->AvoidanceConsiderationRadius = 180;
+	bCanAffectNavigationGeneration = false;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -127,6 +129,11 @@ void AMech_RPGCharacter::SetUpGroup() {
 				if (character != NULL) {
 					character->SetGroup(GetGroup());
 					GetGroup()->AddMemeber(character);
+
+					ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
+					if (con) {
+						GetGroup()->OnMemberDamageEvent.AddDynamic(con, &ABaseAIController::GroupMemberDamaged);
+					}
 				}
 			}
 		}
@@ -137,6 +144,10 @@ void AMech_RPGCharacter::SetUpGroup() {
 		if (con) {
 			GetGroup()->OnMemberDamageEvent.AddDynamic(con, &ABaseAIController::GroupMemberDamaged);
 		}
+		
+		//for (AMech_RPGCharacter* character : GetGroup()->GetMembers()) {
+			//GetWorld()->GetNavigationSystem()->
+		//}
 	}
 }
 
@@ -179,21 +190,21 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
 		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 1));
-		SetDefenceModifier(0.2);
+		SetDefenceModifier(0);
 		SetDamageModifier(1.5);
 		break;
 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
 		abilities.Add(UHeal::CreateAbility(15.0F, this, 600));
-		SetDefenceModifier(0.2);
+		SetDefenceModifier(0);
 		SetDamageModifier(1.5);
 		break;
 
 	case GroupEnums::Tank:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
 		abilities.Add(UTaunt::CreateAbility(5.0F, this));
-		SetDefenceModifier(0.7);
+		SetDefenceModifier(0.4);
 		SetDamageModifier(1);
 		break;
 
@@ -207,18 +218,15 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	case GroupEnums::RPG:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
 		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 1));
-		SetDefenceModifier(0.25);
+		SetDefenceModifier(0);
 		SetDamageModifier(1.25);
 		break;
 	}
-
 }
 
 void AMech_RPGCharacter::SetupWithLoadout() {
-	SetAbilities(startingLoadout.abilities);
 	SetMaxHealth(startingLoadout.maxHealth);
 	SetHealth(GetMaxHealth());
-	SetWeapons(startingLoadout.weapons);
 	SetDefenceModifier(startingLoadout.defenceModifier);
 	SetDamageModifier(startingLoadout.damageModifier);
 	SetCanMove(startingLoadout.canMove);
@@ -291,7 +299,7 @@ bool AMech_RPGCharacter::CompareGroup(UGroup* inGroup) {
 }
 
 bool AMech_RPGCharacter::CompareGroup(AMech_RPGCharacter* inCharacter) {
-	return inCharacter != NULL &&  inCharacter->GetGroup() != NULL ? CompareGroup(inCharacter->GetGroup()) : true;
+	return inCharacter != NULL && inCharacter->GetGroup() != NULL ? CompareGroup(inCharacter->GetGroup()) : true;
 }
 
 AController* AMech_RPGCharacter::GetDemandedController() {
@@ -342,6 +350,14 @@ bool AMech_RPGCharacter::CanMove() {
 	return canMove == 0;
 }
 
+int32& AMech_RPGCharacter::GetCanAttack() {
+	return canAttack;
+}
+
+int32& AMech_RPGCharacter::GetCanMove() {
+	return canMove;
+}
+
 float AMech_RPGCharacter::GetDamageModifier() {
 	return damageModifier;
 }
@@ -389,4 +405,8 @@ void AMech_RPGCharacter::SetMovementModifier(float newVal) {
 
 void AMech_RPGCharacter::SetSpeed(float newVal) {
 	speed = newVal;
+}
+
+void AMech_RPGCharacter::AddAbility(UAbility* newAbility) {
+	abilities.Add(newAbility);
 }

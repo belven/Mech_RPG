@@ -33,11 +33,11 @@ USTRUCT(BlueprintType)
 struct FLoadout {
 	GENERATED_USTRUCT_BODY()
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		TArray<AWeapon*> weapons;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		//TArray<AWeapon*> weapons;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		TArray<UAbility*> abilities;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		//TArray<UAbility*> abilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		float damageModifier = 1;
@@ -80,12 +80,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* TopDownCameraComponent;
 
-	/**
-	 * Top down camera
-	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
-
 	bool isDead;
 	float energy;
 	float health;
@@ -106,6 +100,9 @@ private:
 	USphereComponent* aoe;
 public:
 	AMech_RPGCharacter();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom;
 
 	void SetUpGroup();
 
@@ -204,8 +201,14 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	TArray<UAbility*>& GetAbilities();
-	void SetAbilities(TArray<UAbility*> newVal);
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+		TArray<UAbility*>& GetAbilities();
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+		void SetAbilities(TArray<UAbility*> newVal);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+		void AddAbility(UAbility* newAbility);
 
 	void SwapWeapon();
 
@@ -218,6 +221,8 @@ public:
 
 	bool CanAttack();
 	bool CanMove();
+	int32& GetCanAttack();
+	int32& GetCanMove();
 
 	float GetDamageModifier();
 	float GetDefenceModifier();

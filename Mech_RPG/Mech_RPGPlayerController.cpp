@@ -81,19 +81,36 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 	AWeapon* weapon = owner->GetCurrentWeapon();
 
 	if (weapon != NULL) {
+		collision.IgnoreComponents.Empty();
+
+		if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
+			for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
+				if (member != target) {
+					collision.AddIgnoredActor(member);
+				}
+			}
+
+			owner->GetGroup()->GroupMemberHit(target, owner);
+		}
+		GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
+
 		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
-		if (dist <= weapon->GetRange()) {
+		if (dist <= weapon->GetRange() && (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor())))) {
 			if (GetOwner()->CanAttack() && weapon->CanFire()) {
 				weapon->Fire(target, GetOwner());
 			}
 			StopMovement();
 		}
 		else if (GetWorld()->GetNavigationSystem()) {
-			MoveToActor(target);
+			MoveToLocation(target->GetActorLocation());
 		}
 	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Weapon NULL"));
+	}
 }
+
 
 void AMech_RPGPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
@@ -120,6 +137,10 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("Ctrl", IE_Pressed, this, &AMech_RPGPlayerController::CtrlPressed);
 	InputComponent->BindAction("Ctrl", IE_Released, this, &AMech_RPGPlayerController::CtrlReleased);
+	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &AMech_RPGPlayerController::ZoomIn);
+	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &AMech_RPGPlayerController::ZoomOut);
+	InputComponent->BindAction("ResetZoom", IE_Pressed, this, &AMech_RPGPlayerController::ResetZoom);
+	//	InputComponent->BindAction("UpdateRotation", IE_Pressed, this, &AMech_RPGPlayerController::UpdateRotation);
 }
 
 
@@ -161,6 +182,22 @@ void AMech_RPGPlayerController::OnSetDestinationPressed() {
 void AMech_RPGPlayerController::OnSetDestinationReleased() {
 	bMoveToMouseCursor = false;
 }
+
+void AMech_RPGPlayerController::ZoomIn() {
+	GetOwner()->CameraBoom->TargetArmLength += 100;
+}
+
+void AMech_RPGPlayerController::ZoomOut() {
+	GetOwner()->CameraBoom->TargetArmLength -= 100;
+}
+
+void AMech_RPGPlayerController::ResetZoom() {
+	GetOwner()->CameraBoom->TargetArmLength = 1500;
+}
+
+//void AMech_RPGPlayerController::UpdateRotation() {	
+//	//GetOwner()->CameraBoom->;
+//}
 
 /**
  * Input handlers for Attack action.
