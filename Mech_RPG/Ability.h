@@ -18,11 +18,10 @@ protected:
 private:
 	float cooldown = 1.0F;
 	bool onCooldown = false;
-	bool needsTarget = false;
 
 public:
 	void SetOnCooldown(UWorld* const World);
-	bool OnCooldown();
+	virtual bool OnCooldown();
 	void ResetOnCooldown();
 
 	float GetCooldown();
@@ -31,6 +30,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		virtual void Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) { check(0 && "You must override this") };
 
-	/** Handle for efficient management of ShotTimerExpired timer */
-	FTimerHandle TimerHandle_ShotTimerExpired;
+	FTimerHandle TimerHandle_AbilityOffCooldown;
 };

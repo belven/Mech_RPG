@@ -7,7 +7,7 @@
 void UImmobilise::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (target != NULL && !target->IsDead() && target->GetController()) {
 		SetOnCooldown(owner->GetWorld());
-		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &UImmobilise::ResetImmobilise, duration);
+		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_ImmobiliseEnded, this, &UImmobilise::ResetImmobilise, duration);
 		target->GetCanMove()++;
 		target->GetController()->StopMovement();
 		lastTarget = target;

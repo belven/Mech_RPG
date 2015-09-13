@@ -6,7 +6,7 @@
 
 void UDamageBoost::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	SetOnCooldown(owner->GetWorld());
-	owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &UDamageBoost::ResetDamageBoost, GetCooldown() * 0.5);
+	owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_DamageBoostEnded, this, &UDamageBoost::ResetDamageBoost, GetCooldown() * 0.5);
 	owner->SetDamageModifier(owner->GetDamageModifier() + damageMultiplier);
 }
 

@@ -90,7 +90,6 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 				}
 			}
 
-			owner->GetGroup()->GroupMemberHit(target, owner);
 		}
 		GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
 
@@ -100,6 +99,7 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 			if (GetOwner()->CanAttack() && weapon->CanFire()) {
 				weapon->Fire(target, GetOwner());
 			}
+			owner->GetGroup()->GroupMemberHit(target, owner);
 			StopMovement();
 		}
 		else if (GetWorld()->GetNavigationSystem()) {

@@ -23,5 +23,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		static UDamageBoost* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDamageMultiplier);
 
-		void ResetDamageBoost();
+	void ResetDamageBoost();
+
+	FTimerHandle TimerHandle_DamageBoostEnded;
 };

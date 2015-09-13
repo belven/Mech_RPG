@@ -23,5 +23,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		static UImmobilise* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float duration);
-	void ResetImmobilise();
+	void ResetImmobilise(); 
+	FTimerHandle TimerHandle_ImmobiliseEnded;
 };

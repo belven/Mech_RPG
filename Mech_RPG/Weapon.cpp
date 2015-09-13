@@ -92,7 +92,7 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 		return CreateWeapon(inOwner, 250, 1300, 2.5);
 		break;
 	case WeaponEnums::Shotgun:
-		return CreateWeapon(inOwner, 70, 350, 0.8);
+		return CreateWeapon(inOwner, 70, 400, 0.8);
 		break;
 	case WeaponEnums::Sniper:
 		return CreateWeapon(inOwner, 200, 1500, 2);

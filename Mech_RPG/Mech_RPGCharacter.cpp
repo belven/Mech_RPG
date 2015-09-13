@@ -8,6 +8,7 @@
 #include "Mech_RPGPlayerController.h"
 #include "BaseAIController.h"
 #include "DamageBoost.h"
+#include "ChannelledAbility.h"
 
 AMech_RPGCharacter::AMech_RPGCharacter() {
 	static int32 ID = 0;
@@ -144,9 +145,9 @@ void AMech_RPGCharacter::SetUpGroup() {
 		if (con) {
 			GetGroup()->OnMemberDamageEvent.AddDynamic(con, &ABaseAIController::GroupMemberDamaged);
 		}
-		
+
 		//for (AMech_RPGCharacter* character : GetGroup()->GetMembers()) {
-			//GetWorld()->GetNavigationSystem()->
+		//GetWorld()->GetNavigationSystem()->
 		//}
 	}
 }
@@ -199,18 +200,20 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		abilities.Add(UHeal::CreateAbility(15.0F, this, 600));
 		SetDefenceModifier(0);
 		SetDamageModifier(1.5);
+		SetMovementModifier(1.2);
 		break;
 
 	case GroupEnums::Tank:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
 		abilities.Add(UTaunt::CreateAbility(5.0F, this));
-		SetDefenceModifier(0.4);
+		SetDefenceModifier(0.5);
 		SetDamageModifier(1);
+		SetMovementModifier(1.3);
 		break;
 
 	case GroupEnums::Sniper:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
-		abilities.Add(USnipe::CreateAbility(15.0F, this));
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 1.0F));
 		SetDefenceModifier(0);
 		SetDamageModifier(2);
 		break;

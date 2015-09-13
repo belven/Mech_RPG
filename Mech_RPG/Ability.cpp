@@ -6,7 +6,7 @@
 
 void UAbility::SetOnCooldown(UWorld* const World) {
 	onCooldown = true;
-	World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &UAbility::ResetOnCooldown, GetCooldown());
+	World->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UAbility::ResetOnCooldown, GetCooldown());
 }
 
 float UAbility::GetCooldown() {
