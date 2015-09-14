@@ -18,7 +18,10 @@ private:
 	FHitResult hit;
 public:
 	AMech_RPGPlayerController();
+
+	UFUNCTION(BlueprintCallable, Category = "Owner")
 	AMech_RPGCharacter* GetOwner();
+
 	void SetOwner(AMech_RPGCharacter* newVal);
 
 	bool IsMechCharacter(AActor* character);

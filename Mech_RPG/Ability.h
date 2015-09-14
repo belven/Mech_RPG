@@ -21,11 +21,16 @@ private:
 
 public:
 	void SetOnCooldown(UWorld* const World);
-	virtual bool OnCooldown();
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		virtual bool OnCooldown();
 	void ResetOnCooldown();
 
-	float GetCooldown();
-	void SetCooldown(float newCooldown);
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		float GetCooldown();
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		void SetCooldown(float newCooldown);
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		virtual void Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) { check(0 && "You must override this") };

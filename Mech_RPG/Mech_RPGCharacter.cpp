@@ -93,10 +93,10 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 
 		if (GetHealth() < GetMaxHealth()) {
 			health += healthRegen * DeltaTime;
+		}
 
-			if (GetHealth() > GetMaxHealth()) {
-				health = GetMaxHealth();
-			}
+		if (GetHealth() > GetMaxHealth()) {
+			health = GetMaxHealth();
 		}
 	}
 }

@@ -40,7 +40,6 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 
 	GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
 
-	float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
 	if (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor()))) {
 		if (GetOwner()->GetAbilities().Num() > 0) {
@@ -51,6 +50,8 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 				}
 			}
 		}
+
+		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
 		if (weapon != NULL && dist <= weapon->GetRange()) {
 			if (GetOwner()->CanAttack() && weapon->CanFire()) {

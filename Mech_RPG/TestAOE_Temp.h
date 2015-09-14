@@ -11,19 +11,19 @@ USTRUCT(BlueprintType)
 struct FTempAOESettings {
 	GENERATED_USTRUCT_BODY()
 public:
-	AMech_RPGCharacter* owner;
-	AMech_RPGCharacter* target;
+	AMech_RPGCharacter* owner = NULL;
+	AMech_RPGCharacter* target = NULL;
 
-	FVector location;
-	UWorld* world;
+	FVector location = FVector::ZeroVector;
+	UWorld* world = NULL;
 
-	float radius;
-	float healthChange;
-	float duration;
-	float rate;
+	float radius = 100;
+	float healthChange = 100;
+	float duration = 5;
+	float rate = 1;
 
-	int affectedTeam;
-	bool usesTarget;
+	int affectedTeam = 0;
+	bool usesTarget = false;
 };
 
 UCLASS()

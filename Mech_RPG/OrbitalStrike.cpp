@@ -14,7 +14,7 @@ void UOrbitalStrike::Activate(AMech_RPGCharacter* target, FVector targetLocation
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 1;
-		settings.radius = 300;
+		settings.radius = 5500;
 		settings.target = target;
 		settings.duration = 5;
 		UTestAOE_Temp::CreateTestAOE(settings);
