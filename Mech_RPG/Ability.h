@@ -16,8 +16,11 @@ protected:
 	class AMech_RPGCharacter* owner;
 
 private:
-	float cooldown = 1.0F;
-	bool onCooldown = false;
+		float cooldown = 1.0F;
+
+		bool onCooldown = false;
+
+		float currentTime = 0.0F;
 
 public:
 	void SetOnCooldown(UWorld* const World);
@@ -27,7 +30,10 @@ public:
 	void ResetOnCooldown();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		float GetCooldown();
+		virtual float GetCooldown();
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		virtual float GetCurrentTimeRemaining();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		void SetCooldown(float newCooldown);

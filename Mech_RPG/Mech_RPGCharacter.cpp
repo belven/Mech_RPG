@@ -58,9 +58,9 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 
 	speed = GetCharacterMovement()->MaxWalkSpeed;
 	GetCharacterMovement()->bCanWalkOffLedges = false;
-	GetCharacterMovement()->bUseRVOAvoidance = false;
-	GetCharacterMovement()->AvoidanceConsiderationRadius = 180;
-	bCanAffectNavigationGeneration = false;
+	GetCharacterMovement()->bUseRVOAvoidance = true;
+	GetCharacterMovement()->AvoidanceConsiderationRadius = 100;
+	bCanAffectNavigationGeneration = true;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -134,7 +134,7 @@ void AMech_RPGCharacter::SetUpGroup() {
 
 					ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
 					if (con) {
-						GetGroup()->OnMemberDamageEvent.AddDynamic(con, &ABaseAIController::GroupMemberDamaged);
+						GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
 					}
 				}
 			}
@@ -144,7 +144,7 @@ void AMech_RPGCharacter::SetUpGroup() {
 	if (GetGroup()) {
 		ABaseAIController* con = Cast<ABaseAIController>(Controller);
 		if (con) {
-			GetGroup()->OnMemberDamageEvent.AddDynamic(con, &ABaseAIController::GroupMemberDamaged);
+			GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
 		}
 
 		//for (AMech_RPGCharacter* character : GetGroup()->GetMembers()) {
@@ -412,5 +412,7 @@ void AMech_RPGCharacter::SetSpeed(float newVal) {
 }
 
 void AMech_RPGCharacter::AddAbility(UAbility* newAbility) {
-	abilities.Add(newAbility);
+	if (&newAbility != NULL && newAbility != NULL) {
+		abilities.Add(newAbility);
+	}
 }

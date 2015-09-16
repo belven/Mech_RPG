@@ -12,10 +12,14 @@ class MECH_RPG_API ABaseAIController : public AAIController {
 	GENERATED_BODY()
 
 private:
-	AMech_RPGCharacter* owner;
+	AMech_RPGCharacter* characterOwner;
+
 	AMech_RPGCharacter* target;
+
 	FCollisionQueryParams collision;
+
 	bool collisionSet = false;
+
 	FHitResult hit;
 
 	virtual void Tick(float DeltaTime) override;
@@ -36,13 +40,7 @@ public:
 	void MoveToActor(AActor* target);
 	void MoveToLocation(FVector location);
 
-	UFUNCTION()
-		void OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-		void OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UFUNCTION()
-		void GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
+	UFUNCTION(BlueprintCallable, Category = "Group")
+	void GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
 
 };

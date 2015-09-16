@@ -10,6 +10,6 @@ void AHealMechanic::Tick(float DeltaTime) {
 		}
 	}
 	else {
-		Destroy();
+		//Destroy();
 	}
 }

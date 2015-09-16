@@ -26,32 +26,32 @@ void ABaseAIController::Tick(float DeltaTime) {
 }
 
 void ABaseAIController::AttackTarget(float DeltaTime) {
-	AWeapon* weapon = owner->GetCurrentWeapon();
+	AWeapon* weapon = characterOwner->GetCurrentWeapon();
 	collision.IgnoreComponents.Empty();
 
-	if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
-		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
+	if (characterOwner->GetGroup() != NULL && characterOwner->GetGroup()->GetMembers().Num() > 0) {
+		for (AMech_RPGCharacter* member : characterOwner->GetGroup()->GetMembers()) {
 			if (member != target) {
 				collision.AddIgnoredActor(member);
 			}
 		}
-		owner->GetGroup()->GroupMemberHit(target, owner);
+		characterOwner->GetGroup()->GroupMemberHit(target, characterOwner);
 	}
 
-	GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
+	GetWorld()->LineTraceSingle(hit, characterOwner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
 
 
 	if (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor()))) {
 		if (GetOwner()->GetAbilities().Num() > 0) {
 			for (UAbility* ability : GetOwner()->GetAbilities()) {
-				if (ability != NULL && !ability->OnCooldown()) {
+				if (&ability != NULL && ability != NULL &&!ability->OnCooldown()) {
 					ability->Activate(target);
 					break;
 				}
 			}
 		}
 
-		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
+		float dist = FVector::Dist(characterOwner->GetActorLocation(), target->GetActorLocation());
 
 		if (weapon != NULL && dist <= weapon->GetRange()) {
 			if (GetOwner()->CanAttack() && weapon->CanFire()) {
@@ -86,12 +86,12 @@ bool ABaseAIController::IsMechCharacter(AActor* character) {
 }
 
 void ABaseAIController::FindTarget() {
-	AWeapon* weapon = owner->GetCurrentWeapon();
+	AWeapon* weapon = characterOwner->GetCurrentWeapon();
 
 	collision.IgnoreComponents.Empty();
 
-	if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
-		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
+	if (characterOwner->GetGroup() != NULL && characterOwner->GetGroup()->GetMembers().Num() > 0) {
+		for (AMech_RPGCharacter* member : characterOwner->GetGroup()->GetMembers()) {
 			if (member != target) {
 				collision.AddIgnoredActor(member);
 			}
@@ -105,12 +105,12 @@ void ABaseAIController::FindTarget() {
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 			APawn* pawn = iter->Get();
 
-			GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), pawn->GetActorLocation(), collision, NULL);
+			GetWorld()->LineTraceSingle(hit, characterOwner->GetActorLocation(), pawn->GetActorLocation(), collision, NULL);
 
 			if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(GetOwner()) <= range && hit.GetActor() == pawn) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
-				if (!character->IsDead() && !character->CompareGroup(owner)) {
+				if (!character->IsDead() && !character->CompareGroup(characterOwner)) {
 					SetTarget(character);
 					break;
 				}
@@ -127,16 +127,8 @@ void ABaseAIController::FindTarget() {
 	}
 }
 
-void ABaseAIController::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-
-}
-
-void ABaseAIController::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-
-}
-
 AMech_RPGCharacter* ABaseAIController::GetOwner() {
-	return owner;
+	return characterOwner;
 }
 
 AMech_RPGCharacter* ABaseAIController::GetTarget() {
@@ -147,10 +139,10 @@ bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 	if (inTarget != NULL && !inTarget->IsDead()) {
 		if (GetOwner()->GetCurrentWeapon()) {
 			if (GetOwner()->GetCurrentWeapon()->Heals()) {
-				return inTarget->CompareGroup(owner) && inTarget->GetHealth() < inTarget->GetMaxHealth();
+				return inTarget->CompareGroup(characterOwner) && inTarget->GetHealth() < inTarget->GetMaxHealth();
 			}
 			else {
-				return !inTarget->CompareGroup(owner);
+				return !inTarget->CompareGroup(characterOwner);
 			}
 		}
 	}
@@ -158,7 +150,7 @@ bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 }
 
 void ABaseAIController::SetOwner(AMech_RPGCharacter* newVal) {
-	owner = newVal;
+	characterOwner = newVal;
 }
 
 void ABaseAIController::SetTarget(AMech_RPGCharacter* newVal) {

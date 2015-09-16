@@ -43,7 +43,7 @@ bool UGroup::Compare(UGroup* inGroup) {
 	return inGroup && this ? inGroup->GetID() == this->GetID() : true;
 }
 
-AMech_RPGCharacter* UGroup::GetMember(int index) {
+AMech_RPGCharacter* UGroup::GetMember(int32 index) {
 	return members.IsValidIndex(index - 1) ? members[index - 1] : NULL;
 }
 

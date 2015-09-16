@@ -15,8 +15,16 @@ void UChannelledAbility::Activate(AMech_RPGCharacter* target, FVector targetLoca
 	}
 }
 
+float UChannelledAbility::GetCooldown() {
+	return abilityToActivate->GetCooldown();
+}
+
 bool UChannelledAbility::OnCooldown() {
 	return abilityToActivate->OnCooldown();
+}
+
+float UChannelledAbility::GetCurrentTimeRemaining() {
+	return abilityToActivate->GetCurrentTimeRemaining();
 }
 
 void UChannelledAbility::ActiveChannelAbility() {

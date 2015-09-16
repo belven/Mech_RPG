@@ -34,10 +34,10 @@ struct FLoadout {
 	GENERATED_USTRUCT_BODY()
 public:
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		//TArray<AWeapon*> weapons;
+	//TArray<AWeapon*> weapons;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		//TArray<UAbility*> abilities;
+	//TArray<UAbility*> abilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		float damageModifier = 1;
@@ -90,13 +90,22 @@ private:
 	int32 canMove;
 	int32 canBeDamaged;
 
+	UPROPERTY()
 	TArray<AWeapon*> weapons;
+
+	UPROPERTY()
 	AWeapon* currentWeapon;
 
+	UPROPERTY()
 	UGroup* group;
+
+	UPROPERTY()
 	AController* demandedController;
 
+	UPROPERTY()
 	TArray<UAbility*> abilities;
+
+	UPROPERTY()
 	USphereComponent* aoe;
 public:
 	AMech_RPGCharacter();
@@ -106,6 +115,7 @@ public:
 
 	void SetUpGroup();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 canUseAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")

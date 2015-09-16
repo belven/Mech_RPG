@@ -9,7 +9,7 @@ void AAllyAIController::Tick(float DeltaTime) {
 	if (GetOwner() && GetOwner()->GetDemandedController() == NULL) {
 		if (GetOwner()->IsDead()) {
 			UnPossess();
-			GetOwner()->Destroy(true);
+			//GetOwner()->Destroy(true);
 		}
 		else if (GetPlayerControlledLocation() != FVector::ZeroVector) {
 			float dist = FVector::Dist(GetPlayerControlledLocation(), GetOwner()->GetActorLocation());

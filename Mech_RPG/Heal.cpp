@@ -12,7 +12,7 @@ void UHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		damage.damager = owner;
 		damage.target = target;
 		damage.weaponUsed = NULL;
-		damage.damagedDealt = 1000;
+		damage.damagedDealt = healAmount;
 
 		target->Hit(damage);
 		SetOnCooldown(owner->GetWorld());

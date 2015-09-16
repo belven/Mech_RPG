@@ -34,7 +34,7 @@ void  UTestAOE_Temp::Activate() {
 				bool inRange = dist <= settings.radius;
 
 				if (character != NULL && !character->IsDead() && character->startingGroupID == settings.affectedTeam && inRange) {
-					UE_LOG(LogTemp, Log, TEXT("Dist = %f"), dist);
+					//UE_LOG(LogTemp, Log, TEXT("Dist = %f"), dist);
 					damage.damagedDealt = character->GetMaxHealth() * settings.healthChange;
 					damage.target = character;
 					character->Hit(damage);

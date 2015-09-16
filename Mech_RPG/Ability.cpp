@@ -6,11 +6,16 @@
 
 void UAbility::SetOnCooldown(UWorld* const World) {
 	onCooldown = true;
-	World->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UAbility::ResetOnCooldown, GetCooldown());
+	currentTime = GetCooldown() - 0.1;
+	World->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UAbility::ResetOnCooldown, 0.1F);
 }
 
 float UAbility::GetCooldown() {
 	return cooldown;
+}
+
+float UAbility::GetCurrentTimeRemaining() {
+	return currentTime;
 }
 
 bool UAbility::OnCooldown() {
@@ -22,5 +27,12 @@ void UAbility::SetCooldown(float newCooldown) {
 }
 
 void UAbility::ResetOnCooldown() {
-	onCooldown = false;
+	if (GetCurrentTimeRemaining() <= 0) {
+		onCooldown = false;
+		currentTime = 0;
+	}
+	else {
+		currentTime -= 0.1;
+		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UAbility::ResetOnCooldown, 0.1F);
+	}
 }

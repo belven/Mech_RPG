@@ -28,7 +28,7 @@ void AAOEVolume::Tick(float DeltaTime) {
 		}
 	}
 	else {
-		Destroy();
+		//Destroy();
 	}
 
 		//TArray<AActor*> actors;
