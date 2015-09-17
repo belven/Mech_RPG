@@ -2,8 +2,14 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "BaseAIController.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "Mech_RPGCharacter.h"
 #include "AI/Navigation/NavigationSystem.h"
+
+ABaseAIController::ABaseAIController(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
+
+}
 
 void ABaseAIController::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);

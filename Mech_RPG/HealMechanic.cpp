@@ -3,6 +3,10 @@
 #include "Mech_RPG.h"
 #include "HealMechanic.h"
 
+AHealMechanic::AHealMechanic() : Super() {
+
+}
+
 void AHealMechanic::Tick(float DeltaTime) {
 	if (!IsDead()) {
 		if (GetBoss() && !GetBoss()->IsDead() && GetBoss()->GetHealth() < GetBoss()->GetMaxHealth()) {

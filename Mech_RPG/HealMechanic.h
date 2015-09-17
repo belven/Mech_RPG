@@ -14,6 +14,7 @@ class MECH_RPG_API AHealMechanic : public ABossMechanic
 	GENERATED_BODY()
 	
 public:
+	AHealMechanic();
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Heal")

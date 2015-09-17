@@ -17,7 +17,7 @@ private:
 	FCollisionQueryParams collision;
 	FHitResult hit;
 public:
-	AMech_RPGPlayerController();
+	AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(BlueprintCallable, Category = "Owner")
 	AMech_RPGCharacter* GetOwner();

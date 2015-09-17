@@ -4,10 +4,12 @@
 #include "Mech_RPGPlayerController.h"
 #include "Mech_RPGCharacter.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "BaseAIController.h"
 #include "AllyAIController.h"
 
-AMech_RPGPlayerController::AMech_RPGPlayerController() {
+AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Hand;
 }

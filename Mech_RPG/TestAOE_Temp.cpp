@@ -25,7 +25,7 @@ void  UTestAOE_Temp::Activate() {
 
 			if (iter->IsValid() && pawn != NULL && pawn->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-				float dist = FVector::Dist(locationToUse, character->GetActorLocation());
+				float dist = (locationToUse - character->GetActorLocation()).Size();
 
 				if (dist < 0) {
 					dist = -dist;

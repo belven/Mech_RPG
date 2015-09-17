@@ -3,6 +3,10 @@
 #include "Mech_RPG.h"
 #include "BossMechanic.h"
 
+ABossMechanic::ABossMechanic() : Super(){
+
+}
+
 void ABossMechanic::BeginPlay() {
 	//Super::BeginPlay();
 	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {

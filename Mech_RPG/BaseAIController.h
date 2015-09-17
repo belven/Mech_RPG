@@ -24,6 +24,7 @@ private:
 
 	virtual void Tick(float DeltaTime) override;
 public:
+	ABaseAIController(const FObjectInitializer& ObjectInitializer);
 	void AttackTarget(float DeltaTime);
 	void FindTarget();
 

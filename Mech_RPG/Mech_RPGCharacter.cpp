@@ -9,6 +9,7 @@
 #include "BaseAIController.h"
 #include "DamageBoost.h"
 #include "ChannelledAbility.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "OrbitalStrike.h"
 
 AMech_RPGCharacter::AMech_RPGCharacter() {
@@ -34,7 +35,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
 	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 1500.0f;
+	CameraBoom->TargetArmLength = 1800.0f;
 	CameraBoom->RelativeRotation = FRotator(-60.f, 0.f, 0.f);
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
@@ -58,9 +59,6 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 
 	speed = GetCharacterMovement()->MaxWalkSpeed;
 	GetCharacterMovement()->bCanWalkOffLedges = false;
-	GetCharacterMovement()->bUseRVOAvoidance = true;
-	GetCharacterMovement()->AvoidanceConsiderationRadius = 100;
-	bCanAffectNavigationGeneration = true;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {

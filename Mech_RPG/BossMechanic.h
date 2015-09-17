@@ -17,6 +17,7 @@ private:
 	ABoss* boss;	
 	
 public:
+	ABossMechanic();
 	virtual	void BeginPlay() override;
 
 	ABoss* GetBoss();
