@@ -20,7 +20,7 @@ class AMech_RPGCharacter;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMemberDamageEvent, AMech_RPGCharacter*, attacker, AMech_RPGCharacter*, damagedMember);
 
-UCLASS()
+UCLASS(Blueprintable)
 class MECH_RPG_API UGroup : public UObject {
 	GENERATED_BODY()
 private:

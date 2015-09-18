@@ -8,7 +8,7 @@
 /**
  *
  */
-UCLASS()
+UCLASS(Blueprintable)
 class UAbility : public UObject {
 	GENERATED_BODY()
 

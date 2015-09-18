@@ -8,7 +8,7 @@
 /**
  *
  */
-UCLASS()
+UCLASS(Blueprintable)
 class MECH_RPG_API UChannelledAbility : public UAbility {
 	GENERATED_BODY()
 
@@ -26,6 +26,8 @@ private:
 		UAbility* abilityToActivate;
 
 	bool channelling = false;
+
+	float currentChannelTime = 0;
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
@@ -33,6 +35,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		float GetCooldown() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		float GetCurrentChannelTime();
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		float GetChannelDuration();
 
 	void ActiveChannelAbility();
 

@@ -8,7 +8,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class MECH_RPG_API ABoss : public AMech_RPGCharacter
 {
 	GENERATED_BODY()

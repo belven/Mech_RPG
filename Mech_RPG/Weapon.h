@@ -22,7 +22,7 @@ namespace WeaponEnums {
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class MECH_RPG_API AWeapon : public AMechAttachment
 {
 	GENERATED_BODY()

@@ -5,7 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "MechAttachment.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class MECH_RPG_API AMechAttachment : public AActor
 {
 	GENERATED_BODY()

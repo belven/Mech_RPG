@@ -23,7 +23,7 @@ void UHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 UHeal* UHeal::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inHealAmount) {
 	UHeal* ability = NewObject<UHeal>(StaticClass());
 	ability->SetCooldown(cooldown);
-	ability->healAmount = inHealAmount;
+	ability->healAmount = -inHealAmount;
 	ability->owner = owner;
 	return ability;
 }
