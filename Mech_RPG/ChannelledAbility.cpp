@@ -7,6 +7,7 @@
 void UChannelledAbility::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (!channelling) {
 		channelling = true; 
+		owner->SetChannelling(true);
 		currentChannelTime = channelDuration - 0.1F;
 		owner->GetCanMove()++;
 		owner->GetCanAttack()++;
@@ -14,6 +15,10 @@ void UChannelledAbility::Activate(AMech_RPGCharacter* target, FVector targetLoca
 		this->targetLocation = targetLocation;
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
 	}
+}
+
+bool UChannelledAbility::Channelling() {
+	return channelling;
 }
 
 float UChannelledAbility::GetCooldown() {
@@ -37,15 +42,27 @@ float UChannelledAbility::GetCurrentTimeRemaining() {
 }
 
 void UChannelledAbility::ActiveChannelAbility() {
-	if (currentChannelTime > 0) {
-		currentChannelTime -= 0.1F;
-		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
+	if (channelling && owner->Channelling() && !owner->IsDead()) {
+		if (currentChannelTime > 0) {
+			currentChannelTime -= 0.1F;
+			owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
+		}
+		else {
+			owner->SetChannelling(false);
+			channelling = false;
+			abilityToActivate->Activate(targetCharacter, targetLocation);
+			owner->GetCanMove()--;
+			owner->GetCanAttack()--;
+		}
 	}
 	else {
+		owner->SetChannelling(false);
 		channelling = false;
-		abilityToActivate->Activate(targetCharacter, targetLocation);
+		currentChannelTime = 0;
 		owner->GetCanMove()--;
 		owner->GetCanAttack()--;
+		targetCharacter = NULL;
+		targetLocation = FVector::ZeroVector;
 	}
 }
 

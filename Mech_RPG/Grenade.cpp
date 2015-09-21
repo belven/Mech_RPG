@@ -1,10 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-#pragma once
+// Copyright of Explosive Industries
+
 #include "Mech_RPG.h"
-#include "TestAOE_Temp.h"
+#include "Grenade.h"
 
-
-void UOrbitalStrike::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
+void UGrenade::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (target != NULL) {
 		FTempAOESettings settings;
 		settings.affectedTeam = owner->startingGroupID == 1 ? 0 : 1;
@@ -12,9 +11,9 @@ void UOrbitalStrike::Activate(AMech_RPGCharacter* target, FVector targetLocation
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 1;
-		settings.radius = 700;
+		settings.radius = 400;
 		settings.target = target;
-		settings.duration = 5;
+		settings.duration = 1;
 		settings.usesTarget = true;
 		UTestAOE_Temp::CreateTestAOE(settings);
 		SetOnCooldown(owner->GetWorld());
@@ -22,8 +21,8 @@ void UOrbitalStrike::Activate(AMech_RPGCharacter* target, FVector targetLocation
 }
 
 
-UOrbitalStrike* UOrbitalStrike::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDamage) {
-	UOrbitalStrike* ability = NewObject<UOrbitalStrike>(StaticClass());
+UGrenade* UGrenade::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDamage) {
+	UGrenade* ability = NewObject<UGrenade>(StaticClass());
 	ability->SetCooldown(cooldown);
 	ability->damage = inDamage;
 	ability->owner = owner;

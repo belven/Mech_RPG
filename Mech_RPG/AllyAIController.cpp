@@ -16,10 +16,12 @@ void AAllyAIController::Tick(float DeltaTime) {
 			if (dist > 1800.0F) {
 				SetPlayerControlledLocation(FVector::ZeroVector);
 			}
-			else if (dist > 200) {
+			else if (dist > 100) {
 				MoveToLocation(GetPlayerControlledLocation());
 			}
 			else {
+				SetPlayerControlledLocation(FVector::ZeroVector);
+
 				FindTargetInWeaponRage();
 
 				if (IsTargetValid(GetTarget())) {
@@ -61,10 +63,15 @@ void AAllyAIController::SetPlayerControlledLocation(FVector newVal) {
 }
 
 void AAllyAIController::FindTargetInWeaponRage() {
+	float weaponRange = GetOwner()->GetCurrentWeapon()->GetRange();
+
 	if (!GetOwner()->GetCurrentWeapon()->Heals()) {
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 			APawn* pawn = iter->Get();
-			if (pawn != NULL && pawn != GetOwner() && pawn->GetDistanceTo(GetOwner()) <= GetOwner()->GetCurrentWeapon()->GetRange()) {
+
+			if (pawn != NULL 
+				&& pawn != GetOwner() 
+				&& pawn->GetDistanceTo(GetOwner()) <= weaponRange) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
 				if (!character->IsDead() && !character->CompareGroup(GetOwner())) {
@@ -76,7 +83,9 @@ void AAllyAIController::FindTargetInWeaponRage() {
 	}
 	else {
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
-			if (!character->IsDead() && character->GetHealth() < character->GetMaxHealth()) {
+			if (!character->IsDead() 
+				&& character->GetHealth() < character->GetMaxHealth() 
+				&& character->GetDistanceTo(GetOwner()) <= weaponRange) {
 				SetTarget(character);
 				break;
 			}

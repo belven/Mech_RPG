@@ -1,12 +1,8 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Engine.h"
-#include "Mech_RPGPlayerController.h"
-#include "Mech_RPGCharacter.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "Navigation/CrowdFollowingComponent.h"
-#include "BaseAIController.h"
-#include "AllyAIController.h"
 
 AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
@@ -194,7 +190,7 @@ void AMech_RPGPlayerController::ZoomOut() {
 }
 
 void AMech_RPGPlayerController::ResetZoom() {
-	GetOwner()->CameraBoom->TargetArmLength = 1500;
+	GetOwner()->CameraBoom->TargetArmLength = 1700;
 }
 
 //void AMech_RPGPlayerController::UpdateRotation() {	
@@ -238,7 +234,7 @@ bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 	if (inTarget != NULL && !inTarget->IsDead()) {
 		if (GetOwner()->GetCurrentWeapon()) {
 			if (GetOwner()->GetCurrentWeapon()->Heals()) {
-				return inTarget->CompareGroup(owner) && inTarget->GetHealth() < inTarget->GetMaxHealth();
+				return inTarget->CompareGroup(owner);
 			}
 			else {
 				return !inTarget->CompareGroup(owner);
@@ -323,9 +319,13 @@ void AMech_RPGPlayerController::SwapWeapons() {
 }
 
 void AMech_RPGPlayerController::ActivateAbility() {
-	if (IsOwnerValid() && GetOwner()->GetAbilities().Num() > 0) {
-		if (!GetOwner()->GetAbilities()[0]->OnCooldown()) {
-			GetOwner()->GetAbilities()[0]->Activate(target);
+	if (IsOwnerValid() && GetOwner()->HasAbilities() && !GetOwner()->Channelling()) {
+		for (UAbility* ability : GetOwner()->GetAbilities()) {
+			if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
+				ability->Activate(target);
+				GetOwner()->SetCurrentAbility(ability);
+				break;
+			}
 		}
 	}
 }
@@ -344,13 +344,14 @@ void AMech_RPGPlayerController::PlayerDied() {
 }
 
 void AMech_RPGPlayerController::SwapCharacter() {
-	ABaseAIController* con = Cast<ABaseAIController>(GetOwner()->GetDemandedController());
+	AAllyAIController* con = Cast<AAllyAIController>(GetOwner()->GetDemandedController());
 	AMech_RPGCharacter* other = con->GetOwner();
 
 	GetOwner()->SetDemandedController(NULL);
 	other->SetDemandedController(NULL);
 
 	if (con != NULL) {
+		con->SetPlayerControlledLocation(FVector::ZeroVector);
 		con->Possess(GetOwner());
 		Possess(other);
 	}
@@ -375,7 +376,7 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 
 			AMech_RPGCharacter*	tempTarget = GetTargetUnderCursor();
 
-			if (IsTargetValid(tempTarget)) {
+			if (con->IsTargetValid(tempTarget)) {
 				con->SetPlayerControlledLocation(FVector::ZeroVector);
 				con->SetTarget(tempTarget);
 			}

@@ -1,16 +1,7 @@
 #pragma once
 #include "Mech_RPG.h"
-#include "Mech_RPGCharacter.h"
-#include "Taunt.h"
-#include "Heal.h"
-#include "Snipe.h"
 #include "Engine.h"
-#include "Mech_RPGPlayerController.h"
-#include "BaseAIController.h"
-#include "DamageBoost.h"
-#include "ChannelledAbility.h"
 #include "Navigation/CrowdFollowingComponent.h"
-#include "OrbitalStrike.h"
 
 AMech_RPGCharacter::AMech_RPGCharacter() {
 	static int32 ID = 0;
@@ -59,6 +50,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 
 	speed = GetCharacterMovement()->MaxWalkSpeed;
 	GetCharacterMovement()->bCanWalkOffLedges = false;
+	channeling = false;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -102,6 +94,7 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 void AMech_RPGCharacter::BeginPlay() {
 	Super::BeginPlay();
 	SetGroup(NULL);
+	channeling = false;
 
 	if (!UseLoadout) {
 		CreatePresetRole(startingRole);
@@ -112,6 +105,10 @@ void AMech_RPGCharacter::BeginPlay() {
 
 	if (weapons.Num() > 0) {
 		currentWeapon = weapons[0];
+	}
+
+	if (abilities.Num() > 0) {
+		SetCurrentAbility(abilities[0]);
 	}
 
 	SetUpGroup();
@@ -189,7 +186,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(UDamageBoost::CreateAbility(15.0F, this, 1));
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(15.0F, this, 300), 1.5F));
 		SetDefenceModifier(0);
 		SetDamageModifier(1.5);
 		break;
@@ -240,6 +237,26 @@ void AMech_RPGCharacter::SetupWithLoadout() {
 	SetSpeed(startingLoadout.speed);
 }
 
+bool AMech_RPGCharacter::HasAbilities() {
+	return GetAbilities().Num() > 0;
+}
+
+
+void AMech_RPGCharacter::SetChannelling(bool inChallenning) {
+	channeling = inChallenning;
+}
+
+bool AMech_RPGCharacter::Channelling() {
+	return channeling;
+}
+
+UAbility* AMech_RPGCharacter::GetCurrentAbility() {
+	return currentAbility;
+}
+
+void AMech_RPGCharacter::SetCurrentAbility(UAbility* inAbility) {
+	currentAbility = inAbility;
+}
 float AMech_RPGCharacter::GetEnergy() {
 	return energy;
 }

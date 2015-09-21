@@ -48,10 +48,11 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 
 
 	if (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor()))) {
-		if (GetOwner()->GetAbilities().Num() > 0) {
+		if (GetOwner()->HasAbilities() && !GetOwner()->Channelling()) {
 			for (UAbility* ability : GetOwner()->GetAbilities()) {
-				if (&ability != NULL && ability != NULL &&!ability->OnCooldown()) {
+				if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
 					ability->Activate(target);
+					GetOwner()->SetCurrentAbility(ability);
 					break;
 				}
 			}

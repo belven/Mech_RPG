@@ -84,6 +84,7 @@ private:
 	float energy;
 	float health;
 	float healthRegen;
+	bool channeling;
 
 	int32 id;
 	int32 canAttack;
@@ -103,12 +104,24 @@ private:
 	AController* demandedController;
 
 	UPROPERTY()
-	TArray<UAbility*> abilities;
+		TArray<UAbility*> abilities;
+
+	UPROPERTY()
+		UAbility* currentAbility;
 
 	UPROPERTY()
 	USphereComponent* aoe;
 public:
 	AMech_RPGCharacter();
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		bool Channelling();
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		void SetChannelling(bool inChallenning);
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		bool HasAbilities();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -147,6 +160,13 @@ public:
 
 	virtual	void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
+
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		UAbility* GetCurrentAbility();
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		void SetCurrentAbility(UAbility* inAbility);
 
 	UFUNCTION(BlueprintCallable, Category = "ID")
 		float GetEnergy();

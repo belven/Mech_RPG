@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		float GetChannelDuration();
 
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		bool Channelling();
+
 	void ActiveChannelAbility();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
