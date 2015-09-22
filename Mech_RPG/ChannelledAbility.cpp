@@ -9,8 +9,8 @@ void UChannelledAbility::Activate(AMech_RPGCharacter* target, FVector targetLoca
 		channelling = true; 
 		owner->SetChannelling(true);
 		currentChannelTime = channelDuration - 0.1F;
-		owner->GetCanMove()++;
-		owner->GetCanAttack()++;
+		owner->ApplyCrowdControl(EffectEnums::Move, false);
+		owner->ApplyCrowdControl(EffectEnums::Attack, false);
 		targetCharacter = target;
 		this->targetLocation = targetLocation;
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
@@ -51,16 +51,16 @@ void UChannelledAbility::ActiveChannelAbility() {
 			owner->SetChannelling(false);
 			channelling = false;
 			abilityToActivate->Activate(targetCharacter, targetLocation);
-			owner->GetCanMove()--;
-			owner->GetCanAttack()--;
+			owner->ApplyCrowdControl(EffectEnums::Move, true);
+			owner->ApplyCrowdControl(EffectEnums::Attack, true);
 		}
 	}
 	else {
 		owner->SetChannelling(false);
 		channelling = false;
 		currentChannelTime = 0;
-		owner->GetCanMove()--;
-		owner->GetCanAttack()--;
+		owner->ApplyCrowdControl(EffectEnums::Move, true);
+		owner->ApplyCrowdControl(EffectEnums::Attack, true);
 		targetCharacter = NULL;
 		targetLocation = FVector::ZeroVector;
 	}

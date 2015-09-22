@@ -18,8 +18,8 @@ void AAOEVolume::Tick(float DeltaTime) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
 				if (character != NULL && !character->IsDead() && character->startingGroupID == affectedTeam) {
-					FDamage damage;
-					damage.damagedDealt = healthChange * DeltaTime;
+					FHealthChange damage;
+					damage.healthChange = healthChange * DeltaTime;
 					damage.damager = owner;
 					damage.target = character;
 					character->Hit(damage);
@@ -40,7 +40,7 @@ void AAOEVolume::Tick(float DeltaTime) {
 		//		AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(actor);
 
 		//		if (character != NULL && !character->IsDead() && character->startingGroupID == affectedTeam) {
-		//			FDamage damage;
+		//			FHealthChange damage;
 		//			damage.damagedDealt = healthChange;
 		//			damage.damager = owner;
 		//			damage.target = character;

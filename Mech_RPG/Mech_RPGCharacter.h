@@ -1,4 +1,20 @@
+UENUM(BlueprintType)
+namespace TeamEnums {
+	enum Team {
+		Paladins,
+		Mercenaries
+	};
+}
 
+UENUM(BlueprintType)
+namespace EffectEnums {
+	enum CrowdControl {
+		Attack,
+		Move,
+		Damage,
+		Cast
+	};
+}
 
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
@@ -11,7 +27,7 @@
 #include "Mech_RPGCharacter.generated.h"
 
 USTRUCT(BlueprintType)
-struct FDamage {
+struct FHealthChange {
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
@@ -24,8 +40,7 @@ public:
 		AWeapon* weaponUsed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
-		float damagedDealt = 0;
-
+		float healthChange = 0;
 };
 
 
@@ -52,7 +67,7 @@ public:
 		float healthRegen = 10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		int32 startingGroupID = 0;
+		TEnumAsByte<TeamEnums::Team> team = TeamEnums::Paladins;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		int32 canAttack = 0;
@@ -92,16 +107,16 @@ private:
 	int32 canBeDamaged;
 
 	UPROPERTY()
-	TArray<AWeapon*> weapons;
+		TArray<AWeapon*> weapons;
 
 	UPROPERTY()
-	AWeapon* currentWeapon;
+		AWeapon* currentWeapon;
 
 	UPROPERTY()
-	UGroup* group;
+		UGroup* group;
 
 	UPROPERTY()
-	AController* demandedController;
+		AController* demandedController;
 
 	UPROPERTY()
 		TArray<UAbility*> abilities;
@@ -110,7 +125,7 @@ private:
 		UAbility* currentAbility;
 
 	UPROPERTY()
-	USphereComponent* aoe;
+		USphereComponent* aoe;
 public:
 	AMech_RPGCharacter();
 
@@ -129,7 +144,7 @@ public:
 	void SetUpGroup();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 canUseAbilities;
+		int32 canUseAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		FLoadout startingLoadout;
@@ -141,7 +156,9 @@ public:
 		TEnumAsByte<GroupEnums::Role> startingRole;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
-		int32 startingGroupID;
+		TEnumAsByte<TeamEnums::Team> team;
+
+	int32 startingGroupID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float damageModifier;
@@ -161,6 +178,8 @@ public:
 	virtual	void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 
+	UFUNCTION(BlueprintCallable, Category = "CrowdControl")
+		void ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool positive);
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		UAbility* GetCurrentAbility();
@@ -180,7 +199,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetHealth(float newVal);
 
-	void Hit(FDamage damage);
+	void Hit(FHealthChange damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		bool IsDead();

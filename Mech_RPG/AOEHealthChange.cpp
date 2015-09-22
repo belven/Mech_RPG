@@ -15,7 +15,7 @@ void  UAOEHealthChange::Activate() {
 	if (timesRan < settings.duration) {
 		timesRan++;
 
-		FDamage damage;
+		FHealthChange damage;
 		FVector locationToUse = settings.usesTarget && settings.target != NULL ? settings.target->GetActorLocation() : settings.location;
 
 		damage.damager = settings.owner;
@@ -38,7 +38,7 @@ void  UAOEHealthChange::Activate() {
 					&& character->startingGroupID == settings.affectedTeam 
 					&& inRange) {
 
-					damage.damagedDealt = tempDamage;
+					damage.healthChange = tempDamage;
 					damage.target = character;
 					character->Hit(damage);
 				}

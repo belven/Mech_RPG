@@ -40,14 +40,14 @@ AWeapon* AWeapon::CreateWeapon(AActor* inOwner, float damage, float range, float
 }
 
 void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
-	FDamage damage;
+	FHealthChange damage;
 	float damageDealt = GetDamage()  * owner->GetDamageModifier();
 
 	damage.damager = owner;
 	damage.target = target;
 	damage.weaponUsed = this;
 
-	damage.damagedDealt = heals ? -damageDealt : damageDealt;
+	damage.healthChange = heals ? -damageDealt : damageDealt;
 
 	target->Hit(damage);
 	canFire = false;

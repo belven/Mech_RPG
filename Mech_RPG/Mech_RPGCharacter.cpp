@@ -51,6 +51,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	speed = GetCharacterMovement()->MaxWalkSpeed;
 	GetCharacterMovement()->bCanWalkOffLedges = false;
 	channeling = false;
+	team = TeamEnums::Paladins;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -116,7 +117,7 @@ void AMech_RPGCharacter::BeginPlay() {
 
 void AMech_RPGCharacter::SetUpGroup() {
 	if (!GetGroup()) {
-		SetGroup(UGroup::CreateGroup(startingGroupID));
+		SetGroup(UGroup::CreateGroup(team));
 		GetGroup()->AddMemeber(this);
 
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
@@ -141,10 +142,26 @@ void AMech_RPGCharacter::SetUpGroup() {
 		if (con) {
 			GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
 		}
+	}
+}
 
-		//for (AMech_RPGCharacter* character : GetGroup()->GetMembers()) {
-		//GetWorld()->GetNavigationSystem()->
-		//}
+
+void AMech_RPGCharacter::ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool positive) {
+	int amount = positive ? -1 : 1;
+
+	switch (controlModifications) {
+	case EffectEnums::Attack:
+		canAttack += amount;
+		break;
+	case EffectEnums::Cast:
+		canUseAbilities += amount;
+		break;
+	case EffectEnums::Damage:
+		canBeDamaged += amount;
+		break;
+	case EffectEnums::Move:
+		canMove += amount;
+		break;
 	}
 }
 
@@ -159,11 +176,11 @@ void AMech_RPGCharacter::SwapWeapon() {
 	}
 }
 
-void AMech_RPGCharacter::Hit(FDamage damage) {
+void AMech_RPGCharacter::Hit(FHealthChange damage) {
 	GetGroup()->GroupMemberHit(damage.damager, this);
 
-	if (damage.damagedDealt < 0 || canBeDamaged == 0) {
-		health -= damage.damagedDealt * (1 - GetDefenceModifier());
+	if (damage.healthChange < 0 || canBeDamaged == 0) {
+		health -= damage.healthChange * (1 - GetDefenceModifier());
 	}
 
 	if (health <= 0) {
@@ -232,7 +249,7 @@ void AMech_RPGCharacter::SetupWithLoadout() {
 	SetCanAttack(startingLoadout.canAttack);
 	SetCanBeDamaged(startingLoadout.canBeDamaged);
 	SetHealthRegen(startingLoadout.healthRegen);
-	startingGroupID = startingLoadout.startingGroupID;
+	team = startingLoadout.team;
 	SetMovementModifier(startingLoadout.movementModifier);
 	SetSpeed(startingLoadout.speed);
 }
