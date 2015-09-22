@@ -16,7 +16,7 @@ void AAllyAIController::Tick(float DeltaTime) {
 			if (dist > 1800.0F) {
 				SetPlayerControlledLocation(FVector::ZeroVector);
 			}
-			else if (dist > 100) {
+			else if (dist > 150) {
 				MoveToLocation(GetPlayerControlledLocation());
 			}
 			else {

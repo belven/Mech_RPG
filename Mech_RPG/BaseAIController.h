@@ -17,6 +17,7 @@ private:
 	AMech_RPGCharacter* target;
 
 	FCollisionQueryParams collision;
+	FCollisionObjectQueryParams objectCollision;
 
 	bool collisionSet = false;
 

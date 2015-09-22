@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Mech_RPG.h"
-#include "TestAOE_Temp.h"
+#include "AOEHealthChange.h"
 #include "Mech_RPGCharacter.h"
 
-UTestAOE_Temp* UTestAOE_Temp::CreateTestAOE(FTempAOESettings inSettings) {
-	UTestAOE_Temp* tempAOE = NewObject<UTestAOE_Temp>(UTestAOE_Temp::StaticClass());
+UAOEHealthChange* UAOEHealthChange::CreateTestAOE(FTempAOESettings inSettings) {
+	UAOEHealthChange* tempAOE = NewObject<UAOEHealthChange>(UAOEHealthChange::StaticClass());
 	tempAOE->settings = inSettings;
 	tempAOE->Activate();
 	return tempAOE;
 }
 
-void  UTestAOE_Temp::Activate() {
+void  UAOEHealthChange::Activate() {
 	if (timesRan < settings.duration) {
 		timesRan++;
 
@@ -45,6 +45,6 @@ void  UTestAOE_Temp::Activate() {
 			}
 		}
 
-		settings.world->GetTimerManager().SetTimer(TimerHandle_AOERate, this, &UTestAOE_Temp::Activate, settings.rate);
+		settings.world->GetTimerManager().SetTimer(TimerHandle_AOERate, this, &UAOEHealthChange::Activate, settings.rate);
 	}
 }

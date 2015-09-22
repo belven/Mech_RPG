@@ -8,7 +8,8 @@
 
 ABaseAIController::ABaseAIController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
-
+	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 }
 
 void ABaseAIController::Tick(float DeltaTime) {
@@ -44,7 +45,7 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 		characterOwner->GetGroup()->GroupMemberHit(target, characterOwner);
 	}
 
-	GetWorld()->LineTraceSingle(hit, characterOwner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
+	GetWorld()->LineTraceSingleByObjectType(hit, characterOwner->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
 
 
 	if (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor()))) {
@@ -112,7 +113,7 @@ void ABaseAIController::FindTarget() {
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 			APawn* pawn = iter->Get();
 
-			GetWorld()->LineTraceSingle(hit, characterOwner->GetActorLocation(), pawn->GetActorLocation(), collision, NULL);
+			GetWorld()->LineTraceSingleByObjectType(hit, characterOwner->GetActorLocation(), pawn->GetActorLocation(), objectCollision, collision);
 
 			if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(GetOwner()) <= range && hit.GetActor() == pawn) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);

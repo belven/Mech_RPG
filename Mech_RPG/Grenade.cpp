@@ -15,7 +15,7 @@ void UGrenade::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		settings.target = target;
 		settings.duration = 1;
 		settings.usesTarget = true;
-		UTestAOE_Temp::CreateTestAOE(settings);
+		UAOEHealthChange::CreateTestAOE(settings);
 		SetOnCooldown(owner->GetWorld());
 	}
 }

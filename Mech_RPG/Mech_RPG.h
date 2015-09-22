@@ -14,7 +14,7 @@
 #include "OrbitalStrike.h"
 #include "ChannelledAbility.h"
 
-#include "TestAOE_Temp.h"
+#include "AOEHealthChange.h"
 
 #include "Mech_RPGCharacter.h"
 

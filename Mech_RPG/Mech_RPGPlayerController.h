@@ -15,6 +15,7 @@ private:
 	bool shiftPressed;
 
 	FCollisionQueryParams collision;
+	FCollisionObjectQueryParams objectCollision;
 	FHitResult hit;
 public:
 	AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer);
@@ -47,6 +48,8 @@ public:
 	void AllyAbility(int index);
 	void AllyAttack(int index);
 	void AllyMove(int index);
+
+	void GroupAttack();
 
 	void AltPressed();
 	void AltReleased();
@@ -81,6 +84,7 @@ protected:
 	uint32 bAttackTarget : 1;
 
 	AMech_RPGCharacter* target;
+	AMech_RPGCharacter* cursorTarget;
 
 	/**
 	 * Begin PlayerController interface

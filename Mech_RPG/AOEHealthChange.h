@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Object.h"
-#include "TestAOE_Temp.generated.h"
+#include "AOEHealthChange.generated.h"
 
 class AMech_RPGCharacter;
 
@@ -27,7 +27,7 @@ public:
 };
 
 UCLASS()
-class MECH_RPG_API UTestAOE_Temp : public UObject
+class MECH_RPG_API UAOEHealthChange : public UObject
 {
 	GENERATED_BODY()
 	
@@ -36,6 +36,6 @@ private:
 	int timesRan;
 	FTimerHandle TimerHandle_AOERate;
 public:
-	static UTestAOE_Temp* CreateTestAOE(FTempAOESettings inSettings);
+	static UAOEHealthChange* CreateTestAOE(FTempAOESettings inSettings);
 	void Activate();
 };

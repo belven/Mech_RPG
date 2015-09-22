@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
 #include "Mech_RPG.h"
-#include "TestAOE_Temp.h"
+#include "AOEHealthChange.h"
 
 
 void UOrbitalStrike::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
@@ -16,7 +16,7 @@ void UOrbitalStrike::Activate(AMech_RPGCharacter* target, FVector targetLocation
 		settings.target = target;
 		settings.duration = 5;
 		settings.usesTarget = true;
-		UTestAOE_Temp::CreateTestAOE(settings);
+		UAOEHealthChange::CreateTestAOE(settings);
 		SetOnCooldown(owner->GetWorld());
 	}
 }

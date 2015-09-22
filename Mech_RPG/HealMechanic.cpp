@@ -8,6 +8,8 @@ AHealMechanic::AHealMechanic() : Super() {
 }
 
 void AHealMechanic::Tick(float DeltaTime) {
+	AMech_RPGCharacter::Tick(DeltaTime);
+
 	if (!IsDead()) {
 		if (GetBoss() && !GetBoss()->IsDead() && GetBoss()->GetHealth() < GetBoss()->GetMaxHealth()) {
 			GetBoss()->SetHealth(GetBoss()->GetHealth() + healAmount * DeltaTime);

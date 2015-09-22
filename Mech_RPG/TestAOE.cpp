@@ -3,7 +3,7 @@
 #include "Mech_RPG.h"
 #include "TestAOE.h"
 #include "Mech_RPGCharacter.h"
-#include "TestAOE_Temp.h"
+#include "AOEHealthChange.h"
 
 
 
@@ -20,7 +20,7 @@ void UTestAOE::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		settings.radius = 300;
 		settings.target = NULL;
 		settings.usesTarget = false;
-		UTestAOE_Temp::CreateTestAOE(settings);
+		UAOEHealthChange::CreateTestAOE(settings);
 		SetOnCooldown(owner->GetWorld());
 	}
 }

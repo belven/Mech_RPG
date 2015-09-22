@@ -8,6 +8,8 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Hand;
+	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 }
 
 /**
@@ -26,6 +28,14 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 
 		// Is our owner is still alive
 		if (!GetOwner()->IsDead()) {
+			cursorTarget = GetTargetUnderCursor();
+
+			if (cursorTarget != NULL && !cursorTarget->IsDead()) {
+				CurrentMouseCursor = EMouseCursor::Crosshairs;
+			}
+			else {
+				CurrentMouseCursor = EMouseCursor::Hand;
+			}
 
 			// Check if we want to swap weapons
 			if (swapWeapons) {
@@ -34,21 +44,15 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			}
 
 			if (IsTargetValid(target) && bAttackTarget) {
-				CurrentMouseCursor = EMouseCursor::Crosshairs;
 				AttackTarget(DeltaTime);
 			}
 			else {
-				target = GetTargetUnderCursor();
+				target = cursorTarget;
 
 				if (IsTargetValid(target)) {
-					CurrentMouseCursor = EMouseCursor::Crosshairs;
-
 					if (bAttackTarget) {
 						AttackTarget(DeltaTime);
 					}
-				}
-				else {
-					CurrentMouseCursor = EMouseCursor::Hand;
 				}
 			}
 
@@ -87,9 +91,9 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 					collision.AddIgnoredActor(member);
 				}
 			}
-
 		}
-		GetWorld()->LineTraceSingle(hit, owner->GetActorLocation(), target->GetActorLocation(), collision, NULL);
+
+		GetWorld()->LineTraceSingleByObjectType(hit, owner->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
 
 		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
 
@@ -109,7 +113,6 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 	}
 }
 
-
 void AMech_RPGPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
 
@@ -118,6 +121,8 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("Attack", IE_Pressed, this, &AMech_RPGPlayerController::OnAttackPressed);
 	InputComponent->BindAction("Attack", IE_Released, this, &AMech_RPGPlayerController::OnAttackReleased);
+
+	InputComponent->BindAction("GroupAttack", IE_Pressed, this, &AMech_RPGPlayerController::GroupAttack);
 
 	InputComponent->BindAction("One", IE_Released, this, &AMech_RPGPlayerController::CharacterOne);
 	InputComponent->BindAction("Two", IE_Released, this, &AMech_RPGPlayerController::CharacterTwo);
@@ -324,6 +329,7 @@ void AMech_RPGPlayerController::ActivateAbility() {
 			if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
 				ability->Activate(target);
 				GetOwner()->SetCurrentAbility(ability);
+				StopMovement();
 				break;
 			}
 		}
@@ -366,7 +372,6 @@ void AMech_RPGPlayerController::AllyAbility(int index) {
 }
 
 void AMech_RPGPlayerController::AllyAttack(int index) {
-	static FHitResult Hit;
 	UGroup* group = GetOwner()->GetGroup();
 
 	if (group != NULL) {
@@ -374,11 +379,26 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 		if (character != NULL && !character->IsDead() && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 
-			AMech_RPGCharacter*	tempTarget = GetTargetUnderCursor();
-
-			if (con->IsTargetValid(tempTarget)) {
+			if (con->IsTargetValid(cursorTarget)) {
 				con->SetPlayerControlledLocation(FVector::ZeroVector);
-				con->SetTarget(tempTarget);
+				con->SetTarget(cursorTarget);
+			}
+		}
+	}
+}
+
+void AMech_RPGPlayerController::GroupAttack() {
+	UGroup* group = GetOwner()->GetGroup();
+
+	if (group != NULL) {
+		for (AMech_RPGCharacter* character : group->GetMembers()) {
+			if (character != NULL && !character->IsDead() && character != GetOwner()) {
+				AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
+
+				if (con->IsTargetValid(cursorTarget)) {
+					con->SetPlayerControlledLocation(FVector::ZeroVector);
+					con->SetTarget(cursorTarget);
+				}
 			}
 		}
 	}
