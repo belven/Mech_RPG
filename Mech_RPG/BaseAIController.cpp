@@ -33,7 +33,27 @@ void ABaseAIController::Tick(float DeltaTime) {
 }
 
 void ABaseAIController::AttackTarget(float DeltaTime) {
-	AWeapon* weapon = characterOwner->GetCurrentWeapon();
+	SetupCollision();
+
+	GetWorld()->LineTraceSingleByObjectType(hit, characterOwner->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
+	
+	if (target == GetOwner() || (hit.GetActor() != NULL && hit.GetActor()->GetClass() != NULL)) {
+		bool isCover = hit.GetActor()->GetClass()->IsChildOf(ACover::StaticClass());
+
+		if (IsMechCharacter(hit.GetActor()) || isCover) {
+			PerformAbility();
+			FireWeapon(hit.GetActor());
+		}
+		else if (GetWorld()->GetNavigationSystem()) {
+			MoveToLocation(target->GetActorLocation());
+		}
+	}
+	else if (GetWorld()->GetNavigationSystem()) {
+		MoveToLocation(target->GetActorLocation());
+	}
+}
+
+void ABaseAIController::SetupCollision() {
 	collision.IgnoreComponents.Empty();
 
 	if (characterOwner->GetGroup() != NULL && characterOwner->GetGroup()->GetMembers().Num() > 0) {
@@ -44,36 +64,41 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 		}
 		characterOwner->GetGroup()->GroupMemberHit(target, characterOwner);
 	}
+}
 
-	GetWorld()->LineTraceSingleByObjectType(hit, characterOwner->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
+void ABaseAIController::FireWeapon(AActor* hit) {
+	AWeapon* weapon = characterOwner->GetCurrentWeapon();
+	bool isCover = hit->GetClass()->IsChildOf(ACover::StaticClass());
+	float distToTarget = FVector::Dist(characterOwner->GetActorLocation(), target->GetActorLocation());
+	float distToCover = FVector::Dist(characterOwner->GetActorLocation(), hit->GetActorLocation());
 
-
-	if (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor()))) {
-		if (GetOwner()->HasAbilities() && !GetOwner()->Channelling()) {
-			for (UAbility* ability : GetOwner()->GetAbilities()) {
-				if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
-					ability->Activate(target);
-					GetOwner()->SetCurrentAbility(ability);
-					break;
-				}
+	if (weapon != NULL && distToTarget <= weapon->GetRange()) {
+		if (GetOwner()->CanAttack() && weapon->CanFire()) {
+			if (isCover && distToTarget > 300) {
+				weapon->Fire(Cast<ACover>(hit), GetOwner());
 			}
-		}
-
-		float dist = FVector::Dist(characterOwner->GetActorLocation(), target->GetActorLocation());
-
-		if (weapon != NULL && dist <= weapon->GetRange()) {
-			if (GetOwner()->CanAttack() && weapon->CanFire()) {
+			else {
 				weapon->Fire(target, GetOwner());
 			}
-			SetFocus(target);
-			StopMovement();
 		}
-		else if (GetWorld()->GetNavigationSystem()) {
-			MoveToLocation(target->GetActorLocation());
-		}
+
+		SetFocus(target);
+		StopMovement();
 	}
 	else if (GetWorld()->GetNavigationSystem()) {
 		MoveToLocation(target->GetActorLocation());
+	}
+}
+
+void ABaseAIController::PerformAbility() {
+	if (GetOwner()->HasAbilities() && !GetOwner()->Channelling() && GetOwner()->CanCast()) {
+		for (UAbility* ability : GetOwner()->GetAbilities()) {
+			if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
+				ability->Activate(target);
+				GetOwner()->SetCurrentAbility(ability);
+				break;
+			}
+		}
 	}
 }
 

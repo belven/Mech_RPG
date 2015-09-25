@@ -40,7 +40,7 @@ void  UAOEHealthChange::Activate() {
 
 					damage.healthChange = tempDamage;
 					damage.target = character;
-					character->Hit(damage);
+					character->ChangeHealth(damage);
 				}
 			}
 		}

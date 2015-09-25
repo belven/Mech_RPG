@@ -10,6 +10,7 @@
 #include "Heal.h"
 #include "Snipe.h"
 #include "Grenade.h"
+#include "Disable.h"
 #include "DamageBoost.h"
 #include "OrbitalStrike.h"
 #include "ChannelledAbility.h"
@@ -17,6 +18,7 @@
 #include "AOEHealthChange.h"
 
 #include "Mech_RPGCharacter.h"
+#include "Cover.h"
 
 #include "Mech_RPGPlayerController.h"
 #include "BaseAIController.h"

@@ -22,7 +22,7 @@ void AAOEVolume::Tick(float DeltaTime) {
 					damage.healthChange = healthChange * DeltaTime;
 					damage.damager = owner;
 					damage.target = character;
-					character->Hit(damage);
+					character->ChangeHealth(damage);
 				}
 			}
 		}
@@ -44,7 +44,7 @@ void AAOEVolume::Tick(float DeltaTime) {
 		//			damage.damagedDealt = healthChange;
 		//			damage.damager = owner;
 		//			damage.target = character;
-		//			character->Hit(damage);
+		//			character->ChangeHealth(damage);
 		//		}
 		//	}
 		//}

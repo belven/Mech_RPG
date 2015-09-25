@@ -14,7 +14,7 @@ void UHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		damage.weaponUsed = NULL;
 		damage.healthChange = -healAmount;
 
-		target->Hit(damage);
+		target->ChangeHealth(damage);
 		SetOnCooldown(owner->GetWorld());
 	}
 }

@@ -29,6 +29,10 @@ public:
 	void AttackTarget(float DeltaTime);
 	void FindTarget();
 
+	void PerformAbility();
+	void FireWeapon(AActor* hit);
+	void SetupCollision();
+
 	bool IsMechCharacter(AActor* character);
 
 	AMech_RPGCharacter* GetOwner();

@@ -49,7 +49,21 @@ void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 
 	damage.healthChange = heals ? -damageDealt : damageDealt;
 
-	target->Hit(damage);
+	target->ChangeHealth(damage);
+	canFire = false;
+}
+
+void AWeapon::Fire(ACover* target, AMech_RPGCharacter* owner) {
+	FHealthChange damage;
+	float damageDealt = GetDamage()  * owner->GetDamageModifier();
+
+	damage.damager = owner;
+	//damage.target = target;
+	damage.weaponUsed = this;
+
+	damage.healthChange = heals ? -damageDealt : damageDealt;
+
+	target->ChangeHealth(damage);
 	canFire = false;
 }
 
@@ -83,19 +97,19 @@ void AWeapon::SetHeals(bool newVal) {
 AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type) {
 	switch (type) {
 	case WeaponEnums::SMG:
-		return CreateWeapon(inOwner, 30, 1000, 0.3);
+		return CreateWeapon(inOwner, 35, 1000, 0.3);
 		break;
 	case WeaponEnums::Bio_Repair:
-		return CreateWeapon(inOwner, 60, 600, 0.2, true);
+		return CreateWeapon(inOwner, 45, 600, 0.2, true);
 		break;
 	case WeaponEnums::RPG:
-		return CreateWeapon(inOwner, 250, 1300, 2.5);
+		return CreateWeapon(inOwner, 500, 1300, 2.5);
 		break;
 	case WeaponEnums::Shotgun:
-		return CreateWeapon(inOwner, 70, 400, 0.8);
+		return CreateWeapon(inOwner, 150, 400, 0.8);
 		break;
 	case WeaponEnums::Sniper:
-		return CreateWeapon(inOwner, 200, 1500, 2);
+		return CreateWeapon(inOwner, 250, 1500, 2);
 		break;
 	}
 

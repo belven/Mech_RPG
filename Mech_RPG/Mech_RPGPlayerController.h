@@ -115,4 +115,6 @@ protected:
 	void OnAttackReleased();
 
 	void AttackTarget(float DeltaTime);
+	void FireWeapon(AActor* hit);
+	void SetupCollision();
 };

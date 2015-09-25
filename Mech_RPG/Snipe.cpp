@@ -12,7 +12,7 @@ void USnipe::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		damage.weaponUsed = NULL;
 		damage.healthChange = owner->GetCurrentWeapon()->GetDamage() * 2;
 
-		target->Hit(damage);
+		target->ChangeHealth(damage);
 		SetOnCooldown(owner->GetWorld());
 	}
 }

@@ -18,7 +18,7 @@ AMech_RPGGameMode::AMech_RPGGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	static ConstructorHelpers::FClassFinder<AHUD> hud(TEXT("/Game/TopDown/Blueprints/HUD.HUD_C"));
+	static ConstructorHelpers::FClassFinder<AHUD> hud(TEXT("/Game/TopDown/Blueprints/UI/HUD.HUD_C"));
 	// set default pawn class to our character class
 	HUDClass = hud.Class;
 }

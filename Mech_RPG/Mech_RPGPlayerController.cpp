@@ -80,36 +80,57 @@ void AMech_RPGPlayerController::MoveToLocation(FVector location) {
 }
 
 void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
-	AWeapon* weapon = owner->GetCurrentWeapon();
+	SetupCollision();
 
-	if (weapon != NULL) {
-		collision.IgnoreComponents.Empty();
+	GetWorld()->LineTraceSingleByObjectType(hit, owner->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
 
-		if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
-			for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
-				if (member != target) {
-					collision.AddIgnoredActor(member);
-				}
-			}
-		}
-
-		GetWorld()->LineTraceSingleByObjectType(hit, owner->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
-
-		float dist = FVector::Dist(owner->GetActorLocation(), target->GetActorLocation());
-
-		if (dist <= weapon->GetRange() && (target == GetOwner() || (hit.GetActor() != NULL && IsMechCharacter(hit.GetActor())))) {
-			if (GetOwner()->CanAttack() && weapon->CanFire()) {
-				weapon->Fire(target, GetOwner());
-			}
-			owner->GetGroup()->GroupMemberHit(target, owner);
-			StopMovement();
+	if (target == GetOwner() || (hit.GetActor() != NULL)) {
+		if (IsMechCharacter(hit.GetActor()) || hit.GetActor()->GetClass()->IsChildOf(ACover::StaticClass())) {
+			FireWeapon(hit.GetActor());
 		}
 		else if (GetWorld()->GetNavigationSystem()) {
 			MoveToLocation(target->GetActorLocation());
 		}
 	}
-	else {
-		UE_LOG(LogTemp, Log, TEXT("Weapon NULL"));
+	else if (GetWorld()->GetNavigationSystem()) {
+		MoveToLocation(target->GetActorLocation());
+	}
+}
+
+void AMech_RPGPlayerController::SetupCollision() {
+	collision.IgnoreComponents.Empty();
+
+	if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
+		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
+			if (member != target) {
+				collision.AddIgnoredActor(member);
+			}
+		}
+	}
+}
+
+void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
+	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
+	bool isCover = hit->GetClass()->IsChildOf(ACover::StaticClass());
+
+	float distToTarget = FVector::Dist(GetOwner()->GetActorLocation(), target->GetActorLocation());
+	float distToCover = FVector::Dist(GetOwner()->GetActorLocation(), hit->GetActorLocation());
+
+	if (weapon != NULL && distToTarget <= weapon->GetRange()) {
+		if (GetOwner()->CanAttack() && weapon->CanFire()) {
+			if (isCover && distToTarget > 300) {
+				weapon->Fire(Cast<ACover>(hit), GetOwner());
+			}
+			else {
+				weapon->Fire(target, GetOwner());
+			}
+		}
+
+		owner->GetGroup()->GroupMemberHit(target, owner);
+		StopMovement();
+	}
+	else if (GetWorld()->GetNavigationSystem()) {
+		MoveToLocation(target->GetActorLocation());
 	}
 }
 
@@ -324,7 +345,10 @@ void AMech_RPGPlayerController::SwapWeapons() {
 }
 
 void AMech_RPGPlayerController::ActivateAbility() {
-	if (IsOwnerValid() && GetOwner()->HasAbilities() && !GetOwner()->Channelling()) {
+	if (IsOwnerValid()
+		&& GetOwner()->HasAbilities()
+		&& !GetOwner()->Channelling()
+		&& GetOwner()->CanCast()) {
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
 			if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
 				ability->Activate(target);

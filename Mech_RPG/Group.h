@@ -7,7 +7,8 @@ namespace GroupEnums {
 		Healer,
 		Tank,
 		Sniper,
-		RPG
+		RPG,
+		Support
 	};
 }
 #pragma once

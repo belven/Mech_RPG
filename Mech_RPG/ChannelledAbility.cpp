@@ -42,7 +42,7 @@ float UChannelledAbility::GetCurrentTimeRemaining() {
 }
 
 void UChannelledAbility::ActiveChannelAbility() {
-	if (channelling && owner->Channelling() && !owner->IsDead()) {
+	if (channelling && !owner->IsDead() && owner->Channelling() && owner->CanCast()) {
 		if (currentChannelTime > 0) {
 			currentChannelTime -= 0.1F;
 			owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);

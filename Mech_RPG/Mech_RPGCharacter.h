@@ -199,13 +199,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetHealth(float newVal);
 
-	void Hit(FHealthChange damage);
+	void ChangeHealth(FHealthChange damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		bool IsDead();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		void SetDead(bool newVal);
+		virtual void SetDead(bool newVal);
 
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
@@ -270,6 +270,7 @@ public:
 
 	bool CanAttack();
 	bool CanMove();
+	bool CanCast();
 	int32& GetCanAttack();
 	int32& GetCanMove();
 

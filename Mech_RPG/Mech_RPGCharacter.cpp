@@ -176,7 +176,7 @@ void AMech_RPGCharacter::SwapWeapon() {
 	}
 }
 
-void AMech_RPGCharacter::Hit(FHealthChange damage) {
+void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 	GetGroup()->GroupMemberHit(damage.damager, this);
 
 	if (damage.healthChange < 0 || canBeDamaged == 0) {
@@ -184,7 +184,7 @@ void AMech_RPGCharacter::Hit(FHealthChange damage) {
 	}
 
 	if (health <= 0) {
-		isDead = true;
+		SetDead(true);
 		SetActorHiddenInGame(true);
 		SetActorEnableCollision(false);
 	}
@@ -203,14 +203,14 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(15.0F, this, 300), 1.5F));
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.5), 1.5));
 		SetDefenceModifier(0);
 		SetDamageModifier(1.5);
 		break;
 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
-		abilities.Add(UHeal::CreateAbility(15.0F, this, 600));
+		abilities.Add(UHeal::CreateAbility(15, this, 1000));
 		SetDefenceModifier(0);
 		SetDamageModifier(1.5);
 		SetMovementModifier(1.2);
@@ -218,7 +218,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 
 	case GroupEnums::Tank:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
-		abilities.Add(UTaunt::CreateAbility(5.0F, this));
+		abilities.Add(UTaunt::CreateAbility(5, this));
 		SetDefenceModifier(0.5);
 		SetDamageModifier(1);
 		SetMovementModifier(1.2);
@@ -226,7 +226,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 
 	case GroupEnums::Sniper:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 1.0F));
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 1));
 		SetDefenceModifier(0);
 		SetDamageModifier(2);
 		break;
@@ -235,6 +235,13 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
 		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
 		SetDefenceModifier(0);
+		SetDamageModifier(1.25);
+		break;
+
+	case GroupEnums::Support:
+		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
+		abilities.Add(UDisable::CreateDisable(5, this, 3));
+		SetDefenceModifier(0.3);
 		SetDamageModifier(1.25);
 		break;
 	}
@@ -384,6 +391,10 @@ bool AMech_RPGCharacter::CanAttack() {
 
 bool AMech_RPGCharacter::CanMove() {
 	return canMove == 0;
+}
+
+bool AMech_RPGCharacter::CanCast() {
+	return canUseAbilities == 0;
 }
 
 int32& AMech_RPGCharacter::GetCanAttack() {

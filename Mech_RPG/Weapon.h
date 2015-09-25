@@ -43,6 +43,7 @@ public:
 
 	bool CanFire();
 	void Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner);
+	void Fire(class ACover* target, AMech_RPGCharacter* owner);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		static AWeapon* CreateWeapon(AActor* inOwner, float damage, float range, float fireRate, bool heals = false);

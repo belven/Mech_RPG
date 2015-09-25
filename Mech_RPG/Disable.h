@@ -20,7 +20,7 @@ public:
 		void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		static UDisable* CreateDisable(AMech_RPGCharacter* inOwner, float inDuration);
+		static UDisable* CreateDisable(float cooldown, AMech_RPGCharacter* inOwner, float inDuration);
 
 	void DisableEnd();
 
