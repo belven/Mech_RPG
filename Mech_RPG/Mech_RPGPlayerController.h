@@ -26,6 +26,7 @@ public:
 	void SetOwner(AMech_RPGCharacter* newVal);
 
 	bool IsMechCharacter(AActor* character);
+	bool IsCover(AActor* character);
 
 	AMech_RPGCharacter* GetTargetUnderCursor();
 	FHitResult GetHitFromCursor();

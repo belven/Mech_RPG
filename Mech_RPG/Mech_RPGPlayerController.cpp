@@ -82,16 +82,19 @@ void AMech_RPGPlayerController::MoveToLocation(FVector location) {
 void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 	SetupCollision();
 
-	GetWorld()->LineTraceSingleByObjectType(hit, owner->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
+	GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
 
-	if (target == GetOwner() || (hit.GetActor() != NULL)) {
-		if (IsMechCharacter(hit.GetActor()) || hit.GetActor()->GetClass()->IsChildOf(ACover::StaticClass())) {
-			FireWeapon(hit.GetActor());
-		}
-		else if (GetWorld()->GetNavigationSystem()) {
-			MoveToLocation(target->GetActorLocation());
-		}
+	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
+
+	// Are we targeting ourselves
+	if (target == GetOwner()) {
+		FireWeapon(NULL);
 	}
+	// Have we traced to another character or cover
+	else if (targetTraced && (IsMechCharacter(hit.GetActor()) || IsCover(hit.GetActor()))) {
+		FireWeapon(hit.GetActor());
+	}
+	// We've hit some scenery so move towards the target
 	else if (GetWorld()->GetNavigationSystem()) {
 		MoveToLocation(target->GetActorLocation());
 	}
@@ -111,16 +114,28 @@ void AMech_RPGPlayerController::SetupCollision() {
 
 void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
 	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
-	bool isCover = hit->GetClass()->IsChildOf(ACover::StaticClass());
-
 	float distToTarget = FVector::Dist(GetOwner()->GetActorLocation(), target->GetActorLocation());
-	float distToCover = FVector::Dist(GetOwner()->GetActorLocation(), hit->GetActorLocation());
 
+	// Are we in weapons range
 	if (weapon != NULL && distToTarget <= weapon->GetRange()) {
 		if (GetOwner()->CanAttack() && weapon->CanFire()) {
-			if (isCover && distToTarget > 300) {
-				weapon->Fire(Cast<ACover>(hit), GetOwner());
+
+			bool isCover = hit != NULL ? IsCover(hit) : false;
+
+			// Have we hit cover
+			if (isCover) {
+				float distToCover = FVector::Dist(GetOwner()->GetActorLocation(), hit->GetActorLocation());
+
+				// Are we too far from the cover to avoid shooting it
+				if (distToCover > 200) {
+					weapon->Fire(Cast<ACover>(hit), GetOwner());
+				}
+				// Otherwise we can attack the target
+				else {
+					weapon->Fire(target, GetOwner());
+				}
 			}
+			// Otherwise we've got a clear shot to the target
 			else {
 				weapon->Fire(target, GetOwner());
 			}
@@ -129,6 +144,7 @@ void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
 		owner->GetGroup()->GroupMemberHit(target, owner);
 		StopMovement();
 	}
+	// We're out of range so move closer
 	else if (GetWorld()->GetNavigationSystem()) {
 		MoveToLocation(target->GetActorLocation());
 	}
@@ -256,6 +272,10 @@ bool AMech_RPGPlayerController::IsMechCharacter(AActor* character) {
 	return character->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass());
 }
 
+bool AMech_RPGPlayerController::IsCover(AActor* character) {
+	return character->GetClass()->IsChildOf(ACover::StaticClass());
+}
+
 bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 	if (inTarget != NULL && !inTarget->IsDead()) {
 		if (GetOwner()->GetCurrentWeapon()) {
@@ -346,15 +366,24 @@ void AMech_RPGPlayerController::SwapWeapons() {
 
 void AMech_RPGPlayerController::ActivateAbility() {
 	if (IsOwnerValid()
+		&& target != NULL
 		&& GetOwner()->HasAbilities()
 		&& !GetOwner()->Channelling()
 		&& GetOwner()->CanCast()) {
-		for (UAbility* ability : GetOwner()->GetAbilities()) {
-			if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
-				ability->Activate(target);
-				GetOwner()->SetCurrentAbility(ability);
-				StopMovement();
-				break;
+		SetupCollision();
+
+		GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
+
+		bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL && hit.GetActor() == target;
+
+		if (targetTraced) {
+			for (UAbility* ability : GetOwner()->GetAbilities()) {
+				if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
+					ability->Activate(target);
+					GetOwner()->SetCurrentAbility(ability);
+					StopMovement();
+					break;
+				}
 			}
 		}
 	}

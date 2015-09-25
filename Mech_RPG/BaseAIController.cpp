@@ -35,48 +35,64 @@ void ABaseAIController::Tick(float DeltaTime) {
 void ABaseAIController::AttackTarget(float DeltaTime) {
 	SetupCollision();
 
-	GetWorld()->LineTraceSingleByObjectType(hit, characterOwner->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
-	
-	if (target == GetOwner() || (hit.GetActor() != NULL && hit.GetActor()->GetClass() != NULL)) {
-		bool isCover = hit.GetActor()->GetClass()->IsChildOf(ACover::StaticClass());
+	GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
 
-		if (IsMechCharacter(hit.GetActor()) || isCover) {
-			PerformAbility();
-			FireWeapon(hit.GetActor());
-		}
-		else if (GetWorld()->GetNavigationSystem()) {
-			MoveToLocation(target->GetActorLocation());
-		}
+	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
+
+	// Are we targeting ourselves
+	if (target == GetOwner()) {
+		PerformAbility();
+		FireWeapon(NULL);
 	}
+	// Have we traced to another character or cover
+	else if (targetTraced && (IsMechCharacter(hit.GetActor()) || IsCover(hit.GetActor()))) {
+		PerformAbility();
+		FireWeapon(hit.GetActor());
+	}
+	// We've hit some scenery so move towards the target
 	else if (GetWorld()->GetNavigationSystem()) {
 		MoveToLocation(target->GetActorLocation());
 	}
 }
 
+
 void ABaseAIController::SetupCollision() {
 	collision.IgnoreComponents.Empty();
 
-	if (characterOwner->GetGroup() != NULL && characterOwner->GetGroup()->GetMembers().Num() > 0) {
-		for (AMech_RPGCharacter* member : characterOwner->GetGroup()->GetMembers()) {
+	if (GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->GetMembers().Num() > 0) {
+		for (AMech_RPGCharacter* member : GetOwner()->GetGroup()->GetMembers()) {
 			if (member != target) {
 				collision.AddIgnoredActor(member);
 			}
 		}
-		characterOwner->GetGroup()->GroupMemberHit(target, characterOwner);
+		GetOwner()->GetGroup()->GroupMemberHit(target, GetOwner());
 	}
 }
 
 void ABaseAIController::FireWeapon(AActor* hit) {
-	AWeapon* weapon = characterOwner->GetCurrentWeapon();
-	bool isCover = hit->GetClass()->IsChildOf(ACover::StaticClass());
-	float distToTarget = FVector::Dist(characterOwner->GetActorLocation(), target->GetActorLocation());
-	float distToCover = FVector::Dist(characterOwner->GetActorLocation(), hit->GetActorLocation());
+	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
+	float distToTarget = FVector::Dist(GetOwner()->GetActorLocation(), target->GetActorLocation());
 
+	// Are we in weapons range
 	if (weapon != NULL && distToTarget <= weapon->GetRange()) {
 		if (GetOwner()->CanAttack() && weapon->CanFire()) {
-			if (isCover && distToTarget > 300) {
-				weapon->Fire(Cast<ACover>(hit), GetOwner());
+
+			bool isCover = hit != NULL ? IsCover(hit) : false;
+
+			// Have we hit cover
+			if (isCover) {
+				float distToCover = FVector::Dist(GetOwner()->GetActorLocation(), hit->GetActorLocation());
+
+				// Are we too far from the cover to avoid shooting it
+				if (distToCover > 200) {
+					weapon->Fire(Cast<ACover>(hit), GetOwner());
+				}
+				// Otherwise we can attack the target
+				else {
+					weapon->Fire(target, GetOwner());
+				}
 			}
+			// Otherwise we've got a clear shot to the target
 			else {
 				weapon->Fire(target, GetOwner());
 			}
@@ -85,6 +101,7 @@ void ABaseAIController::FireWeapon(AActor* hit) {
 		SetFocus(target);
 		StopMovement();
 	}
+	// We're out of range so move closer
 	else if (GetWorld()->GetNavigationSystem()) {
 		MoveToLocation(target->GetActorLocation());
 	}
@@ -114,17 +131,21 @@ void ABaseAIController::MoveToLocation(FVector location) {
 	}
 }
 
+bool ABaseAIController::IsCover(AActor* character) {
+	return character->GetClass()->IsChildOf(ACover::StaticClass());
+}
+
 bool ABaseAIController::IsMechCharacter(AActor* character) {
 	return character->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass());
 }
 
 void ABaseAIController::FindTarget() {
-	AWeapon* weapon = characterOwner->GetCurrentWeapon();
+	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
 
 	collision.IgnoreComponents.Empty();
 
-	if (characterOwner->GetGroup() != NULL && characterOwner->GetGroup()->GetMembers().Num() > 0) {
-		for (AMech_RPGCharacter* member : characterOwner->GetGroup()->GetMembers()) {
+	if (GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->GetMembers().Num() > 0) {
+		for (AMech_RPGCharacter* member : GetOwner()->GetGroup()->GetMembers()) {
 			if (member != target) {
 				collision.AddIgnoredActor(member);
 			}
@@ -138,12 +159,12 @@ void ABaseAIController::FindTarget() {
 		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 			APawn* pawn = iter->Get();
 
-			GetWorld()->LineTraceSingleByObjectType(hit, characterOwner->GetActorLocation(), pawn->GetActorLocation(), objectCollision, collision);
+			GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), pawn->GetActorLocation(), objectCollision, collision);
 
 			if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(GetOwner()) <= range && hit.GetActor() == pawn) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
-				if (!character->IsDead() && !character->CompareGroup(characterOwner)) {
+				if (!character->IsDead() && !character->CompareGroup(GetOwner())) {
 					SetTarget(character);
 					break;
 				}
@@ -172,10 +193,10 @@ bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 	if (inTarget != NULL && !inTarget->IsDead()) {
 		if (GetOwner()->GetCurrentWeapon()) {
 			if (GetOwner()->GetCurrentWeapon()->Heals()) {
-				return inTarget->CompareGroup(characterOwner) && inTarget->GetHealth() < inTarget->GetMaxHealth();
+				return inTarget->CompareGroup(GetOwner()) && inTarget->GetHealth() < inTarget->GetMaxHealth();
 			}
 			else {
-				return !inTarget->CompareGroup(characterOwner);
+				return !inTarget->CompareGroup(GetOwner());
 			}
 		}
 	}
