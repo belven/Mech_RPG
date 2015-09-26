@@ -14,12 +14,7 @@ AAddSpawningMechanic::AAddSpawningMechanic() : Super() {
 void AAddSpawningMechanic::Tick(float DeltaTime) {
 	AMech_RPGCharacter::Tick(DeltaTime);
 
-	if (!IsDead()) {
-		if (GetBoss() && !GetBoss()->IsDead() && GetBoss()->GetHealth() < GetBoss()->GetMaxHealth()) {
-			//GetBoss()->SetHealth(GetBoss()->GetHealth() + healAmount * DeltaTime);
-		}
-	}
-	else {
+	if (IsDead()) {
 		//Destroy();
 	}
 }
@@ -36,19 +31,15 @@ void AAddSpawningMechanic::BeginPlay() {
 
 void AAddSpawningMechanic::TriggerSpawn() {
 	if (classToSpawn != NULL) {
-		AMech_RPGCharacter* character = GetWorld()->SpawnActor<AMech_RPGCharacter>(classToSpawn);
 		FNavLocation nav;
-		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 200, nav);
+		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
 		nav.Location.Z = GetActorLocation().Z;
-		character->SetActorLocation(nav.Location);
-		character->OnPostBeginPlay.AddDynamic(this, &AAddSpawningMechanic::SetUpCharacter);
-
+		AMech_RPGCharacter* character = GetWorld()->SpawnActor<AMech_RPGCharacter>(classToSpawn, nav.Location, nav.Location.Rotation());
+		SetUpCharacter(character);
 		spawnAmount--;
 	}
 }
 
 void AAddSpawningMechanic::SetUpCharacter(AMech_RPGCharacter* character) {
-	character->CreatePresetRole(GroupEnums::DPS);
-	character->SetDefenceModifier(0.5);
-	character->SetDamageModifier(3);
+	character->SpawnDefaultController();
 }

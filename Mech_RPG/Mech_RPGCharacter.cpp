@@ -35,11 +35,6 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	//aoe = CreateDefaultSubobject<USphereComponent>(TEXT("AOE"));
-	//aoe->AttachParent = RootComponent;
-	//aoe->SetSphereRadius(1000);
-	//aoe->SetWorldLocation(GetActorLocation());
-
 	startingRole = GroupEnums::DPS;
 	damageModifier = 1;
 	defenceModifier = 0;
@@ -93,7 +88,8 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 }
 
 void AMech_RPGCharacter::BeginPlay() {
-	SetGroup(NULL);
+	Super::BeginPlay();
+
 	channeling = false;
 
 	if (!UseLoadout) {
@@ -112,52 +108,41 @@ void AMech_RPGCharacter::BeginPlay() {
 	}
 
 	SetUpGroup();
-	Super::BeginPlay();
+
+	if (OnPostBeginPlay.IsBound()) {
+		OnPostBeginPlay.Broadcast(this);
+	}
 }
 
 void AMech_RPGCharacter::SetUpGroup() {
+	if (GetGroup() == NULL) {
+		SetGroup(UGroup::CreateGroup(team));
+		GetGroup()->AddMemeber(this);
+	}
+
 	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 		APawn* pawn = iter->Get();
 
 		if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 700) {
 			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
-			if (character != NULL) {
-				if (character->GetGroup() == NULL) {
-					if (GetGroup() == NULL) {
-						SetGroup(UGroup::CreateGroup(team));
-						GetGroup()->AddMemeber(this);
-					}
+			if (character != NULL && character->team == team && character->GetGroup() != GetGroup()) {
+				character->SetGroup(GetGroup());
+				GetGroup()->AddMemeber(character);
+				character->SetUpGroup();
 
-					character->SetGroup(GetGroup());
-					GetGroup()->AddMemeber(character);
+				ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
 
-					ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
-					if (con) {
-						GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
-					}
-				}
-				else {
-					SetGroup(character->GetGroup());
-					GetGroup()->AddMemeber(this);
-					break;
+				if (con) {
+					GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
 				}
 			}
 		}
 	}
 
-	if (GetGroup() == NULL) {
-		SetGroup(UGroup::CreateGroup(team));
-		GetGroup()->AddMemeber(this);
-	}
-
 	ABaseAIController* con = Cast<ABaseAIController>(Controller);
 	if (con) {
 		GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
-	}
-
-	if (OnPostBeginPlay.IsBound()) {
-		OnPostBeginPlay.Broadcast(this);
 	}
 }
 

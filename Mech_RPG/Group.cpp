@@ -58,7 +58,7 @@ AMech_RPGCharacter* UGroup::GetPlayer() {
 		}
 	}
 
-	return  NULL;
+	return NULL;
 }
 
 

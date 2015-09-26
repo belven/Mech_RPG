@@ -20,6 +20,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 		int32 spawnAmount;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TSubclassOf<class AMech_RPGCharacter> classToSpawn;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
