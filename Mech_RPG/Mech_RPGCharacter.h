@@ -85,6 +85,11 @@ public:
 		float movementModifier = 1;
 };
 
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChangeEvent, FHealthChange, healthChange);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostBeginPlay, AMech_RPGCharacter*, character);
+
 UCLASS(Blueprintable)
 class AMech_RPGCharacter : public ACharacter {
 	GENERATED_BODY()
@@ -129,6 +134,9 @@ private:
 public:
 	AMech_RPGCharacter();
 
+	FHealthChangeEvent OnHealthChange;
+	FPostBeginPlay OnPostBeginPlay;
+
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		bool Channelling();
 
@@ -157,9 +165,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
 		TEnumAsByte<TeamEnums::Team> team;
-
-	int32 startingGroupID;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float damageModifier;
 

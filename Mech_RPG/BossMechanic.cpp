@@ -8,7 +8,6 @@ ABossMechanic::ABossMechanic() : Super(){
 }
 
 void ABossMechanic::BeginPlay() {
-	Super::BeginPlay();
 	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
 		APawn* pawn = iter->Get();
 		if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 1200) {
@@ -20,6 +19,7 @@ void ABossMechanic::BeginPlay() {
 			}
 		}
 	}
+	Super::BeginPlay();
 }
 
 ABoss* ABossMechanic::GetBoss() {

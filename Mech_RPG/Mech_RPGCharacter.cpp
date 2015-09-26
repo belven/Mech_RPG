@@ -27,7 +27,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	CameraBoom->AttachTo(RootComponent);
 	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = 1800.0f;
-	CameraBoom->RelativeRotation = FRotator(-60.f, 0.f, 0.f);
+	CameraBoom->RelativeRotation = FRotator(-75.f, 0.f, 0.f);
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 	// Create a camera...
@@ -93,7 +93,6 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 }
 
 void AMech_RPGCharacter::BeginPlay() {
-	Super::BeginPlay();
 	SetGroup(NULL);
 	channeling = false;
 
@@ -113,18 +112,23 @@ void AMech_RPGCharacter::BeginPlay() {
 	}
 
 	SetUpGroup();
+	Super::BeginPlay();
 }
 
 void AMech_RPGCharacter::SetUpGroup() {
-	if (!GetGroup()) {
-		SetGroup(UGroup::CreateGroup(team));
-		GetGroup()->AddMemeber(this);
+	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
+		APawn* pawn = iter->Get();
 
-		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
-			APawn* pawn = iter->Get();
-			if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 700) {
-				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-				if (character != NULL) {
+		if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 700) {
+			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
+
+			if (character != NULL) {
+				if (character->GetGroup() == NULL) {
+					if (GetGroup() == NULL) {
+						SetGroup(UGroup::CreateGroup(team));
+						GetGroup()->AddMemeber(this);
+					}
+
 					character->SetGroup(GetGroup());
 					GetGroup()->AddMemeber(character);
 
@@ -133,15 +137,27 @@ void AMech_RPGCharacter::SetUpGroup() {
 						GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
 					}
 				}
+				else {
+					SetGroup(character->GetGroup());
+					GetGroup()->AddMemeber(this);
+					break;
+				}
 			}
 		}
 	}
 
-	if (GetGroup()) {
-		ABaseAIController* con = Cast<ABaseAIController>(Controller);
-		if (con) {
-			GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
-		}
+	if (GetGroup() == NULL) {
+		SetGroup(UGroup::CreateGroup(team));
+		GetGroup()->AddMemeber(this);
+	}
+
+	ABaseAIController* con = Cast<ABaseAIController>(Controller);
+	if (con) {
+		GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
+	}
+
+	if (OnPostBeginPlay.IsBound()) {
+		OnPostBeginPlay.Broadcast(this);
 	}
 }
 
@@ -183,6 +199,10 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 		health -= damage.healthChange * (1 - GetDefenceModifier());
 	}
 
+	if (OnHealthChange.IsBound()) {
+		OnHealthChange.Broadcast(damage);
+	}
+
 	if (health <= 0) {
 		SetDead(true);
 		SetActorHiddenInGame(true);
@@ -203,7 +223,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.5), 1.5));
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.2), 1.5));
 		SetDefenceModifier(0);
 		SetDamageModifier(1.5);
 		break;

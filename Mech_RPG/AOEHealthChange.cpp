@@ -35,7 +35,7 @@ void  UAOEHealthChange::Activate() {
 
 				if (character != NULL 
 					&& !character->IsDead() 
-					&& character->startingGroupID == settings.affectedTeam 
+					&& settings.affectedTeam == AOEEnums::Ally ? character->team == settings.owner->team : character->team != settings.owner->team
 					&& inRange) {
 
 					damage.healthChange = tempDamage;

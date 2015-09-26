@@ -6,8 +6,8 @@
 #include "Mech_RPGCharacter.h"
 #include "AI/Navigation/NavigationSystem.h"
 
-ABaseAIController::ABaseAIController(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
+ABaseAIController::ABaseAIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
+	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 }

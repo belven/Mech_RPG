@@ -1,5 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+UENUM(BlueprintType)
+namespace AOEEnums {
+	enum AffectedTeam {
+		Ally,
+		Enemy
+	};
+}
+
 #pragma once
 
 #include "Object.h"
@@ -22,7 +30,7 @@ public:
 	float duration = 5;
 	float rate = 1;
 
-	int affectedTeam = 0;
+	TEnumAsByte<AOEEnums::AffectedTeam>  affectedTeam = AOEEnums::Enemy;
 	bool usesTarget = false;
 };
 

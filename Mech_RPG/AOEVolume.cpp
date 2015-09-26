@@ -17,7 +17,9 @@ void AAOEVolume::Tick(float DeltaTime) {
 			if (pawn != NULL && pawn->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass()) && pawn->GetDistanceTo(this) <= 200) {
 				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
-				if (character != NULL && !character->IsDead() && character->startingGroupID == affectedTeam) {
+				if (character != NULL 
+					&& !character->IsDead() 
+					&& character->team == affectedTeam) {
 					FHealthChange damage;
 					damage.healthChange = healthChange * DeltaTime;
 					damage.damager = owner;

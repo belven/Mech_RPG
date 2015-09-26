@@ -7,7 +7,7 @@
 void UOrbitalStrike::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (target != NULL) {
 		FTempAOESettings settings;
-		settings.affectedTeam = owner->startingGroupID == 1 ? 0 : 1;
+		settings.affectedTeam = AOEEnums::Enemy;
 		settings.healthChange = damage;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();

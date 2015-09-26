@@ -7,20 +7,22 @@
 #include "BossMechanic.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
-class MECH_RPG_API ABossMechanic : public AMech_RPGCharacter
-{
+class MECH_RPG_API ABossMechanic : public AMech_RPGCharacter {
 	GENERATED_BODY()
 private:
-	ABoss* boss;	
-	
+	ABoss* boss;
+
 public:
 	ABossMechanic();
 	virtual	void BeginPlay() override;
 
-	ABoss* GetBoss();
-	void SetBoss(ABoss* newVal);
-	
+	UFUNCTION(BlueprintCallable, Category = "Boss")
+		ABoss* GetBoss();
+
+	UFUNCTION(BlueprintCallable, Category = "Boss")
+		void SetBoss(ABoss* newVal);
+
 };

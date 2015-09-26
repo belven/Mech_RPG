@@ -4,8 +4,8 @@
 #include "AI/Navigation/NavigationSystem.h"
 #include "Navigation/CrowdFollowingComponent.h"
 
-AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
+AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
+	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Hand;
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
