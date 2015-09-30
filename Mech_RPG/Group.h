@@ -64,5 +64,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		void GroupMemberHit(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
 
+	bool HasMemebers();
+
 		FMemberDamageEvent OnMemberDamageEvent;
 };

@@ -66,25 +66,17 @@ void AAllyAIController::FindTargetInWeaponRage() {
 	float weaponRange = GetOwner()->GetCurrentWeapon()->GetRange();
 
 	if (!GetOwner()->GetCurrentWeapon()->Heals()) {
-		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
-			APawn* pawn = iter->Get();
-
-			if (pawn != NULL 
-				&& pawn != GetOwner() 
-				&& pawn->GetDistanceTo(GetOwner()) <= weaponRange) {
-				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-
-				if (!character->IsDead() && !character->CompareGroup(GetOwner())) {
-					SetTarget(character);
-					break;
-				}
+		for (AMech_RPGCharacter* character : GetCharactersInRange(weaponRange)) {
+			if (!character->CompareGroup(GetOwner())) {
+				SetTarget(character);
+				break;
 			}
 		}
 	}
 	else {
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
-			if (!character->IsDead() 
-				&& character->GetHealth() < character->GetMaxHealth() 
+			if (!character->IsDead()
+				&& character->GetHealth() < character->GetMaxHealth()
 				&& character->GetDistanceTo(GetOwner()) <= weaponRange) {
 				SetTarget(character);
 				break;

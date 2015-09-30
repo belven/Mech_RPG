@@ -59,7 +59,7 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 void ABaseAIController::SetupCollision() {
 	collision.IgnoreComponents.Empty();
 
-	if (GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->GetMembers().Num() > 0) {
+	if (GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : GetOwner()->GetGroup()->GetMembers()) {
 			if (member != target) {
 				collision.AddIgnoredActor(member);
@@ -156,18 +156,15 @@ void ABaseAIController::FindTarget() {
 		float range = weapon->GetRange() * 1.3;
 		range = range < 1200 ? 1200 : range;
 
-		for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
-			APawn* pawn = iter->Get();
+		for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
+			GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), character->GetActorLocation(), objectCollision, collision);
 
-			GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), pawn->GetActorLocation(), objectCollision, collision);
-
-			if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(GetOwner()) <= range && hit.GetActor() == pawn) {
-				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-
-				if (!character->IsDead() && !character->CompareGroup(GetOwner())) {
-					SetTarget(character);
-					break;
-				}
+			if (hit.bBlockingHit
+				&& hit.GetActor() != NULL
+				&& (hit.GetActor() == character || IsCover(hit.GetActor()))
+				&& !character->CompareGroup(GetOwner())) {
+				SetTarget(character);
+				break;
 			}
 		}
 	}
@@ -179,6 +176,21 @@ void ABaseAIController::FindTarget() {
 			}
 		}
 	}
+}
+
+TArray<AMech_RPGCharacter*> ABaseAIController::GetCharactersInRange(float range) {
+	TArray<AMech_RPGCharacter*> characters;
+	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
+		APawn* pawn = iter->Get();
+		if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(GetOwner()) <= range) {
+			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
+
+			if (!character->IsDead()) {
+				characters.Add(character);
+			}
+		}
+	}
+	return characters;
 }
 
 AMech_RPGCharacter* ABaseAIController::GetOwner() {

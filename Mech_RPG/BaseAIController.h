@@ -50,4 +50,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Group")
 	void GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
 
+	TArray<AMech_RPGCharacter*> GetCharactersInRange(float range);
+
 };

@@ -73,6 +73,7 @@ public:
 	void ZoomOut();
 	void ResetZoom();
 	//void UpdateRotation();
+	TArray<AMech_RPGCharacter*> GetCharactersInRange(float range);
 
 protected:
 	/**

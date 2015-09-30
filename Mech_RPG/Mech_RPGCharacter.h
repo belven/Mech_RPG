@@ -16,6 +16,15 @@ namespace EffectEnums {
 	};
 }
 
+UENUM(BlueprintType)
+namespace GameEnums {
+	enum Difficulty {
+		Easy,
+		Medium,
+		Hard
+	};
+}
+
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
@@ -104,12 +113,16 @@ private:
 	float energy;
 	float health;
 	float healthRegen;
+	bool inCombat;
 	bool channeling;
 
 	int32 id;
 	int32 canAttack;
 	int32 canMove;
 	int32 canBeDamaged;
+
+
+	FTimerHandle TimerHandle_OutOfCombat;
 
 	UPROPERTY()
 		TArray<AWeapon*> weapons;
@@ -136,6 +149,8 @@ public:
 
 	FHealthChangeEvent OnHealthChange;
 	FPostBeginPlay OnPostBeginPlay;
+
+	void OutOfCombat();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		bool Channelling();
@@ -304,6 +319,6 @@ public:
 	void SetMovementModifier(float newVal);
 	void SetSpeed(float newVal);
 
-
+	float GetModifierForDifficulty(TEnumAsByte<GameEnums::Difficulty> difficulty);
 };
 

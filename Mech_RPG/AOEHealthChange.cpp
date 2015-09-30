@@ -3,6 +3,7 @@
 #include "Mech_RPG.h"
 #include "AOEHealthChange.h"
 #include "Mech_RPGCharacter.h"
+#include "DrawDebugHelpers.h"
 
 UAOEHealthChange* UAOEHealthChange::CreateTestAOE(FTempAOESettings inSettings) {
 	UAOEHealthChange* tempAOE = NewObject<UAOEHealthChange>(UAOEHealthChange::StaticClass());
@@ -17,6 +18,7 @@ void  UAOEHealthChange::Activate() {
 
 		FHealthChange damage;
 		FVector locationToUse = settings.usesTarget && settings.target != NULL ? settings.target->GetActorLocation() : settings.location;
+		DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, FColor::Blue, false, settings.rate, 0);
 
 		damage.damager = settings.owner;
 

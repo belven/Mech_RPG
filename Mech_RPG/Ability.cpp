@@ -36,3 +36,7 @@ void UAbility::ResetOnCooldown() {
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UAbility::ResetOnCooldown, 0.1F);
 	}
 }
+
+TEnumAsByte<AOEEnums::AffectedTeam> UAbility::GetAffectedTeam() {
+	return affectedTeam;
+}

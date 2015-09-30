@@ -48,7 +48,7 @@ AMech_RPGCharacter* UGroup::GetMember(int32 index) {
 }
 
 AMech_RPGCharacter* UGroup::GetPlayer() {
-	if (members.Num() > 0) {
+	if (HasMemebers()) {
 		for (AMech_RPGCharacter* character : members) {
 			if (character != NULL 
 				&& character->GetController() != NULL 
@@ -66,4 +66,8 @@ void UGroup::GroupMemberHit(AMech_RPGCharacter* attacker, AMech_RPGCharacter* da
 	if (OnMemberDamageEvent.IsBound() && attacker != NULL && !attacker->IsDead()) {
 		OnMemberDamageEvent.Broadcast(attacker, damagedMember);
 	}
+}
+
+bool UGroup::HasMemebers() {
+	return members.Num() > 0;
 }

@@ -13,21 +13,23 @@ class MECH_RPG_API UChannelledAbility : public UAbility {
 	GENERATED_BODY()
 
 private:
-
 	UPROPERTY()
 	class AMech_RPGCharacter* targetCharacter;
-
 	FVector targetLocation;
+
 	bool usesLocation = false;
+	bool channelling = false;
+	bool usesTrace = false;
 
 	float channelDuration;
+	float currentChannelTime = 0;
 
 	UPROPERTY()
 		UAbility* abilityToActivate;
 
-	bool channelling = false;
-
-	float currentChannelTime = 0;
+	FCollisionQueryParams collision;
+	FCollisionObjectQueryParams objectCollision;
+	FHitResult hit;
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
@@ -47,6 +49,8 @@ public:
 
 	void ActiveChannelAbility();
 
+	bool PerformLineTrace();
+
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		bool OnCooldown() override;
 
@@ -54,5 +58,5 @@ public:
 		float GetCurrentTimeRemaining() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		static UChannelledAbility* CreateChannelledAbility(AMech_RPGCharacter* inOwner, UAbility* inAbilityToActivate, float inChannelDuration, bool inUsesLocation = false);
+		static UChannelledAbility* CreateChannelledAbility(AMech_RPGCharacter* inOwner, UAbility* inAbilityToActivate, float inChannelDuration, bool inUsesLocation = false, bool inUsesTrace = false);
 };

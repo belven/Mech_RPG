@@ -30,11 +30,11 @@ void AAddSpawningMechanic::BeginPlay() {
 }
 
 void AAddSpawningMechanic::TriggerSpawn() {
-	if (classToSpawn != NULL) {
+	if (classToSpawn != NULL && !IsDead()) {
 		FNavLocation nav;
 		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
 		nav.Location.Z = GetActorLocation().Z;
-		AMech_RPGCharacter* character = GetWorld()->SpawnActor<AMech_RPGCharacter>(classToSpawn, nav.Location, nav.Location.Rotation());
+		AMech_RPGCharacter* character = GetWorld()->SpawnActor<AMech_RPGCharacter>(classToSpawn, nav.Location, GetActorRotation());
 		SetUpCharacter(character);
 		spawnAmount--;
 	}

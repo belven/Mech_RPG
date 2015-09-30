@@ -86,6 +86,13 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 
 	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
 
+
+	FLookAtMatrix lookAt = FLookAtMatrix::FLookAtMatrix(GetOwner()->GetActorLocation(), target->GetActorLocation(), GetOwner()->GetActorUpVector());	
+	FRotator rotation = GetOwner()->GetActorRotation();
+
+	rotation.Yaw = lookAt.Rotator().Yaw - 90;
+	GetOwner()->SetActorRotation(rotation);
+
 	// Are we targeting ourselves
 	if (target == GetOwner()) {
 		FireWeapon(NULL);
@@ -110,6 +117,21 @@ void AMech_RPGPlayerController::SetupCollision() {
 			}
 		}
 	}
+}
+
+TArray<AMech_RPGCharacter*> AMech_RPGPlayerController::GetCharactersInRange(float range) {
+	TArray<AMech_RPGCharacter*> characters;
+	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
+		APawn* pawn = iter->Get();
+		if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(GetOwner()) <= range) {
+			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
+
+			if (!character->IsDead()) {
+				characters.Add(character);
+			}
+		}
+	}
+	return characters;
 }
 
 void AMech_RPGPlayerController::FireWeapon(AActor* hit) {

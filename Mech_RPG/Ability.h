@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Object.h"
+#include "AOEHealthChange.h"
 #include "Ability.generated.h"
 
 /**
@@ -19,9 +19,9 @@ private:
 		float cooldown = 1.0F;
 
 		bool onCooldown = false;
+		TEnumAsByte<AOEEnums::AffectedTeam> affectedTeam = AOEEnums::Enemy;
 
 		float currentTime = 0.0F;
-
 public:
 	void SetOnCooldown(UWorld* const World);
 
@@ -42,4 +42,7 @@ public:
 		virtual void Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) { check(0 && "You must override this") };
 
 	FTimerHandle TimerHandle_AbilityOffCooldown;
+
+	TEnumAsByte<AOEEnums::AffectedTeam> GetAffectedTeam();
+
 };

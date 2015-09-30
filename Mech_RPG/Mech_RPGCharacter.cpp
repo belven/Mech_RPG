@@ -78,7 +78,8 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 		}
 
 		if (GetHealth() < GetMaxHealth()) {
-			health += healthRegen * DeltaTime;
+			float regen = !inCombat ? 200 : healthRegen;
+			health += regen * DeltaTime;
 		}
 
 		if (GetHealth() > GetMaxHealth()) {
@@ -182,6 +183,9 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 
 	if (damage.healthChange < 0 || canBeDamaged == 0) {
 		health -= damage.healthChange * (1 - GetDefenceModifier());
+		inCombat = true;
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_OutOfCombat);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 7.0F);
 	}
 
 	if (OnHealthChange.IsBound()) {
@@ -195,6 +199,10 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 	}
 }
 
+void AMech_RPGCharacter::OutOfCombat() {
+	inCombat = false;
+}
+
 void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
 	if (newWeapon) {
 		weapons.Add(newWeapon);
@@ -205,51 +213,72 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	SetHealth(GetMaxHealth());
 	SetHealthRegen(10.0);
 
+	float statModifier = 0;
+
+	bool isPlayer = GetController() != NULL ? GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass()) : false;
+	bool isAlly = GetController() != NULL ? GetController()->GetClass()->IsChildOf(AAllyAIController::StaticClass()) : false;
+
+	if (isAlly || isPlayer) {
+		statModifier = GetModifierForDifficulty(GameEnums::Easy);
+	}
+
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
 		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.2), 1.5));
-		SetDefenceModifier(0);
-		SetDamageModifier(1.5);
+		SetDefenceModifier(0 + statModifier);
+		SetDamageModifier(1.5 + statModifier);
 		break;
 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
 		abilities.Add(UHeal::CreateAbility(15, this, 1000));
-		SetDefenceModifier(0);
-		SetDamageModifier(1.5);
-		SetMovementModifier(1.2);
+		SetDefenceModifier(0 + statModifier);
+		SetDamageModifier(1.5 + statModifier);
+		SetMovementModifier(1.2 + statModifier);
 		break;
 
 	case GroupEnums::Tank:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
 		abilities.Add(UTaunt::CreateAbility(5, this));
-		SetDefenceModifier(0.5);
-		SetDamageModifier(1);
-		SetMovementModifier(1.2);
+		SetDefenceModifier(0.5 + statModifier);
+		SetDamageModifier(1 + statModifier);
+		SetMovementModifier(1.2 + statModifier);
 		break;
 
 	case GroupEnums::Sniper:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 1));
-		SetDefenceModifier(0);
-		SetDamageModifier(2);
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 1.5, true, true));
+		SetDefenceModifier(0 + statModifier);
+		SetDamageModifier(2 + statModifier);
 		break;
 
 	case GroupEnums::RPG:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
 		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
-		SetDefenceModifier(0);
-		SetDamageModifier(1.25);
+		SetDefenceModifier(0 + statModifier);
+		SetDamageModifier(1.25 + statModifier);
 		break;
 
 	case GroupEnums::Support:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
 		abilities.Add(UDisable::CreateDisable(5, this, 3));
-		SetDefenceModifier(0.3);
-		SetDamageModifier(1.25);
+		SetDefenceModifier(0.3 + statModifier);
+		SetDamageModifier(1.25 + statModifier);
 		break;
 	}
+}
+
+float AMech_RPGCharacter::GetModifierForDifficulty(TEnumAsByte<GameEnums::Difficulty> difficulty) {
+	switch (difficulty) {
+	case GameEnums::Easy:
+		return 0.25;
+	case GameEnums::Medium:
+		return 0.15;
+	case GameEnums::Hard:
+		return 0.05;
+	}
+	return 0;
 }
 
 void AMech_RPGCharacter::SetupWithLoadout() {
