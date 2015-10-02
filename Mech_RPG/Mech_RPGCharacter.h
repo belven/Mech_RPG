@@ -147,6 +147,10 @@ private:
 public:
 	AMech_RPGCharacter();
 
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
+
 	FHealthChangeEvent OnHealthChange;
 	FPostBeginPlay OnPostBeginPlay;
 

@@ -145,6 +145,8 @@ void AMech_RPGCharacter::SetUpGroup() {
 	if (con) {
 		GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
 	}
+
+	GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(this, &AMech_RPGCharacter::SetInCombat);
 }
 
 
@@ -183,9 +185,6 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 
 	if (damage.healthChange < 0 || canBeDamaged == 0) {
 		health -= damage.healthChange * (1 - GetDefenceModifier());
-		inCombat = true;
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_OutOfCombat);
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 7.0F);
 	}
 
 	if (OnHealthChange.IsBound()) {
@@ -197,6 +196,12 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 		SetActorHiddenInGame(true);
 		SetActorEnableCollision(false);
 	}
+}
+
+void AMech_RPGCharacter::SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
+	inCombat = true;
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_OutOfCombat);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 7.0F);
 }
 
 void AMech_RPGCharacter::OutOfCombat() {

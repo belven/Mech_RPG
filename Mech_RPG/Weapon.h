@@ -13,26 +13,31 @@ namespace WeaponEnums {
 }
 
 #pragma once
-
-
-
 #include "MechAttachment.h"
 #include "Weapon.generated.h"
 
-/**
- * 
- */
+
+USTRUCT(BlueprintType)
+struct FWeaponParams {
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		float damage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		float range;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		float fireRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		bool heals;
+};
+
 UCLASS(Blueprintable)
-class MECH_RPG_API AWeapon : public AMechAttachment
-{
+class MECH_RPG_API AWeapon : public AMechAttachment {
 	GENERATED_BODY()
-private:
-	float damage;
-	float range;	
-	float fireRate;
+protected:
+	FWeaponParams settings;
 	bool canFire;
 	float lastTime;
-	bool heals;
 
 public:
 	float GetDamage();
@@ -41,17 +46,17 @@ public:
 	void SetDamage(float newVal);
 	void SetRange(float newVal);
 
-	bool CanFire();
-	void Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner);
-	void Fire(class ACover* target, AMech_RPGCharacter* owner);
+	virtual bool CanFire();
+	virtual void Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner);
+	virtual void Fire(class ACover* target, AMech_RPGCharacter* owner);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AWeapon* CreateWeapon(AActor* inOwner, float damage, float range, float fireRate, bool heals = false);
+		static AWeapon* CreateWeapon(AActor* inOwner, FWeaponParams inSettings);
 
 	float GetFireRate();
 	void SetFireRate(float newVal);
 
-	void Tick(float DeltaTime);
+	virtual void Tick(float DeltaTime);
 	bool Heals();
 	void SetHeals(bool newVal);
 

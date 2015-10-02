@@ -2,38 +2,36 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Weapon.h"
-#include "Mech_RPGCharacter.h"
+#include "OverHeatWeapon.h"
+#include "MagazineWeapon.h"
 
 float AWeapon::GetDamage() {
-	return damage;
+	return settings.damage;
 }
 
 float AWeapon::GetRange() {
-	return range;
+	return settings.range;
 }
 
 void AWeapon::SetDamage(float newVal) {
-	damage = newVal;
+	settings.damage = newVal;
 }
 
 void AWeapon::SetRange(float newVal) {
-	range = newVal;
+	settings.range = newVal;
 }
 
 bool AWeapon::CanFire() {
 	return canFire;
 }
 
-AWeapon* AWeapon::CreateWeapon(AActor* inOwner, float damage, float range, float fireRate, bool heals) {
+AWeapon* AWeapon::CreateWeapon(AActor* inOwner, FWeaponParams inSettings) {
 	if (inOwner && inOwner->GetWorld()) {
 		AWeapon* weapon = inOwner->GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass());
-		weapon->SetDamage(damage);
-		weapon->SetRange(range);
-		weapon->SetFireRate(fireRate);
+		weapon->settings = inSettings;
 		weapon->canFire = true;
 		weapon->AttachRootComponentToActor(inOwner);
 		weapon->lastTime = 0;
-		weapon->SetHeals(heals);
 		return weapon;
 	}
 	return NULL;
@@ -47,7 +45,7 @@ void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 	damage.target = target;
 	damage.weaponUsed = this;
 
-	damage.healthChange = heals ? -damageDealt : damageDealt;
+	damage.healthChange = settings.heals ? -damageDealt : damageDealt;
 
 	target->ChangeHealth(damage);
 	canFire = false;
@@ -61,25 +59,25 @@ void AWeapon::Fire(ACover* target, AMech_RPGCharacter* owner) {
 	//damage.target = target;
 	damage.weaponUsed = this;
 
-	damage.healthChange = heals ? -damageDealt : damageDealt;
+	damage.healthChange = settings.heals ? -damageDealt : damageDealt;
 
 	target->ChangeHealth(damage);
 	canFire = false;
 }
 
 float AWeapon::GetFireRate() {
-	return fireRate;
+	return settings.fireRate;
 }
 
 void AWeapon::SetFireRate(float newVal) {
-	fireRate = newVal;
+	settings.fireRate = newVal;
 }
 
 void AWeapon::Tick(float DeltaTime) {
 	if (!canFire) {
 		lastTime += DeltaTime;
 
-		if (lastTime >= fireRate) {
+		if (lastTime >= settings.fireRate) {
 			lastTime = 0;
 			canFire = true;
 		}
@@ -87,30 +85,50 @@ void AWeapon::Tick(float DeltaTime) {
 }
 
 bool AWeapon::Heals() {
-	return heals;
+	return settings.heals;
 }
 
 void AWeapon::SetHeals(bool newVal) {
-	heals = newVal;
+	settings.heals = newVal;
 }
 
 AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type) {
+	FWeaponParams settings;
+	FMagazineWeaponParams magSettings;
+
 	switch (type) {
 	case WeaponEnums::SMG:
-		return CreateWeapon(inOwner, 35, 1000, 0.3);
-		break;
+		magSettings.damage = 35;
+		magSettings.range = 1000;
+		magSettings.fireRate = 0.3;
+		magSettings.heals = false;
+		magSettings.magazineSize = 10;
+		magSettings.reloadAmount = 1;
+		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings);
 	case WeaponEnums::Bio_Repair:
-		return CreateWeapon(inOwner, 45, 600, 0.2, true);
-		break;
+		settings.damage = 45;
+		settings.range = 600;
+		settings.fireRate = 0.2;
+		settings.heals = true;
+		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, settings);
 	case WeaponEnums::RPG:
-		return CreateWeapon(inOwner, 500, 1300, 2.5);
-		break;
+		settings.damage = 500;
+		settings.range = 1300;
+		settings.fireRate = 2.5;
+		settings.heals = false;
+		return CreateWeapon(inOwner, settings);
 	case WeaponEnums::Shotgun:
-		return CreateWeapon(inOwner, 150, 400, 0.8);
-		break;
+		settings.damage = 150;
+		settings.range = 400;
+		settings.fireRate = 0.8;
+		settings.heals = false;
+		return CreateWeapon(inOwner, settings);
 	case WeaponEnums::Sniper:
-		return CreateWeapon(inOwner, 250, 1500, 2);
-		break;
+		settings.damage = 250;
+		settings.range = 1500;
+		settings.fireRate = 2;
+		settings.heals = false;
+		return CreateWeapon(inOwner, settings);
 	}
 
 	return  NULL;
