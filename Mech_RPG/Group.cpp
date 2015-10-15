@@ -73,5 +73,5 @@ bool UGroup::HasMemebers() {
 }
 
 TEnumAsByte<GroupEnums::Role> UGroup::GetRandomRole() {
-	return (GroupEnums::Role)(rand() % (GroupEnums::End - 1));
+	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
 }

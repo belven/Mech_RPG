@@ -25,4 +25,6 @@ private:
 
 public:
 	void CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole);
+
+	static TEnumAsByte<BossEnums::BossRole> GetRandomRole();
 };

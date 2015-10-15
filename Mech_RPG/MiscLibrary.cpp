@@ -51,8 +51,26 @@ bool UMiscLibrary::IsMechCharacter(AActor* character) {
 	return character->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass());
 }
 
-AMech_RPGCharacter* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotation, TSubclassOf<class AMech_RPGCharacter> classToSpawn) {
-	AMech_RPGCharacter* character = world->SpawnActor<AMech_RPGCharacter>(classToSpawn, location, rotation);
-	character->SpawnDefaultController();
-	return character;
+template<class T>
+T* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotation, TSubclassOf<class AMech_RPGCharacter> classToSpawn) {
+	int count = 0;
+	FNavLocation nav;
+	AMech_RPGCharacter* character = NULL;
+
+	while (character == NULL && count < 10) {
+		world->GetNavigationSystem()->GetRandomPointInNavigableRadius(location, 100, nav);
+		character = world->SpawnActor<T>(classToSpawn, nav.Location, rotation);
+		count++;
+	}
+
+	if (character != NULL) {
+		character->SpawnDefaultController();
+		return dynamic_cast<T*>(character);
+	}
+	else return NULL;
+}
+
+
+int UMiscLibrary::GetRandomEnum(int end) {
+	return rand() % (end - 1);
 }

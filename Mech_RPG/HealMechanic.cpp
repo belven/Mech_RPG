@@ -7,15 +7,22 @@ AHealMechanic::AHealMechanic() : Super() {
 
 }
 
+void AHealMechanic::BeginPlay() {
+	Super::BeginPlay();
+	if (GetBoss()) {
+		GetBoss()->ApplyCrowdControl(EffectEnums::Damage, false);
+	}
+}
+
 void AHealMechanic::Tick(float DeltaTime) {
 	AMech_RPGCharacter::Tick(DeltaTime);
 
 	if (!IsDead()) {
 		if (GetBoss() && !GetBoss()->IsDead() && GetBoss()->GetHealth() < GetBoss()->GetMaxHealth()) {
-			GetBoss()->SetHealth(GetBoss()->GetHealth() + healAmount * DeltaTime);
+			GetBoss()->ApplyCrowdControl(EffectEnums::Damage, true);
 		}
 	}
 	else {
-		//Destroy();
+		GetBoss()->ApplyCrowdControl(EffectEnums::Damage, true);
 	}
 }

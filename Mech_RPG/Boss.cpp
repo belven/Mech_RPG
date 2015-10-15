@@ -2,9 +2,13 @@
 #include "Mech_RPG.h"
 #include "Boss.h"
 
-
+TEnumAsByte<BossEnums::BossRole> ABoss::GetRandomRole() {
+	return (BossEnums::BossRole)(UMiscLibrary::GetRandomEnum(BossEnums::End));
+}
 
 void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
+	FWeaponParams params;
+
 	SetHealth(GetMaxHealth());
 	SetHealthRegen(10.0);
 
@@ -26,10 +30,14 @@ void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
 
 	switch (inRole) {
 	case BossEnums::DPS:
-		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.2), 1.5));
+		params.damage = 400;
+		params.fireRate = 1;
+		params.range = 1300;
+
+		AddWeapon(AWeapon::CreateWeapon(this, params));
+		AddAbility(UDamageBoost::CreateAbility(7, this, 1.5));
 		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1.5 + statModifier);
+		SetDamageModifier(1.2 + statModifier);
 		break;
 	default:
 		CreatePresetRole(BossEnums::DPS);

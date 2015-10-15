@@ -41,7 +41,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static bool IsMechCharacter(AActor* character);
 
-	UFUNCTION(BlueprintCallable, Category = "Character")
-		static AMech_RPGCharacter* SpawnCharacter(UWorld* world, FVector location, FRotator rotation, TSubclassOf<class AMech_RPGCharacter> classToSpawn);
+	static int GetRandomEnum(int end);
+
+	template<class T> static T* SpawnCharacter(UWorld* world, FVector location, FRotator rotation, TSubclassOf<AMech_RPGCharacter> classToSpawn);
 
 };

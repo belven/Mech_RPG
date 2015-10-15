@@ -7,19 +7,18 @@
 #include "Spawnpoint.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
-class MECH_RPG_API ASpawnpoint : public ATargetPoint
-{
+class MECH_RPG_API ASpawnpoint : public ATargetPoint {
 	GENERATED_BODY()
 public:
 	ASpawnpoint();
 	virtual void BeginPlay() override;
-	int spawnAmount = 3;
 
-	TSubclassOf<class AMech_RPGCharacter> classToSpawn;
-	
-	
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+		int32 spawnAmount = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+		TSubclassOf<class AMech_RPGCharacter> classToSpawn;
 };
