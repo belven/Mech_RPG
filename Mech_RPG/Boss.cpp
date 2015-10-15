@@ -2,16 +2,37 @@
 #include "Mech_RPG.h"
 #include "Boss.h"
 
-void ABoss::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-	//static int botsSpawned = 4;
-	//if (GetHealth() < 800 && botsSpawned > 0) {
-	//	FNavLocation loc;
-	//	GetWorld()->GetNavigationSystem()->GetRandomReachablePointInRadius(GetActorLocation(), 400, loc);
 
-	//	AMech_RPGCharacter* bot = GetWorld()->SpawnActor<AMech_RPGCharacter>(AMech_RPGCharacter::StaticClass(), loc.Location, GetActorRotation());
-	//	bot->SetGroup(GetGroup());
-	//	bot->CreatePresetRole();
-	//	botsSpawned--;
-	//}
+
+void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
+	SetHealth(GetMaxHealth());
+	SetHealthRegen(10.0);
+
+	GameEnums::Difficulty difficulty = GameEnums::Easy;
+
+	float statModifier = 0;
+
+	switch (difficulty) {
+	case GameEnums::Easy:
+		statModifier = 0.2;
+		break;
+	case GameEnums::Medium:
+		statModifier = 0.3;
+		break;
+	case GameEnums::Hard:
+		statModifier = 0.4;
+		break;
+	}
+
+	switch (inRole) {
+	case BossEnums::DPS:
+		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.2), 1.5));
+		SetDefenceModifier(0 + statModifier);
+		SetDamageModifier(1.5 + statModifier);
+		break;
+	default:
+		CreatePresetRole(BossEnums::DPS);
+		break;
+	}
 }

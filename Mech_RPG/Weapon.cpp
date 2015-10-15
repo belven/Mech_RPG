@@ -37,6 +37,10 @@ AWeapon* AWeapon::CreateWeapon(AActor* inOwner, FWeaponParams inSettings) {
 	return NULL;
 }
 
+float AWeapon::GetProgressBarPercent() {
+	return -1;
+}
+
 void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 	FHealthChange damage;
 	float damageDealt = GetDamage()  * owner->GetDamageModifier();
@@ -128,7 +132,7 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 		settings.range = 1500;
 		settings.fireRate = 2;
 		settings.heals = false;
-		return CreateWeapon(inOwner, settings);
+		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, settings);
 	}
 
 	return  NULL;

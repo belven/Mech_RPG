@@ -8,7 +8,8 @@ namespace GroupEnums {
 		Tank,
 		Sniper,
 		RPG,
-		Support
+		Support,
+		End
 	};
 }
 #pragma once
@@ -66,5 +67,8 @@ public:
 
 	bool HasMemebers();
 
-		FMemberDamageEvent OnMemberDamageEvent;
+	FMemberDamageEvent OnMemberDamageEvent;
+
+	UFUNCTION(BlueprintCallable, Category = "Group")
+		static TEnumAsByte<GroupEnums::Role> GetRandomRole();
 };

@@ -71,3 +71,7 @@ void UGroup::GroupMemberHit(AMech_RPGCharacter* attacker, AMech_RPGCharacter* da
 bool UGroup::HasMemebers() {
 	return members.Num() > 0;
 }
+
+TEnumAsByte<GroupEnums::Role> UGroup::GetRandomRole() {
+	return (GroupEnums::Role)(rand() % (GroupEnums::End - 1));
+}

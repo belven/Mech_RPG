@@ -22,5 +22,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual bool CanFire() override;
 
+	UFUNCTION(BlueprintCallable, Category = "OverHeatWeapon")
+	float GetHeatLevel();
+
 	static AOverHeatWeapon* CreateOverHeatWeapon(AActor* inOwner, FWeaponParams inSettings);
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		virtual float GetProgressBarPercent() override;
 };

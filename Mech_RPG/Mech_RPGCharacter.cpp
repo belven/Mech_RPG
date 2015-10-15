@@ -258,18 +258,22 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		SetDamageModifier(2 + statModifier);
 		break;
 
-	case GroupEnums::RPG:
-		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
-		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1.25 + statModifier);
-		break;
+	//case GroupEnums::RPG:
+	//	AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
+	//	abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
+	//	SetDefenceModifier(0 + statModifier);
+	//	SetDamageModifier(1.25 + statModifier);
+	//	break;
 
 	case GroupEnums::Support:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
 		abilities.Add(UDisable::CreateDisable(5, this, 3));
 		SetDefenceModifier(0.3 + statModifier);
 		SetDamageModifier(1.25 + statModifier);
+		break;
+
+	default:
+		CreatePresetRole(GroupEnums::DPS);
 		break;
 	}
 }

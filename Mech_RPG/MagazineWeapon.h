@@ -31,6 +31,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual bool CanFire() override;
 
+	UFUNCTION(BlueprintCallable, Category = "MagazineWeapon")
+		float GetMagazineSize();
+
+	UFUNCTION(BlueprintCallable, Category = "MagazineWeapon")
+		float GetAmmo();
+
 	static AMagazineWeapon* CreateMagazineWeapon(AActor* inOwner, FMagazineWeaponParams inSettings);
 
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		virtual float GetProgressBarPercent() override;
 };

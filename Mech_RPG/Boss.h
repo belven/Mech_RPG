@@ -1,13 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#pragma once
+UENUM(BlueprintType)
+namespace BossEnums {
+	enum BossRole {
+		None,
+		DPS,
+		Healer,
+		Tank,
+		Sniper,
+		End
+	};
+}
 
+#pragma once
 #include "Mech_RPGCharacter.h"
 #include "Boss.generated.h"
 
-/**
- * 
- */
+
 UCLASS(Blueprintable)
 class MECH_RPG_API ABoss : public AMech_RPGCharacter
 {
@@ -15,5 +24,5 @@ class MECH_RPG_API ABoss : public AMech_RPGCharacter
 private:
 
 public:
-	virtual void Tick(float DeltaTime) override;
+	void CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole);
 };

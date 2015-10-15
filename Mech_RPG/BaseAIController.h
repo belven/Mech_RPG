@@ -32,10 +32,7 @@ public:
 	void PerformAbility();
 	void FireWeapon(AActor* hit);
 	void SetupCollision();
-
-	bool IsMechCharacter(AActor* character);
-	bool IsCover(AActor* character);
-
+	
 	AMech_RPGCharacter* GetOwner();
 	AMech_RPGCharacter* GetTarget();
 

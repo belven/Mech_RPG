@@ -18,7 +18,7 @@ void AOverHeatWeapon::Tick(float DeltaTime) {
 		}
 		else {
 			// If takes 6.45 ish seconds to loose 100 heat when overHeated is TRUE
-			heatLevel -= 0.15 * DeltaTime;
+			heatLevel -= 0.12 * DeltaTime;
 
 			if (heatLevel < 0) {
 				heatLevel = 0;
@@ -32,8 +32,16 @@ void AOverHeatWeapon::Tick(float DeltaTime) {
 	}
 }
 
+float AOverHeatWeapon::GetProgressBarPercent() {
+	return heatLevel;
+}
+
 bool AOverHeatWeapon::CanFire() {
 	return !overHeated && Super::CanFire();
+}
+
+float AOverHeatWeapon::GetHeatLevel() {
+	return heatLevel;
 }
 
 /* Pre calculate the amount of damage
@@ -68,7 +76,7 @@ void AOverHeatWeapon::Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter*
 		}
 	}
 
-	heatLevel += (actualDamageDealt / target->GetMaxHealth());
+	heatLevel += (actualDamageDealt / target->GetMaxHealth()) * (1 + heatLevel);
 	Super::Fire(target, owner);
 }
 

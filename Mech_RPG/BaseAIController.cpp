@@ -3,7 +3,6 @@
 #include "Mech_RPG.h"
 #include "BaseAIController.h"
 #include "Navigation/CrowdFollowingComponent.h"
-#include "Mech_RPGCharacter.h"
 #include "AI/Navigation/NavigationSystem.h"
 
 ABaseAIController::ABaseAIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
@@ -45,7 +44,8 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 		FireWeapon(NULL);
 	}
 	// Have we traced to another character or cover
-	else if (targetTraced && (IsMechCharacter(hit.GetActor()) || IsCover(hit.GetActor()))) {
+	else if (targetTraced 
+		&& (UMiscLibrary::IsMechCharacter(hit.GetActor()) || UMiscLibrary::IsCover(hit.GetActor()))) {
 		PerformAbility();
 		FireWeapon(hit.GetActor());
 	}
@@ -71,17 +71,17 @@ void ABaseAIController::SetupCollision() {
 
 void ABaseAIController::FireWeapon(AActor* hit) {
 	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
-	float distToTarget = FVector::Dist(GetOwner()->GetActorLocation(), target->GetActorLocation());
+	float distToTarget = GetOwner()->GetDistanceTo(target);
 
 	// Are we in weapons range
 	if (weapon != NULL && distToTarget <= weapon->GetRange()) {
 		if (GetOwner()->CanAttack() && weapon->CanFire()) {
 
-			bool isCover = hit != NULL ? IsCover(hit) : false;
+			bool isCover = hit != NULL ? UMiscLibrary::IsCover(hit) : false;
 
 			// Have we hit cover
 			if (isCover) {
-				float distToCover = FVector::Dist(GetOwner()->GetActorLocation(), hit->GetActorLocation());
+				float distToCover = GetOwner()->GetDistanceTo(hit);
 
 				// Are we too far from the cover to avoid shooting it
 				if (distToCover > 200) {
@@ -108,9 +108,12 @@ void ABaseAIController::FireWeapon(AActor* hit) {
 }
 
 void ABaseAIController::PerformAbility() {
-	if (GetOwner()->HasAbilities() && !GetOwner()->Channelling() && GetOwner()->CanCast()) {
+	if (GetOwner()->HasAbilities() 
+		&& !GetOwner()->Channelling() 
+		&& GetOwner()->CanCast()) {
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
-			if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
+
+			if (ability != NULL && !ability->OnCooldown()) {
 				ability->Activate(target);
 				GetOwner()->SetCurrentAbility(ability);
 				break;
@@ -131,20 +134,12 @@ void ABaseAIController::MoveToLocation(FVector location) {
 	}
 }
 
-bool ABaseAIController::IsCover(AActor* character) {
-	return character->GetClass()->IsChildOf(ACover::StaticClass());
-}
-
-bool ABaseAIController::IsMechCharacter(AActor* character) {
-	return character->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass());
-}
-
 void ABaseAIController::FindTarget() {
 	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
 
 	collision.IgnoreComponents.Empty();
 
-	if (GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->GetMembers().Num() > 0) {
+	if (GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : GetOwner()->GetGroup()->GetMembers()) {
 			if (member != target) {
 				collision.AddIgnoredActor(member);
@@ -154,14 +149,14 @@ void ABaseAIController::FindTarget() {
 
 	if (weapon != NULL && !weapon->Heals()) {
 		float range = weapon->GetRange() * 1.3;
-		range = range < 1200 ? 1200 : range;
+		range = range < 1700 ? 1700 : range;
 
 		for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
 			GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), character->GetActorLocation(), objectCollision, collision);
 
 			if (hit.bBlockingHit
 				&& hit.GetActor() != NULL
-				&& (hit.GetActor() == character || IsCover(hit.GetActor()))
+				&& (hit.GetActor() == character || UMiscLibrary::IsCover(hit.GetActor()))
 				&& !character->CompareGroup(GetOwner())) {
 				SetTarget(character);
 				break;
@@ -170,7 +165,7 @@ void ABaseAIController::FindTarget() {
 	}
 	else if (weapon != NULL && GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->GetMembers().Num() > 0) {
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
-			if (!character->IsDead() && character->GetHealth() < character->GetMaxHealth()) {
+			if (UMiscLibrary::IsCharacterAlive(character) && UMiscLibrary::GetMissingHealth(character) > 0) {
 				SetTarget(character);
 				break;
 			}
@@ -179,18 +174,7 @@ void ABaseAIController::FindTarget() {
 }
 
 TArray<AMech_RPGCharacter*> ABaseAIController::GetCharactersInRange(float range) {
-	TArray<AMech_RPGCharacter*> characters;
-	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
-		APawn* pawn = iter->Get();
-		if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(GetOwner()) <= range) {
-			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-
-			if (!character->IsDead()) {
-				characters.Add(character);
-			}
-		}
-	}
-	return characters;
+	return UMiscLibrary::GetCharactersInRange(range, GetOwner());
 }
 
 AMech_RPGCharacter* ABaseAIController::GetOwner() {
@@ -202,10 +186,10 @@ AMech_RPGCharacter* ABaseAIController::GetTarget() {
 }
 
 bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget) {
-	if (inTarget != NULL && !inTarget->IsDead()) {
+	if (UMiscLibrary::IsCharacterAlive(inTarget)) {
 		if (GetOwner()->GetCurrentWeapon()) {
 			if (GetOwner()->GetCurrentWeapon()->Heals()) {
-				return inTarget->CompareGroup(GetOwner()) && inTarget->GetHealth() < inTarget->GetMaxHealth();
+				return inTarget->CompareGroup(GetOwner()) && UMiscLibrary::GetMissingHealth(inTarget) > 0;
 			}
 			else {
 				return !inTarget->CompareGroup(GetOwner());

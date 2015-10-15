@@ -61,5 +61,8 @@ public:
 	void SetHeals(bool newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		virtual float GetProgressBarPercent();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		static AWeapon* CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type = WeaponEnums::SMG);
 };

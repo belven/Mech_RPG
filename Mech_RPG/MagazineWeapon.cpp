@@ -5,21 +5,22 @@
 
 void AMagazineWeapon::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-
-	lastTime += DeltaTime;
-	
 	if (ammo <= 0) {
 		reloading = true;
 	}
+	
+	if (reloading) {
+		lastTime += DeltaTime;
 
-	if (reloading && lastTime >= 1) {
-		lastTime = 0;
+		if (lastTime >= 1) {
+			lastTime = 0;
 
-		ammo += reloadAmount;
+			ammo += reloadAmount;
 
-		if (ammo >= magazineSize) {
-			reloading = false;
-			ammo = magazineSize;
+			if (ammo >= magazineSize) {
+				reloading = false;
+				ammo = magazineSize;
+			}
 		}
 	}
 }
@@ -28,6 +29,17 @@ bool AMagazineWeapon::CanFire() {
 	return !reloading && Super::CanFire();
 }
 
+float AMagazineWeapon::GetMagazineSize() {
+	return magazineSize;
+}
+
+float AMagazineWeapon::GetProgressBarPercent() {
+	return ammo / magazineSize;
+}
+
+float AMagazineWeapon::GetAmmo() {
+	return ammo;
+}
 
 void AMagazineWeapon::Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 	Super::Fire(target, owner);
