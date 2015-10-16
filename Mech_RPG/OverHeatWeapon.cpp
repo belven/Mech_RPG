@@ -1,7 +1,6 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
-#include "OverHeatWeapon.h"
 
 void AOverHeatWeapon::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);

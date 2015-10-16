@@ -1,7 +1,6 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
-#include "MagazineWeapon.h"
 
 void AMagazineWeapon::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
@@ -56,6 +55,8 @@ AMagazineWeapon* AMagazineWeapon::CreateMagazineWeapon(AActor* inOwner, FMagazin
 		weapon->lastTime = 0;
 		weapon->magazineSize = inSettings.magazineSize;
 		weapon->reloadAmount = inSettings.reloadAmount;
+		weapon->ammo = inSettings.magazineSize;
+		weapon->reloading = false;
 		return weapon;
 	}
 	return NULL;

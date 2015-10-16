@@ -3,6 +3,9 @@
 #include "Engine.h"
 #include "Navigation/CrowdFollowingComponent.h"
 
+#define MIN(a,b) (a < b) ? a : b
+#define MAX(a,b) (a > b) ? a : b
+
 AMech_RPGCharacter::AMech_RPGCharacter() {
 	static int32 ID = 0;
 	SetID(ID++);
@@ -449,11 +452,11 @@ int32& AMech_RPGCharacter::GetCanMove() {
 }
 
 float AMech_RPGCharacter::GetDamageModifier() {
-	return damageModifier;
+	return  MAX(damageModifier, 0.1);
 }
 
 float AMech_RPGCharacter::GetDefenceModifier() {
-	return defenceModifier;
+	return MIN(defenceModifier, 0.99);
 }
 
 void AMech_RPGCharacter::SetCanAttack(int32 newVal) {

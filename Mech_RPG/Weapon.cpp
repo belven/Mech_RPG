@@ -97,7 +97,6 @@ void AWeapon::SetHeals(bool newVal) {
 }
 
 AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type) {
-	FWeaponParams settings;
 	FMagazineWeaponParams magSettings;
 
 	switch (type) {
@@ -106,33 +105,37 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 		magSettings.range = 1000;
 		magSettings.fireRate = 0.3;
 		magSettings.heals = false;
-		magSettings.magazineSize = 10;
-		magSettings.reloadAmount = 1;
+		magSettings.magazineSize = 20;
+		magSettings.reloadAmount = 4;
 		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings);
 	case WeaponEnums::Bio_Repair:
-		settings.damage = 45;
-		settings.range = 600;
-		settings.fireRate = 0.2;
-		settings.heals = true;
-		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, settings);
+		magSettings.damage = 45;
+		magSettings.range = 600;
+		magSettings.fireRate = 0.2;
+		magSettings.heals = true;
+		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, magSettings);
 	case WeaponEnums::RPG:
-		settings.damage = 500;
-		settings.range = 1300;
-		settings.fireRate = 2.5;
-		settings.heals = false;
-		return CreateWeapon(inOwner, settings);
+		magSettings.damage = 500;
+		magSettings.range = 1300;
+		magSettings.fireRate = 2.5;
+		magSettings.heals = false;
+		return CreateWeapon(inOwner, magSettings);
 	case WeaponEnums::Shotgun:
-		settings.damage = 150;
-		settings.range = 400;
-		settings.fireRate = 0.8;
-		settings.heals = false;
-		return CreateWeapon(inOwner, settings);
+		magSettings.damage = 150;
+		magSettings.range = 400;
+		magSettings.fireRate = 0.8;
+		magSettings.heals = false;
+		magSettings.magazineSize = 5;
+		magSettings.reloadAmount = 1;
+		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings);
 	case WeaponEnums::Sniper:
-		settings.damage = 250;
-		settings.range = 1500;
-		settings.fireRate = 2;
-		settings.heals = false;
-		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, settings);
+		magSettings.damage = 250;
+		magSettings.range = 1500;
+		magSettings.fireRate = 2;
+		magSettings.heals = false;
+		magSettings.magazineSize = 5;
+		magSettings.reloadAmount = 1;
+		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings);
 	}
 
 	return  NULL;

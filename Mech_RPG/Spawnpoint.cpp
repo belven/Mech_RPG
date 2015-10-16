@@ -19,7 +19,7 @@ void ASpawnpoint::BeginPlay() {
 	for (int i = 0; i < spawnAmount; i++) {
 		if (GetWorld() != NULL) {
 			GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
-			nav.Location.Y = GetActorLocation().Y;
+			//nav.Location.Y = GetActorLocation().Y;
 			AMech_RPGCharacter* character = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(GetWorld(), nav.Location, GetActorRotation(), classToSpawn);
 			
 			GroupEnums::Role role = UGroup::GetRandomRole();

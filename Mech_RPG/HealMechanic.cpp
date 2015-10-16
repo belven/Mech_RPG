@@ -17,12 +17,7 @@ void AHealMechanic::BeginPlay() {
 void AHealMechanic::Tick(float DeltaTime) {
 	AMech_RPGCharacter::Tick(DeltaTime);
 
-	if (!IsDead()) {
-		if (GetBoss() && !GetBoss()->IsDead() && GetBoss()->GetHealth() < GetBoss()->GetMaxHealth()) {
-			GetBoss()->ApplyCrowdControl(EffectEnums::Damage, true);
-		}
-	}
-	else {
+	if (IsDead()) {
 		GetBoss()->ApplyCrowdControl(EffectEnums::Damage, true);
 	}
 }

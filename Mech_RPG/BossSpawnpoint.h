@@ -18,6 +18,9 @@ public:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+		int32 amountOfMechanics = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 		TSubclassOf<class ABoss> bossClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")

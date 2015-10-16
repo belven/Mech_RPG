@@ -24,6 +24,8 @@
 #include "BaseAIController.h"
 #include "AllyAIController.h"
 
+#include "MagazineWeapon.h"
+#include "OverHeatWeapon.h"
 #include "MiscLibrary.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogMech_RPG, Log, All);
