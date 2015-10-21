@@ -29,6 +29,8 @@ public:
 		float fireRate;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 		bool heals;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
 };
 
 UCLASS(Blueprintable)
@@ -38,6 +40,7 @@ protected:
 	FWeaponParams settings;
 	bool canFire;
 	float lastTime;
+	TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
 
 public:
 	float GetDamage();
