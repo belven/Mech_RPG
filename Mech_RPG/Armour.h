@@ -12,6 +12,7 @@ namespace ArmourEnums {
 	};
 }
 
+UENUM(BlueprintType)
 namespace DamageEnums {
 	enum DamageType {
 		Physical,
@@ -24,20 +25,35 @@ namespace DamageEnums {
 #include "Object.h"
 #include "Armour.generated.h"
 
-UCLASS()
-class MECH_RPG_API UArmour : public UObject
-{
+UCLASS(BlueprintType)
+class MECH_RPG_API UArmour : public UObject {
 	GENERATED_BODY()
 private:
 	TEnumAsByte<ArmourEnums::ArmourPosition> armourPosition;
 
-	float physicalResistance;
-	float blastResistance;
-	float energyResistance;
+	float physicalResistance = 0.15;
+	float blastResistance = 0.15;
+	float energyResistance = 0.15;
 
 public:
-	
-	float GetResistance(DamageEnums::DamageType damageType);
-	
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		TEnumAsByte<ArmourEnums::ArmourPosition> GetArmourPosition();
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		float GetPhysicalResistance();
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		float GetBlastResistance();
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		float GetEnergyResistance();
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		static FString GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		float GetResistance(DamageEnums::DamageType damageType);
+
 	static UArmour* CreateArmour(float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition);
 };

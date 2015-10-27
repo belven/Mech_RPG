@@ -1,5 +1,6 @@
 #pragma once
 #include "GameFramework/PlayerController.h"
+#include "Blueprint/UserWidget.h"
 #include "Mech_RPGPlayerController.generated.h"
 
 class AMech_RPGCharacter;
@@ -13,6 +14,7 @@ private:
 	bool altPressed;
 	bool ctrlPressed;
 	bool shiftPressed;
+	bool characterPaneOpen = false;
 
 	FCollisionQueryParams collision;
 	FCollisionObjectQueryParams objectCollision;
@@ -34,6 +36,8 @@ public:
 	bool IsTargetValid(AMech_RPGCharacter* inTarget);
 
 	void DemandSwapCharacter(int index);
+
+	virtual	void BeginPlay() override;
 
 	void CharacterFour();
 	void CharacterOne();
@@ -74,6 +78,13 @@ public:
 	void ResetZoom();
 	//void UpdateRotation();
 	TArray<AMech_RPGCharacter*> GetCharactersInRange(float range);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = UI)
+	TSubclassOf<UUserWidget> WidgetTemplate;
+
+
+	UUserWidget* characterPane;
+	void OpenCharacterPane();
 
 protected:
 	/**

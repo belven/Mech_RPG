@@ -4,7 +4,7 @@
 #define __MECH_RPG_H__
 
 #pragma once
-#include "EngineMinimal.h"
+#include "Engine.h"
 
 #include "Taunt.h"
 #include "Heal.h"
@@ -28,6 +28,12 @@
 #include "OverHeatWeapon.h"
 #include "MiscLibrary.h"
 #include "Armour.h"
+
+#include "Runtime/UMG/Public/UMG.h"
+#include "Runtime/UMG/Public/UMGStyle.h"
+#include "Runtime/UMG/Public/Slate/SObjectWidget.h"
+#include "Runtime/UMG/Public/IUMGModule.h"
+#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogMech_RPG, Log, All);
 

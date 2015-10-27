@@ -50,6 +50,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	GetCharacterMovement()->bCanWalkOffLedges = false;
 	channeling = false;
 	team = TeamEnums::Paladins;
+
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -94,7 +95,12 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 void AMech_RPGCharacter::BeginPlay() {
 	Super::BeginPlay();
 
+	armour.Empty();
 	channeling = false;
+
+	for (int i = 0; i < 5; i++) {
+		armour.Add(UArmour::CreateArmour(15, 15, 15, (ArmourEnums::ArmourPosition)i));
+	}
 
 	if (!UseLoadout) {
 		CreatePresetRole(startingRole);
@@ -116,6 +122,17 @@ void AMech_RPGCharacter::BeginPlay() {
 	if (OnPostBeginPlay.IsBound()) {
 		OnPostBeginPlay.Broadcast(this);
 	}
+}
+
+TArray<UArmour*>& AMech_RPGCharacter::GetArmour() {
+	return armour;
+}
+
+UArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
+	for (UArmour* armour : GetArmour()) {
+		if (armour != NULL && armour->GetArmourPosition() == pos) return armour;
+	}
+	return NULL;
 }
 
 void AMech_RPGCharacter::SetUpGroup() {
@@ -183,11 +200,31 @@ void AMech_RPGCharacter::SwapWeapon() {
 	}
 }
 
+float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType) {
+	float totalResistance = 0;
+	for (UArmour* armour : armour) {
+		if (armour != NULL) totalResistance += armour->GetResistance(damageType);
+	}
+
+	return totalResistance;
+}
+
 void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 	GetGroup()->GroupMemberHit(damage.damager, this);
 
+	float resistance = 0;
+
+	if (damage.weaponUsed  != NULL) {
+		resistance += GetTotalResistance(damage.weaponUsed->GetDamageType());
+		resistance *= (1 + GetDefenceModifier());
+
+		if (resistance >= 0.99) {
+			resistance = 0.99;
+		}
+	}
+
 	if (damage.healthChange < 0 || canBeDamaged == 0) {
-		health -= damage.healthChange * (1 - GetDefenceModifier());
+		health -= damage.healthChange * resistance;
 	}
 
 	if (OnHealthChange.IsBound()) {
@@ -204,7 +241,7 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 void AMech_RPGCharacter::SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
 	inCombat = true;
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_OutOfCombat);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 7.0F);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 3.0F);
 }
 
 void AMech_RPGCharacter::OutOfCombat() {

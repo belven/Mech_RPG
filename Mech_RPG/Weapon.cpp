@@ -25,6 +25,10 @@ bool AWeapon::CanFire() {
 	return canFire;
 }
 
+DamageEnums::DamageType AWeapon::GetDamageType() {
+	return settings.damageType;
+}
+
 AWeapon* AWeapon::CreateWeapon(AActor* inOwner, FWeaponParams inSettings) {
 	if (inOwner && inOwner->GetWorld()) {
 		AWeapon* weapon = inOwner->GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass());
@@ -101,13 +105,13 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 
 	switch (type) {
 	case WeaponEnums::SMG:
-		magSettings.damage = 35;
+		magSettings.damage = 42;
 		magSettings.range = 1000;
 		magSettings.fireRate = 0.3;
 		magSettings.heals = false;
 		magSettings.magazineSize = 20;
 		magSettings.reloadAmount = 4;
-		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings);
+		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings); // 82
 	case WeaponEnums::Bio_Repair:
 		magSettings.damage = 45;
 		magSettings.range = 600;
@@ -127,7 +131,7 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 		magSettings.heals = false;
 		magSettings.magazineSize = 5;
 		magSettings.reloadAmount = 1;
-		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings);
+		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings); //83
 	case WeaponEnums::Sniper:
 		magSettings.damage = 250;
 		magSettings.range = 1500;
@@ -135,7 +139,7 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 		magSettings.heals = false;
 		magSettings.magazineSize = 5;
 		magSettings.reloadAmount = 1;
-		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings);
+		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings); //83
 	}
 
 	return  NULL;

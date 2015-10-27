@@ -14,6 +14,7 @@ namespace WeaponEnums {
 
 #pragma once
 #include "MechAttachment.h"
+#include "Armour.h"
 #include "Weapon.generated.h"
 
 
@@ -40,7 +41,6 @@ protected:
 	FWeaponParams settings;
 	bool canFire;
 	float lastTime;
-	TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
 
 public:
 	float GetDamage();
@@ -62,6 +62,8 @@ public:
 	virtual void Tick(float DeltaTime);
 	bool Heals();
 	void SetHeals(bool newVal);
+
+	DamageEnums::DamageType GetDamageType();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent();

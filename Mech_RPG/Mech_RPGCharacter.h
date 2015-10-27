@@ -140,6 +140,9 @@ private:
 		TArray<UAbility*> abilities;
 
 	UPROPERTY()
+		TArray<UArmour*> armour;
+
+	UPROPERTY()
 		UAbility* currentAbility;
 
 	UPROPERTY()
@@ -147,9 +150,12 @@ private:
 public:
 	AMech_RPGCharacter();
 
+	class UCameraComponent* GetTopDownCamera() { return TopDownCameraComponent; };
+
+	float GetTotalResistance(DamageEnums::DamageType damageType);
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
+		void SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
 
 	FHealthChangeEvent OnHealthChange;
 	FPostBeginPlay OnPostBeginPlay;
@@ -179,12 +185,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		bool UseLoadout = false;
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
 		TEnumAsByte<GroupEnums::Role> startingRole;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
 		TEnumAsByte<TeamEnums::Team> team;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float damageModifier;
 
@@ -202,6 +209,13 @@ public:
 
 	virtual	void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
+
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		TArray<UArmour*>& GetArmour();
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		UArmour* GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
 
 	UFUNCTION(BlueprintCallable, Category = "CrowdControl")
 		void ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool positive);

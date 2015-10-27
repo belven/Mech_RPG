@@ -40,7 +40,7 @@ float AMagazineWeapon::GetAmmo() {
 	return ammo;
 }
 
-void AMagazineWeapon::Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
+void AMagazineWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 	Super::Fire(target, owner);
 	ammo--;
 }

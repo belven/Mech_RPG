@@ -28,6 +28,26 @@ bool UMiscLibrary::IsCharacterAlive(AMech_RPGCharacter* character) {
 	return character != NULL && !character->IsDead();
 }
 
+void UMiscLibrary::OpenCharacterPane(UWorld* world) {
+	AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(UGameplayStatics::GetPlayerCharacter(world, 0));
+
+	if (character != NULL && character->GetController() != NULL) {
+		Cast<AMech_RPGPlayerController>(character->GetController())->OpenCharacterPane();
+	}
+}
+
+float UMiscLibrary::GetWidgetYaw(UCameraComponent* camera) {
+
+	if (camera != NULL) {
+		return camera->GetComponentRotation().Yaw + 90;
+	}
+	return 0;
+}
+
+UWorld* UMiscLibrary::GetWorld(AActor* actor) {
+	return actor->GetWorld();
+}
+
 TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range,  AActor* origin) {
 	TArray<AMech_RPGCharacter*> characters;
 	for (FConstPawnIterator iter = origin->GetWorld()->GetPawnIterator(); iter; iter++) {

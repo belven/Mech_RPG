@@ -10,6 +10,22 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 	DefaultMouseCursor = EMouseCursor::Hand;
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/Character_Interface.Character_Interface_C"));
+	
+	if (characterPaneClass.Class != NULL) {
+		WidgetTemplate = characterPaneClass.Class;
+	}
+
+	SetTickableWhenPaused(true);
+}
+
+void AMech_RPGPlayerController::BeginPlay() {
+	if (WidgetTemplate != NULL) {
+		characterPane = CreateWidget<UUserWidget>(this, WidgetTemplate);
+		characterPane->AddToViewport();
+		characterPane->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 /**
@@ -202,9 +218,27 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &AMech_RPGPlayerController::ZoomIn);
 	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &AMech_RPGPlayerController::ZoomOut);
 	InputComponent->BindAction("ResetZoom", IE_Pressed, this, &AMech_RPGPlayerController::ResetZoom);
+	InputComponent->BindAction("CharacterPane", IE_Pressed, this, &AMech_RPGPlayerController::OpenCharacterPane);
 	//	InputComponent->BindAction("UpdateRotation", IE_Pressed, this, &AMech_RPGPlayerController::UpdateRotation);
 }
 
+
+void AMech_RPGPlayerController::OpenCharacterPane() {
+	if (characterPaneOpen) {
+		FInputModeGameAndUI data;
+		SetInputMode(data);
+		//SetPause(false);
+		characterPaneOpen = false;
+		characterPane->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else {
+		FInputModeUIOnly data;
+		SetInputMode(data);
+		//SetPause(true);
+		characterPaneOpen = true;
+		characterPane->SetVisibility(ESlateVisibility::Visible);
+	}
+}
 
 /**
  * Navigate player to the current mouse cursor location.

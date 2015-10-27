@@ -45,4 +45,13 @@ public:
 
 	template<class T> static T* SpawnCharacter(UWorld* world, FVector location, FRotator rotation, TSubclassOf<AMech_RPGCharacter> classToSpawn);
 
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static void OpenCharacterPane(UWorld* world);
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static float GetWidgetYaw(UCameraComponent* camera);
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static UWorld* GetWorld(AActor* actor);
+
 };
