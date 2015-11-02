@@ -409,30 +409,29 @@ void AMech_RPGPlayerController::SwapWeapons() {
 
 void AMech_RPGPlayerController::ActivateAbility() {
 	AMech_RPGCharacter* tempTarget = cursorTarget != NULL ? cursorTarget : target;
+	FHitResult hit = GetHitFromCursor();
+	FVector location = hit.bBlockingHit ? hit.ImpactPoint : FVector::ZeroVector;
 
 	if (IsOwnerValid()
-		&& tempTarget != NULL
 		&& GetOwner()->HasAbilities()
 		&& !GetOwner()->Channelling()
 		&& GetOwner()->CanCast()) {
 		SetupCollision();
 
-		GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), tempTarget->GetActorLocation(), objectCollision, collision);
+		GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), location, objectCollision, collision);
 
 		bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL && UMiscLibrary::IsMechCharacter(hit.GetActor());
 
 		if (targetTraced) {
 			tempTarget = Cast<AMech_RPGCharacter>(hit.GetActor());
+		}
 
-			if (tempTarget != NULL && !tempTarget->CompareGroup(GetOwner())) {
-				for (UAbility* ability : GetOwner()->GetAbilities()) {
-					if (ability != NULL && !ability->OnCooldown()) {
-						ability->Activate(tempTarget);
-						GetOwner()->SetCurrentAbility(ability);
-						StopMovement();
-						break;
-					}
-				}
+		for (UAbility* ability : GetOwner()->GetAbilities()) {
+			if (ability != NULL && !ability->OnCooldown()) {
+				ability->Activate(tempTarget, location);
+				GetOwner()->SetCurrentAbility(ability);
+				StopMovement();
+				break;
 			}
 		}
 	}

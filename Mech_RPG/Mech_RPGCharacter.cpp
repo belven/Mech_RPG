@@ -235,13 +235,13 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 	if (damage.weaponUsed  != NULL) {
 		resistance += GetTotalResistance(damage.weaponUsed->GetDamageType());
 		resistance *= (1 + GetDefenceModifier());
-
-		if (resistance >= 0.99) {
-			resistance = 0.99;
-		}
+		resistance = MIN(0.99, resistance);		
 	}
 
-	if (damage.healthChange < 0 || canBeDamaged == 0) {
+	if (damage.healthChange < 0 ) {
+		health -= damage.healthChange ;
+	}
+	else if (canBeDamaged == 0) {
 		health -= damage.healthChange * resistance;
 	}
 
@@ -288,7 +288,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.35), 1.5));
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.35), 0.5, true));
 		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1.5 + statModifier);
 		break;

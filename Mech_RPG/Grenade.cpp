@@ -4,7 +4,7 @@
 #include "Grenade.h"
 
 void UGrenade::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
-	if (target != NULL) {
+	if (!targetLocation.IsZero()) {
 		FTempAOESettings settings;
 		settings.affectedTeam = AOEEnums::Enemy;
 		settings.healthChange = damage;
@@ -12,9 +12,9 @@ void UGrenade::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		settings.world = owner->GetWorld();
 		settings.rate = 1;
 		settings.radius = 300;
-		settings.target = target;
+		settings.location = targetLocation;
 		settings.duration = 1;
-		settings.usesTarget = true;
+		settings.usesTarget = false;
 		UAOEHealthChange::CreateTestAOE(settings);
 		SetOnCooldown(owner->GetWorld());
 	}

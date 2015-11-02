@@ -50,23 +50,11 @@ UWorld* UMiscLibrary::GetActorWorld(AActor* actor) {
 
 TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AActor* origin) {
 	TArray<AMech_RPGCharacter*> characters;
-	//for (FConstPawnIterator iter = origin->GetWorld()->GetPawnIterator(); iter; iter++) {
-	//	APawn* pawn = iter->Get();
-	//	if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(origin) <= range) {
-	//		AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-
-	//		if (IsCharacterAlive(character)) {
-	//			characters.Add(character);
-	//		}
-	//	}
-	//}
-
 	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
 		if (IsCharacterAlive(character) && IsValid(origin) && IsValid(character) && character->GetDistanceTo(origin) <= range) {
 			characters.Add(character);
 		}
-	}
-	
+	}	
 	return characters;
 }
 

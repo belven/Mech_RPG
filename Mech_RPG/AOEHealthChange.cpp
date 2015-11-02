@@ -22,28 +22,16 @@ void  UAOEHealthChange::Activate() {
 
 		damage.damager = settings.owner;
 
-		for (FConstPawnIterator iter = settings.world->GetPawnIterator(); iter; iter++) {
-			APawn* pawn = iter->Get();
+		for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+			bool canAffect = settings.affectedTeam == AOEEnums::Ally ? character->CompareGroup(settings.owner) : !character->CompareGroup(settings.owner);
 
-			if (iter->IsValid() 
-				&& pawn != NULL 
-				&& pawn->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass())) {
-
-				AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-
+			if (UMiscLibrary::IsCharacterAlive(character)
+				&& FVector::Dist(character->GetActorLocation(), locationToUse) <= settings.radius
+				&& canAffect) {
 				float tempDamage = settings.healthChange > 2 ? settings.healthChange : character->GetMaxHealth() * settings.healthChange;
-				float dist = FVector::Dist(locationToUse, character->GetActorLocation());
-				bool inRange = dist <= settings.radius;
-
-				if (character != NULL 
-					&& !character->IsDead() 
-					&& settings.affectedTeam == AOEEnums::Ally ? character->team == settings.owner->team : character->team != settings.owner->team
-					&& inRange) {
-
-					damage.healthChange = tempDamage;
-					damage.target = character;
-					character->ChangeHealth(damage);
-				}
+				damage.healthChange = tempDamage;
+				damage.target = character;
+				character->ChangeHealth(damage);
 			}
 		}
 
