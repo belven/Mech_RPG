@@ -6,6 +6,8 @@
 #define MIN(a,b) (a < b) ? a : b
 #define MAX(a,b) (a > b) ? a : b
 
+TArray<AMech_RPGCharacter*> AMech_RPGCharacter::characters;
+
 AMech_RPGCharacter::AMech_RPGCharacter() {
 	static int32 ID = 0;
 	SetID(ID++);
@@ -50,7 +52,23 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	GetCharacterMovement()->bCanWalkOffLedges = false;
 	channeling = false;
 	team = TeamEnums::Paladins;
+	characters.Add(this);	
+}
 
+const TArray<AMech_RPGCharacter*>& AMech_RPGCharacter::GetCharacters() {
+	TArray<AMech_RPGCharacter*> tempCharacters;
+
+	for (AMech_RPGCharacter* character : characters) {
+		if (character == NULL || character->IsDead()) {
+			tempCharacters.Add(character);
+		}
+	}
+
+	for (AMech_RPGCharacter* character : tempCharacters) {
+		characters.Remove(character);
+	}
+
+	return characters;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -270,7 +288,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.2), 1.5));
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.35), 1.5));
 		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1.5 + statModifier);
 		break;
@@ -489,7 +507,7 @@ int32& AMech_RPGCharacter::GetCanMove() {
 }
 
 float AMech_RPGCharacter::GetDamageModifier() {
-	return  MAX(damageModifier, 0.1);
+	return MAX(damageModifier, 0.01);
 }
 
 float AMech_RPGCharacter::GetDefenceModifier() {
@@ -520,7 +538,6 @@ float AMech_RPGCharacter::GetMovementModifier() {
 	return movementModifier;
 }
 
-
 float AMech_RPGCharacter::GetSpeed() {
 	return speed;
 }
@@ -538,7 +555,7 @@ void AMech_RPGCharacter::SetSpeed(float newVal) {
 }
 
 void AMech_RPGCharacter::AddAbility(UAbility* newAbility) {
-	if (&newAbility != NULL && newAbility != NULL) {
+	if (newAbility != NULL) {
 		abilities.Add(newAbility);
 	}
 }

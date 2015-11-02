@@ -121,6 +121,7 @@ private:
 	int32 canMove;
 	int32 canBeDamaged;
 
+	static TArray<AMech_RPGCharacter*> characters;
 
 	FTimerHandle TimerHandle_OutOfCombat;
 
@@ -149,6 +150,8 @@ private:
 		USphereComponent* aoe;
 public:
 	AMech_RPGCharacter();
+
+	static const TArray<AMech_RPGCharacter*>& GetCharacters();
 
 	class UCameraComponent* GetTopDownCamera() { return TopDownCameraComponent; };
 

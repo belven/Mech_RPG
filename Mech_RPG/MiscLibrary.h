@@ -52,6 +52,6 @@ public:
 		static float GetWidgetYaw(UCameraComponent* camera);
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
-		static UWorld* GetWorld(AActor* actor);
+		static UWorld* GetActorWorld(AActor* actor);
 
 };

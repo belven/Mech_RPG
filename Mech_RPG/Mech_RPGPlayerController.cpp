@@ -12,12 +12,11 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/Character_Interface.Character_Interface_C"));
-	
+
 	if (characterPaneClass.Class != NULL) {
 		WidgetTemplate = characterPaneClass.Class;
 	}
 
-	SetTickableWhenPaused(true);
 }
 
 void AMech_RPGPlayerController::BeginPlay() {
@@ -25,6 +24,8 @@ void AMech_RPGPlayerController::BeginPlay() {
 		characterPane = CreateWidget<UUserWidget>(this, WidgetTemplate);
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
+		characterPane->SetPositionInViewport(FVector2D(1000, 200));
+
 	}
 }
 
@@ -103,10 +104,10 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
 
 
-	FLookAtMatrix lookAt = FLookAtMatrix::FLookAtMatrix(GetOwner()->GetActorLocation(), target->GetActorLocation(), GetOwner()->GetActorUpVector());	
+	FLookAtMatrix lookAt = FLookAtMatrix::FLookAtMatrix(GetOwner()->GetActorLocation(), target->GetActorLocation(), GetOwner()->GetActorUpVector());
 	FRotator rotation = GetOwner()->GetActorRotation();
 
-	rotation.Yaw = lookAt.Rotator().Yaw - 90;
+	//rotation.Yaw = lookAt.Rotator().Yaw - 90;
 	GetOwner()->SetActorRotation(rotation);
 
 	// Are we targeting ourselves
@@ -126,7 +127,7 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 void AMech_RPGPlayerController::SetupCollision() {
 	collision.IgnoreComponents.Empty();
 
-	if (owner->GetGroup() != NULL && owner->GetGroup()->GetMembers().Num() > 0) {
+	if (owner->GetGroup() != NULL && owner->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
 			if (member != target) {
 				collision.AddIgnoredActor(member);
@@ -136,18 +137,7 @@ void AMech_RPGPlayerController::SetupCollision() {
 }
 
 TArray<AMech_RPGCharacter*> AMech_RPGPlayerController::GetCharactersInRange(float range) {
-	TArray<AMech_RPGCharacter*> characters;
-	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
-		APawn* pawn = iter->Get();
-		if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(GetOwner()) <= range) {
-			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-
-			if (!character->IsDead()) {
-				characters.Add(character);
-			}
-		}
-	}
-	return characters;
+	return UMiscLibrary::GetCharactersInRange(range, GetOwner());
 }
 
 void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
@@ -295,9 +285,6 @@ void AMech_RPGPlayerController::ResetZoom() {
 //	//GetOwner()->CameraBoom->;
 //}
 
-/**
- * Input handlers for Attack action.
- */
 void AMech_RPGPlayerController::OnAttackPressed() {
 	bAttackTarget = true;
 }
@@ -421,24 +408,30 @@ void AMech_RPGPlayerController::SwapWeapons() {
 }
 
 void AMech_RPGPlayerController::ActivateAbility() {
+	AMech_RPGCharacter* tempTarget = cursorTarget != NULL ? cursorTarget : target;
+
 	if (IsOwnerValid()
-		&& target != NULL
+		&& tempTarget != NULL
 		&& GetOwner()->HasAbilities()
 		&& !GetOwner()->Channelling()
 		&& GetOwner()->CanCast()) {
 		SetupCollision();
 
-		GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
+		GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), tempTarget->GetActorLocation(), objectCollision, collision);
 
-		bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL && hit.GetActor() == target;
+		bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL && UMiscLibrary::IsMechCharacter(hit.GetActor());
 
 		if (targetTraced) {
-			for (UAbility* ability : GetOwner()->GetAbilities()) {
-				if (ability != NULL && &ability != NULL && !ability->OnCooldown()) {
-					ability->Activate(target);
-					GetOwner()->SetCurrentAbility(ability);
-					StopMovement();
-					break;
+			tempTarget = Cast<AMech_RPGCharacter>(hit.GetActor());
+
+			if (tempTarget != NULL && !tempTarget->CompareGroup(GetOwner())) {
+				for (UAbility* ability : GetOwner()->GetAbilities()) {
+					if (ability != NULL && !ability->OnCooldown()) {
+						ability->Activate(tempTarget);
+						GetOwner()->SetCurrentAbility(ability);
+						StopMovement();
+						break;
+					}
 				}
 			}
 		}
@@ -449,8 +442,9 @@ void AMech_RPGPlayerController::PlayerDied() {
 	for (int i = 0; i < GetOwner()->GetGroup()->GetMembers().Num(); i++) {
 		AMech_RPGCharacter* character = GetOwner()->GetGroup()->GetMembers()[i];
 
-		if (!character->IsDead()) {
+		if (UMiscLibrary::IsCharacterAlive(character)) {
 			DemandSwapCharacter(i + 1);
+			break;
 		}
 	}
 
@@ -485,7 +479,7 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 
 	if (group != NULL) {
 		AMech_RPGCharacter* character = group->GetMember(index);
-		if (character != NULL && !character->IsDead() && character != GetOwner()) {
+		if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 
 			if (con->IsTargetValid(cursorTarget)) {
@@ -501,7 +495,7 @@ void AMech_RPGPlayerController::GroupAttack() {
 
 	if (group != NULL) {
 		for (AMech_RPGCharacter* character : group->GetMembers()) {
-			if (character != NULL && !character->IsDead() && character != GetOwner()) {
+			if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
 				AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 
 				if (con->IsTargetValid(cursorTarget)) {
@@ -517,7 +511,7 @@ void AMech_RPGPlayerController::AllyMove(int index) {
 	UGroup* group = GetOwner()->GetGroup();
 	if (group != NULL) {
 		AMech_RPGCharacter* character = group->GetMember(index);
-		if (character != NULL && !character->IsDead() && character != GetOwner()) {
+		if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 			static FHitResult Hit;
 

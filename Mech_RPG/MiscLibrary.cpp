@@ -25,7 +25,7 @@ float UMiscLibrary::GetAbilityChannelPercent(UChannelledAbility* ability) {
 }
 
 bool UMiscLibrary::IsCharacterAlive(AMech_RPGCharacter* character) {
-	return character != NULL && !character->IsDead();
+	return character != NULL && &character != NULL && !character->IsDead();
 }
 
 void UMiscLibrary::OpenCharacterPane(UWorld* world) {
@@ -44,22 +44,29 @@ float UMiscLibrary::GetWidgetYaw(UCameraComponent* camera) {
 	return 0;
 }
 
-UWorld* UMiscLibrary::GetWorld(AActor* actor) {
+UWorld* UMiscLibrary::GetActorWorld(AActor* actor) {
 	return actor->GetWorld();
 }
 
-TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range,  AActor* origin) {
+TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AActor* origin) {
 	TArray<AMech_RPGCharacter*> characters;
-	for (FConstPawnIterator iter = origin->GetWorld()->GetPawnIterator(); iter; iter++) {
-		APawn* pawn = iter->Get();
-		if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(origin) <= range) {
-			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
+	//for (FConstPawnIterator iter = origin->GetWorld()->GetPawnIterator(); iter; iter++) {
+	//	APawn* pawn = iter->Get();
+	//	if (pawn != NULL && IsMechCharacter(pawn) && pawn->GetDistanceTo(origin) <= range) {
+	//		AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
 
-			if (IsCharacterAlive(character)) {
-				characters.Add(character);
-			}
+	//		if (IsCharacterAlive(character)) {
+	//			characters.Add(character);
+	//		}
+	//	}
+	//}
+
+	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+		if (IsCharacterAlive(character) && IsValid(origin) && IsValid(character) && character->GetDistanceTo(origin) <= range) {
+			characters.Add(character);
 		}
 	}
+	
 	return characters;
 }
 
