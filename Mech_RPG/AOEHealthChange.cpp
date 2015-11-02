@@ -31,6 +31,7 @@ void  UAOEHealthChange::Activate() {
 				float tempDamage = settings.healthChange > 2 ? settings.healthChange : character->GetMaxHealth() * settings.healthChange;
 				damage.healthChange = tempDamage;
 				damage.target = character;
+				damage.damageType = settings.damageType;
 				character->ChangeHealth(damage);
 			}
 		}

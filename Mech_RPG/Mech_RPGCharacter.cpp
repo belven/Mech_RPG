@@ -3,8 +3,8 @@
 #include "Engine.h"
 #include "Navigation/CrowdFollowingComponent.h"
 
-#define MIN(a,b) (a < b) ? a : b
-#define MAX(a,b) (a > b) ? a : b
+#define MIN(a,b) (a < b) ? (a) : (b)
+#define MAX(a,b) (a > b) ? (a) : (b)
 
 TArray<AMech_RPGCharacter*> AMech_RPGCharacter::characters;
 
@@ -52,22 +52,14 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	GetCharacterMovement()->bCanWalkOffLedges = false;
 	channeling = false;
 	team = TeamEnums::Paladins;
-	characters.Add(this);	
+	characters.Add(this);
+}
+
+AMech_RPGCharacter::~AMech_RPGCharacter() {
+	characters.Remove(this);
 }
 
 const TArray<AMech_RPGCharacter*>& AMech_RPGCharacter::GetCharacters() {
-	TArray<AMech_RPGCharacter*> tempCharacters;
-
-	for (AMech_RPGCharacter* character : characters) {
-		if (character == NULL || character->IsDead()) {
-			tempCharacters.Add(character);
-		}
-	}
-
-	for (AMech_RPGCharacter* character : tempCharacters) {
-		characters.Remove(character);
-	}
-
 	return characters;
 }
 
@@ -230,19 +222,16 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 	GetGroup()->GroupMemberHit(damage.damager, this);
 
-	float resistance = 0;
+	float resistance = (GetTotalResistance(damage.damageType) / 100);	
 
-	if (damage.weaponUsed  != NULL) {
-		resistance += GetTotalResistance(damage.weaponUsed->GetDamageType());
-		resistance *= (1 + GetDefenceModifier());
-		resistance = MIN(0.99, resistance);		
-	}
+	resistance *= (1 + GetDefenceModifier());
+	resistance = MIN(0.99F, resistance);
 
-	if (damage.healthChange < 0 ) {
-		health -= damage.healthChange ;
+	if (damage.healthChange < 0) {
+		health -= damage.healthChange;
 	}
 	else if (canBeDamaged == 0) {
-		health -= damage.healthChange * resistance;
+		health -= (damage.healthChange * resistance);
 	}
 
 	if (OnHealthChange.IsBound()) {
@@ -288,7 +277,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.35), 0.5, true));
+		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.15), 0.5, true));
 		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1.5 + statModifier);
 		break;
@@ -316,12 +305,12 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		SetDamageModifier(2 + statModifier);
 		break;
 
-	//case GroupEnums::RPG:
-	//	AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
-	//	abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
-	//	SetDefenceModifier(0 + statModifier);
-	//	SetDamageModifier(1.25 + statModifier);
-	//	break;
+		//case GroupEnums::RPG:
+		//	AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
+		//	abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
+		//	SetDefenceModifier(0 + statModifier);
+		//	SetDamageModifier(1.25 + statModifier);
+		//	break;
 
 	case GroupEnums::Support:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
@@ -507,11 +496,11 @@ int32& AMech_RPGCharacter::GetCanMove() {
 }
 
 float AMech_RPGCharacter::GetDamageModifier() {
-	return MAX(damageModifier, 0.01);
+	return MAX(damageModifier, 0.01F);
 }
 
 float AMech_RPGCharacter::GetDefenceModifier() {
-	return MIN(defenceModifier, 0.99);
+	return MIN(defenceModifier, 0.99F);
 }
 
 void AMech_RPGCharacter::SetCanAttack(int32 newVal) {

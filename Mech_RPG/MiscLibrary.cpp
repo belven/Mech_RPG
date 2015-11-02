@@ -51,10 +51,16 @@ UWorld* UMiscLibrary::GetActorWorld(AActor* actor) {
 TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AActor* origin) {
 	TArray<AMech_RPGCharacter*> characters;
 	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
-		if (IsCharacterAlive(character) && IsValid(origin) && IsValid(character) && character->GetDistanceTo(origin) <= range) {
-			characters.Add(character);
+		if (IsCharacterAlive(character)
+			&& IsValid(origin)
+			&& origin->IsValidLowLevel()
+			&& IsValid(character)
+			&& character->IsValidLowLevel()) {
+
+			if (character->GetDistanceTo(origin) <= range)
+				characters.Add(character);
 		}
-	}	
+	}
 	return characters;
 }
 

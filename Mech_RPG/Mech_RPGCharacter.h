@@ -50,6 +50,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
 		float healthChange = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+		TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
 };
 
 
@@ -148,6 +151,11 @@ private:
 
 	UPROPERTY()
 		USphereComponent* aoe;
+
+protected:
+
+	virtual ~AMech_RPGCharacter();
+
 public:
 	AMech_RPGCharacter();
 

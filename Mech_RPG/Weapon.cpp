@@ -52,7 +52,7 @@ void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 	damage.damager = owner;
 	damage.target = target;
 	damage.weaponUsed = this;
-
+	damage.damageType = settings.damageType;
 	damage.healthChange = settings.heals ? -damageDealt : damageDealt;
 
 	target->ChangeHealth(damage);

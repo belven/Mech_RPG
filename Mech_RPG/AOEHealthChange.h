@@ -11,6 +11,7 @@ namespace AOEEnums {
 #pragma once
 
 #include "Object.h"
+#include "Armour.h"
 #include "AOEHealthChange.generated.h"
 
 class AMech_RPGCharacter;
@@ -31,6 +32,8 @@ public:
 	float rate = 1;
 
 	TEnumAsByte<AOEEnums::AffectedTeam>  affectedTeam = AOEEnums::Enemy;
+	TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
+
 	bool usesTarget = false;
 };
 
