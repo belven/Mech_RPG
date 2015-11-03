@@ -20,6 +20,7 @@ ABossSpawnpoint::ABossSpawnpoint() {
 
 void ABossSpawnpoint::BeginPlay() {
 	FNavLocation nav;
+	FVector loc = GetActorLocation();
 	GroupEnums::Role role = UGroup::GetRandomRole();
 	BossEnums::BossRole bossRole = ABoss::GetRandomRole();
 
@@ -32,11 +33,19 @@ void ABossSpawnpoint::BeginPlay() {
 			healerSpawned = true;
 	}
 
+	loc = character->GetActorLocation();
+	loc.Z += (character->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
+	character->SetActorLocation(loc);
+	
 	character->CreatePresetRole(bossRole);
 
 	for (int i = 0; i < amountOfMechanics; i++) {
 		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
 		ABossMechanic* character = UMiscLibrary::SpawnCharacter<ABossMechanic>(GetWorld(), nav.Location, GetActorRotation(), mechanicClass);
+		loc = character->GetActorLocation();
+		
+		loc.Z += (character->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
+		character->SetActorLocation(loc);
 
 		if (role == GroupEnums::Healer) {
 			if (!healerSpawned) {

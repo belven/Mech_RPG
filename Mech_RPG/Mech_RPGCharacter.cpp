@@ -1,6 +1,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Engine.h"
+#include "Armour.h"
 #include "Navigation/CrowdFollowingComponent.h"
 
 #define MIN(a,b) (a < b) ? (a) : (b)
@@ -105,12 +106,8 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 void AMech_RPGCharacter::BeginPlay() {
 	Super::BeginPlay();
 
-	armour.Empty();
 	channeling = false;
 
-	for (int i = 0; i < 5; i++) {
-		armour.Add(UArmour::CreateArmour(15, 15, 15, (ArmourEnums::ArmourPosition)i));
-	}
 
 	if (!UseLoadout) {
 		CreatePresetRole(startingRole);
@@ -216,7 +213,7 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 		if (armour != NULL) totalResistance += armour->GetResistance(damageType);
 	}
 
-	return totalResistance;
+	return MAX(totalResistance, 1);
 }
 
 void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
@@ -231,7 +228,7 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 		health -= damage.healthChange;
 	}
 	else if (canBeDamaged == 0) {
-		health -= (damage.healthChange * resistance);
+		health -= (damage.healthChange * (1 - resistance));
 	}
 
 	if (OnHealthChange.IsBound()) {
@@ -262,6 +259,8 @@ void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
 }
 
 void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
+	int armourValue;
+
 	SetHealth(GetMaxHealth());
 	SetHealthRegen(10.0);
 
@@ -279,30 +278,34 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
 		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.15), 0.5, true));
 		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1.5 + statModifier);
+		SetDamageModifier(1 + statModifier);
+		armourValue = 5;
 		break;
 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
 		abilities.Add(UHeal::CreateAbility(15, this, 1000));
 		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1.5 + statModifier);
-		SetMovementModifier(1.2 + statModifier);
+		SetDamageModifier(1 + statModifier);
+		SetMovementModifier(1 + statModifier);
+		armourValue = 5;
 		break;
 
 	case GroupEnums::Tank:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
 		abilities.Add(UTaunt::CreateAbility(5, this));
-		SetDefenceModifier(0.5 + statModifier);
+		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1 + statModifier);
-		SetMovementModifier(1.2 + statModifier);
+		SetMovementModifier(1 + statModifier);
+		armourValue = 10;
 		break;
 
 	case GroupEnums::Sniper:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
 		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 1.5, true, true));
 		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(2 + statModifier);
+		SetDamageModifier(1 + statModifier);
+		armourValue = 5;
 		break;
 
 		//case GroupEnums::RPG:
@@ -315,13 +318,20 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	case GroupEnums::Support:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
 		abilities.Add(UDisable::CreateDisable(5, this, 3));
-		SetDefenceModifier(0.3 + statModifier);
-		SetDamageModifier(1.25 + statModifier);
+		SetDefenceModifier(0 + statModifier);
+		SetDamageModifier(1 + statModifier);
+		armourValue = 7;
 		break;
 
 	default:
 		CreatePresetRole(GroupEnums::DPS);
 		break;
+	}
+	
+	armour.Empty();
+
+	for (int i = 0; i < ArmourEnums::End; i++) {
+		armour.Add(UArmour::CreateArmour(armourValue, armourValue, armourValue, (ArmourEnums::ArmourPosition)i));
 	}
 }
 

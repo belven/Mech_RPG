@@ -13,15 +13,18 @@ ASpawnpoint::ASpawnpoint() {
 
 void ASpawnpoint::BeginPlay() {
 	Super::BeginPlay();
+	FVector loc;
 	FNavLocation nav;
 	bool healerSpawned = false;
 
 	for (int i = 0; i < spawnAmount; i++) {
 		if (GetWorld() != NULL) {
 			GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
-			//nav.Location.Y = GetActorLocation().Y;
 			AMech_RPGCharacter* character = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(GetWorld(), nav.Location, GetActorRotation(), classToSpawn);
-			
+			loc = character->GetActorLocation();
+			loc.Z += (character->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
+			character->SetActorLocation(loc);
+
 			GroupEnums::Role role = UGroup::GetRandomRole();
 
 			if (role == GroupEnums::Healer) {

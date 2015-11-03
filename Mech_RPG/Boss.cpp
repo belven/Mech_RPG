@@ -7,6 +7,7 @@ TEnumAsByte<BossEnums::BossRole> ABoss::GetRandomRole() {
 }
 
 void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
+	int armourValue;
 	FMagazineWeaponParams params;
 
 	SetHealth(GetMaxHealth());
@@ -35,11 +36,13 @@ void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
 		params.range = 1300;
 		params.magazineSize = 20;
 		params.reloadAmount = 4;
+		params.heals = false;
 
 		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(this, params));
 		AddAbility(UDamageBoost::CreateAbility(7, this, 0.5));
 		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1.2 + statModifier);
+		SetDamageModifier(1 + statModifier);
+		armourValue = 5;
 		break;
 	case BossEnums::Tank:
 		params.damage = 200;
@@ -47,11 +50,13 @@ void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
 		params.range = 400;
 		params.magazineSize = 5;
 		params.reloadAmount = 1;
+		params.heals = false;
 
 		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(this, params));
 		AddAbility(UTaunt::CreateAbility(7, this));
-		SetDefenceModifier(0.5 + statModifier);
+		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1 + statModifier);
+		armourValue = 10;
 		break;
 	case BossEnums::Sniper:
 		params.damage = 350;
@@ -59,14 +64,22 @@ void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
 		params.range = 2000;
 		params.magazineSize = 5;
 		params.reloadAmount = 1;
+		params.heals = false;
 
 		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(this, params));
 		AddAbility(UTaunt::CreateAbility(7, this));
 		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1 + statModifier);
+		armourValue = 5;
 		break;
 	default:
 		CreatePresetRole(BossEnums::DPS);
 		break;
+	}
+
+	GetArmour().Empty();
+
+	for (int i = 0; i < ArmourEnums::End; i++) {
+		GetArmour().Add(UArmour::CreateArmour(armourValue, armourValue, armourValue, (ArmourEnums::ArmourPosition)i));
 	}
 }

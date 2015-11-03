@@ -8,6 +8,7 @@ namespace ArmourEnums {
 		Chest,
 		Left_Arm,
 		Right_Arm,
+		End,
 		Other
 	};
 }
