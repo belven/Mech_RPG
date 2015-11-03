@@ -16,7 +16,7 @@ void AAllyAIController::Tick(float DeltaTime) {
 			if (dist > 1800.0F) {
 				SetPlayerControlledLocation(FVector::ZeroVector);
 			}
-			else if (dist > 150) {
+			else if (dist > 150.0F) {
 				MoveToLocation(GetPlayerControlledLocation());
 			}
 			else {
@@ -75,11 +75,13 @@ void AAllyAIController::FindTargetInWeaponRage() {
 	}
 	else {
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
-			if (!character->IsDead()
-				&& character->GetHealth() < character->GetMaxHealth()
-				&& character->GetDistanceTo(GetOwner()) <= weaponRange) {
-				SetTarget(character);
-				break;
+			for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
+				if (UMiscLibrary::IsCharacterAlive(character)
+					&& UMiscLibrary::GetMissingHealth(character) > 0
+					&& character->GetDistanceTo(GetOwner()) <= weaponRange) {
+					SetTarget(character);
+					break;
+				}
 			}
 		}
 	}

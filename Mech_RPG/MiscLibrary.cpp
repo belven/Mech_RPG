@@ -3,6 +3,7 @@
 #include "Mech_RPG.h"
 #include "MiscLibrary.h"
 
+UGroup* UMiscLibrary::playerGroup = NULL;
 
 float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
 	return character != NULL ? character->GetMaxHealth() - character->GetHealth() : 0.0;
@@ -34,6 +35,24 @@ void UMiscLibrary::OpenCharacterPane(UWorld* world) {
 	if (character != NULL && character->GetController() != NULL) {
 		Cast<AMech_RPGPlayerController>(character->GetController())->OpenCharacterPane();
 	}
+}
+
+UGroup* UMiscLibrary::GetPlayerGroup() {
+	if (playerGroup == NULL || playerGroup->GetPlayer() == NULL) {
+		for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+			if (IsCharacterAlive(character)
+				&& IsValid(character)
+				&& character->IsValidLowLevel()
+				&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
+				playerGroup = character->GetGroup();
+			}
+		}
+	}
+	return playerGroup;
+}
+
+AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
+	return playerGroup != NULL ? playerGroup->GetPlayer() : NULL;
 }
 
 float UMiscLibrary::GetWidgetYaw(UCameraComponent* camera) {

@@ -163,7 +163,7 @@ void ABaseAIController::FindTarget() {
 			}
 		}
 	}
-	else if (weapon != NULL && GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->GetMembers().Num() > 0) {
+	else if (weapon != NULL && GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
 			if (UMiscLibrary::IsCharacterAlive(character) && UMiscLibrary::GetMissingHealth(character) > 0) {
 				SetTarget(character);

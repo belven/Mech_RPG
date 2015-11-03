@@ -13,9 +13,18 @@ UCLASS()
 class MECH_RPG_API UMiscLibrary : public UObject {
 	GENERATED_BODY()
 
+private:
+	static UGroup* playerGroup;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static float GetMissingHealth(AMech_RPGCharacter* character);
+	
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static UGroup* GetPlayerGroup();
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static AMech_RPGCharacter* GetPlayer();
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static float GetMissingHealthPercent(AMech_RPGCharacter* character);
