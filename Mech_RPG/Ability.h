@@ -16,12 +16,14 @@ protected:
 	class AMech_RPGCharacter* owner;
 
 private:
-		float cooldown = 1.0F;
+	float cooldown = 1.0F;
 
-		bool onCooldown = false;
-		TEnumAsByte<AOEEnums::AffectedTeam> affectedTeam = AOEEnums::Enemy;
+	bool onCooldown = false;
 
-		float currentTime = 0.0F;
+	float currentTime = 0.0F;
+protected:
+	TEnumAsByte<AOEEnums::AffectedTeam> affectedTeam = AOEEnums::Enemy;
+
 public:
 	void SetOnCooldown(UWorld* const World);
 

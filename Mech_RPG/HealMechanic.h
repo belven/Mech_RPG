@@ -16,7 +16,7 @@ class MECH_RPG_API AHealMechanic : public ABossMechanic
 public:
 	AHealMechanic();
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
+	void SetDead(bool newVal) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Heal")
 		float healAmount;

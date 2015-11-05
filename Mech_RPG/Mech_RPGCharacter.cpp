@@ -2,6 +2,8 @@
 #include "Mech_RPG.h"
 #include "Engine.h"
 #include "Armour.h"
+#include "BaseAIController.h"
+#include "AllyAIController.h"
 #include "Navigation/CrowdFollowingComponent.h"
 
 #define MIN(a,b) (a < b) ? (a) : (b)
@@ -259,7 +261,7 @@ void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
 }
 
 void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
-	int armourValue;
+	int armourValue = 5;
 
 	SetHealth(GetMaxHealth());
 	SetHealthRegen(10.0);

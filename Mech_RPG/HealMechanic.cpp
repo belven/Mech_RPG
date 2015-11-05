@@ -14,8 +14,8 @@ void AHealMechanic::BeginPlay() {
 	}
 }
 
-void AHealMechanic::Tick(float DeltaTime) {
-	AMech_RPGCharacter::Tick(DeltaTime);
+void AHealMechanic::SetDead(bool newVal) {
+	Super::SetDead(newVal);
 
 	if (IsDead()) {
 		GetBoss()->ApplyCrowdControl(EffectEnums::Damage, true);

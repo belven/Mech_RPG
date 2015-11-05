@@ -17,12 +17,12 @@
 
 #include "AOEHealthChange.h"
 
-#include "Mech_RPGCharacter.h"
 #include "Cover.h"
 
-#include "Mech_RPGPlayerController.h"
-#include "BaseAIController.h"
-#include "AllyAIController.h"
+//#include "Mech_RPGCharacter.h"
+//#include "Mech_RPGPlayerController.h"
+//#include "BaseAIController.h"
+//#include "AllyAIController.h"
 
 #include "MagazineWeapon.h"
 #include "OverHeatWeapon.h"
