@@ -8,7 +8,7 @@ void UAoEHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (!targetLocation.IsZero()) {
 		FTempAOESettings settings;
 		settings.affectedTeam = GetAffectedTeam();
-		settings.healthChange = healAmount;
+		settings.healthChange = -healAmount;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 1;

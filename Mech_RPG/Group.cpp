@@ -32,7 +32,7 @@ void UGroup::SetMembers(TArray<AMech_RPGCharacter*> newVal) {
 }
 
 void UGroup::AddMemeber(AMech_RPGCharacter* memberToAdd) {
-	members.Add(memberToAdd);
+	members.AddUnique(memberToAdd);
 }
 
 void UGroup::RemoveMember(AMech_RPGCharacter* memberToRemove) {
@@ -50,8 +50,8 @@ AMech_RPGCharacter* UGroup::GetMember(int32 index) {
 AMech_RPGCharacter* UGroup::GetPlayer() {
 	if (HasMemebers()) {
 		for (AMech_RPGCharacter* character : members) {
-			if (character != NULL 
-				&& character->GetController() != NULL 
+			if (character != NULL
+				&& character->GetController() != NULL
 				&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
 				return character;
 			}

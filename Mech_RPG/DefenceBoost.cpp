@@ -3,8 +3,6 @@
 #include "Mech_RPG.h"
 #include "DefenceBoost.h"
 
-
-
 void UDefenceBoost::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	SetOnCooldown(owner->GetWorld());
 	owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_DefenceBoostEnded, this, &UDefenceBoost::ResetDefenceBoost, GetCooldown() * 0.5);

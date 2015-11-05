@@ -6,12 +6,25 @@
 void UTimedHealthChange::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (target != NULL) {
 		this->target = target;
-		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UTimedHealthChange::TimeTick, 0.1F);
+		timeLeft = duration;
+		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_TimeTick, this, &UTimedHealthChange::TimeTick, rate);
+		SetOnCooldown(owner->GetWorld());
 	}
 }
 
 void UTimedHealthChange::TimeTick() {
+	if (UMiscLibrary::IsCharacterAlive(owner) && UMiscLibrary::IsCharacterAlive(target) && timeLeft > 0) {
+		timeLeft -= rate;
+		float amount = heals ? -changeAmount : changeAmount;
 
+		FHealthChange healthChange;
+		healthChange.damager = owner;
+		healthChange.healthChange = amount;
+		healthChange.target = target;
+
+		target->ChangeHealth(healthChange);
+		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_TimeTick, this, &UTimedHealthChange::TimeTick, rate);
+	}
 }
 
 UTimedHealthChange* UTimedHealthChange::CreateTimedHealthChange(AMech_RPGCharacter* inOwner, float cooldown, float inChangeAmount, float inRate, float inDuration, bool inHeals) {

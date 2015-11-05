@@ -1,6 +1,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Engine.h"
+#include "Mech_RPGPlayerController.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "Navigation/CrowdFollowingComponent.h"
 

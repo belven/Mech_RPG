@@ -4,6 +4,7 @@
 #include "Armour.h"
 #include "BaseAIController.h"
 #include "AllyAIController.h"
+#include "Mech_RPGPlayerController.h"
 #include "Navigation/CrowdFollowingComponent.h"
 
 #define MIN(a,b) (a < b) ? (a) : (b)
@@ -221,7 +222,7 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 	GetGroup()->GroupMemberHit(damage.damager, this);
 
-	float resistance = (GetTotalResistance(damage.damageType) / 100);	
+	float resistance = (GetTotalResistance(damage.damageType) / 100);
 
 	resistance *= (1 + GetDefenceModifier());
 	resistance = MIN(0.99F, resistance);
@@ -278,58 +279,63 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7, this, 0.15), 0.5, true));
-		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1 + statModifier);
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7.0F, this, 0.15F), 0.5F, true));
+		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F));
+		SetDefenceModifier(0.0F + statModifier);
+		SetDamageModifier(1.0F + statModifier);
 		armourValue = 5;
 		break;
 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
-		abilities.Add(UHeal::CreateAbility(15, this, 1000));
-		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1 + statModifier);
-		SetMovementModifier(1 + statModifier);
+		AddAbility(UHeal::CreateAbility(15.0F, this, 1000.0F));
+		//AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 100.0F, 0.2F, 1.0F, true), 1.0F, false, true));
+		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 100.0F, 0.2F, 1.0F, true));
+		AddAbility(UAoEHeal::CreateAbility(20.0F, this, 0.5F));
+		SetDefenceModifier(0.0F + statModifier);
+		SetDamageModifier(1.0F + statModifier);
+		SetMovementModifier(1.0F + statModifier);
 		armourValue = 5;
 		break;
 
 	case GroupEnums::Tank:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
-		abilities.Add(UTaunt::CreateAbility(5, this));
-		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1 + statModifier);
-		SetMovementModifier(1 + statModifier);
+		AddAbility(UTaunt::CreateAbility(5.0F, this));
+		AddAbility(UDefenceBoost::CreateAbility(7.0F, this, 0.5F));
+		SetDefenceModifier(0.0F + statModifier);
+		SetDamageModifier(1.0F + statModifier);
+		SetMovementModifier(1.0F + statModifier);
 		armourValue = 10;
 		break;
 
 	case GroupEnums::Sniper:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
-		abilities.Add(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 1.5, true, true));
-		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1 + statModifier);
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 1.5F, true, true));
+		SetDefenceModifier(0.0F + statModifier);
+		SetDamageModifier(1.0F + statModifier);
 		armourValue = 5;
 		break;
 
 		//case GroupEnums::RPG:
 		//	AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
-		//	abilities.Add(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
+		//	AddAbility(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
 		//	SetDefenceModifier(0 + statModifier);
 		//	SetDamageModifier(1.25 + statModifier);
 		//	break;
 
 	case GroupEnums::Support:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
-		abilities.Add(UDisable::CreateDisable(5, this, 3));
-		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1 + statModifier);
-		armourValue = 7;
+		AddAbility(UDisable::CreateDisable(5.0F, this, 3.0F));
+		SetDefenceModifier(0.0F + statModifier);
+		SetDamageModifier(1.0F + statModifier);
+		armourValue = 7.0F;
 		break;
 
 	default:
 		CreatePresetRole(GroupEnums::DPS);
 		break;
 	}
-	
+
 	armour.Empty();
 
 	for (int i = 0; i < ArmourEnums::End; i++) {

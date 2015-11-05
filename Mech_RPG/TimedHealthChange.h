@@ -29,4 +29,6 @@ private:
 	bool heals;
 
 	class AMech_RPGCharacter* target;
+
+	FTimerHandle TimerHandle_TimeTick;
 };

@@ -45,6 +45,8 @@ float UChannelledAbility::GetCurrentTimeRemaining() {
 void UChannelledAbility::ActiveChannelAbility() {
 	bool ownerIsValid = !owner->IsDead() && owner->Channelling() && owner->CanCast();
 	bool targetIsValid = usesLocation ? true : targetCharacter != NULL && !targetCharacter->IsDead();
+	bool reset = false;
+
 	targetLocation = !usesLocation && targetIsValid ? targetCharacter->GetActorLocation() : targetLocation;
 
 	if (channelling	&& ownerIsValid && targetIsValid) {
@@ -54,23 +56,18 @@ void UChannelledAbility::ActiveChannelAbility() {
 			owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
 		}
 		else if (!usesTrace || (usesTrace && PerformLineTrace())) {
-			owner->SetChannelling(false);
-			channelling = false;
 			abilityToActivate->Activate(targetCharacter, targetLocation);
-			owner->ApplyCrowdControl(EffectEnums::Move, true);
-			owner->ApplyCrowdControl(EffectEnums::Attack, true);
+			reset = true;
 		}
 		else {
-			owner->SetChannelling(false);
-			channelling = false;
-			currentChannelTime = 0;
-			owner->ApplyCrowdControl(EffectEnums::Move, true);
-			owner->ApplyCrowdControl(EffectEnums::Attack, true);
-			targetCharacter = NULL;
-			targetLocation = FVector::ZeroVector;
+			reset = true;
 		}
 	}
 	else {
+		reset = true;
+	}
+
+	if (reset) {
 		owner->SetChannelling(false);
 		channelling = false;
 		currentChannelTime = 0;

@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "MiscLibrary.h"
+#include "Mech_RPGPlayerController.h"
 
 UGroup* UMiscLibrary::playerGroup = NULL;
 
@@ -43,6 +44,7 @@ UGroup* UMiscLibrary::GetPlayerGroup() {
 			if (IsCharacterAlive(character)
 				&& IsValid(character)
 				&& character->IsValidLowLevel()
+				&& character->GetController() != NULL
 				&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
 				playerGroup = character->GetGroup();
 			}
@@ -52,7 +54,17 @@ UGroup* UMiscLibrary::GetPlayerGroup() {
 }
 
 AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
-	return playerGroup != NULL ? playerGroup->GetPlayer() : NULL;
+	//return playerGroup != NULL ? playerGroup->GetPlayer() : GetPlayerGroup() != NULL ? playerGroup->GetPlayer() : NULL;
+	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+		if (IsCharacterAlive(character)
+			&& IsValid(character)
+			&& character->IsValidLowLevel()
+			&& character->GetController() != NULL
+			&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
+			return character;
+		}
+	}
+	return NULL;
 }
 
 float UMiscLibrary::GetWidgetYaw(UCameraComponent* camera) {

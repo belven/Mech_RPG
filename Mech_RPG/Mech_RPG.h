@@ -14,6 +14,9 @@
 #include "DamageBoost.h"
 #include "OrbitalStrike.h"
 #include "ChannelledAbility.h"
+#include "TimedHealthChange.h"
+#include "AoEHeal.h"
+#include "DefenceBoost.h"
 
 #include "AOEHealthChange.h"
 
