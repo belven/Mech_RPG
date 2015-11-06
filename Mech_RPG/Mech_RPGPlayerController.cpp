@@ -2,8 +2,9 @@
 #include "Mech_RPG.h"
 #include "Engine.h"
 #include "Mech_RPGPlayerController.h"
+#include "AllyAIController.h"
 #include "AI/Navigation/NavigationSystem.h"
-#include "Navigation/CrowdFollowingComponent.h"
+//#include "Navigation/CrowdFollowingComponent.h"
 
 AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
@@ -517,7 +518,7 @@ void AMech_RPGPlayerController::AllyMove(int index) {
 
 			GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
 
-			if (Hit.bBlockingHit) {
+			if (con != NULL && Hit.bBlockingHit) {
 				con->SetPlayerControlledLocation(Hit.ImpactPoint);
 			}
 		}

@@ -43,28 +43,24 @@ float UChannelledAbility::GetCurrentTimeRemaining() {
 }
 
 void UChannelledAbility::ActiveChannelAbility() {
-	bool ownerIsValid = !owner->IsDead() && owner->Channelling() && owner->CanCast();
-	bool targetIsValid = usesLocation ? true : targetCharacter != NULL && !targetCharacter->IsDead();
-	bool reset = false;
+	bool ownerIsValid = UMiscLibrary::IsCharacterAlive(owner) && owner->Channelling() && owner->CanCast();
+	bool targetIsValid = usesLocation ? true : UMiscLibrary::IsCharacterAlive(targetCharacter);
+	bool reset = true;
 
-	targetLocation = !usesLocation && targetIsValid ? targetCharacter->GetActorLocation() : targetLocation;
+	if (!usesLocation && targetIsValid) {
+		targetLocation = targetCharacter->GetActorLocation();
+	}
 
 	if (channelling	&& ownerIsValid && targetIsValid) {
 		if (currentChannelTime > 0) {
+			reset = false;
 			currentChannelTime -= 0.1F;
 			DrawDebugLine(owner->GetWorld(), owner->GetActorLocation(), targetLocation, FColor::Blue, false, 0.2, 0, 5);
 			owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
 		}
 		else if (!usesTrace || (usesTrace && PerformLineTrace())) {
 			abilityToActivate->Activate(targetCharacter, targetLocation);
-			reset = true;
 		}
-		else {
-			reset = true;
-		}
-	}
-	else {
-		reset = true;
 	}
 
 	if (reset) {
@@ -97,15 +93,10 @@ bool UChannelledAbility::PerformLineTrace() {
 	if (targetTraced && (hit.GetActor()->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass()))) {
 		AMech_RPGCharacter* tempCharacter = Cast<AMech_RPGCharacter>(hit.GetActor());
 		targetCharacter = tempCharacter;
-		return affectsAllies && tempCharacter->team == owner->team || !affectsAllies && tempCharacter->team != owner->team;
-	}
-	else if (targetTraced && hit.GetActor()->GetClass()->IsChildOf(ACover::StaticClass())) {
-		//	ACover* tempCover = Cast<ACover>(hit.GetActor());
-		return true;
+		return affectsAllies && tempCharacter->CompareGroup(owner) || !affectsAllies && !tempCharacter->CompareGroup(owner);
 	}
 
 	return false;
-	//float distToCover = FVector::Dist(owner->GetActorLocation(), hit->GetActorLocation());
 }
 
 UChannelledAbility* UChannelledAbility::CreateChannelledAbility(AMech_RPGCharacter* inOwner, UAbility* inAbilityToActivate, float inChannelDuration, bool inUsesLocation, bool inUsesTrace) {

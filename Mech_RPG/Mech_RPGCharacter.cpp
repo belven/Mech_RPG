@@ -127,6 +127,10 @@ void AMech_RPGCharacter::BeginPlay() {
 		SetCurrentAbility(abilities[0]);
 	}
 
+	/*while (settingUpGroups) {
+		Sleep(500);
+		}*/
+
 	SetUpGroup();
 
 	if (OnPostBeginPlay.IsBound()) {
@@ -145,38 +149,32 @@ UArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::Armour
 	return NULL;
 }
 
+bool AMech_RPGCharacter::settingUpGroups = false;
+
 void AMech_RPGCharacter::SetUpGroup() {
-	if (GetGroup() == NULL) {
-		SetGroup(UGroup::CreateGroup(team));
-		GetGroup()->AddMemeber(this);
-	}
+	if (group == NULL) {
+		TArray<AMech_RPGCharacter*> charactersFound = UMiscLibrary::GetCharactersInRange(700, this);
 
-	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
-		APawn* pawn = iter->Get();
-
-		if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 700) {
-			AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(pawn);
-
-			if (character != NULL && character->team == team && character->GetGroup() != GetGroup()) {
-				character->SetGroup(GetGroup());
-				GetGroup()->AddMemeber(character);
-				character->SetUpGroup();
-
-				ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
-
-				if (con) {
-					GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
-				}
+		for (AMech_RPGCharacter* character : charactersFound) {
+			if (character != this && character->team == team && character->GetGroup() != NULL) {
+				SetGroup(character->GetGroup());
+				GetGroup()->AddMemeber(this);
+				break;
 			}
 		}
 	}
 
-	ABaseAIController* con = Cast<ABaseAIController>(Controller);
-	if (con) {
-		GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
+	if (group == NULL) {
+		SetGroup(UGroup::CreateGroup(team));
+		group->AddMemeber(this);
 	}
 
-	GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(this, &AMech_RPGCharacter::SetInCombat);
+	ABaseAIController* con = Cast<ABaseAIController>(Controller);
+	if (con) {
+		group->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
+	}
+
+	group->OnMemberDamageEvent.AddUniqueDynamic(this, &AMech_RPGCharacter::SetInCombat);
 }
 
 
@@ -220,7 +218,9 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 }
 
 void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
-	GetGroup()->GroupMemberHit(damage.damager, this);
+	if (GetGroup() != NULL) {
+		GetGroup()->GroupMemberHit(damage.damager, this);
+	}
 
 	float resistance = (GetTotalResistance(damage.damageType) / 100);
 
@@ -289,8 +289,8 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
 		AddAbility(UHeal::CreateAbility(15.0F, this, 1000.0F));
-		//AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 100.0F, 0.2F, 1.0F, true), 1.0F, false, true));
-		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 100.0F, 0.2F, 1.0F, true));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 100.0F, 0.2F, 1.0F, true), 1.0F, false, true));
+		//AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 100.0F, 0.2F, 1.0F, true));
 		AddAbility(UAoEHeal::CreateAbility(20.0F, this, 0.5F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);

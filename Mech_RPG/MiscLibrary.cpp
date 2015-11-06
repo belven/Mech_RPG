@@ -39,18 +39,18 @@ void UMiscLibrary::OpenCharacterPane(UWorld* world) {
 }
 
 UGroup* UMiscLibrary::GetPlayerGroup() {
-	if (playerGroup == NULL || playerGroup->GetPlayer() == NULL) {
+	//if (playerGroup == NULL || playerGroup->GetPlayer() == NULL) {
 		for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
 			if (IsCharacterAlive(character)
 				&& IsValid(character)
 				&& character->IsValidLowLevel()
 				&& character->GetController() != NULL
 				&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
-				playerGroup = character->GetGroup();
+				return character->GetGroup();
 			}
 		}
-	}
-	return playerGroup;
+	//}
+	return NULL;
 }
 
 AMech_RPGCharacter* UMiscLibrary::GetPlayer() {

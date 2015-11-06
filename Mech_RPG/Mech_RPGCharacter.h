@@ -112,12 +112,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* TopDownCameraComponent;
 
-	bool isDead;
 	float energy;
 	float health;
 	float healthRegen;
 	bool inCombat;
 	bool channeling;
+	bool isDead;
+	static bool settingUpGroups;
 
 	int32 id;
 	int32 canAttack;

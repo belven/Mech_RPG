@@ -112,9 +112,8 @@ void ABaseAIController::PerformAbility() {
 		&& !GetOwner()->Channelling() 
 		&& GetOwner()->CanCast()) {
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
-
 			if (ability != NULL && !ability->OnCooldown()) {
-				ability->Activate(target);
+				ability->Activate(target, target->GetActorLocation());
 				GetOwner()->SetCurrentAbility(ability);
 				break;
 			}
