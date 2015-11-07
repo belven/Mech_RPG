@@ -13,7 +13,7 @@ void UChannelledAbility::Activate(AMech_RPGCharacter* target, FVector targetLoca
 		owner->ApplyCrowdControl(EffectEnums::Move, false);
 		owner->ApplyCrowdControl(EffectEnums::Attack, false);
 		targetCharacter = target;
-		this->targetLocation = targetLocation != FVector::ZeroVector ? targetLocation : target->GetActorLocation();
+		this->targetLocation = targetLocation;
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
 	}
 }
@@ -58,7 +58,7 @@ void UChannelledAbility::ActiveChannelAbility() {
 			DrawDebugLine(owner->GetWorld(), owner->GetActorLocation(), targetLocation, FColor::Blue, false, 0.2, 0, 5);
 			owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
 		}
-		else if (!usesTrace || (usesTrace && PerformLineTrace())) {
+		else if (!usesTrace || targetCharacter == owner || (usesTrace && PerformLineTrace())) {
 			abilityToActivate->Activate(targetCharacter, targetLocation);
 		}
 	}
@@ -90,10 +90,11 @@ bool UChannelledAbility::PerformLineTrace() {
 	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
 	bool affectsAllies = abilityToActivate->GetAffectedTeam() == AOEEnums::Ally;
 
-	if (targetTraced && (hit.GetActor()->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass()))) {
-		AMech_RPGCharacter* tempCharacter = Cast<AMech_RPGCharacter>(hit.GetActor());
-		targetCharacter = tempCharacter;
-		return affectsAllies && tempCharacter->CompareGroup(owner) || !affectsAllies && !tempCharacter->CompareGroup(owner);
+	if (targetTraced && UMiscLibrary::IsMechCharacter(hit.GetActor())) {
+		targetCharacter = Cast<AMech_RPGCharacter>(hit.GetActor());
+		bool affectedAlly = affectsAllies && targetCharacter->CompareGroup(owner);
+		bool affectedEnemy = !affectsAllies && !targetCharacter->CompareGroup(owner);
+		return affectedAlly || affectedEnemy;
 	}
 
 	return false;

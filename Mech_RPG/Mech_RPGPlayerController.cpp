@@ -62,20 +62,19 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 				swapWeapons = false;
 			}
 
-			if (IsTargetValid(target) && bAttackTarget) {
+			if (IsTargetValid(target)) {
 				AttackTarget(DeltaTime);
 			}
-			else {
+			else if (IsTargetValid(cursorTarget)) {
 				target = cursorTarget;
 
-				if (IsTargetValid(target)) {
-					if (bAttackTarget) {
-						AttackTarget(DeltaTime);
-					}
+				if (bAttackTarget) {
+					AttackTarget(DeltaTime);
 				}
 			}
 
-			if (!bAttackTarget && bMoveToMouseCursor) {
+			if (bMoveToMouseCursor) {
+				target = NULL;
 				OnAttackReleased();
 				MoveToMouseCursor();
 			}
