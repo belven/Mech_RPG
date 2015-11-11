@@ -10,7 +10,7 @@ void USnipe::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		damage.damager = owner;
 		damage.target = target;
 		damage.weaponUsed = NULL;
-		damage.healthChange = target->GetMaxHealth() * 0.2;
+		damage.healthChange = target->GetMaxHealth() * 0.3;
 
 		target->ChangeHealth(damage);
 		SetOnCooldown(owner->GetWorld());

@@ -1,6 +1,7 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
+#include "Armour.h"
 
 float UArmour::GetResistance(DamageEnums::DamageType damageType) {
 	switch (damageType) {
@@ -28,6 +29,19 @@ FString UArmour::GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
 		return "Left Leg";
 	}
 	return "Not Found";
+}
+
+float UArmour::GetDeafultValue(ArmourGrades::ArmourGrade grade) {
+	switch (grade) {
+	case ArmourGrades::Light:
+		return 8.0F;
+	case ArmourGrades::Medium:
+		return 10.0F;
+	case ArmourGrades::Heavy:
+		return 12.0F;
+	default:
+		return 0.0F;
+	}
 }
 
 float UArmour::GetPhysicalResistance() {

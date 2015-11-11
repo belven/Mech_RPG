@@ -27,8 +27,7 @@ void ASpawnpoint::BeginPlay() {
 
 			GroupEnums::Role role = UGroup::GetRandomRole();
 
-			if (role == GroupEnums::Healer) {
-				if (!healerSpawned)
+			if (role == GroupEnums::Healer && !healerSpawned) {
 					healerSpawned = true;
 				
 				while (role == GroupEnums::Healer) {
@@ -36,7 +35,7 @@ void ASpawnpoint::BeginPlay() {
 				}
 			}
 
-			character->CreatePresetRole();
+			character->CreatePresetRole(role);
 		}
 	}
 }

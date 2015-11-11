@@ -130,7 +130,7 @@ void AMech_RPGPlayerController::SetupCollision() {
 
 	if (owner->GetGroup() != NULL && owner->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
-			if (member != target) {
+			if (member != target && member != cursorTarget) {
 				collision.AddIgnoredActor(member);
 			}
 		}
@@ -288,6 +288,8 @@ void AMech_RPGPlayerController::ResetZoom() {
 
 void AMech_RPGPlayerController::OnAttackPressed() {
 	bAttackTarget = true;
+
+	if (cursorTarget != NULL && !cursorTarget->IsDead()) SetTarget(cursorTarget);
 }
 
 void AMech_RPGPlayerController::OnAttackReleased() {
@@ -409,30 +411,45 @@ void AMech_RPGPlayerController::SwapWeapons() {
 }
 
 void AMech_RPGPlayerController::ActivateAbility() {
-	AMech_RPGCharacter* tempTarget = cursorTarget != NULL ? cursorTarget : target;
-	FHitResult hit = GetHitFromCursor();
-	FVector location = hit.bBlockingHit ? hit.ImpactPoint : FVector::ZeroVector;
+	FHitResult hit;
+	FVector location;
 
 	if (IsOwnerValid()
 		&& GetOwner()->HasAbilities()
 		&& !GetOwner()->Channelling()
 		&& GetOwner()->CanCast()) {
+
 		SetupCollision();
+
+		//We're targetting the ground so get selected location
+		if (cursorTarget == NULL) {
+			hit = GetHitFromCursor();
+			location = hit.bBlockingHit ? hit.ImpactPoint : FVector::ZeroVector;
+		}
+		else {
+			location = cursorTarget->GetActorLocation();
+		}
 
 		GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), location, objectCollision, collision);
 
-		bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL && UMiscLibrary::IsMechCharacter(hit.GetActor());
-
-		if (targetTraced) {
-			tempTarget = Cast<AMech_RPGCharacter>(hit.GetActor());
+		//Only use an ability if we have LoS to our target/location
+		if (hit.bBlockingHit) {
+			// Have we hit something that isn't a mech
+			if (hit.GetActor() == NULL || !UMiscLibrary::IsMechCharacter(hit.GetActor())) {
+				MoveToLocation(location);
+				return;
+			}
 		}
 
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
 			if (ability != NULL && !ability->OnCooldown()) {
-				ability->Activate(tempTarget, location);
-				GetOwner()->SetCurrentAbility(ability);
-				StopMovement();
-				break;
+				ability->Activate(cursorTarget, location);
+
+				if (ability->OnCooldown()) {
+					GetOwner()->SetCurrentAbility(ability);
+					StopMovement();
+					break;
+				}
 			}
 		}
 	}

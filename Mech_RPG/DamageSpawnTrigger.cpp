@@ -7,7 +7,7 @@ UDamageSpawnTrigger* UDamageSpawnTrigger::CreateDamageSpawnTrigger(ABoss* inBoss
 	UDamageSpawnTrigger* tempTrigger = NewObject<UDamageSpawnTrigger>(StaticClass());
 	if (inBoss != NULL) {
 		tempTrigger->SetBoss(inBoss);
-		inBoss->OnHealthChange.AddDynamic(tempTrigger, &UDamageSpawnTrigger::BossHealthChange);
+		inBoss->OnHealthChange.AddUniqueDynamic(tempTrigger, &UDamageSpawnTrigger::BossHealthChange);
 		tempTrigger->lastHealthPecent = inBoss->GetHealth() / inBoss->GetMaxHealth();
 	}
 	else {

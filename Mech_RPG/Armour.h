@@ -14,6 +14,15 @@ namespace ArmourEnums {
 }
 
 UENUM(BlueprintType)
+namespace ArmourGrades {
+	enum ArmourGrade {
+		Light,
+		Medium,
+		Heavy
+	};
+}
+
+UENUM(BlueprintType)
 namespace DamageEnums {
 	enum DamageType {
 		Physical,
@@ -55,6 +64,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		float GetResistance(DamageEnums::DamageType damageType);
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		static float GetDeafultValue(ArmourGrades::ArmourGrade grade);
 
 	static UArmour* CreateArmour(float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition);
 };

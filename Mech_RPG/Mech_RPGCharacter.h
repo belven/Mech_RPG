@@ -73,7 +73,7 @@ public:
 		float defenceModifier = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		float maxHealth = 1000;
+		float maxHealth = 2000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		float healthRegen = 10;

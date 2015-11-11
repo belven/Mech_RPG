@@ -3,23 +3,20 @@
 #include "Mech_RPG.h"
 #include "BossMechanic.h"
 
-ABossMechanic::ABossMechanic() : Super(){
+ABossMechanic::ABossMechanic() : Super() {
 
 }
 
 void ABossMechanic::BeginPlay() {
-	for (FConstPawnIterator iter = GetWorld()->GetPawnIterator(); iter; iter++) {
-		APawn* pawn = iter->Get();
-		if (pawn && pawn != this && pawn->GetDistanceTo(this) <= 1200) {
-			ABoss* boss = Cast<ABoss>(pawn);
+	Super::BeginPlay();
 
-			if (boss != NULL) {
-				SetBoss(boss);
-				break;
-			}
+	for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(1200, this)) {
+		if (character != NULL && character->GetClass()->IsChildOf(ABoss::StaticClass())) {
+			ABoss* boss = Cast<ABoss>(character);
+			SetBoss(boss);
+			break;
 		}
 	}
-	Super::BeginPlay();
 }
 
 ABoss* ABossMechanic::GetBoss() {

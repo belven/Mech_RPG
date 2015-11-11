@@ -11,7 +11,7 @@ void UGrenade::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 1;
-		settings.radius = 200;
+		settings.radius = 400;
 		settings.location = targetLocation;
 		settings.damageType = DamageEnums::Blast;
 		settings.duration = 1;

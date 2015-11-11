@@ -11,8 +11,7 @@ void UTaunt::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 
 	if (target && target->GetGroup()) {
 		for (AMech_RPGCharacter* member : target->GetGroup()->GetMembers()) {
-			if (member != NULL && !member->IsDead()) {
-
+			if (UMiscLibrary::IsCharacterAlive(member)) {
 				ABaseAIController* con = Cast<ABaseAIController>(member->GetController());
 				if (con && con->GetTarget() != owner) {
 					con->SetTarget(owner);
@@ -31,5 +30,6 @@ UTaunt* UTaunt::CreateAbility(float cooldown, AMech_RPGCharacter* owner) {
 	UTaunt* ability = NewObject<UTaunt>(StaticClass());
 	ability->SetCooldown(cooldown);
 	ability->owner = owner;
+	ability->affectedTeam = AOEEnums::Enemy;
 	return ability;
 }
