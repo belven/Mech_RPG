@@ -24,4 +24,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
 		void BossHealthChange(FHealthChange damage);
+
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+		void SetBoss(ABoss* inBoss) override;
 };

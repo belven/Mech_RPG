@@ -278,11 +278,11 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7.0F, this, 300.0F), 0.5F, true));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7.0F, this, 900.0F), 2.0F, true));
 		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light) * (1 + statModifier);
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
 		SetMaxHealth(2000 * (1 + statModifier));
 		break;
 
@@ -295,7 +295,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
 		SetMovementModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium) * (1 + statModifier);
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
 		SetMaxHealth(2500 * (1 + statModifier));
 		break;
 
@@ -306,16 +306,16 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
 		SetMovementModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy) * (1 + statModifier);
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
 		SetMaxHealth(3000 * (1 + statModifier));
 		break;
 
 	case GroupEnums::Sniper:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 1.5F, true, true));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 2.5F, true, true));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light) * (1 + statModifier);
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
 		SetMaxHealth(2000 * (1 + statModifier));
 		break;
 
@@ -331,7 +331,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		AddAbility(UDisable::CreateDisable(5.0F, this, 3.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium) * (1 + statModifier);
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
 		SetMaxHealth(2500 * (1 + statModifier));
 		break;
 

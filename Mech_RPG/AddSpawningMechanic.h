@@ -31,4 +31,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
 		void SetUpCharacter(AMech_RPGCharacter* character);
+
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void SetBoss(ABoss* newVal) override;
 };

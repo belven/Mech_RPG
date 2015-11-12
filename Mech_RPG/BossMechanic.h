@@ -23,6 +23,6 @@ public:
 		ABoss* GetBoss();
 
 	UFUNCTION(BlueprintCallable, Category = "Boss")
-		void SetBoss(ABoss* newVal);
+		virtual void SetBoss(ABoss* newVal);
 
 };

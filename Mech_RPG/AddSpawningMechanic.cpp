@@ -29,10 +29,13 @@ void AAddSpawningMechanic::BeginPlay() {
 			trigger->SetBoss(GetBoss());
 			trigger->SetAmount(spawnAmount);
 		}
-		else {
-			trigger = UDamageSpawnTrigger::CreateDamageSpawnTrigger(GetBoss(), 5, 0.1F);
-			trigger->OnSpawnTrigger.AddUniqueDynamic(this, &AAddSpawningMechanic::TriggerSpawn);
-		}
+	}
+}
+
+void AAddSpawningMechanic::SetBoss(ABoss* newVal) {
+	Super::SetBoss(newVal);
+	if (trigger != NULL && trigger->GetBoss() == NULL && newVal != NULL) {
+		trigger->SetBoss(GetBoss());
 	}
 }
 

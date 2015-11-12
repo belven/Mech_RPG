@@ -5,22 +5,22 @@
 
 UDamageSpawnTrigger* UDamageSpawnTrigger::CreateDamageSpawnTrigger(ABoss* inBoss, int inAmount, float inPercent) {
 	UDamageSpawnTrigger* tempTrigger = NewObject<UDamageSpawnTrigger>(StaticClass());
-	if (inBoss != NULL) {
-		tempTrigger->SetBoss(inBoss);
-		inBoss->OnHealthChange.AddUniqueDynamic(tempTrigger, &UDamageSpawnTrigger::BossHealthChange);
-		tempTrigger->lastHealthPecent = inBoss->GetHealth() / inBoss->GetMaxHealth();
-	}
-	else {
-		tempTrigger->lastHealthPecent = 1;
-	}
-
+	tempTrigger->SetBoss(inBoss);
 	tempTrigger->SetAmount(inAmount);
 	tempTrigger->percent = inPercent;
 	return tempTrigger;
 }
 
+void UDamageSpawnTrigger::SetBoss(ABoss* inBoss) {
+	Super::SetBoss(inBoss);
+	if (inBoss != NULL) {
+		inBoss->OnHealthChange.AddUniqueDynamic(this, &UDamageSpawnTrigger::BossHealthChange);
+		this->lastHealthPecent = inBoss->GetHealth() / inBoss->GetMaxHealth();
+	}
+}
+
 void UDamageSpawnTrigger::BossHealthChange(FHealthChange damage) {
-	if (GetAmount() > 0) {
+	if (GetBoss() != NULL && GetAmount() > 0) {
 		float healthPercent = GetBoss()->GetHealth() / GetBoss()->GetMaxHealth();
 		if (lastHealthPecent - healthPercent >= percent) {
 			lastHealthPecent = healthPercent;
