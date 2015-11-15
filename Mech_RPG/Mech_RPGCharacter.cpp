@@ -272,7 +272,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	bool isAlly = GetController() != NULL ? GetController()->GetClass()->IsChildOf(AAllyAIController::StaticClass()) : false;
 
 	if (isAlly || isPlayer) {
-		statModifier = GetModifierForDifficulty(GameEnums::Easy);
+		statModifier = GetModifierForDifficulty(GameEnums::Medium);
 	}
 
 	switch (inRole) {
@@ -312,7 +312,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 
 	case GroupEnums::Sniper:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(4.0F, this), 2.5F, true, true));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(15.0F, this), 2.5F, true, true));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
@@ -351,9 +351,9 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 float AMech_RPGCharacter::GetModifierForDifficulty(TEnumAsByte<GameEnums::Difficulty> difficulty) {
 	switch (difficulty) {
 	case GameEnums::Easy:
-		return 0.25;
-	case GameEnums::Medium:
 		return 0.15;
+	case GameEnums::Medium:
+		return 0.10;
 	case GameEnums::Hard:
 		return 0.05;
 	}

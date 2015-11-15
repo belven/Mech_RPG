@@ -29,8 +29,9 @@ void ABossSpawnpoint::BeginPlay() {
 	ABoss* character = UMiscLibrary::SpawnCharacter<ABoss>(GetWorld(), GetActorLocation(), GetActorRotation(), bossClass);
 
 	if (bossRole == GroupEnums::Healer) {
-		if (!healerSpawned)
+		if (!healerSpawned) {
 			healerSpawned = true;
+		}
 	}
 
 	loc = character->GetActorLocation();
@@ -47,15 +48,17 @@ void ABossSpawnpoint::BeginPlay() {
 		loc.Z += (character->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
 		character->SetActorLocation(loc);
 
-		if (role == GroupEnums::Healer) {
+		if (role == GroupEnums::Healer ) {
 			if (!healerSpawned) {
 				healerSpawned = true;
 			}
-
-			while (role == GroupEnums::Healer) {
-				role = UGroup::GetRandomRole();
+			else {
+				while (role == GroupEnums::Healer) {
+					role = UGroup::GetRandomRole();
+				}
 			}
 		}
+
 		character->CreatePresetRole(role);
 	}
 

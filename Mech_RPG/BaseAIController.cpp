@@ -65,7 +65,6 @@ void ABaseAIController::SetupCollision() {
 				collision.AddIgnoredActor(member);
 			}
 		}
-		GetOwner()->GetGroup()->GroupMemberHit(target, GetOwner());
 	}
 }
 
@@ -95,6 +94,7 @@ void ABaseAIController::FireWeapon(AActor* hit) {
 			// Otherwise we've got a clear shot to the target
 			else {
 				weapon->Fire(target, GetOwner());
+				GetOwner()->GetGroup()->GroupMemberHit(GetOwner(), target);
 			}
 		}
 

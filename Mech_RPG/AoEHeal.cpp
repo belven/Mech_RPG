@@ -17,7 +17,7 @@ void UAoEHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		settings.damageType = DamageEnums::Blast;
 		settings.duration = 1;
 		settings.usesTarget = false;
-		UAOEHealthChange::CreateTestAOE(settings);
+		UAOEHealthChange::CreateAOEHealthChange(settings);
 		SetOnCooldown(owner->GetWorld());
 	}
 }

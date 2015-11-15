@@ -16,7 +16,7 @@ void UOrbitalStrike::Activate(AMech_RPGCharacter* target, FVector targetLocation
 		settings.target = target;
 		settings.duration = 5;
 		settings.usesTarget = true;
-		UAOEHealthChange::CreateTestAOE(settings);
+		UAOEHealthChange::CreateAOEHealthChange(settings);
 		SetOnCooldown(owner->GetWorld());
 	}
 }

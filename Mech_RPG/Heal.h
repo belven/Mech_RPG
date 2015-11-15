@@ -3,22 +3,20 @@
 #pragma once
 
 #include "Ability.h"
+#include "TargetedHealthChange.h"
 #include "Heal.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MECH_RPG_API UHeal : public UAbility
+class MECH_RPG_API UHeal : public UTargetedHealthChange
 {
 	GENERATED_BODY()
 private:
 	float healAmount;
 
 public:
-
-	UFUNCTION(BlueprintCallable, Category = "Ability")
-	void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	static UHeal* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inHealAmount);

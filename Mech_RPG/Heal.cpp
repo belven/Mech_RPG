@@ -2,28 +2,14 @@
 
 #include "Mech_RPG.h"
 #include "Heal.h"
-#include "Mech_RPGCharacter.h"
 
-
-void UHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
-	if (target && target->GetMaxHealth() - target->GetHealth()) {
-		FHealthChange damage;
-
-		damage.damager = owner;
-		damage.target = target;
-		damage.weaponUsed = NULL;
-		damage.healthChange = -healAmount;
-
-		target->ChangeHealth(damage);
-		SetOnCooldown(owner->GetWorld());
-	}
-}
 
 
 UHeal* UHeal::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inHealAmount) {
 	UHeal* ability = NewObject<UHeal>(StaticClass());
 	ability->SetCooldown(cooldown);
-	ability->healAmount = inHealAmount;
+	ability->changeAmount = inHealAmount;
 	ability->owner = owner;
+	ability->affectedTeam = AOEEnums::Ally;
 	return ability;
 }

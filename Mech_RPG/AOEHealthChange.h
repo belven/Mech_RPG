@@ -47,6 +47,6 @@ private:
 	int timesRan;
 	FTimerHandle TimerHandle_AOERate;
 public:
-	static UAOEHealthChange* CreateTestAOE(FTempAOESettings inSettings);
+	static UAOEHealthChange* CreateAOEHealthChange(FTempAOESettings inSettings);
 	void Activate();
 };

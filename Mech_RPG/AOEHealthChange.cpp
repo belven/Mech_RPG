@@ -5,7 +5,7 @@
 #include "Mech_RPGCharacter.h"
 #include "DrawDebugHelpers.h"
 
-UAOEHealthChange* UAOEHealthChange::CreateTestAOE(FTempAOESettings inSettings) {
+UAOEHealthChange* UAOEHealthChange::CreateAOEHealthChange(FTempAOESettings inSettings) {
 	UAOEHealthChange* tempAOE = NewObject<UAOEHealthChange>(UAOEHealthChange::StaticClass());
 	tempAOE->settings = inSettings;
 	tempAOE->Activate();
