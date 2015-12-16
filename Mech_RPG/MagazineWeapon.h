@@ -19,7 +19,7 @@ UCLASS()
 class MECH_RPG_API AMagazineWeapon : public AWeapon {
 	GENERATED_BODY()
 
-private:
+protected:
 	bool reloading = false;
 	float reloadAmount = 1;
 	float ammo = 10;

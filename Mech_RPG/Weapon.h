@@ -23,13 +23,15 @@ struct FWeaponParams {
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		float damage;
+		float damage = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		float range;
+		float critChance = 15;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		float fireRate;
+		float range = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		bool heals;
+		float fireRate = 0.5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		bool heals = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 		TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
 };

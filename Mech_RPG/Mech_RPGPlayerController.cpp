@@ -9,6 +9,7 @@
 AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
 	bShowMouseCursor = true;
+	bAttackTarget = false;
 	DefaultMouseCursor = EMouseCursor::Hand;
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
@@ -65,12 +66,9 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			if (IsTargetValid(target)) {
 				AttackTarget(DeltaTime);
 			}
-			else if (IsTargetValid(cursorTarget)) {
+			else if (IsTargetValid(cursorTarget) && bAttackTarget) {
 				target = cursorTarget;
-
-				if (bAttackTarget) {
-					AttackTarget(DeltaTime);
-				}
+				AttackTarget(DeltaTime);
 			}
 
 			if (bMoveToMouseCursor) {
@@ -107,8 +105,8 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 
 	FLookAtMatrix lookAt = FLookAtMatrix::FLookAtMatrix(GetOwner()->GetActorLocation(), target->GetActorLocation(), GetOwner()->GetActorUpVector());
 	FRotator rotation = GetOwner()->GetActorRotation();
-
-	//rotation.Yaw = lookAt.Rotator().Yaw - 90;
+	
+	rotation.Yaw = lookAt.Rotator().Yaw;
 	GetOwner()->SetActorRotation(rotation);
 
 	// Are we targeting ourselves
@@ -288,8 +286,6 @@ void AMech_RPGPlayerController::ResetZoom() {
 
 void AMech_RPGPlayerController::OnAttackPressed() {
 	bAttackTarget = true;
-
-	if (cursorTarget != NULL && !cursorTarget->IsDead()) SetTarget(cursorTarget);
 }
 
 void AMech_RPGPlayerController::OnAttackReleased() {
@@ -297,14 +293,14 @@ void AMech_RPGPlayerController::OnAttackReleased() {
 }
 
 AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
-	static FHitResult Hit;
+	FHitResult Hit;
 	FCollisionQueryParams collision;
 	collision.AddIgnoredActor(owner);
 
 	Hit = GetHitFromCursor();
 
 	if (Hit.bBlockingHit) {
-		static AActor* targetFound;
+		AActor* targetFound;
 		targetFound = Hit.GetActor();
 
 		if (targetFound != NULL	&& IsMechCharacter(targetFound)) {

@@ -4,6 +4,9 @@
 #include "Weapon.h"
 #include "OverHeatWeapon.h"
 #include "MagazineWeapon.h"
+#include "SMG.h"
+#include "Shotgun.h"
+#include "Sniper.h"
 
 float AWeapon::GetDamage() {
 	return settings.damage;
@@ -48,6 +51,12 @@ float AWeapon::GetProgressBarPercent() {
 void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 	FHealthChange damage;
 	float damageDealt = GetDamage()  * owner->GetDamageModifier();
+	bool isCrit = settings.critChance <= rand() % 100;
+
+	if (isCrit) {
+		damageDealt = damageDealt * 2;
+	}
+
 
 	damage.damager = owner;
 	damage.target = target;
@@ -105,13 +114,7 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 
 	switch (type) {
 	case WeaponEnums::SMG:
-		magSettings.damage = 42;
-		magSettings.range = 1000;
-		magSettings.fireRate = 0.3;
-		magSettings.heals = false;
-		magSettings.magazineSize = 20;
-		magSettings.reloadAmount = 4;
-		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings); // 82
+		return ASMG::CreateSMG(inOwner);
 	case WeaponEnums::Bio_Repair:
 		magSettings.damage = 45;
 		magSettings.range = 600;
@@ -125,21 +128,9 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 		magSettings.heals = false;
 		return CreateWeapon(inOwner, magSettings);
 	case WeaponEnums::Shotgun:
-		magSettings.damage = 150;
-		magSettings.range = 400;
-		magSettings.fireRate = 0.8;
-		magSettings.heals = false;
-		magSettings.magazineSize = 5;
-		magSettings.reloadAmount = 1;
-		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings); //83
+		return AShotgun::CreateShotgun(inOwner);
 	case WeaponEnums::Sniper:
-		magSettings.damage = 250;
-		magSettings.range = 1500;
-		magSettings.fireRate = 2;
-		magSettings.heals = false;
-		magSettings.magazineSize = 5;
-		magSettings.reloadAmount = 1;
-		return AMagazineWeapon::CreateMagazineWeapon(inOwner, magSettings); //83
+		return ASniper::CreateSniper(inOwner);
 	}
 
 	return  NULL;

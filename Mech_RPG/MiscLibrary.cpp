@@ -76,7 +76,7 @@ float UMiscLibrary::GetWidgetYaw(UCameraComponent* camera) {
 }
 
 UWorld* UMiscLibrary::GetActorWorld(AActor* actor) {
-	return actor->GetWorld();
+	return actor != NULL ? actor->GetWorld() : NULL;
 }
 
 TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AActor* origin) {

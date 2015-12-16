@@ -2,18 +2,21 @@
 
 #pragma once
 
-#include "Weapon.h"
+#include "MagazineWeapon.h"
 #include "SMG.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MECH_RPG_API ASMG : public AWeapon
+class MECH_RPG_API ASMG : public AMagazineWeapon
 {
 	GENERATED_BODY()
 	
 	
-	
+public:
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		static ASMG* CreateSMG(AActor* inOwner);
+
 	
 };

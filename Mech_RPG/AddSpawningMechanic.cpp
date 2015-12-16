@@ -45,12 +45,10 @@ void AAddSpawningMechanic::TriggerSpawn() {
 		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
 		nav.Location.Z = GetActorLocation().Z;
 		AMech_RPGCharacter* character = GetWorld()->SpawnActor<AMech_RPGCharacter>(classToSpawn, nav.Location, GetActorRotation());
-
-		SetUpCharacter(character);
+		character != NULL ? character->SpawnDefaultController() : true;
 		spawnAmount--;
 	}
 }
 
 void AAddSpawningMechanic::SetUpCharacter(AMech_RPGCharacter* character) {
-	character->SpawnDefaultController();
 }

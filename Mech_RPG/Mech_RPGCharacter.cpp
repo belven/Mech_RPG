@@ -289,9 +289,9 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
 		AddAbility(UHeal::CreateAbility(15.0F, this, 1000.0F));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 100.0F, 0.2F, 1.0F, true), 1.0F, false, true));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 50.0F, 0.2F, 1.0F, true), 1.0F, false, true));
 		//AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 100.0F, 0.2F, 1.0F, true));
-		AddAbility(UAoEHeal::CreateAbility(20.0F, this, 0.5F));
+		AddAbility(UAoEHeal::CreateAbility(20.0F, this, 0.20F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
 		SetMovementModifier(1.0F + statModifier);
@@ -329,6 +329,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	case GroupEnums::Support:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
 		AddAbility(UDisable::CreateDisable(5.0F, this, 3.0F));
+		AddAbility(UOrbitalStrike::CreateAbility(15.0F, this, 0.55F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);

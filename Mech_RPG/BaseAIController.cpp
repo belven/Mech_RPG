@@ -36,7 +36,13 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 
 	GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
 
-	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
+	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL; 
+	
+	FLookAtMatrix lookAt = FLookAtMatrix::FLookAtMatrix(GetOwner()->GetActorLocation(), target->GetActorLocation(), GetOwner()->GetActorUpVector());
+	FRotator rotation = GetOwner()->GetActorRotation();
+
+	rotation.Yaw = lookAt.Rotator().Yaw;
+	GetOwner()->SetActorRotation(rotation);
 
 	// Are we targeting ourselves
 	if (target == GetOwner()) {

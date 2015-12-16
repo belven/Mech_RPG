@@ -2,17 +2,19 @@
 
 #pragma once
 
-#include "Weapon.h"
+#include "MagazineWeapon.h"
 #include "Shotgun.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MECH_RPG_API AShotgun : public AWeapon
+class MECH_RPG_API AShotgun : public AMagazineWeapon
 {
 	GENERATED_BODY()
-	
+public:
+		UFUNCTION(BlueprintCallable, Category = "Weapon")
+		static AShotgun* CreateShotgun(AActor* inOwner);
 	
 	
 	
