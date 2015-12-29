@@ -42,11 +42,15 @@ class MECH_RPG_API AWeapon : public AMechAttachment {
 protected:
 	FWeaponParams settings;
 	bool canFire;
-	float lastTime;
+	float lastTime;     
 
 public:
+	AWeapon();
 	float GetDamage();
 	float GetRange();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Particles)
+		UParticleSystemComponent* partclSystem;
 
 	void SetDamage(float newVal);
 	void SetRange(float newVal);

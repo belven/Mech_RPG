@@ -46,6 +46,12 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			SwapCharacter();
 		}
 
+		if (panLeft || panRight) {
+			FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
+			rot.Yaw += panLeft ? -1 : 1;
+			GetOwner()->CameraBoom->SetRelativeRotation(rot);
+		}
+
 		// Is our owner is still alive
 		if (!GetOwner()->IsDead()) {
 			cursorTarget = GetTargetUnderCursor();
@@ -71,11 +77,6 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 				AttackTarget(DeltaTime);
 			}
 
-			if (bMoveToMouseCursor) {
-				target = NULL;
-				OnAttackReleased();
-				MoveToMouseCursor();
-			}
 		}
 		else {
 			PlayerDied();
@@ -105,7 +106,7 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 
 	FLookAtMatrix lookAt = FLookAtMatrix::FLookAtMatrix(GetOwner()->GetActorLocation(), target->GetActorLocation(), GetOwner()->GetActorUpVector());
 	FRotator rotation = GetOwner()->GetActorRotation();
-	
+
 	rotation.Yaw = lookAt.Rotator().Yaw;
 	GetOwner()->SetActorRotation(rotation);
 
@@ -206,6 +207,13 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Ctrl", IE_Released, this, &AMech_RPGPlayerController::CtrlReleased);
 	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &AMech_RPGPlayerController::ZoomIn);
 	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &AMech_RPGPlayerController::ZoomOut);
+
+	InputComponent->BindAction("PanLeft", IE_Pressed, this, &AMech_RPGPlayerController::PanLeft);
+	InputComponent->BindAction("PanLeft", IE_Released, this, &AMech_RPGPlayerController::PanLeftReleased);
+
+	InputComponent->BindAction("PanRight", IE_Pressed, this, &AMech_RPGPlayerController::PanRight);
+	InputComponent->BindAction("PanRight", IE_Released, this, &AMech_RPGPlayerController::PanRightReleased);
+
 	InputComponent->BindAction("ResetZoom", IE_Pressed, this, &AMech_RPGPlayerController::ResetZoom);
 	InputComponent->BindAction("CharacterPane", IE_Pressed, this, &AMech_RPGPlayerController::OpenCharacterPane);
 	//	InputComponent->BindAction("UpdateRotation", IE_Pressed, this, &AMech_RPGPlayerController::UpdateRotation);
@@ -262,6 +270,10 @@ void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation
  */
 void AMech_RPGPlayerController::OnSetDestinationPressed() {
 	bMoveToMouseCursor = true;
+
+	target = NULL;
+	OnAttackReleased();
+	MoveToMouseCursor();
 }
 
 void AMech_RPGPlayerController::OnSetDestinationReleased() {
@@ -278,11 +290,33 @@ void AMech_RPGPlayerController::ZoomOut() {
 
 void AMech_RPGPlayerController::ResetZoom() {
 	GetOwner()->CameraBoom->TargetArmLength = 1700;
+	FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
+	rot.Yaw = GetOwner()->GetViewRotation().Yaw;
+	GetOwner()->CameraBoom->SetRelativeRotation(rot);
 }
 
-//void AMech_RPGPlayerController::UpdateRotation() {	
-//	//GetOwner()->CameraBoom->;
-//}
+void AMech_RPGPlayerController::PanLeft()
+{
+	panLeft = true;
+	FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
+	rot.Yaw -= 18;
+	GetOwner()->CameraBoom->SetRelativeRotation(rot);
+}
+
+void AMech_RPGPlayerController::PanLeftReleased()
+{
+	panLeft = false;
+}
+
+void AMech_RPGPlayerController::PanRight()
+{
+	panRight = true;
+}
+
+void AMech_RPGPlayerController::PanRightReleased()
+{
+	panRight = false;
+}
 
 void AMech_RPGPlayerController::OnAttackPressed() {
 	bAttackTarget = true;
@@ -475,6 +509,7 @@ void AMech_RPGPlayerController::SwapCharacter() {
 	if (con != NULL) {
 		con->SetPlayerControlledLocation(FVector::ZeroVector);
 		con->Possess(GetOwner());
+		other->MirrorCamera(GetOwner());
 		Possess(other);
 	}
 }

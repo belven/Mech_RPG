@@ -8,6 +8,13 @@
 #include "Shotgun.h"
 #include "Sniper.h"
 
+AWeapon::AWeapon() {
+	static ConstructorHelpers::FObjectFinder<UParticleSystemComponent> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/Bio_beam"));
+	if (ParticleSystemClass.Succeeded()) {
+		partclSystem = ParticleSystemClass.Object;
+	}
+}
+
 float AWeapon::GetDamage() {
 	return settings.damage;
 }
@@ -57,6 +64,9 @@ void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 		damageDealt = damageDealt * 2;
 	}
 
+	if (partclSystem != NULL) {
+		partclSystem->Activate(true);
+	}
 
 	damage.damager = owner;
 	damage.target = target;
@@ -97,6 +107,9 @@ void AWeapon::Tick(float DeltaTime) {
 		if (lastTime >= settings.fireRate) {
 			lastTime = 0;
 			canFire = true;
+			if (partclSystem != NULL) {
+				partclSystem->Deactivate();
+			}
 		}
 	}
 }
@@ -116,9 +129,9 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 	case WeaponEnums::SMG:
 		return ASMG::CreateSMG(inOwner);
 	case WeaponEnums::Bio_Repair:
-		magSettings.damage = 45;
+		magSettings.damage = 40;
 		magSettings.range = 600;
-		magSettings.fireRate = 0.2;
+		magSettings.fireRate = 0.3;
 		magSettings.heals = true;
 		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, magSettings);
 	case WeaponEnums::RPG:

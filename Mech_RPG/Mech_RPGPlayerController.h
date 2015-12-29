@@ -14,6 +14,9 @@ private:
 	bool altPressed;
 	bool ctrlPressed;
 	bool shiftPressed;
+	bool panLeft;
+	bool panRight;
+
 	bool characterPaneOpen = false;
 
 	FCollisionQueryParams collision;
@@ -76,6 +79,13 @@ public:
 	void ZoomIn();
 	void ZoomOut();
 	void ResetZoom();
+
+	void PanLeft();
+	void PanLeftReleased();
+
+	void PanRight();
+	void PanRightReleased();
+
 	//void UpdateRotation();
 	TArray<AMech_RPGCharacter*> GetCharactersInRange(float range);
 

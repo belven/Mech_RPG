@@ -164,6 +164,16 @@ public:
 
 	class UCameraComponent* GetTopDownCamera() { return TopDownCameraComponent; };
 
+	void SetTopDownCamera(class UCameraComponent* newCamera) {
+		TopDownCameraComponent = newCamera;
+	};
+
+	void MirrorCamera(AMech_RPGCharacter* other)
+	{
+		CameraBoom->TargetArmLength = other->CameraBoom->TargetArmLength;
+		CameraBoom->SetRelativeRotation(other->CameraBoom->RelativeRotation);
+	}
+
 	float GetTotalResistance(DamageEnums::DamageType damageType);
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
