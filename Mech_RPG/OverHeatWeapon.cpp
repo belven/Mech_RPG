@@ -48,39 +48,15 @@ and add heat based on the amount of damage/healing dealt as a percent of the tar
 
 This will cause healers to have a burnout allowing thier allies to be killed with only a few DPS
 */
-void AOverHeatWeapon::Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
-	float damageDealt = settings.damage * owner->GetDamageModifier();
-	float actualDamageDealt = 0;
-
-	if (Heals()) {
-		// Calculate actual amount healed based on missing health and max health
-		float missingHealth = target->GetMaxHealth() - target->GetHealth();
-
-		if (settings.damage > missingHealth) {
-			actualDamageDealt = missingHealth;
-		}
-		else {
-			actualDamageDealt = settings.damage;
-		}
-	}
-	else {
-		//Calculate actual damage dealt based on health less and max health
-		float remainingHealth = target->GetHealth();
-
-		if (settings.damage > remainingHealth) {
-			actualDamageDealt = remainingHealth;
-		}
-		else {
-			actualDamageDealt = settings.damage;
-		}
+void AOverHeatWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
+	if ((Heals() && UMiscLibrary::GetMissingHealth(target) > 0) || (!Heals() && target->GetHealth() > 0)) {
+		heatLevel += heatGenerated * (1 + (heatLevel * 0.5));
 	}
 
-	heatLevel += (actualDamageDealt / target->GetMaxHealth()) * (1 + heatLevel);
 	Super::Fire(target, owner);
 }
 
-
-AOverHeatWeapon* AOverHeatWeapon::CreateOverHeatWeapon(AActor* inOwner, FWeaponParams inSettings) {
+AOverHeatWeapon* AOverHeatWeapon::CreateOverHeatWeapon(AActor* inOwner, FOverheatWeaponParams inSettings) {
 	if (inOwner && inOwner->GetWorld()) {
 		AOverHeatWeapon* weapon = inOwner->GetWorld()->SpawnActor<AOverHeatWeapon>(AOverHeatWeapon::StaticClass());
 		weapon->settings = inSettings;
@@ -89,7 +65,8 @@ AOverHeatWeapon* AOverHeatWeapon::CreateOverHeatWeapon(AActor* inOwner, FWeaponP
 		weapon->lastTime = 0;
 		weapon->overHeated = false;
 		weapon->heatLevel = 0;
-		weapon->heatLosePerTick = 0.05;
+		weapon->heatLosePerTick = inSettings.heatLosePerTick;
+		weapon->heatGenerated = inSettings.heatGenerated;
 		return weapon;
 	}
 	return NULL;

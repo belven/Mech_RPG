@@ -124,16 +124,19 @@ void AWeapon::SetHeals(bool newVal) {
 
 AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type) {
 	FMagazineWeaponParams magSettings;
+	FOverheatWeaponParams overheatSettings;
 
 	switch (type) {
 	case WeaponEnums::SMG:
 		return ASMG::CreateSMG(inOwner);
 	case WeaponEnums::Bio_Repair:
-		magSettings.damage = 40;
-		magSettings.range = 600;
-		magSettings.fireRate = 0.3;
-		magSettings.heals = true;
-		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, magSettings);
+		overheatSettings.damage = 40;
+		overheatSettings.range = 600;
+		overheatSettings.fireRate = 0.3;
+		overheatSettings.heals = true;
+		overheatSettings.heatLosePerTick = 0.05;
+		overheatSettings.heatGenerated = 0.05;
+		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, overheatSettings);
 	case WeaponEnums::RPG:
 		magSettings.damage = 500;
 		magSettings.range = 1300;
