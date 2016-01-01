@@ -184,6 +184,8 @@ public:
 
 	void OutOfCombat();
 
+	void LookAt(AMech_RPGCharacter* other);
+
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		bool Channelling();
 

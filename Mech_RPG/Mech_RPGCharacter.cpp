@@ -256,6 +256,18 @@ void AMech_RPGCharacter::OutOfCombat() {
 	inCombat = false;
 }
 
+void AMech_RPGCharacter::LookAt(AMech_RPGCharacter * other)
+{
+	FRotator rotation = GetActorRotation();
+
+	FVector Direction = GetActorLocation() - other->GetActorLocation();
+	Direction = FVector(Direction.X, Direction.Y, 0);
+
+	rotation.Yaw = FRotationMatrix::MakeFromX(Direction).Rotator().Yaw + 180;
+
+	SetActorRotation(rotation);
+}
+
 void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
 	if (newWeapon) {
 		weapons.Add(newWeapon);

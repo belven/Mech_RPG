@@ -102,13 +102,8 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 	GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
 
 	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
-
-
-	FLookAtMatrix lookAt = FLookAtMatrix::FLookAtMatrix(GetOwner()->GetActorLocation(), target->GetActorLocation(), GetOwner()->GetActorUpVector());
-	FRotator rotation = GetOwner()->GetActorRotation();
-
-	rotation.Yaw = lookAt.Rotator().Yaw;
-	GetOwner()->SetActorRotation(rotation);
+	
+	GetOwner()->LookAt(target);
 
 	// Are we targeting ourselves
 	if (target == GetOwner()) {

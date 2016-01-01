@@ -9,9 +9,12 @@
 #include "Sniper.h"
 
 AWeapon::AWeapon() {
-	static ConstructorHelpers::FObjectFinder<UParticleSystemComponent> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/Bio_beam"));
+	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ArbitraryParticleName"));
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/Bio_beam"));
 	if (ParticleSystemClass.Succeeded()) {
-		partclSystem = ParticleSystemClass.Object;
+		partclSystem->Template = ParticleSystemClass.Object;
+		partclSystem->bAutoActivate = false;
 	}
 }
 
@@ -66,6 +69,8 @@ void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 
 	if (partclSystem != NULL) {
 		partclSystem->Activate(true);
+		//FLookAtMatrix rot(owner->GetRootComponent()->GetComponentLocation(), target->GetActorLocation(), owner->GetRootComponent()->GetUpVector());
+		//partclSystem->SetRelativeRotation(rot.Rotator());
 	}
 
 	damage.damager = owner;
