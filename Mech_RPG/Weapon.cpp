@@ -105,6 +105,14 @@ void AWeapon::SetFireRate(float newVal) {
 	settings.fireRate = newVal;
 }
 
+float AWeapon::GetCritChance() {
+	return settings.critChance;
+}
+
+void AWeapon::SetCritChance(float newVal) {
+	settings.critChance = newVal;
+}
+
 void AWeapon::Tick(float DeltaTime) {
 	if (!canFire) {
 		lastTime += DeltaTime;

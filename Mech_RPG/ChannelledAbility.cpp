@@ -61,6 +61,9 @@ void UChannelledAbility::ActiveChannelAbility() {
 		else if (!usesTrace || targetCharacter == owner || (usesTrace && PerformLineTrace())) {
 			abilityToActivate->Activate(targetCharacter, targetLocation);
 		}
+		else if (usesTrace) {
+			abilityToActivate->SetOnCooldown(owner->GetWorld());
+		}
 	}
 
 	if (reset) {
@@ -100,6 +103,15 @@ bool UChannelledAbility::PerformLineTrace() {
 	return false;
 }
 
+/*
+Activates an ability at the end of a set duration, providing that:
+
+1. The owner is still alive
+2. The owner can cast and channelling is TRUE
+3. If inUsesTrace is true and the line trace dectects a vaible target
+
+Note: inUsesLocation will cause this to fixate on the original location that was passed in, i.e. the cursor location.
+*/
 UChannelledAbility* UChannelledAbility::CreateChannelledAbility(AMech_RPGCharacter* inOwner, UAbility* inAbilityToActivate, float inChannelDuration, bool inUsesLocation, bool inUsesTrace) {
 	UChannelledAbility* ability = NewObject<UChannelledAbility>(StaticClass());
 	ability->objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);

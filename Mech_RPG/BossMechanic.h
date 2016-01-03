@@ -25,4 +25,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Boss")
 		virtual void SetBoss(ABoss* newVal);
 
+	void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) override;
+
 };

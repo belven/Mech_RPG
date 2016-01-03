@@ -347,7 +347,7 @@ public:
 	void SetDefenceModifier(float newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
-		void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS);
+		virtual void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
 		void SetupWithLoadout();

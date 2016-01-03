@@ -34,32 +34,31 @@ void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
 		params.damage = 100;
 		params.fireRate = 0.3;
 		params.range = 1300;
-		params.magazineSize = 20;
+		params.magazineSize = 40;
 		params.reloadAmount = 4;
 		params.heals = false;
 
 		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(this, params));
 		AddAbility(UDamageBoost::CreateAbility(7, this, 0.5));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 400.0F), 2, true, true));
 		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1 + statModifier);
 		armourValue = 5;
 		break;
 	case BossEnums::Tank:
-		params.damage = 400;
+		params.damage = 1200;
 		params.fireRate = 1;
 		params.range = 400;
-		params.magazineSize = 5;
-		params.reloadAmount = 1;
-		params.heals = false;
 
-		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(this, params));
-		AddAbility(UTaunt::CreateAbility(7, this));
+		AddWeapon(AWeapon::CreateWeapon(this, params));
+		AddAbility(UTaunt::CreateAbility(5, this));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UImmobilise::CreateAbility(10, this, 5), 2.5, true, true));
 		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1 + statModifier);
 		armourValue = 10;
 		break;
 	case BossEnums::Sniper:
-		params.damage = 600;
+		params.damage = 800;
 		params.fireRate = 2.5;
 		params.range = 2000;
 		params.magazineSize = 5;

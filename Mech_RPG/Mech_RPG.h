@@ -13,6 +13,7 @@
 #include "Disable.h"
 #include "DamageBoost.h"
 #include "OrbitalStrike.h"
+#include "Immobilise.h"
 #include "ChannelledAbility.h"
 #include "TimedHealthChange.h"
 #include "AoEHeal.h"

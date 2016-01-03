@@ -65,6 +65,9 @@ public:
 	float GetFireRate();
 	void SetFireRate(float newVal);
 
+	float GetCritChance();
+	void SetCritChance(float newVal);
+
 	virtual void Tick(float DeltaTime);
 	bool Heals();
 	void SetHeals(bool newVal);
