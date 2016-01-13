@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "CritBoost.h"
+#include "Weapon.h"
 
 void UCritBoost::Activate(AMech_RPGCharacter * target, FVector targetLocation)
 {
@@ -9,7 +10,7 @@ void UCritBoost::Activate(AMech_RPGCharacter * target, FVector targetLocation)
 		weaponAffected = owner->GetCurrentWeapon();
 		SetOnCooldown(owner->GetWorld());
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_DamageBoostEnded, this, &UCritBoost::ResetCritBoost, GetCooldown() * 0.7);
-		weaponAffected->SetCritChance(weaponAffected->GeCritChance() + critMultiplier);
+		weaponAffected->SetCritChance(weaponAffected->GetCritChance() + critMultiplier);
 	}
 }
 
@@ -24,5 +25,5 @@ UCritBoost * UCritBoost::CreateCritBoost(float cooldown, AMech_RPGCharacter * ow
 
 void UCritBoost::ResetCritBoost()
 {
-	weaponAffected->SetCritChance(weaponAffected->GeCritChance() - critMultiplier);
+	weaponAffected->SetCritChance(weaponAffected->GetCritChance() - critMultiplier);
 }

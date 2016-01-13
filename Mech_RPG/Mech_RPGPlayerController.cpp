@@ -69,14 +69,13 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 				swapWeapons = false;
 			}
 
-			if (IsTargetValid(target)) {
-				AttackTarget(DeltaTime);
-			}
-			else if (IsTargetValid(cursorTarget) && bAttackTarget) {
+			if (IsTargetValid(cursorTarget) && bAttackTarget) {
 				target = cursorTarget;
 				AttackTarget(DeltaTime);
 			}
-
+			else if (IsTargetValid(target)) {
+				AttackTarget(DeltaTime);
+			}
 		}
 		else {
 			PlayerDied();
@@ -102,7 +101,7 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 	GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
 
 	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
-	
+
 	GetOwner()->LookAt(target);
 
 	// Are we targeting ourselves
@@ -470,7 +469,7 @@ void AMech_RPGPlayerController::ActivateAbility() {
 			if (ability != NULL && !ability->OnCooldown()) {
 				ability->Activate(cursorTarget, location);
 
-				if (ability->OnCooldown()) {
+				if (ability->OnCooldown() || GetOwner()->Channelling()) {
 					GetOwner()->SetCurrentAbility(ability);
 					StopMovement();
 					break;
@@ -489,9 +488,6 @@ void AMech_RPGPlayerController::PlayerDied() {
 			break;
 		}
 	}
-
-	UnPossess();
-	//GetOwner()->Destroy(true);
 }
 
 void AMech_RPGPlayerController::SwapCharacter() {

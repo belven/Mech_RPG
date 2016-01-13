@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Ability.h"
-#include "Weapon.h"
 #include "CritBoost.generated.h"
 
 /**
@@ -17,7 +16,7 @@ class MECH_RPG_API UCritBoost : public UAbility
 
 private:
 	float critMultiplier;
-	AWeapon* weaponAffected;
+	class AWeapon* weaponAffected;
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")

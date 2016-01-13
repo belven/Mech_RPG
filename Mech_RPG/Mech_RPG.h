@@ -15,6 +15,7 @@
 #include "OrbitalStrike.h"
 #include "Immobilise.h"
 #include "ChannelledAbility.h"
+#include "CritBoost.h"
 #include "TimedHealthChange.h"
 #include "AoEHeal.h"
 #include "DefenceBoost.h"
@@ -38,6 +39,7 @@
 #include "Runtime/UMG/Public/Slate/SObjectWidget.h"
 #include "Runtime/UMG/Public/IUMGModule.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
+#include "Runtime/UMG/Public/Components/WidgetComponent.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogMech_RPG, Log, All);
 

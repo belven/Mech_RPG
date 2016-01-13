@@ -33,6 +33,7 @@ namespace GameEnums {
 #include "Group.h"
 #include "Array.h"
 #include "Ability.h"
+#include "FloatingStats_BP.h"
 #include "Mech_RPGCharacter.generated.h"
 
 USTRUCT(BlueprintType)
@@ -153,12 +154,19 @@ private:
 	UPROPERTY()
 		USphereComponent* aoe;
 
+	UPROPERTY()
+		class UWidgetComponent* stats;
+
+		TSubclassOf<class UFloatingStats_BP> widgetClass;
+
 protected:
 
 	virtual ~AMech_RPGCharacter();
 
 public:
 	AMech_RPGCharacter();
+
+	class UWidgetComponent* GetStats();
 
 	static const TArray<AMech_RPGCharacter*>& GetCharacters();
 

@@ -6,9 +6,9 @@
 ASniper* ASniper::CreateSniper(AActor* inOwner) {
 	if (inOwner && inOwner->GetWorld()) {
 		FMagazineWeaponParams magSettings;
-		magSettings.damage = 250;
+		magSettings.damage = 300;
 		magSettings.range = 1500;
-		magSettings.fireRate = 2;
+		magSettings.fireRate = 1.5;
 		magSettings.heals = false;
 		magSettings.magazineSize = 5;
 		magSettings.reloadAmount = 1;

@@ -4,6 +4,7 @@
 #include "Armour.h"
 #include "BaseAIController.h"
 #include "AllyAIController.h"
+#include "Blueprint/UserWidget.h"
 #include "Mech_RPGPlayerController.h"
 #include "Navigation/CrowdFollowingComponent.h"
 
@@ -29,7 +30,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	
+
 
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -58,6 +59,21 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	channeling = false;
 	team = TeamEnums::Paladins;
 	characters.Add(this);
+
+	static ConstructorHelpers::FClassFinder<UFloatingStats_BP> statsWidget(TEXT("/Game/TopDown/Blueprints/UI/FloatingStats"));
+
+	if (statsWidget.Succeeded()) {
+		widgetClass = statsWidget.Class;
+		stats = CreateDefaultSubobject<UWidgetComponent>(TEXT("Floating Stats Component"));
+		stats->AttachTo(GetRootComponent());
+	}
+
+	//WidgetBlueprint'/Game/TopDown/Blueprints/UI/FloatingStats.FloatingStats'
+}
+
+UWidgetComponent * AMech_RPGCharacter::GetStats()
+{
+	return stats;
 }
 
 AMech_RPGCharacter::~AMech_RPGCharacter() {
@@ -104,6 +120,13 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 		if (GetHealth() > GetMaxHealth()) {
 			health = GetMaxHealth();
 		}
+
+		if (stats->GetUserWidgetObject() != nullptr) {
+			UFloatingStats_BP* statsBP = Cast<UFloatingStats_BP>(stats->GetUserWidgetObject());
+
+			statsBP->Tick(DeltaTime);
+			statsBP->SetOwner(this);			
+		}
 	}
 }
 
@@ -128,14 +151,23 @@ void AMech_RPGCharacter::BeginPlay() {
 		SetCurrentAbility(abilities[0]);
 	}
 
-	/*while (settingUpGroups) {
-		Sleep(500);
-		}*/
-
 	SetUpGroup();
 
 	if (OnPostBeginPlay.IsBound()) {
 		OnPostBeginPlay.Broadcast(this);
+	}
+
+	if (widgetClass != nullptr) {
+		UFloatingStats_BP* widget = CreateWidget<UFloatingStats_BP>(GetWorld(), widgetClass);
+		widget->SetOwner(this);
+		stats->SetWidget(widget);
+
+		FTransform trans;
+		trans.SetLocation(FVector(-0.000035, 7.999790, 111.999756));
+		trans.SetScale3D(FVector(0.25, 0.75, 1));
+		stats->SetRelativeTransform(trans);
+		stats->AttachTo(GetRootComponent());
+	    stats->SetDrawSize(FVector2D(100, 50));
 	}
 }
 
@@ -254,6 +286,15 @@ void AMech_RPGCharacter::SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGChar
 
 void AMech_RPGCharacter::OutOfCombat() {
 	inCombat = false;
+
+	if (IsDead() && GetGroup()->GetPlayer() != nullptr) {
+		SetDead(false);
+		SetActorHiddenInGame(false);
+		SetActorEnableCollision(true);
+		SetHealth(GetMaxHealth() * 0.2);
+		AIControllerClass = AAllyAIController::StaticClass();
+		SpawnDefaultController();
+	}
 }
 
 void AMech_RPGCharacter::LookAt(AMech_RPGCharacter * other)
@@ -291,12 +332,12 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7.0F, this, 300.0F), 2.0F, true));
-		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7.0F, this, 300.0F), 1.0F, true));
+		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 200.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
-		SetMaxHealth(2000 * (1 + statModifier));
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
+		SetMaxHealth(2500 * (1 + statModifier));
 		break;
 
 	case GroupEnums::Healer:
@@ -306,8 +347,8 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
 		SetMovementModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
-		SetMaxHealth(2500 * (1 + statModifier));
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
+		SetMaxHealth(2000 * (1 + statModifier));
 		break;
 
 	case GroupEnums::Tank:
@@ -324,6 +365,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	case GroupEnums::Sniper:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
 		AddAbility(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(15.0F, this), 2.5F, true, true));
+		AddAbility(UCritBoost::CreateCritBoost(6, this, 55.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
