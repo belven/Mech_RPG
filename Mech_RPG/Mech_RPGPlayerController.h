@@ -16,6 +16,8 @@ private:
 	bool shiftPressed;
 	bool panLeft;
 	bool panRight;
+	bool panUp;
+	bool panDown;
 
 	bool characterPaneOpen = false;
 
@@ -85,6 +87,12 @@ public:
 
 	void PanRight();
 	void PanRightReleased();
+
+	void PanUp();
+	void PanUpReleased();
+
+	void PanDown();
+	void PanDownReleased();
 
 	//void UpdateRotation();
 	TArray<AMech_RPGCharacter*> GetCharactersInRange(float range);

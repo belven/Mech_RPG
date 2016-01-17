@@ -47,6 +47,11 @@ AMech_RPGCharacter* UGroup::GetMember(int32 index) {
 	return members.IsValidIndex(index - 1) ? members[index - 1] : NULL;
 }
 
+AMech_RPGCharacter* UGroup::GetRandomMember()
+{
+	return members.Num() == 1 ? GetMember(0) : GetMember(rand() % (members.Num() - 1));
+}
+
 AMech_RPGCharacter* UGroup::GetPlayer() {
 	if (HasMemebers()) {
 		for (AMech_RPGCharacter* character : members) {

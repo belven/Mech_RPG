@@ -42,8 +42,7 @@ class MECH_RPG_API AWeapon : public AMechAttachment {
 protected:
 	FWeaponParams settings;
 	bool canFire;
-	float lastTime;     
-
+	float lastTime;
 public:
 	AWeapon();
 	float GetDamage();
@@ -56,11 +55,16 @@ public:
 	void SetRange(float newVal);
 
 	virtual bool CanFire();
-	virtual void Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner);
-	virtual void Fire(class ACover* target, AMech_RPGCharacter* owner);
+	virtual void Fire(class AMech_RPGCharacter* targetr);
+	virtual void Fire(class ACover* target);	
+	
+	virtual	void SetOwner(AMech_RPGCharacter* inOwner) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AWeapon* CreateWeapon(AActor* inOwner, FWeaponParams inSettings);
+		virtual void StopFire();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		static AWeapon* CreateWeapon(AMech_RPGCharacter* inOwner, FWeaponParams inSettings);
 
 	float GetFireRate();
 	void SetFireRate(float newVal);

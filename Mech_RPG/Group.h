@@ -60,6 +60,9 @@ public:
 		AMech_RPGCharacter* GetMember(int32 index);
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
+		AMech_RPGCharacter* GetRandomMember();
+
+	UFUNCTION(BlueprintCallable, Category = "Group")
 		AMech_RPGCharacter* GetPlayer();
 
 	UFUNCTION(BlueprintCallable, Category = "Group")

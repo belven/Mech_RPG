@@ -42,38 +42,47 @@ DamageEnums::DamageType AWeapon::GetDamageType() {
 	return settings.damageType;
 }
 
-AWeapon* AWeapon::CreateWeapon(AActor* inOwner, FWeaponParams inSettings) {
+AWeapon* AWeapon::CreateWeapon(AMech_RPGCharacter* inOwner, FWeaponParams inSettings) {
 	if (inOwner && inOwner->GetWorld()) {
 		AWeapon* weapon = inOwner->GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass());
 		weapon->settings = inSettings;
 		weapon->canFire = true;
 		weapon->AttachRootComponentToActor(inOwner);
 		weapon->lastTime = 0;
+		weapon->SetOwner(inOwner);
+		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
 	return NULL;
+}
+
+void AWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
+	Super::SetOwner(inOwner);
+
+	if (partclSystem != nullptr) {
+		partclSystem->AttachTo(inOwner->GetRootComponent());
+	}
 }
 
 float AWeapon::GetProgressBarPercent() {
 	return -1;
 }
 
-void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
+void AWeapon::Fire(AMech_RPGCharacter* target) {
 	FHealthChange damage;
-	float damageDealt = GetDamage()  * owner->GetDamageModifier();
+	float damageDealt = GetDamage() * GetOwner()->GetDamageModifier();
 	bool isCrit = settings.critChance <= rand() % 100;
 
 	if (isCrit) {
 		damageDealt = damageDealt * 2;
 	}
 
-	if (partclSystem != NULL) {
+	if (partclSystem != NULL && !partclSystem->IsActive()) {
 		partclSystem->Activate(true);
-		//FLookAtMatrix rot(owner->GetRootComponent()->GetComponentLocation(), target->GetActorLocation(), owner->GetRootComponent()->GetUpVector());
-		//partclSystem->SetRelativeRotation(rot.Rotator());
+		partclSystem->ActivateSystem(true);
 	}
 
-	damage.damager = owner;
+	damage.damager = GetOwner();
 	damage.target = target;
 	damage.weaponUsed = this;
 	damage.damageType = settings.damageType;
@@ -83,11 +92,11 @@ void AWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
 	canFire = false;
 }
 
-void AWeapon::Fire(ACover* target, AMech_RPGCharacter* owner) {
+void AWeapon::Fire(ACover* target) {
 	FHealthChange damage;
-	float damageDealt = GetDamage()  * owner->GetDamageModifier();
+	float damageDealt = GetDamage()  * GetOwner()->GetDamageModifier();
 
-	damage.damager = owner;
+	damage.damager = GetOwner();
 	//damage.target = target;
 	damage.weaponUsed = this;
 
@@ -95,6 +104,13 @@ void AWeapon::Fire(ACover* target, AMech_RPGCharacter* owner) {
 
 	target->ChangeHealth(damage);
 	canFire = false;
+}
+
+void AWeapon::StopFire()
+{
+	if (partclSystem != NULL) {
+		partclSystem->DeactivateSystem();
+	}
 }
 
 float AWeapon::GetFireRate() {
@@ -120,9 +136,6 @@ void AWeapon::Tick(float DeltaTime) {
 		if (lastTime >= settings.fireRate) {
 			lastTime = 0;
 			canFire = true;
-			if (partclSystem != NULL) {
-				partclSystem->Deactivate();
-			}
 		}
 	}
 }

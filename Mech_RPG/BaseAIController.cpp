@@ -16,11 +16,12 @@ void ABaseAIController::Tick(float DeltaTime) {
 
 	if (GetOwner() && GetOwner()->GetDemandedController() == NULL) {
 		if (GetOwner()->IsDead()) {
-			UnPossess();
+			//UnPossess();
 			//GetOwner()->Destroy(true);
 		}
 		else {
 			if (!IsTargetValid(GetTarget())) {
+				GetOwner()->OnStopFiring.Broadcast();
 				FindTarget();
 			}
 
@@ -86,16 +87,16 @@ void ABaseAIController::FireWeapon(AActor* hit) {
 
 				// Are we too far from the cover to avoid shooting it
 				if (distToCover > 200) {
-					weapon->Fire(Cast<ACover>(hit), GetOwner());
+					weapon->Fire(Cast<ACover>(hit));
 				}
 				// Otherwise we can attack the target
 				else {
-					weapon->Fire(target, GetOwner());
+					weapon->Fire(target);
 				}
 			}
 			// Otherwise we've got a clear shot to the target
 			else {
-				weapon->Fire(target, GetOwner());
+				weapon->Fire(target);
 				GetOwner()->GetGroup()->GroupMemberHit(GetOwner(), target);
 			}
 		}
@@ -125,12 +126,14 @@ void ABaseAIController::PerformAbility() {
 
 void ABaseAIController::MoveToActor(AActor* target) {
 	if (GetOwner()->CanMove()) {
+		GetOwner()->OnStopFiring.Broadcast();
 		GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, target);
 	}
 }
 
 void ABaseAIController::MoveToLocation(FVector location) {
 	if (GetOwner()->CanMove()) {
+		GetOwner()->OnStopFiring.Broadcast();
 		GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, location);
 	}
 }
@@ -149,8 +152,7 @@ void ABaseAIController::FindTarget() {
 	}
 
 	if (weapon != NULL && !weapon->Heals()) {
-		float range = weapon->GetRange() * 1.3;
-		range = range < 1700 ? 1700 : range;
+		float range = weapon->GetRange();
 
 		for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
 			GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), character->GetActorLocation(), objectCollision, collision);
@@ -159,7 +161,12 @@ void ABaseAIController::FindTarget() {
 				&& hit.GetActor() != NULL
 				&& (hit.GetActor() == character || UMiscLibrary::IsCover(hit.GetActor()))
 				&& !character->CompareGroup(GetOwner())) {
-				SetTarget(character);
+				if (character->GetGroup() != nullptr && character->GetGroup()->HasMemebers()) {
+					SetTarget(character->GetGroup()->GetRandomMember());
+				}
+				else {
+					SetTarget(character);
+				}
 				break;
 			}
 		}

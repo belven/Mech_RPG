@@ -26,14 +26,14 @@ private:
 	float heatGenerated = 0;
 
 public:
-	virtual void Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner) override;
+	virtual void Fire(class AMech_RPGCharacter* target) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual bool CanFire() override;
 
 	UFUNCTION(BlueprintCallable, Category = "OverHeatWeapon")
 	float GetHeatLevel();
 
-	static AOverHeatWeapon* CreateOverHeatWeapon(AActor* inOwner, FOverheatWeaponParams inSettings);
+	static AOverHeatWeapon* CreateOverHeatWeapon(AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent() override;

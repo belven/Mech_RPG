@@ -16,7 +16,7 @@ class MECH_RPG_API ASMG : public AMagazineWeapon
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static ASMG* CreateSMG(AActor* inOwner);
+		static ASMG* CreateSMG(AMech_RPGCharacter* inOwner);
 
 	
 };

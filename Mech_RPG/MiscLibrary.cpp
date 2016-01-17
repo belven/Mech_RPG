@@ -4,79 +4,90 @@
 #include "MiscLibrary.h"
 #include "Mech_RPGPlayerController.h"
 
-UGroup* UMiscLibrary::playerGroup = NULL;
+UGroup* UMiscLibrary::playerGroup = nullptr;
+TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::difficulty = GameEnums::Easy;
 
 float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
-	return character != NULL ? character->GetMaxHealth() - character->GetHealth() : 0.0;
+	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;
+}
+
+TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::GetDifficulty()
+{
+	return difficulty;
+}
+
+void UMiscLibrary::SetDifficulty(GameEnums::Difficulty newDifficulty)
+{
+	difficulty = newDifficulty;
 }
 
 float UMiscLibrary::GetHealthPercent(AMech_RPGCharacter* character) {
-	return character != NULL ? character->GetHealth() / character->GetMaxHealth() : 0.0;
+	return character != nullptr ? character->GetHealth() / character->GetMaxHealth() : 0.0;
 }
 
 float UMiscLibrary::GetMissingHealthPercent(AMech_RPGCharacter* character) {
-	return character != NULL ? character->GetMaxHealth() / GetMissingHealth(character) : 0.0;
+	return character != nullptr ? character->GetMaxHealth() / GetMissingHealth(character) : 0.0;
 }
 
 float UMiscLibrary::GetAbilityCooldownPercent(UAbility* ability) {
-	return ability != NULL ? 1 - (ability->GetCurrentTimeRemaining() / ability->GetCooldown()) : 0.0;
+	return ability != nullptr ? 1 - (ability->GetCurrentTimeRemaining() / ability->GetCooldown()) : 0.0;
 }
 
 float UMiscLibrary::GetAbilityChannelPercent(UChannelledAbility* ability) {
-	return ability != NULL ? 1 - (ability->GetCurrentChannelTime() / ability->GetChannelDuration()) : 0.0;
+	return ability != nullptr ? 1 - (ability->GetCurrentChannelTime() / ability->GetChannelDuration()) : 0.0;
 }
 
 bool UMiscLibrary::IsCharacterAlive(AMech_RPGCharacter* character) {
-	return character != NULL && &character != NULL && !character->IsDead();
+	return character != nullptr && &character != nullptr && !character->IsDead();
 }
 
 void UMiscLibrary::OpenCharacterPane(UWorld* world) {
 	AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(UGameplayStatics::GetPlayerCharacter(world, 0));
 
-	if (character != NULL && character->GetController() != NULL) {
+	if (character != nullptr && character->GetController() != nullptr) {
 		Cast<AMech_RPGPlayerController>(character->GetController())->OpenCharacterPane();
 	}
 }
 
 UGroup* UMiscLibrary::GetPlayerGroup() {
-	//if (playerGroup == NULL || playerGroup->GetPlayer() == NULL) {
+	//if (playerGroup == nullptr || playerGroup->GetPlayer() == nullptr) {
 		for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
 			if (IsCharacterAlive(character)
 				&& IsValid(character)
 				&& character->IsValidLowLevel()
-				&& character->GetController() != NULL
+				&& character->GetController() != nullptr
 				&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
 				return character->GetGroup();
 			}
 		}
 	//}
-	return NULL;
+	return nullptr;
 }
 
 AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
-	//return playerGroup != NULL ? playerGroup->GetPlayer() : GetPlayerGroup() != NULL ? playerGroup->GetPlayer() : NULL;
+	//return playerGroup != nullptr ? playerGroup->GetPlayer() : GetPlayerGroup() != nullptr ? playerGroup->GetPlayer() : nullptr;
 	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
 		if (IsCharacterAlive(character)
 			&& IsValid(character)
 			&& character->IsValidLowLevel()
-			&& character->GetController() != NULL
+			&& character->GetController() != nullptr
 			&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
 			return character;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 float UMiscLibrary::GetWidgetYaw(UCameraComponent* camera) {
 
-	if (camera != NULL) {
+	if (camera != nullptr) {
 		return camera->GetComponentRotation().Yaw + 90;
 	}
 	return 0;
 }
 
 UWorld* UMiscLibrary::GetActorWorld(AActor* actor) {
-	return actor != NULL ? actor->GetWorld() : NULL;
+	return actor != nullptr ? actor->GetWorld() : nullptr;
 }
 
 TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AActor* origin) {
@@ -95,6 +106,20 @@ TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AAct
 	return characters;
 }
 
+TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, FVector location) {
+	TArray<AMech_RPGCharacter*> characters;
+	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+		if (IsCharacterAlive(character)
+			&& IsValid(character)
+			&& character->IsValidLowLevel()) {
+
+			if ((character->GetActorLocation() - location).Size() <= range)
+				characters.Add(character);
+		}
+	}
+	return characters;
+}
+
 bool UMiscLibrary::IsCover(AActor* character) {
 	return character->GetClass()->IsChildOf(ACover::StaticClass());
 }
@@ -107,19 +132,19 @@ template<class T>
 T* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotation, TSubclassOf<class AMech_RPGCharacter> classToSpawn) {
 	int count = 0;
 	FNavLocation nav;
-	AMech_RPGCharacter* character = NULL;
+	AMech_RPGCharacter* character = nullptr;
 
-	while (character == NULL && count < 10) {
+	while (character == nullptr && count < 10) {
 		world->GetNavigationSystem()->GetRandomPointInNavigableRadius(location, 100, nav);
 		character = world->SpawnActor<T>(classToSpawn, nav.Location, rotation);
 		count++;
 	}
 
-	if (character != NULL) {
+	if (character != nullptr) {
 		character->SpawnDefaultController();
 		return dynamic_cast<T*>(character);
 	}
-	else return NULL;
+	else return nullptr;
 }
 
 

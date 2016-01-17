@@ -24,7 +24,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = 1800.0f;
 	CameraBoom->RelativeRotation = FRotator(-75.f, 0.f, 0.f);
-	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	CameraBoom->bDoCollisionTest = true; // Don't want to pull camera in when it collides with level
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -68,7 +68,14 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 		stats->AttachTo(GetRootComponent());
 	}
 
-	//WidgetBlueprint'/Game/TopDown/Blueprints/UI/FloatingStats.FloatingStats'
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> newMesh(TEXT("/Game/TopDown/Meshes/Mecha_2.Mecha_2"));
+
+	if (newMesh.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(newMesh.Object);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+
+	AIControllerClass = ABaseAIController::StaticClass();
 }
 
 UWidgetComponent * AMech_RPGCharacter::GetStats()
@@ -253,6 +260,10 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 	if (GetGroup() != NULL) {
 		GetGroup()->GroupMemberHit(damage.damager, this);
+	}	
+	
+	if (OnPreHealthChange.IsBound()) {
+		OnPreHealthChange.Broadcast(damage);
 	}
 
 	float resistance = (GetTotalResistance(damage.damageType) / 100);
@@ -267,14 +278,15 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange damage) {
 		health -= (damage.healthChange * (1 - resistance));
 	}
 
-	if (OnHealthChange.IsBound()) {
-		OnHealthChange.Broadcast(damage);
+	if (OnPostHealthChange.IsBound()) {
+		OnPostHealthChange.Broadcast(damage);
 	}
 
 	if (health <= 0) {
 		SetDead(true);
 		SetActorHiddenInGame(true);
-		SetActorEnableCollision(false);
+		SetActorEnableCollision(false); 
+		OnStopFiring.Broadcast();
 	}
 }
 
@@ -285,7 +297,8 @@ void AMech_RPGCharacter::SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGChar
 }
 
 void AMech_RPGCharacter::OutOfCombat() {
-	inCombat = false;
+	inCombat = false; 
+	OnStopFiring.Broadcast();
 
 	if (IsDead() && GetGroup()->GetPlayer() != nullptr) {
 		SetDead(false);
@@ -326,7 +339,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	bool isAlly = GetController() != NULL ? GetController()->GetClass()->IsChildOf(AAllyAIController::StaticClass()) : false;
 
 	if (isAlly || isPlayer) {
-		statModifier = GetModifierForDifficulty(GameEnums::Medium);
+		statModifier = GetModifierForDifficulty(UMiscLibrary::GetDifficulty());
 	}
 
 	switch (inRole) {
@@ -336,13 +349,13 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 200.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
 		SetMaxHealth(2500 * (1 + statModifier));
 		break;
 
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
-		AddAbility(UHeal::CreateAbility(15.0F, this, 1000.0F));
+		AddAbility(UHeal::CreateAbility(15.0F, this, 500.0F));
 		AddAbility(UAoEHeal::CreateAbility(20.0F, this, 0.20F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetDamageModifier(1.0F + statModifier);

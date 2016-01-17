@@ -27,7 +27,7 @@ protected:
 	float lastTime = 0;
 
 public:
-	virtual void Fire(class AMech_RPGCharacter* target, AMech_RPGCharacter* owner) override;
+	virtual void Fire(class AMech_RPGCharacter* target) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual bool CanFire() override;
 
@@ -37,7 +37,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MagazineWeapon")
 		float GetAmmo();
 
-	static AMagazineWeapon* CreateMagazineWeapon(AActor* inOwner, FMagazineWeaponParams inSettings);
+	static AMagazineWeapon* CreateMagazineWeapon(AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent() override;

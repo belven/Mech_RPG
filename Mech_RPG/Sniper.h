@@ -15,7 +15,9 @@ class MECH_RPG_API ASniper : public AMagazineWeapon
 
 
 public:
+	ASniper();
+
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static ASniper* CreateSniper(AActor* inOwner);
+		static ASniper* CreateSniper(AMech_RPGCharacter* inOwner);
 
 };

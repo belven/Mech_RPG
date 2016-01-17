@@ -16,6 +16,9 @@ public:
 	ASpawnpoint();
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+		TEnumAsByte<TeamEnums::Team> team = TeamEnums::Mercenaries;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 		int32 spawnAmount = 3;
 

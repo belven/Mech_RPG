@@ -16,14 +16,6 @@ namespace EffectEnums {
 	};
 }
 
-UENUM(BlueprintType)
-namespace GameEnums {
-	enum Difficulty {
-		Easy,
-		Medium,
-		Hard
-	};
-}
 
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
@@ -100,8 +92,10 @@ public:
 
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChangeEvent, FHealthChange, healthChange);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPreHealthChangeEvent, FHealthChange, healthChange);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostHealthChangeEvent, FHealthChange, healthChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostBeginPlay, AMech_RPGCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopFiring);
 
 UCLASS(Blueprintable)
 class AMech_RPGCharacter : public ACharacter {
@@ -187,8 +181,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 		void SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
 
-	FHealthChangeEvent OnHealthChange;
+	FPreHealthChangeEvent OnPreHealthChange;
+	FPostHealthChangeEvent OnPostHealthChange;
 	FPostBeginPlay OnPostBeginPlay;
+	FStopFiring OnStopFiring;
 
 	void OutOfCombat();
 

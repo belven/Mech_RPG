@@ -4,7 +4,7 @@
 #include "SMG.h"
 
 
-ASMG* ASMG::CreateSMG(AActor* inOwner) {
+ASMG* ASMG::CreateSMG(AMech_RPGCharacter* inOwner) {
 	if (inOwner && inOwner->GetWorld()) {
 		FMagazineWeaponParams magSettings;
 		magSettings.damage = 42;
@@ -19,6 +19,8 @@ ASMG* ASMG::CreateSMG(AActor* inOwner) {
 		weapon->canFire = true;
 		weapon->AttachRootComponentToActor(inOwner);
 		weapon->lastTime = 0;
+		weapon->SetOwner(inOwner);
+		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
 	return NULL;

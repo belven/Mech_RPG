@@ -16,6 +16,7 @@ void AOverHeatWeapon::Tick(float DeltaTime) {
 			heatLevel -= heatLosePerTick * DeltaTime;
 		}
 		else {
+			StopFire();
 			// If takes 6.45 ish seconds to loose 100 heat when overHeated is TRUE
 			heatLevel -= 0.12 * DeltaTime;
 
@@ -48,15 +49,15 @@ and add heat based on the amount of damage/healing dealt as a percent of the tar
 
 This will cause healers to have a burnout allowing thier allies to be killed with only a few DPS
 */
-void AOverHeatWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
+void AOverHeatWeapon::Fire(AMech_RPGCharacter* target) {
 	if ((Heals() && UMiscLibrary::GetMissingHealth(target) > 0) || (!Heals() && target->GetHealth() > 0)) {
 		heatLevel += heatGenerated * (1 + (heatLevel * 0.5));
 	}
 
-	Super::Fire(target, owner);
+	Super::Fire(target);
 }
 
-AOverHeatWeapon* AOverHeatWeapon::CreateOverHeatWeapon(AActor* inOwner, FOverheatWeaponParams inSettings) {
+AOverHeatWeapon* AOverHeatWeapon::CreateOverHeatWeapon(AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings) {
 	if (inOwner && inOwner->GetWorld()) {
 		AOverHeatWeapon* weapon = inOwner->GetWorld()->SpawnActor<AOverHeatWeapon>(AOverHeatWeapon::StaticClass());
 		weapon->settings = inSettings;
@@ -67,6 +68,8 @@ AOverHeatWeapon* AOverHeatWeapon::CreateOverHeatWeapon(AActor* inOwner, FOverhea
 		weapon->heatLevel = 0;
 		weapon->heatLosePerTick = inSettings.heatLosePerTick;
 		weapon->heatGenerated = inSettings.heatGenerated;
+		weapon->SetOwner(inOwner);
+		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
 	return NULL;

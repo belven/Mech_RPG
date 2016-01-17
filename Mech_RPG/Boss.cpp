@@ -2,18 +2,18 @@
 #include "Mech_RPG.h"
 #include "Boss.h"
 
-TEnumAsByte<BossEnums::BossRole> ABoss::GetRandomRole() {
-	return (BossEnums::BossRole)(UMiscLibrary::GetRandomEnum(BossEnums::End));
+TEnumAsByte<GroupEnums::Role> ABoss::GetRandomRole() {
+	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
 }
 
-void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
+void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
 	int armourValue = 5;
 	FMagazineWeaponParams params;
 
 	SetHealth(GetMaxHealth());
 	SetHealthRegen(10.0);
 
-	GameEnums::Difficulty difficulty = GameEnums::Easy;
+	GameEnums::Difficulty difficulty = UMiscLibrary::GetDifficulty();
 
 	float statModifier = 0;
 
@@ -30,7 +30,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
 	}
 
 	switch (inRole) {
-	case BossEnums::DPS:
+	case GroupEnums::DPS:
 		params.damage = 100;
 		params.fireRate = 0.3;
 		params.range = 1300;
@@ -43,9 +43,9 @@ void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
 		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 400.0F), 2, true, true));
 		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1 + statModifier);
-		armourValue = 5;
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
 		break;
-	case BossEnums::Tank:
+	case GroupEnums::Tank:
 		params.damage = 1200;
 		params.fireRate = 1;
 		params.range = 400;
@@ -55,9 +55,9 @@ void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
 		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UImmobilise::CreateAbility(10, this, 5), 2.5, true, true));
 		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1 + statModifier);
-		armourValue = 10;
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
 		break;
-	case BossEnums::Sniper:
+	case GroupEnums::Sniper:
 		params.damage = 800;
 		params.fireRate = 2.5;
 		params.range = 2000;
@@ -69,10 +69,19 @@ void ABoss::CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole) {
 		AddAbility(USnipe::CreateAbility(7, this));
 		SetDefenceModifier(0 + statModifier);
 		SetDamageModifier(1 + statModifier);
-		armourValue = 5;
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
+		break;
+	case GroupEnums::Healer:
+		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
+		GetWeapons()[0]->SetDamage(GetWeapons()[0]->GetDamage() * 1.4);
+		AddAbility(UHeal::CreateAbility(5, this, 800));
+		AddAbility(UDisable::CreateDisable(10, this, 5));
+		SetDefenceModifier(0 + statModifier);
+		SetDamageModifier(1 + statModifier);
+		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
 		break;
 	default:
-		CreatePresetRole(BossEnums::DPS);
+		CreatePresetRole(GroupEnums::DPS);
 		break;
 	}
 

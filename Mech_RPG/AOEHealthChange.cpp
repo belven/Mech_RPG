@@ -22,12 +22,10 @@ void  UAOEHealthChange::Activate() {
 
 		damage.damager = settings.owner;
 
-		for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+		for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(settings.radius, locationToUse)) {
 			bool canAffect = settings.affectedTeam == AOEEnums::Ally ? character->CompareGroup(settings.owner) : !character->CompareGroup(settings.owner);
 
-			if (UMiscLibrary::IsCharacterAlive(character)
-				&& FVector::Dist(character->GetActorLocation(), locationToUse) <= settings.radius
-				&& canAffect) {
+			if (canAffect) {
 				float tempDamage = settings.healthChange > 2 ? settings.healthChange : character->GetMaxHealth() * settings.healthChange;
 				damage.healthChange = tempDamage;
 				damage.target = character;

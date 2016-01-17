@@ -6,6 +6,7 @@ void AMagazineWeapon::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 	if (ammo <= 0) {
 		reloading = true;
+		StopFire();
 	}
 	
 	if (reloading) {
@@ -40,13 +41,13 @@ float AMagazineWeapon::GetAmmo() {
 	return ammo;
 }
 
-void AMagazineWeapon::Fire(AMech_RPGCharacter* target, AMech_RPGCharacter* owner) {
-	Super::Fire(target, owner);
+void AMagazineWeapon::Fire(AMech_RPGCharacter* target) {
+	Super::Fire(target);
 	ammo--;
 }
 
 
-AMagazineWeapon* AMagazineWeapon::CreateMagazineWeapon(AActor* inOwner, FMagazineWeaponParams inSettings) {
+AMagazineWeapon* AMagazineWeapon::CreateMagazineWeapon(AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings) {
 	if (inOwner && inOwner->GetWorld()) {
 		AMagazineWeapon* weapon = inOwner->GetWorld()->SpawnActor<AMagazineWeapon>(AMagazineWeapon::StaticClass());
 		weapon->settings = inSettings;
@@ -57,6 +58,8 @@ AMagazineWeapon* AMagazineWeapon::CreateMagazineWeapon(AActor* inOwner, FMagazin
 		weapon->reloadAmount = inSettings.reloadAmount;
 		weapon->ammo = inSettings.magazineSize;
 		weapon->reloading = false;
+		weapon->SetOwner(inOwner);
+		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
 	return NULL;

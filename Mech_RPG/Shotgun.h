@@ -14,7 +14,7 @@ class MECH_RPG_API AShotgun : public AMagazineWeapon
 	GENERATED_BODY()
 public:
 		UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AShotgun* CreateShotgun(AActor* inOwner);
+		static AShotgun* CreateShotgun(AMech_RPGCharacter* inOwner);
 	
 	
 	

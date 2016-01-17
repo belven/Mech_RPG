@@ -24,7 +24,7 @@ class MECH_RPG_API ABoss : public AMech_RPGCharacter
 private:
 
 public:
-	void CreatePresetRole(TEnumAsByte<BossEnums::BossRole> inRole);
+	void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS) override;
 
-	static TEnumAsByte<BossEnums::BossRole> GetRandomRole();
+	static TEnumAsByte<GroupEnums::Role> GetRandomRole();
 };

@@ -28,7 +28,6 @@ void AMech_RPGPlayerController::BeginPlay() {
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
 		characterPane->SetPositionInViewport(FVector2D(1000, 200));
-
 	}
 }
 
@@ -49,6 +48,20 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 		if (panLeft || panRight) {
 			FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
 			rot.Yaw += panLeft ? -1 : 1;
+			GetOwner()->CameraBoom->SetRelativeRotation(rot);
+		}
+
+		if (panUp || panDown) {
+			FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
+			rot.Pitch += panUp ? -1 : 1;
+
+			if (rot.Pitch < -80) {
+				rot.Pitch = -80;
+			}
+			else if (rot.Pitch > 0) {
+				rot.Pitch = 0;
+			}
+
 			GetOwner()->CameraBoom->SetRelativeRotation(rot);
 		}
 
@@ -85,12 +98,14 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 
 void AMech_RPGPlayerController::MoveToActor(AActor* target) {
 	if (GetOwner()->CanMove()) {
+		GetOwner()->OnStopFiring.Broadcast();
 		GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, target);
 	}
 }
 
 void AMech_RPGPlayerController::MoveToLocation(FVector location) {
 	if (GetOwner()->CanMove()) {
+		GetOwner()->OnStopFiring.Broadcast();
 		GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, location);
 	}
 }
@@ -150,16 +165,16 @@ void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
 
 				// Are we too far from the cover to avoid shooting it
 				if (distToCover > 200) {
-					weapon->Fire(Cast<ACover>(hit), GetOwner());
+					weapon->Fire(Cast<ACover>(hit));
 				}
 				// Otherwise we can attack the target
 				else {
-					weapon->Fire(target, GetOwner());
+					weapon->Fire(target);
 				}
 			}
 			// Otherwise we've got a clear shot to the target
 			else {
-				weapon->Fire(target, GetOwner());
+				weapon->Fire(target);
 			}
 		}
 
@@ -207,6 +222,12 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("PanRight", IE_Pressed, this, &AMech_RPGPlayerController::PanRight);
 	InputComponent->BindAction("PanRight", IE_Released, this, &AMech_RPGPlayerController::PanRightReleased);
+
+	InputComponent->BindAction("PanUp", IE_Pressed, this, &AMech_RPGPlayerController::PanUp);
+	InputComponent->BindAction("PanUp", IE_Released, this, &AMech_RPGPlayerController::PanUpReleased);
+
+	InputComponent->BindAction("PanDown", IE_Pressed, this, &AMech_RPGPlayerController::PanDown);
+	InputComponent->BindAction("PanDown", IE_Released, this, &AMech_RPGPlayerController::PanDownReleased);
 
 	InputComponent->BindAction("ResetZoom", IE_Pressed, this, &AMech_RPGPlayerController::ResetZoom);
 	InputComponent->BindAction("CharacterPane", IE_Pressed, this, &AMech_RPGPlayerController::OpenCharacterPane);
@@ -286,6 +307,7 @@ void AMech_RPGPlayerController::ResetZoom() {
 	GetOwner()->CameraBoom->TargetArmLength = 1700;
 	FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
 	rot.Yaw = GetOwner()->GetViewRotation().Yaw;
+	rot.Pitch = -75.f;
 	GetOwner()->CameraBoom->SetRelativeRotation(rot);
 }
 
@@ -310,6 +332,26 @@ void AMech_RPGPlayerController::PanRight()
 void AMech_RPGPlayerController::PanRightReleased()
 {
 	panRight = false;
+}
+
+void AMech_RPGPlayerController::PanUp()
+{
+	panUp = true;
+}
+
+void AMech_RPGPlayerController::PanUpReleased()
+{
+	panUp = false;
+}
+
+void AMech_RPGPlayerController::PanDown()
+{
+	panDown = true;
+}
+
+void AMech_RPGPlayerController::PanDownReleased()
+{
+	panDown = false;
 }
 
 void AMech_RPGPlayerController::OnAttackPressed() {

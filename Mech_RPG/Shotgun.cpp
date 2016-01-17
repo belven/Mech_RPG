@@ -6,7 +6,7 @@
 
 
 
-AShotgun* AShotgun::CreateShotgun(AActor* inOwner) {
+AShotgun* AShotgun::CreateShotgun(AMech_RPGCharacter* inOwner) {
 	if (inOwner && inOwner->GetWorld()) {
 		FMagazineWeaponParams magSettings;
 		magSettings.damage = 150;
@@ -21,6 +21,8 @@ AShotgun* AShotgun::CreateShotgun(AActor* inOwner) {
 		weapon->canFire = true;
 		weapon->AttachRootComponentToActor(inOwner);
 		weapon->lastTime = 0;
+		weapon->SetOwner(inOwner);
+		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
 	return NULL;

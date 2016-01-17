@@ -3,7 +3,14 @@
 #include "Mech_RPG.h"
 #include "Sniper.h"
 
-ASniper* ASniper::CreateSniper(AActor* inOwner) {
+ASniper::ASniper() : Super() {
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> sniper(TEXT("/Game/TopDown/Meshes/Sniper"));
+	if (sniper.Succeeded()) {
+		mesh = sniper.Object;
+	}	 	
+}
+
+ASniper* ASniper::CreateSniper(AMech_RPGCharacter* inOwner) {
 	if (inOwner && inOwner->GetWorld()) {
 		FMagazineWeaponParams magSettings;
 		magSettings.damage = 300;
@@ -17,8 +24,10 @@ ASniper* ASniper::CreateSniper(AActor* inOwner) {
 		ASniper* weapon = inOwner->GetWorld()->SpawnActor<ASniper>(ASniper::StaticClass());
 		weapon->settings = magSettings;
 		weapon->canFire = true;
-		weapon->AttachRootComponentToActor(inOwner);
+		//weapon->AttachRootComponentToActor(inOwner);
 		weapon->lastTime = 0;
+		weapon->SetOwner(inOwner);
+		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
 	return NULL;

@@ -25,6 +25,7 @@ void ASpawnpoint::BeginPlay() {
 			while (character == NULL && count < 10) {
 				GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
 				character = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(GetWorld(), nav.Location, GetActorRotation(), classToSpawn);
+				character->team = team;
 				count++;
 			}
 
