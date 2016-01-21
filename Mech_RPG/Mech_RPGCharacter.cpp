@@ -24,7 +24,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = 1800.0f;
 	CameraBoom->RelativeRotation = FRotator(-75.f, 0.f, 0.f);
-	CameraBoom->bDoCollisionTest = true; // Don't want to pull camera in when it collides with level
+	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));

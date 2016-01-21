@@ -9,8 +9,7 @@ namespace AOEEnums {
 }
 
 #pragma once
-
-#include "Object.h"
+#include "Engine/TargetPoint.h"
 #include "Armour.h"
 #include "AOEHealthChange.generated.h"
 
@@ -38,7 +37,7 @@ public:
 };
 
 UCLASS()
-class MECH_RPG_API UAOEHealthChange : public UObject
+class MECH_RPG_API AAOEHealthChange : public ATargetPoint
 {
 	GENERATED_BODY()
 	
@@ -47,6 +46,11 @@ private:
 	int timesRan;
 	FTimerHandle TimerHandle_AOERate;
 public:
-	static UAOEHealthChange* CreateAOEHealthChange(FTempAOESettings inSettings);
+	AAOEHealthChange();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Particles)
+		UParticleSystemComponent* partclSystem;
+
+	static AAOEHealthChange* CreateAOEHealthChange(FTempAOESettings inSettings);
 	void Activate();
 };

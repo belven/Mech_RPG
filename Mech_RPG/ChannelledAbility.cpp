@@ -5,6 +5,16 @@
 #include "Mech_RPGCharacter.h"
 #include "DrawDebugHelpers.h"
 
+UChannelledAbility::UChannelledAbility() : Super() {
+	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ChannelLineParticleSystem"));
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/AoE"));
+	if (ParticleSystemClass.Succeeded()) {
+		partclSystem->Template = ParticleSystemClass.Object;
+		partclSystem->bAutoActivate = false;
+	}
+}
+
 void UChannelledAbility::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (!channelling) {
 		channelling = true;

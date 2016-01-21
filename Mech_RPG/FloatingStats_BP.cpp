@@ -49,7 +49,7 @@ void UFloatingStats_BP::Tick(float DeltaTime)
 	AMech_RPGCharacter* player = UMiscLibrary::GetPlayer();
 
 	if (player != nullptr) {
-		FRotator rot(90, UMiscLibrary::GetWidgetYaw(player->GetTopDownCamera()) + 90, 0);
+		FRotator rot(-player->GetTopDownCamera()->GetComponentRotation().Pitch, UMiscLibrary::GetWidgetYaw(player->GetTopDownCamera()) + 90, 0);
 
 		owner->GetStats()->SetWorldRotation(rot);
 	}

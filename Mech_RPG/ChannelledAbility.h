@@ -31,6 +31,10 @@ private:
 	FCollisionObjectQueryParams objectCollision;
 	FHitResult hit;
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Particles)
+		UParticleSystemComponent* partclSystem;
+
+	UChannelledAbility();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
