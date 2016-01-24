@@ -25,6 +25,7 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 protected:
 	UStaticMeshComponent* meshComponent;
 	TSubclassOf<UStaticMesh> meshClass;

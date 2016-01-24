@@ -31,6 +31,8 @@ public:
 	static TEnumAsByte<GameEnums::Difficulty> GetDifficulty();
 	static void SetDifficulty(GameEnums::Difficulty newDifficulty);
 
+	static bool CanSee(UWorld * world, FVector pointA, FVector pointB);
+
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static UGroup* GetPlayerGroup();
 

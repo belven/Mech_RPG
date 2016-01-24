@@ -21,6 +21,12 @@ void UMiscLibrary::SetDifficulty(GameEnums::Difficulty newDifficulty)
 	difficulty = newDifficulty;
 }
 
+bool UMiscLibrary::CanSee(UWorld* world, FVector pointA, FVector pointB) {
+	TArray<FHitResult> results;
+	world->LineTraceMultiByObjectType(results, pointA, pointB, ECollisionChannel::ECC_WorldStatic);
+	return results.Num() == 0;
+}
+
 float UMiscLibrary::GetHealthPercent(AMech_RPGCharacter* character) {
 	return character != nullptr ? character->GetHealth() / character->GetMaxHealth() : 0.0;
 }
@@ -51,15 +57,15 @@ void UMiscLibrary::OpenCharacterPane(UWorld* world) {
 
 UGroup* UMiscLibrary::GetPlayerGroup() {
 	//if (playerGroup == nullptr || playerGroup->GetPlayer() == nullptr) {
-		for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
-			if (IsCharacterAlive(character)
-				&& IsValid(character)
-				&& character->IsValidLowLevel()
-				&& character->GetController() != nullptr
-				&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
-				return character->GetGroup();
-			}
+	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+		if (IsCharacterAlive(character)
+			&& IsValid(character)
+			&& character->IsValidLowLevel()
+			&& character->GetController() != nullptr
+			&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
+			return character->GetGroup();
 		}
+	}
 	//}
 	return nullptr;
 }

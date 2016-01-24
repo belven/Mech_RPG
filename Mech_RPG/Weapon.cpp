@@ -18,16 +18,16 @@ AWeapon::AWeapon() {
 	}
 }
 
-float AWeapon::GetDamage() {
-	return settings.damage;
+float AWeapon::GetChangeAmount() {
+	return settings.healthChange;
 }
 
 float AWeapon::GetRange() {
 	return settings.range;
 }
 
-void AWeapon::SetDamage(float newVal) {
-	settings.damage = newVal;
+void AWeapon::SetChangeAmount(float newVal) {
+	settings.healthChange = newVal;
 }
 
 void AWeapon::SetRange(float newVal) {
@@ -38,7 +38,7 @@ bool AWeapon::CanFire() {
 	return canFire;
 }
 
-DamageEnums::DamageType AWeapon::GetDamageType() {
+DamageEnums::DamageType AWeapon::GetChangeAmountType() {
 	return settings.damageType;
 }
 
@@ -69,12 +69,12 @@ float AWeapon::GetProgressBarPercent() {
 }
 
 void AWeapon::Fire(AMech_RPGCharacter* target) {
-	FHealthChange damage;
-	float damageDealt = GetDamage() * GetOwner()->GetDamageModifier();
+	FHealthChange healthChange;
+	float changeAmount = GetChangeAmount() * GetOwner()->GetDamageModifier();
 	bool isCrit = settings.critChance <= rand() % 100;
 
 	if (isCrit) {
-		damageDealt = damageDealt * 2;
+		changeAmount = changeAmount * 2;
 	}
 
 	if (partclSystem != NULL && !partclSystem->IsActive()) {
@@ -82,27 +82,28 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 		partclSystem->ActivateSystem(true);
 	}
 
-	damage.damager = GetOwner();
-	damage.target = target;
-	damage.weaponUsed = this;
-	damage.damageType = settings.damageType;
-	damage.healthChange = settings.heals ? -damageDealt : damageDealt;
+	healthChange.damager = GetOwner();
+	healthChange.target = target;
+	healthChange.weaponUsed = this;
+	healthChange.damageType = settings.damageType;
+	healthChange.healthChange = changeAmount;
+	healthChange.heals = settings.heals;
 
-	target->ChangeHealth(damage);
+	target->ChangeHealth(healthChange);
 	canFire = false;
 }
 
 void AWeapon::Fire(ACover* target) {
-	FHealthChange damage;
-	float damageDealt = GetDamage()  * GetOwner()->GetDamageModifier();
+	FHealthChange healthChange;
+	float changeAmount = GetChangeAmount()  * GetOwner()->GetDamageModifier();
 
-	damage.damager = GetOwner();
-	//damage.target = target;
-	damage.weaponUsed = this;
+	healthChange.damager = GetOwner();
+	//healthChange.target = target;
+	healthChange.weaponUsed = this;
 
-	damage.healthChange = settings.heals ? -damageDealt : damageDealt;
+	healthChange.healthChange = settings.heals ? -changeAmount : changeAmount;
 
-	target->ChangeHealth(damage);
+	target->ChangeHealth(healthChange);
 	canFire = false;
 }
 
@@ -156,7 +157,7 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 	case WeaponEnums::SMG:
 		return ASMG::CreateSMG(inOwner);
 	case WeaponEnums::Bio_Repair:
-		overheatSettings.damage = 40;
+		overheatSettings.healthChange = 40;
 		overheatSettings.range = 600;
 		overheatSettings.fireRate = 0.3;
 		overheatSettings.heals = true;
@@ -164,7 +165,7 @@ AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<We
 		overheatSettings.heatGenerated = 0.05;
 		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, overheatSettings);
 	case WeaponEnums::RPG:
-		magSettings.damage = 500;
+		magSettings.healthChange = 500;
 		magSettings.range = 1300;
 		magSettings.fireRate = 2.5;
 		magSettings.heals = false;

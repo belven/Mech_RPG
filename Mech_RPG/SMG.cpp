@@ -3,11 +3,18 @@
 #include "Mech_RPG.h"
 #include "SMG.h"
 
+ASMG::ASMG() : Super() {
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> smg(TEXT("/Game/TopDown/Meshes/SMG"));
+	if (smg.Succeeded()) {
+		mesh = smg.Object;
+	}
+}
+
 
 ASMG* ASMG::CreateSMG(AMech_RPGCharacter* inOwner) {
 	if (inOwner && inOwner->GetWorld()) {
 		FMagazineWeaponParams magSettings;
-		magSettings.damage = 42;
+		magSettings.healthChange = 42;
 		magSettings.range = 1000;
 		magSettings.fireRate = 0.3;
 		magSettings.heals = false;

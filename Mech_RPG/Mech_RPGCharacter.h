@@ -32,20 +32,23 @@ USTRUCT(BlueprintType)
 struct FHealthChange {
 	GENERATED_USTRUCT_BODY()
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		AMech_RPGCharacter* target;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		AMech_RPGCharacter* damager;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		AWeapon* weaponUsed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float healthChange = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		bool heals;
 };
 
 
@@ -96,6 +99,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPreHealthChangeEvent, FHealthChange
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostHealthChangeEvent, FHealthChange, healthChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostBeginPlay, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopFiring);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfCombat);
 
 UCLASS(Blueprintable)
 class AMech_RPGCharacter : public ACharacter {
@@ -160,6 +164,8 @@ protected:
 public:
 	AMech_RPGCharacter();
 
+	void SetActorHiddenInGame(bool bNewHidden) override;
+
 	class UWidgetComponent* GetStats();
 
 	static const TArray<AMech_RPGCharacter*>& GetCharacters();
@@ -180,13 +186,19 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 		void SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
+	
+	UFUNCTION(BlueprintCallable, Category = "Other")
+	void Reset();
 
 	FPreHealthChangeEvent OnPreHealthChange;
 	FPostHealthChangeEvent OnPostHealthChange;
 	FPostBeginPlay OnPostBeginPlay;
 	FStopFiring OnStopFiring;
+	FOutOfCombat OnOutOfCombat;
 
 	void OutOfCombat();
+
+	bool GetInCombat();
 
 	void LookAt(AMech_RPGCharacter* other);
 
@@ -266,7 +278,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetHealth(float newVal);
 
-	void ChangeHealth(FHealthChange damage);
+	void ChangeHealth(FHealthChange healthChange);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		bool IsDead();

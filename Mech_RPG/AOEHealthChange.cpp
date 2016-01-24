@@ -12,6 +12,8 @@ AAOEHealthChange::AAOEHealthChange() : Super() {
 	if (ParticleSystemClass.Succeeded()) {
 		partclSystem->Template = ParticleSystemClass.Object;
 		partclSystem->bAutoActivate = false;
+		//partclSystem->SetWorldRotation(FRotator(0, 0, 0));
+		//partclSystem->SetRelativeRotation(FRotator(0, 0, 0));
 		SetRootComponent(partclSystem);
 	}
 
@@ -29,7 +31,7 @@ AAOEHealthChange* AAOEHealthChange::CreateAOEHealthChange(FTempAOESettings inSet
 		locationToUse = inSettings.location;
 	}
 
-	AAOEHealthChange* tempAOE = inSettings.world->SpawnActor<AAOEHealthChange>(StaticClass(), locationToUse, FRotator(90, 0, 0));
+	AAOEHealthChange* tempAOE = inSettings.world->SpawnActor<AAOEHealthChange>(StaticClass(), locationToUse, FRotator(0, 0, 0));
 	tempAOE->settings = inSettings;
 	tempAOE->Activate();
 	return tempAOE;
@@ -39,7 +41,7 @@ void  AAOEHealthChange::Activate() {
 	if (timesRan < settings.duration) {
 		timesRan++;
 
-		FHealthChange damage;
+		FHealthChange healthChange;
 		FVector locationToUse = settings.usesTarget && settings.target != NULL ? settings.target->GetActorLocation() : settings.location;
 		//DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, FColor::Blue, false, settings.rate, 0);
 
@@ -48,17 +50,17 @@ void  AAOEHealthChange::Activate() {
 			partclSystem->Activate(true);
 		}
 
-		damage.damager = settings.owner;
+		healthChange.damager = settings.owner;
 
 		for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(settings.radius, locationToUse)) {
 			bool canAffect = settings.affectedTeam == AOEEnums::Ally ? character->CompareGroup(settings.owner) : !character->CompareGroup(settings.owner);
 
 			if (canAffect) {
 				float tempDamage = settings.healthChange > 2 ? settings.healthChange : character->GetMaxHealth() * settings.healthChange;
-				damage.healthChange = tempDamage;
-				damage.target = character;
-				damage.damageType = settings.damageType;
-				character->ChangeHealth(damage);
+				healthChange.healthChange = tempDamage;
+				healthChange.target = character;
+				healthChange.damageType = settings.damageType;
+				character->ChangeHealth(healthChange);
 			}
 		}
 

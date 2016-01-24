@@ -11,11 +11,11 @@ void UAoEHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		settings.healthChange = -healAmount;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
-		settings.rate = 1;
+		settings.rate = 0.5;
 		settings.radius = 700;
 		settings.location = targetLocation;
 		settings.damageType = DamageEnums::Blast;
-		settings.duration = 1;
+		settings.duration = 3;
 		settings.usesTarget = false;
 		AAOEHealthChange::CreateAOEHealthChange(settings);
 		SetOnCooldown(owner->GetWorld());

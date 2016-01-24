@@ -34,6 +34,7 @@ public:
 	TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
 
 	bool usesTarget = false;
+	bool heals;
 };
 
 UCLASS()

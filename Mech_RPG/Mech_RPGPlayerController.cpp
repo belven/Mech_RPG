@@ -111,21 +111,16 @@ void AMech_RPGPlayerController::MoveToLocation(FVector location) {
 }
 
 void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
-	SetupCollision();
-
-	GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
-
-	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
-
-	GetOwner()->LookAt(target);
 
 	// Are we targeting ourselves
 	if (target == GetOwner()) {
 		FireWeapon(NULL);
+		GetOwner()->LookAt(target);
 	}
 	// Have we traced to another character or cover
-	else if (targetTraced && (IsMechCharacter(hit.GetActor()) || IsCover(hit.GetActor()))) {
-		FireWeapon(hit.GetActor());
+	else if (UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), target->GetActorLocation())) {
+		FireWeapon(target);
+		GetOwner()->LookAt(target);
 	}
 	// We've hit some scenery so move towards the target
 	else if (GetWorld()->GetNavigationSystem()) {
@@ -496,15 +491,10 @@ void AMech_RPGPlayerController::ActivateAbility() {
 			location = cursorTarget->GetActorLocation();
 		}
 
-		GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), location, objectCollision, collision);
-
 		//Only use an ability if we have LoS to our target/location
-		if (hit.bBlockingHit) {
-			// Have we hit something that isn't a mech
-			if (hit.GetActor() == NULL || !UMiscLibrary::IsMechCharacter(hit.GetActor())) {
-				MoveToLocation(location);
-				return;
-			}
+		if (!UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), location)) {
+			MoveToLocation(location);
+			return;
 		}
 
 		for (UAbility* ability : GetOwner()->GetAbilities()) {

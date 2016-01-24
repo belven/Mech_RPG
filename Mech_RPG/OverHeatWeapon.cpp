@@ -1,6 +1,7 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
+#include "Mech_RPGCharacter.h"
 
 void AOverHeatWeapon::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
@@ -34,6 +35,16 @@ void AOverHeatWeapon::Tick(float DeltaTime) {
 
 float AOverHeatWeapon::GetProgressBarPercent() {
 	return heatLevel;
+}
+
+void AOverHeatWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
+	Super::SetOwner(inOwner);
+	inOwner->OnOutOfCombat.AddUniqueDynamic(this, &AOverHeatWeapon::Cooldown);
+}
+
+void AOverHeatWeapon::Cooldown() {
+	heatLevel = 0;
+	overHeated = false;
 }
 
 bool AOverHeatWeapon::CanFire() {

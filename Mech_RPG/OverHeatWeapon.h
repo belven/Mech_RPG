@@ -29,6 +29,10 @@ public:
 	virtual void Fire(class AMech_RPGCharacter* target) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual bool CanFire() override;
+	virtual	void SetOwner(AMech_RPGCharacter* inOwner) override;
+	
+	UFUNCTION(BlueprintCallable, Category = "OverHeatWeapon")
+	void Cooldown();
 
 	UFUNCTION(BlueprintCallable, Category = "OverHeatWeapon")
 	float GetHeatLevel();

@@ -49,7 +49,23 @@ AMech_RPGCharacter* UGroup::GetMember(int32 index) {
 
 AMech_RPGCharacter* UGroup::GetRandomMember()
 {
-	return members.Num() == 1 ? GetMember(0) : GetMember(rand() % (members.Num() - 1));
+	TArray<AMech_RPGCharacter*> aliveMembers;
+
+	for (AMech_RPGCharacter* member : members) {
+		if (UMiscLibrary::IsCharacterAlive(member)) {
+			aliveMembers.Add(member);
+		}
+	}
+
+	if (aliveMembers.Num() == 0) {
+		return NULL;
+	}
+	else if (aliveMembers.Num() == 1) {
+		return aliveMembers[0];
+	}
+	else {
+		return aliveMembers[rand() % (aliveMembers.Num() - 1)];
+	}
 }
 
 AMech_RPGCharacter* UGroup::GetPlayer() {

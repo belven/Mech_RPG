@@ -23,7 +23,7 @@ struct FWeaponParams {
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		float damage = 100;
+		float healthChange = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 		float critChance = 15;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
@@ -45,13 +45,13 @@ protected:
 	float lastTime;
 public:
 	AWeapon();
-	float GetDamage();
+	float GetChangeAmount();
 	float GetRange();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Particles)
 		UParticleSystemComponent* partclSystem;
 
-	void SetDamage(float newVal);
+	void SetChangeAmount(float newVal);
 	void SetRange(float newVal);
 
 	virtual bool CanFire();
@@ -76,7 +76,7 @@ public:
 	bool Heals();
 	void SetHeals(bool newVal);
 
-	DamageEnums::DamageType GetDamageType();
+	DamageEnums::DamageType GetChangeAmountType();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent();

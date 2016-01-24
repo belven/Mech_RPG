@@ -3,13 +3,17 @@
 #include "Mech_RPG.h"
 #include "Shotgun.h"
 
-
-
+AShotgun::AShotgun() : Super() {
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Shotgun(TEXT("/Game/TopDown/Meshes/Shotgun"));
+	if (Shotgun.Succeeded()) {
+		mesh = Shotgun.Object;
+	}
+}
 
 AShotgun* AShotgun::CreateShotgun(AMech_RPGCharacter* inOwner) {
 	if (inOwner && inOwner->GetWorld()) {
 		FMagazineWeaponParams magSettings;
-		magSettings.damage = 150;
+		magSettings.healthChange = 150;
 		magSettings.range = 400;
 		magSettings.fireRate = 0.8;
 		magSettings.heals = false;

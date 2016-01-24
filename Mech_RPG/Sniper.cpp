@@ -13,7 +13,7 @@ ASniper::ASniper() : Super() {
 ASniper* ASniper::CreateSniper(AMech_RPGCharacter* inOwner) {
 	if (inOwner && inOwner->GetWorld()) {
 		FMagazineWeaponParams magSettings;
-		magSettings.damage = 300;
+		magSettings.healthChange = 300;
 		magSettings.range = 1500;
 		magSettings.fireRate = 1.5;
 		magSettings.heals = false;

@@ -32,14 +32,15 @@ void AMechAttachment::SetOwner(AMech_RPGCharacter* inOwner)
 	}
 
 	if (mesh != nullptr) {
+		SetRootComponent(meshComponent);
 		meshComponent->SetStaticMesh(mesh);
-
+		meshComponent->SetMobility(EComponentMobility::Movable);
 		meshComponent->bOwnerNoSee = false;
 		meshComponent->bCastDynamicShadow = true;
 		meshComponent->CastShadow = true;
 		meshComponent->SetHiddenInGame(false);
 		meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		meshComponent->AttachTo(owner->GetMesh(), "RightHand");
+		AttachRootComponentTo(owner->GetMesh(), "RightHand");
 	}
 }
 
@@ -55,5 +56,12 @@ void AMechAttachment::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMechAttachment::SetActorHiddenInGame(bool bNewHidden)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
+	meshComponent->SetHiddenInGame(bNewHidden, true);
+	meshComponent->SetVisibility(bNewHidden, true);
 }
 

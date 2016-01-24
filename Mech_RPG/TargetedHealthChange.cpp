@@ -6,17 +6,17 @@
 
 void UTargetedHealthChange::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (UMiscLibrary::IsCharacterAlive(target)) {
-		FHealthChange damage;
-		float damageToDo = affectedTeam == AOEEnums::Ally ? -changeAmount : changeAmount;
+		FHealthChange healthChange;
+		float changeAmount = affectedTeam == AOEEnums::Ally ? healthChange.heals = true : healthChange.heals = false;
 
-		damageToDo = (damageToDo <= 2.0F) ? target->GetMaxHealth() * damageToDo : damageToDo;
+		changeAmount = (changeAmount <= 2.0F) ? target->GetMaxHealth() * changeAmount : changeAmount;
 
-		damage.damager = owner;
-		damage.target = target;
-		damage.weaponUsed = NULL;
-		damage.healthChange = damageToDo;
+		healthChange.damager = owner;
+		healthChange.target = target;
+		healthChange.weaponUsed = NULL;
+		healthChange.healthChange = changeAmount;
 
-		target->ChangeHealth(damage);
+		target->ChangeHealth(healthChange);
 		SetOnCooldown(owner->GetWorld());
 	}
 }

@@ -14,7 +14,7 @@ ABaseAIController::ABaseAIController(const FObjectInitializer& ObjectInitializer
 void ABaseAIController::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	if (GetOwner() && GetOwner()->GetDemandedController() == NULL) {
+	if (GetOwner() && GetOwner()->GetDemandedController() == nullptr) {
 		if (GetOwner()->IsDead()) {
 			//UnPossess();
 			//GetOwner()->Destroy(true);
@@ -28,29 +28,25 @@ void ABaseAIController::Tick(float DeltaTime) {
 			if (IsTargetValid(GetTarget())) {
 				AttackTarget(DeltaTime);
 			}
+			else {
+				GetOwner()->OnStopFiring.Broadcast();
+			}
 		}
 	}
 }
 
 void ABaseAIController::AttackTarget(float DeltaTime) {
-	SetupCollision();
-
-	GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), target->GetActorLocation(), objectCollision, collision);
-
-	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL; 
-
-	GetOwner()->LookAt(target);
-
 	// Are we targeting ourselves
 	if (target == GetOwner()) {
 		PerformAbility();
-		FireWeapon(NULL);
+		FireWeapon(nullptr);
+		GetOwner()->LookAt(target);
 	}
 	// Have we traced to another character or cover
-	else if (targetTraced 
-		&& (UMiscLibrary::IsMechCharacter(hit.GetActor()) || UMiscLibrary::IsCover(hit.GetActor()))) {
+	else if (UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), target->GetActorLocation())) {
 		PerformAbility();
-		FireWeapon(hit.GetActor());
+		FireWeapon(target);
+		GetOwner()->LookAt(target);
 	}
 	// We've hit some scenery so move towards the target
 	else if (GetWorld()->GetNavigationSystem()) {
@@ -62,7 +58,7 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 void ABaseAIController::SetupCollision() {
 	collision.IgnoreComponents.Empty();
 
-	if (GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->HasMemebers()) {
+	if (GetOwner()->GetGroup() != nullptr && GetOwner()->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : GetOwner()->GetGroup()->GetMembers()) {
 			if (member != target) {
 				collision.AddIgnoredActor(member);
@@ -76,10 +72,10 @@ void ABaseAIController::FireWeapon(AActor* hit) {
 	float distToTarget = GetOwner()->GetDistanceTo(target);
 
 	// Are we in weapons range
-	if (weapon != NULL && distToTarget <= weapon->GetRange()) {
+	if (weapon != nullptr && distToTarget <= weapon->GetRange()) {
 		if (GetOwner()->CanAttack() && weapon->CanFire()) {
 
-			bool isCover = hit != NULL ? UMiscLibrary::IsCover(hit) : false;
+			bool isCover = hit != nullptr ? UMiscLibrary::IsCover(hit) : false;
 
 			// Have we hit cover
 			if (isCover) {
@@ -111,11 +107,11 @@ void ABaseAIController::FireWeapon(AActor* hit) {
 }
 
 void ABaseAIController::PerformAbility() {
-	if (GetOwner()->HasAbilities() 
-		&& !GetOwner()->Channelling() 
+	if (GetOwner()->HasAbilities()
+		&& !GetOwner()->Channelling()
 		&& GetOwner()->CanCast()) {
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
-			if (ability != NULL && !ability->OnCooldown()) {
+			if (ability != nullptr && !ability->OnCooldown()) {
 				ability->Activate(target, target->GetActorLocation());
 				GetOwner()->SetCurrentAbility(ability);
 				break;
@@ -140,27 +136,17 @@ void ABaseAIController::MoveToLocation(FVector location) {
 
 void ABaseAIController::FindTarget() {
 	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
+	SetupCollision();
 
-	collision.IgnoreComponents.Empty();
-
-	if (GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->HasMemebers()) {
-		for (AMech_RPGCharacter* member : GetOwner()->GetGroup()->GetMembers()) {
-			if (member != target) {
-				collision.AddIgnoredActor(member);
-			}
-		}
-	}
-
-	if (weapon != NULL && !weapon->Heals()) {
+	if (weapon != nullptr && !weapon->Heals()) {
 		float range = weapon->GetRange();
 
 		for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
-			GetWorld()->LineTraceSingleByObjectType(hit, GetOwner()->GetActorLocation(), character->GetActorLocation(), objectCollision, collision);
+			//TArray<FHitResult> results;
+			//GetWorld()->LineTraceMultiByChannel(results, GetOwner()->GetActorLocation(), character->GetActorLocation(), ECollisionChannel::ECC_WorldStatic);
+			//bool canSee = (results.Num() == 0);
 
-			if (hit.bBlockingHit
-				&& hit.GetActor() != NULL
-				&& (hit.GetActor() == character || UMiscLibrary::IsCover(hit.GetActor()))
-				&& !character->CompareGroup(GetOwner())) {
+			if (IsTargetValid(character) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
 				if (character->GetGroup() != nullptr && character->GetGroup()->HasMemebers()) {
 					SetTarget(character->GetGroup()->GetRandomMember());
 				}
@@ -171,7 +157,7 @@ void ABaseAIController::FindTarget() {
 			}
 		}
 	}
-	else if (weapon != NULL && GetOwner()->GetGroup() != NULL && GetOwner()->GetGroup()->HasMemebers()) {
+	else if (weapon != nullptr && GetOwner()->GetGroup() != nullptr && GetOwner()->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
 			if (UMiscLibrary::IsCharacterAlive(character) && UMiscLibrary::GetMissingHealth(character) > 0) {
 				SetTarget(character);

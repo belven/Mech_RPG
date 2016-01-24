@@ -1,6 +1,7 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
+#include "Mech_RPGCharacter.h"
 
 void AMagazineWeapon::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
@@ -8,7 +9,7 @@ void AMagazineWeapon::Tick(float DeltaTime) {
 		reloading = true;
 		StopFire();
 	}
-	
+
 	if (reloading) {
 		lastTime += DeltaTime;
 
@@ -23,6 +24,16 @@ void AMagazineWeapon::Tick(float DeltaTime) {
 			}
 		}
 	}
+}
+
+void AMagazineWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
+	Super::SetOwner(inOwner);
+	inOwner->OnOutOfCombat.AddUniqueDynamic(this, &AMagazineWeapon::FullReload);
+}
+
+void AMagazineWeapon::FullReload() {
+	reloading = false;
+	ammo = magazineSize;
 }
 
 bool AMagazineWeapon::CanFire() {

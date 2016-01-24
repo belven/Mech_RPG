@@ -15,12 +15,12 @@ void UTimedHealthChange::Activate(AMech_RPGCharacter* target, FVector targetLoca
 void UTimedHealthChange::TimeTick() {
 	if (UMiscLibrary::IsCharacterAlive(owner) && UMiscLibrary::IsCharacterAlive(target) && timeLeft > 0) {
 		timeLeft -= rate;
-		float amount = heals ? -changeAmount : changeAmount;
 
 		FHealthChange healthChange;
 		healthChange.damager = owner;
-		healthChange.healthChange = amount;
+		healthChange.healthChange = changeAmount;
 		healthChange.target = target;
+		healthChange.heals = heals;
 
 		target->ChangeHealth(healthChange);
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_TimeTick, this, &UTimedHealthChange::TimeTick, rate);
