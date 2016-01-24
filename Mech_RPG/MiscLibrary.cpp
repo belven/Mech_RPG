@@ -5,7 +5,7 @@
 #include "Mech_RPGPlayerController.h"
 
 UGroup* UMiscLibrary::playerGroup = nullptr;
-TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::difficulty = GameEnums::Easy;
+TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::difficulty = GameEnums::Hard;
 
 float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
 	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;

@@ -18,7 +18,7 @@ public:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
-		int32 spawnAmount;
+		int32 spawnAmount = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TSubclassOf<class AMech_RPGCharacter> classToSpawn;

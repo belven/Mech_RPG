@@ -6,11 +6,15 @@
 #pragma once
 #include "Engine.h"
 
+#define MIN(a,b) (a < b) ? (a) : (b)
+#define MAX(a,b) (a > b) ? (a) : (b)
+
 #include "Taunt.h"
 #include "Heal.h"
 #include "Snipe.h"
 #include "Grenade.h"
 #include "Disable.h"
+#include "Stun.h"
 #include "DamageBoost.h"
 #include "OrbitalStrike.h"
 #include "Immobilise.h"

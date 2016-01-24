@@ -16,14 +16,14 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/Character_Interface.Character_Interface_C"));
 
-	if (characterPaneClass.Class != NULL) {
+	if (characterPaneClass.Class != nullptr) {
 		WidgetTemplate = characterPaneClass.Class;
 	}
 
 }
 
 void AMech_RPGPlayerController::BeginPlay() {
-	if (WidgetTemplate != NULL) {
+	if (WidgetTemplate != nullptr) {
 		characterPane = CreateWidget<UUserWidget>(this, WidgetTemplate);
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
@@ -41,7 +41,7 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 	if (GetOwner()) {
 
 		// Is our owner demanding a character change
-		if (GetOwner()->GetDemandedController() != NULL) {
+		if (GetOwner()->GetDemandedController() != nullptr) {
 			SwapCharacter();
 		}
 
@@ -55,8 +55,8 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
 			rot.Pitch += panUp ? -1 : 1;
 
-			if (rot.Pitch < -80) {
-				rot.Pitch = -80;
+			if (rot.Pitch < -85) {
+				rot.Pitch = -85;
 			}
 			else if (rot.Pitch > 0) {
 				rot.Pitch = 0;
@@ -69,7 +69,7 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 		if (!GetOwner()->IsDead()) {
 			cursorTarget = GetTargetUnderCursor();
 
-			if (cursorTarget != NULL && !cursorTarget->IsDead()) {
+			if (cursorTarget != nullptr && !cursorTarget->IsDead()) {
 				CurrentMouseCursor = EMouseCursor::Crosshairs;
 			}
 			else {
@@ -88,6 +88,9 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			}
 			else if (IsTargetValid(target)) {
 				AttackTarget(DeltaTime);
+			}
+			else {
+				GetOwner()->OnStopFiring.Broadcast();
 			}
 		}
 		else {
@@ -111,10 +114,9 @@ void AMech_RPGPlayerController::MoveToLocation(FVector location) {
 }
 
 void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
-
 	// Are we targeting ourselves
 	if (target == GetOwner()) {
-		FireWeapon(NULL);
+		FireWeapon(nullptr);
 		GetOwner()->LookAt(target);
 	}
 	// Have we traced to another character or cover
@@ -131,7 +133,7 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 void AMech_RPGPlayerController::SetupCollision() {
 	collision.IgnoreComponents.Empty();
 
-	if (owner->GetGroup() != NULL && owner->GetGroup()->HasMemebers()) {
+	if (owner->GetGroup() != nullptr && owner->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
 			if (member != target && member != cursorTarget) {
 				collision.AddIgnoredActor(member);
@@ -149,10 +151,10 @@ void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
 	float distToTarget = FVector::Dist(GetOwner()->GetActorLocation(), target->GetActorLocation());
 
 	// Are we in weapons range
-	if (weapon != NULL && distToTarget <= weapon->GetRange()) {
+	if (weapon != nullptr && distToTarget <= weapon->GetRange()) {
 		if (GetOwner()->CanAttack() && weapon->CanFire()) {
 
-			bool isCover = hit != NULL ? IsCover(hit) : false;
+			bool isCover = hit != nullptr ? IsCover(hit) : false;
 
 			// Have we hit cover
 			if (isCover) {
@@ -281,7 +283,7 @@ void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation
 void AMech_RPGPlayerController::OnSetDestinationPressed() {
 	bMoveToMouseCursor = true;
 
-	target = NULL;
+	target = nullptr;
 	OnAttackReleased();
 	MoveToMouseCursor();
 }
@@ -368,11 +370,11 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 		AActor* targetFound;
 		targetFound = Hit.GetActor();
 
-		if (targetFound != NULL	&& IsMechCharacter(targetFound)) {
+		if (targetFound != nullptr	&& IsMechCharacter(targetFound)) {
 			return Cast<AMech_RPGCharacter>(targetFound);
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool AMech_RPGPlayerController::IsMechCharacter(AActor* character) {
@@ -384,7 +386,7 @@ bool AMech_RPGPlayerController::IsCover(AActor* character) {
 }
 
 bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
-	if (inTarget != NULL && !inTarget->IsDead()) {
+	if (inTarget != nullptr && !inTarget->IsDead()) {
 		if (GetOwner()->GetCurrentWeapon()) {
 			if (GetOwner()->GetCurrentWeapon()->Heals()) {
 				return inTarget->CompareGroup(owner);
@@ -399,11 +401,11 @@ bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 
 void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 	// Do we have an owner
-	if (GetOwner() != NULL) {
+	if (GetOwner() != nullptr) {
 		UGroup* group = GetOwner()->GetGroup();
 
 		// Does the owner have a group and is there more than 1 other person
-		if (group != NULL && group->GetMembers().Num() > 1) {
+		if (group != nullptr && group->GetMembers().Num() > 1) {
 
 			// Does the character we want to swawp to exist
 			if (group->GetMembers().Num() > index - 1) {
@@ -483,7 +485,7 @@ void AMech_RPGPlayerController::ActivateAbility() {
 		SetupCollision();
 
 		//We're targetting the ground so get selected location
-		if (cursorTarget == NULL) {
+		if (cursorTarget == nullptr) {
 			hit = GetHitFromCursor();
 			location = hit.bBlockingHit ? hit.ImpactPoint : FVector::ZeroVector;
 		}
@@ -498,7 +500,7 @@ void AMech_RPGPlayerController::ActivateAbility() {
 		}
 
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
-			if (ability != NULL && !ability->OnCooldown()) {
+			if (ability != nullptr && !ability->OnCooldown()) {
 				ability->Activate(cursorTarget, location);
 
 				if (ability->OnCooldown() || GetOwner()->Channelling()) {
@@ -523,22 +525,24 @@ void AMech_RPGPlayerController::PlayerDied() {
 }
 
 void AMech_RPGPlayerController::SwapCharacter() {
-	AAllyAIController* con = Cast<AAllyAIController>(GetOwner()->GetDemandedController());
-	AMech_RPGCharacter* other = con->GetOwner();
+	AAllyAIController* aiCon = Cast<AAllyAIController>(GetOwner()->GetDemandedController());
+	AMech_RPGCharacter* aiOwner = aiCon->GetOwner();
+	AMech_RPGCharacter* aiTarget = aiCon->GetTarget();
 
-	GetOwner()->SetDemandedController(NULL);
-	other->SetDemandedController(NULL);
+	GetOwner()->SetDemandedController(nullptr);
+	aiOwner->SetDemandedController(nullptr);
 
-	if (con != NULL) {
-		con->SetPlayerControlledLocation(FVector::ZeroVector);
-		con->Possess(GetOwner());
-		other->MirrorCamera(GetOwner());
-		Possess(other);
+	if (aiCon != nullptr) {
+		aiCon->SetTarget(GetTarget());
+		aiCon->SetPlayerControlledLocation(FVector::ZeroVector);
+		aiCon->Possess(GetOwner());
+		aiOwner->MirrorCamera(GetOwner());
+		Possess(aiOwner);
 	}
 }
 
 bool AMech_RPGPlayerController::IsOwnerValid() {
-	return GetOwner() != NULL && !GetOwner()->IsDead();
+	return GetOwner() != nullptr && !GetOwner()->IsDead();
 }
 
 void AMech_RPGPlayerController::AllyAbility(int index) {
@@ -548,7 +552,7 @@ void AMech_RPGPlayerController::AllyAbility(int index) {
 void AMech_RPGPlayerController::AllyAttack(int index) {
 	UGroup* group = GetOwner()->GetGroup();
 
-	if (group != NULL) {
+	if (group != nullptr) {
 		AMech_RPGCharacter* character = group->GetMember(index);
 		if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
@@ -564,7 +568,7 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 void AMech_RPGPlayerController::GroupAttack() {
 	UGroup* group = GetOwner()->GetGroup();
 
-	if (group != NULL) {
+	if (group != nullptr) {
 		for (AMech_RPGCharacter* character : group->GetMembers()) {
 			if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
 				AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
@@ -580,7 +584,7 @@ void AMech_RPGPlayerController::GroupAttack() {
 
 void AMech_RPGPlayerController::AllyMove(int index) {
 	UGroup* group = GetOwner()->GetGroup();
-	if (group != NULL) {
+	if (group != nullptr) {
 		AMech_RPGCharacter* character = group->GetMember(index);
 		if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
@@ -588,7 +592,7 @@ void AMech_RPGPlayerController::AllyMove(int index) {
 
 			GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
 
-			if (con != NULL && Hit.bBlockingHit) {
+			if (con != nullptr && Hit.bBlockingHit) {
 				con->SetPlayerControlledLocation(Hit.ImpactPoint);
 			}
 		}

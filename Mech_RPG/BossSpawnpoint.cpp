@@ -15,7 +15,7 @@ ABossSpawnpoint::ABossSpawnpoint() {
 		bossClass = ABoss::StaticClass();
 	}
 
-	static ConstructorHelpers::FClassFinder<ABossMechanic> MechanicClass(TEXT("/Game/TopDown/Blueprints/Bosses/Boss_Mehanics/Damage_Mechanic"));
+	static ConstructorHelpers::FClassFinder<ABossMechanic> MechanicClass(TEXT("/Game/TopDown/Blueprints/Bosses/Boss_Mehanics/Boss_Damage_Boost"));
 	if (MechanicClass.Succeeded()) {
 		mechanicClass = MechanicClass.Class;
 	}

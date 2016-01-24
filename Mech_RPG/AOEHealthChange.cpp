@@ -60,6 +60,7 @@ void  AAOEHealthChange::Activate() {
 				healthChange.healthChange = tempDamage;
 				healthChange.target = character;
 				healthChange.damageType = settings.damageType;
+				healthChange.heals = settings.heals;
 				character->ChangeHealth(healthChange);
 			}
 		}

@@ -8,7 +8,7 @@ void UAoEHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	if (!targetLocation.IsZero()) {
 		FTempAOESettings settings;
 		settings.affectedTeam = GetAffectedTeam();
-		settings.healthChange = -healAmount;
+		settings.healthChange = healAmount;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 0.5;
@@ -17,6 +17,7 @@ void UAoEHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		settings.damageType = DamageEnums::Blast;
 		settings.duration = 3;
 		settings.usesTarget = false;
+		settings.heals = true;
 		AAOEHealthChange::CreateAOEHealthChange(settings);
 		SetOnCooldown(owner->GetWorld());
 	}

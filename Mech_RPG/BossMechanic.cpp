@@ -11,7 +11,7 @@ void ABossMechanic::BeginPlay() {
 	Super::BeginPlay();
 
 	for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(1200, this)) {
-		if (character != NULL && character->GetClass()->IsChildOf(ABoss::StaticClass())) {
+		if (character != nullptr && character->GetClass()->IsChildOf(ABoss::StaticClass())) {
 			ABoss* boss = Cast<ABoss>(character);
 			SetBoss(boss);
 			break;

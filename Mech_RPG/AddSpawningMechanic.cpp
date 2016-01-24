@@ -23,29 +23,29 @@ void AAddSpawningMechanic::Tick(float DeltaTime) {
 void AAddSpawningMechanic::BeginPlay() {
 	Super::BeginPlay();
 
-	if (GetBoss() != NULL) {
-		if (trigger != NULL) {
-			trigger->OnSpawnTrigger.AddUniqueDynamic(this, &AAddSpawningMechanic::TriggerSpawn);
-			trigger->SetBoss(GetBoss());
-			trigger->SetAmount(spawnAmount);
+	if (GetBoss() != nullptr) {
+		if (trigger == nullptr) {
+			trigger = UDamageSpawnTrigger::CreateDamageSpawnTrigger(GetBoss(), spawnAmount, 0.15);
 		}
+
+		trigger->OnSpawnTrigger.AddUniqueDynamic(this, &AAddSpawningMechanic::TriggerSpawn);
+		trigger->SetBoss(GetBoss());
+		trigger->SetAmount(spawnAmount);
 	}
 }
 
 void AAddSpawningMechanic::SetBoss(ABoss* newVal) {
 	Super::SetBoss(newVal);
-	if (trigger != NULL && trigger->GetBoss() == NULL && newVal != NULL) {
-		trigger->SetBoss(GetBoss());
-	}
 }
 
 void AAddSpawningMechanic::TriggerSpawn() {
-	if (classToSpawn != NULL && !IsDead()) {
+	if (classToSpawn != nullptr && !IsDead()) {
 		FNavLocation nav;
 		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
 		nav.Location.Z = GetActorLocation().Z;
 		AMech_RPGCharacter* character = GetWorld()->SpawnActor<AMech_RPGCharacter>(classToSpawn, nav.Location, GetActorRotation());
-		character != NULL ? character->SpawnDefaultController() : true;
+		character != nullptr ? character->SpawnDefaultController() : true;
+		character->CreatePresetRole((GroupEnums::Role)UMiscLibrary::GetRandomEnum(GroupEnums::End));
 		spawnAmount--;
 	}
 }

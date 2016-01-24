@@ -71,7 +71,7 @@ float AWeapon::GetProgressBarPercent() {
 void AWeapon::Fire(AMech_RPGCharacter* target) {
 	FHealthChange healthChange;
 	float changeAmount = GetChangeAmount() * GetOwner()->GetDamageModifier();
-	bool isCrit = settings.critChance <= rand() % 100;
+	bool isCrit = rand() % 100 <= settings.critChance;
 
 	if (isCrit) {
 		changeAmount = changeAmount * 2;

@@ -12,17 +12,16 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
 	int armourValue = 5;
 
 	Reset();
-	SetHealthRegen(10.0);
 
 	switch (UMiscLibrary::GetDifficulty()) {
 	case GameEnums::Easy:
-		statModifier = 0.2;
+		GetModifierForDifficulty(GameEnums::Hard);
 		break;
 	case GameEnums::Medium:
-		statModifier = 0.3;
+		GetModifierForDifficulty(GameEnums::Medium);
 		break;
 	case GameEnums::Hard:
-		statModifier = 0.4;
+		GetModifierForDifficulty(GameEnums::Easy);
 		break;
 	}
 
