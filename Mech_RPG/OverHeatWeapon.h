@@ -19,7 +19,7 @@ UCLASS()
 class MECH_RPG_API AOverHeatWeapon : public AWeapon {
 	GENERATED_BODY()
 
-private:
+protected:
 	bool overHeated = false;
 	float heatLevel = 0;
 	float heatLosePerTick = 0.05;

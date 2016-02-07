@@ -6,6 +6,7 @@
 #include "MiscLibrary.generated.h"
 
 
+#define mIsChildOf(inUObject, checkClass) UMiscLibrary::IsChildOf(inUObject, checkClass)
 
 UENUM(BlueprintType)
 namespace GameEnums {
@@ -64,6 +65,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static bool IsMechCharacter(AActor* character);
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static bool IsChildOf(UObject* object, UClass* inClass);
 
 	static int GetRandomEnum(int end);
 

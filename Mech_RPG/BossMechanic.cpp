@@ -14,6 +14,7 @@ void ABossMechanic::BeginPlay() {
 		if (character != nullptr && character->GetClass()->IsChildOf(ABoss::StaticClass())) {
 			ABoss* boss = Cast<ABoss>(character);
 			SetBoss(boss);
+			SetGroup(GetBoss()->GetGroup());
 			break;
 		}
 	}
@@ -27,7 +28,7 @@ void ABossMechanic::SetBoss(ABoss* newVal) {
 	boss = newVal;
 }
 
-void ABossMechanic::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole)
+void ABossMechanic::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility)
 {
 	AMech_RPGCharacter::CreatePresetRole(inRole);
 

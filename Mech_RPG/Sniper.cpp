@@ -22,12 +22,8 @@ ASniper* ASniper::CreateSniper(AMech_RPGCharacter* inOwner) {
 		magSettings.critChance = 45;
 
 		ASniper* weapon = inOwner->GetWorld()->SpawnActor<ASniper>(ASniper::StaticClass());
-		weapon->settings = magSettings;
-		weapon->canFire = true;
-		//weapon->AttachRootComponentToActor(inOwner);
-		weapon->lastTime = 0;
+		weapon->SetSettings(magSettings);
 		weapon->SetOwner(inOwner);
-		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
 	return NULL;

@@ -7,7 +7,7 @@
 void UDamageBoost::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 	SetOnCooldown(owner->GetWorld());
 	owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_DamageBoostEnded, this, &UDamageBoost::ResetDamageBoost, GetCooldown() * 0.5);
-	owner->SetDamageModifier(owner->GetDamageModifier() + damageMultiplier);
+	owner->SetHealthChangeModifier(owner->GetHealthChangeModifier() + damageMultiplier);
 }
 
 UDamageBoost* UDamageBoost::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDamageMultiplier) {
@@ -19,5 +19,5 @@ UDamageBoost* UDamageBoost::CreateAbility(float cooldown, AMech_RPGCharacter* ow
 }
 
 void  UDamageBoost::ResetDamageBoost() {
-	owner->SetDamageModifier(owner->GetDamageModifier() - damageMultiplier);
+	owner->SetHealthChangeModifier(owner->GetHealthChangeModifier() - damageMultiplier);
 }

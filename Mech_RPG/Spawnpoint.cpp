@@ -11,31 +11,40 @@ ASpawnpoint::ASpawnpoint() {
 	}
 }
 
+AMech_RPGCharacter* ASpawnpoint::SpawnCharacter(TSubclassOf<class AMech_RPGCharacter> spawnClass, int spawnRadius) {
+	FNavLocation nav;
+	AMech_RPGCharacter* character = nullptr;
+	int count = 0;	
+	
+	while (character == nullptr && count < 10) {
+		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), spawnRadius, nav);
+		character = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(GetWorld(), nav.Location, GetActorRotation(), spawnClass);
+		count++;
+	}
+	return character;
+}
+
+void ASpawnpoint::SetUpCharacter(AMech_RPGCharacter* character, UGroup* group, GroupEnums::Role role) {
+	FVector loc;
+	character->team = team;
+	loc = character->GetActorLocation();
+	loc.Z += (character->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
+	character->SetActorLocation(loc);
+	character->SetGroup(group);
+	character->CreatePresetRole(role);
+}
+
 void ASpawnpoint::BeginPlay() {
 	Super::BeginPlay();
-	FVector loc;
-	FNavLocation nav;
 	bool healerSpawned = false;
+	UGroup* group = UGroup::CreateGroup(team);
 
 	for (int i = 0; i < spawnAmount; i++) {
-		if (GetWorld() != NULL) {
-			AMech_RPGCharacter* character = NULL;
-			int count = 0;
+		if (GetWorld() != nullptr) {
+			AMech_RPGCharacter* character = SpawnCharacter(classToSpawn, 400); 
+			GroupEnums::Role role = UGroup::GetRandomRole();
 
-			while (character == NULL && count < 10) {
-				GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
-				character = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(GetWorld(), nav.Location, GetActorRotation(), classToSpawn);
-				character->team = team;
-				count++;
-			}
-
-			if (character != NULL) {
-				loc = character->GetActorLocation();
-				loc.Z += (character->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
-				character->SetActorLocation(loc);
-
-				GroupEnums::Role role = UGroup::GetRandomRole();
-
+			if (character != nullptr) {
 				if (role == GroupEnums::Healer) {
 					if (!healerSpawned) {
 						healerSpawned = true;
@@ -47,7 +56,7 @@ void ASpawnpoint::BeginPlay() {
 					}
 				}
 
-				character->CreatePresetRole(role);
+				SetUpCharacter(character, group, role);
 			}
 		}
 	}

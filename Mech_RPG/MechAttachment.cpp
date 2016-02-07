@@ -9,13 +9,33 @@
 /**
  * Sets default values for this actor's properties
  */
-AMechAttachment::AMechAttachment()
+AMechAttachment::AMechAttachment() : Super()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	meshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MechAttachment_MeshComponent"));
 
+}
+
+int32 AMechAttachment::GetGrade()
+{
+	return grade;
+}
+
+int32 AMechAttachment::GetQuality()
+{
+	return quality;
+}
+
+void AMechAttachment::SetGrade(int32 newGrade)
+{
+	grade = newGrade;
+}
+
+void AMechAttachment::SetQuality(int32 newQuality)
+{
+	quality = newQuality;
 }
 
 AMech_RPGCharacter * AMechAttachment::GetOwner()

@@ -6,7 +6,7 @@ TEnumAsByte<GroupEnums::Role> ABoss::GetRandomRole() {
 	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
 }
 
-void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
+void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole , int32 grade , int32 quaility) {
 	FMagazineWeaponParams params;
 	float statModifier = 0;
 	int armourValue = 5;
@@ -38,7 +38,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
 		AddAbility(UDamageBoost::CreateAbility(7, this, 0.5));
 		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 400.0F), 2, true, true));
 		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1 + statModifier);
+		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
 		break;
@@ -51,7 +51,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
 		AddAbility(UTaunt::CreateAbility(5, this));
 		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UImmobilise::CreateAbility(10, this, 5), 2.5, true, true));
 		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1 + statModifier);
+		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
 		break;
@@ -66,7 +66,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
 		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(this, params));
 		AddAbility(USnipe::CreateAbility(7, this));
 		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1 + statModifier);
+		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
 		break;
@@ -76,7 +76,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
 		AddAbility(UHeal::CreateAbility(5, this, 800));
 		AddAbility(UDisable::CreateDisable(10, this, 5));
 		SetDefenceModifier(0 + statModifier);
-		SetDamageModifier(1 + statModifier);
+		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
 		break;

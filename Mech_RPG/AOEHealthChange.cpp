@@ -69,5 +69,6 @@ void  AAOEHealthChange::Activate() {
 	}
 	else {
 		partclSystem->Deactivate();
+		Destroy();
 	}
 }

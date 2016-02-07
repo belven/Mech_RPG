@@ -17,6 +17,7 @@ class MECH_RPG_API UCritBoost : public UAbility
 private:
 	float critMultiplier;
 	class AWeapon* weaponAffected;
+	int count;
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
@@ -24,6 +25,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		static UCritBoost* CreateCritBoost(float cooldown, AMech_RPGCharacter* owner, float inCritMultiplier);
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		void OwnerFired();
 
 	void ResetCritBoost();
 

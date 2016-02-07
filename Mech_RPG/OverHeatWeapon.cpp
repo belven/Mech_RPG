@@ -71,16 +71,10 @@ void AOverHeatWeapon::Fire(AMech_RPGCharacter* target) {
 AOverHeatWeapon* AOverHeatWeapon::CreateOverHeatWeapon(AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings) {
 	if (inOwner && inOwner->GetWorld()) {
 		AOverHeatWeapon* weapon = inOwner->GetWorld()->SpawnActor<AOverHeatWeapon>(AOverHeatWeapon::StaticClass());
-		weapon->settings = inSettings;
-		weapon->canFire = true;
-		weapon->AttachRootComponentToActor(inOwner);
-		weapon->lastTime = 0;
-		weapon->overHeated = false;
-		weapon->heatLevel = 0;
+		weapon->SetSettings(inSettings);
 		weapon->heatLosePerTick = inSettings.heatLosePerTick;
 		weapon->heatGenerated = inSettings.heatGenerated;
 		weapon->SetOwner(inOwner);
-		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
 	return NULL;

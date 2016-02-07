@@ -12,9 +12,22 @@ namespace WeaponEnums {
 	};
 }
 
+UENUM(BlueprintType)
+namespace QualityEnums {
+	enum Quality {
+		Base,
+		Iron,
+		Steel,
+		Titianium,
+		Unobtainium,
+		End
+	};
+}
+
 #pragma once
 #include "MechAttachment.h"
 #include "Armour.h"
+#include "MiscLibrary.h"
 #include "Weapon.generated.h"
 
 
@@ -34,15 +47,22 @@ public:
 		bool heals = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 		TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		TEnumAsByte<QualityEnums::Quality> quality = (QualityEnums::Quality) UMiscLibrary::GetRandomEnum(QualityEnums::End);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		int32 grade = rand() % 2;
+
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFired);
 
 UCLASS(Blueprintable)
 class MECH_RPG_API AWeapon : public AMechAttachment {
 	GENERATED_BODY()
 protected:
 	FWeaponParams settings;
-	bool canFire;
-	float lastTime;
+	bool canFire = true;
+	float lastTime = 0;
 public:
 	AWeapon();
 	float GetChangeAmount();
@@ -56,8 +76,8 @@ public:
 
 	virtual bool CanFire();
 	virtual void Fire(class AMech_RPGCharacter* targetr);
-	virtual void Fire(class ACover* target);	
-	
+	virtual void Fire(class ACover* target);
+
 	virtual	void SetOwner(AMech_RPGCharacter* inOwner) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
@@ -65,6 +85,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		static AWeapon* CreateWeapon(AMech_RPGCharacter* inOwner, FWeaponParams inSettings);
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FFired OnFire;
 
 	float GetFireRate();
 	void SetFireRate(float newVal);
@@ -76,11 +99,13 @@ public:
 	bool Heals();
 	void SetHeals(bool newVal);
 
+	void SetSettings(FWeaponParams newSettings);
+
 	DamageEnums::DamageType GetChangeAmountType();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AWeapon* CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type = WeaponEnums::SMG);
+		static AWeapon* CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type = WeaponEnums::SMG, int32 grade = 0, int32 quality = 0);
 };

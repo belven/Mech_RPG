@@ -6,6 +6,8 @@
 #include "HealMechanic.h"
 #include "DamageBoostMechanic.h"
 
+#define loop(i, max) for(i = 0; i < max; i++)
+
 ABossSpawnpoint::ABossSpawnpoint() {
 	static ConstructorHelpers::FClassFinder<ABoss> BossClass(TEXT("/Game/TopDown/Blueprints/Bosses/Boss"));
 	if (BossClass.Succeeded()) {
@@ -25,16 +27,14 @@ ABossSpawnpoint::ABossSpawnpoint() {
 }
 
 void ABossSpawnpoint::BeginPlay() {
-	FNavLocation nav;
-	FVector loc = GetActorLocation();
+	int i;
 	GroupEnums::Role role = UGroup::GetRandomRole();
 	GroupEnums::Role bossRole = ABoss::GetRandomRole();
+	UGroup* group = UGroup::CreateGroup(team);
 
 	bool healerSpawned = false;
 
-	ABoss* character = UMiscLibrary::SpawnCharacter<ABoss>(GetWorld(), GetActorLocation(), GetActorRotation(), bossClass);
-
-	character->team = team;
+	ABoss* character = dynamic_cast<ABoss*>(SpawnCharacter(bossClass, 400));
 
 	if (bossRole == GroupEnums::Healer) {
 		if (!healerSpawned) {
@@ -42,22 +42,12 @@ void ABossSpawnpoint::BeginPlay() {
 		}
 	}
 
-	loc = character->GetActorLocation();
-	loc.Z += (character->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
-	character->SetActorLocation(loc);
-	
-	character->CreatePresetRole(bossRole);
+	SetUpCharacter(character, group, bossRole);
 
-	for (int i = 0; i < amountOfMechanics; i++) {
-		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
-		ABossMechanic* character = UMiscLibrary::SpawnCharacter<ABossMechanic>(GetWorld(), nav.Location, GetActorRotation(), mechanicClass);
-		character->team = team;
-		loc = character->GetActorLocation();
-		
-		loc.Z += (character->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
-		character->SetActorLocation(loc);
+	loop(i, amountOfMechanics) {
+		ABossMechanic* character = dynamic_cast<ABossMechanic*>(SpawnCharacter(mechanicClass, 400)) ;
 
-		if (role == GroupEnums::Healer ) {
+		if (role == GroupEnums::Healer) {
 			if (!healerSpawned) {
 				healerSpawned = true;
 			}
@@ -68,7 +58,7 @@ void ABossSpawnpoint::BeginPlay() {
 			}
 		}
 
-		character->CreatePresetRole(role);
+		SetUpCharacter(character, group, role);
 	}
 
 	if (spawnAdds) {

@@ -13,7 +13,7 @@ void UTargetedHealthChange::Activate(AMech_RPGCharacter* target, FVector targetL
 
 		healthChange.damager = owner;
 		healthChange.target = target;
-		healthChange.weaponUsed = NULL;
+		healthChange.weaponUsed = nullptr;
 		healthChange.healthChange = changeAmount;
 
 		target->ChangeHealth(healthChange);

@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Stats")
 		ESlateVisibility GetChannelBarVis();
 
+	UFUNCTION(BlueprintCallable, Category = "Stats")
+		FText GetRoleText();
+
 	void SetOwner(class AMech_RPGCharacter* newOwner);
 
 	void Tick(float DeltaTime);

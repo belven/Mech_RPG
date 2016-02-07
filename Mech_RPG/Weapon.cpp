@@ -7,19 +7,23 @@
 #include "SMG.h"
 #include "Shotgun.h"
 #include "Sniper.h"
+#include "Bio_Rifle.h"
 
-AWeapon::AWeapon() {
+AWeapon::AWeapon() : Super() {
 	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ArbitraryParticleName"));
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/Bio_beam"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/Gun_Flash"));
 	if (ParticleSystemClass.Succeeded()) {
 		partclSystem->Template = ParticleSystemClass.Object;
 		partclSystem->bAutoActivate = false;
+		partclSystem->SetActorParameter(FName(TEXT("BeamSource")), this);
 	}
 }
 
 float AWeapon::GetChangeAmount() {
-	return settings.healthChange;
+	float tempDamage = settings.healthChange * (1 + (GetGrade() * 0.25));
+	tempDamage *= (1 + (GetQuality() * 0.07));
+	return tempDamage;
 }
 
 float AWeapon::GetRange() {
@@ -45,15 +49,11 @@ DamageEnums::DamageType AWeapon::GetChangeAmountType() {
 AWeapon* AWeapon::CreateWeapon(AMech_RPGCharacter* inOwner, FWeaponParams inSettings) {
 	if (inOwner && inOwner->GetWorld()) {
 		AWeapon* weapon = inOwner->GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass());
-		weapon->settings = inSettings;
-		weapon->canFire = true;
-		weapon->AttachRootComponentToActor(inOwner);
-		weapon->lastTime = 0;
+		weapon->SetSettings(inSettings);
 		weapon->SetOwner(inOwner);
-		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void AWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
@@ -62,6 +62,9 @@ void AWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
 	if (partclSystem != nullptr) {
 		partclSystem->AttachTo(inOwner->GetRootComponent());
 	}
+
+	inOwner->OnStopFiring.AddDynamic(this, &AWeapon::StopFire);
+	AttachRootComponentToActor(inOwner);
 }
 
 float AWeapon::GetProgressBarPercent() {
@@ -70,16 +73,17 @@ float AWeapon::GetProgressBarPercent() {
 
 void AWeapon::Fire(AMech_RPGCharacter* target) {
 	FHealthChange healthChange;
-	float changeAmount = GetChangeAmount() * GetOwner()->GetDamageModifier();
+	float changeAmount = GetChangeAmount() * GetOwner()->GetHealthChangeModifier();
 	bool isCrit = rand() % 100 <= settings.critChance;
 
 	if (isCrit) {
 		changeAmount = changeAmount * 2;
 	}
 
-	if (partclSystem != NULL && !partclSystem->IsActive()) {
+	if (partclSystem != nullptr && !partclSystem->IsActive()) {
 		partclSystem->Activate(true);
 		partclSystem->ActivateSystem(true);
+		partclSystem->SetActorParameter(FName(TEXT("BeamTarget")), target);
 	}
 
 	healthChange.damager = GetOwner();
@@ -91,11 +95,15 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 
 	target->ChangeHealth(healthChange);
 	canFire = false;
+
+	if (OnFire.IsBound()) {
+		OnFire.Broadcast();
+	}
 }
 
 void AWeapon::Fire(ACover* target) {
 	FHealthChange healthChange;
-	float changeAmount = GetChangeAmount()  * GetOwner()->GetDamageModifier();
+	float changeAmount = GetChangeAmount()  * GetOwner()->GetHealthChangeModifier();
 
 	healthChange.damager = GetOwner();
 	//healthChange.target = target;
@@ -109,8 +117,8 @@ void AWeapon::Fire(ACover* target) {
 
 void AWeapon::StopFire()
 {
-	if (partclSystem != NULL) {
-		partclSystem->DeactivateSystem();
+	if (partclSystem != nullptr) {
+		partclSystem->Deactivate();
 	}
 }
 
@@ -149,32 +157,39 @@ void AWeapon::SetHeals(bool newVal) {
 	settings.heals = newVal;
 }
 
-AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type) {
+void AWeapon::SetSettings(FWeaponParams newSettings)
+{
+	settings = newSettings;
+}
+
+AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type, int32 grade, int32 quality) {
 	FMagazineWeaponParams magSettings;
-	FOverheatWeaponParams overheatSettings;
+	AWeapon* weapon = nullptr;
 
 	switch (type) {
 	case WeaponEnums::SMG:
-		return ASMG::CreateSMG(inOwner);
+		weapon = ASMG::CreateSMG(inOwner);
+		break;
 	case WeaponEnums::Bio_Repair:
-		overheatSettings.healthChange = 40;
-		overheatSettings.range = 600;
-		overheatSettings.fireRate = 0.3;
-		overheatSettings.heals = true;
-		overheatSettings.heatLosePerTick = 0.05;
-		overheatSettings.heatGenerated = 0.05;
-		return AOverHeatWeapon::CreateOverHeatWeapon(inOwner, overheatSettings);
+		weapon = ABio_Rifle::CreateBioRifle(inOwner);
+		break;
 	case WeaponEnums::RPG:
 		magSettings.healthChange = 500;
 		magSettings.range = 1300;
 		magSettings.fireRate = 2.5;
 		magSettings.heals = false;
-		return CreateWeapon(inOwner, magSettings);
+		weapon = CreateWeapon(inOwner, magSettings);
+		break;
 	case WeaponEnums::Shotgun:
-		return AShotgun::CreateShotgun(inOwner);
+		weapon = AShotgun::CreateShotgun(inOwner);
+		break;
 	case WeaponEnums::Sniper:
-		return ASniper::CreateSniper(inOwner);
+		weapon = ASniper::CreateSniper(inOwner);
+		break;
 	}
 
-	return  NULL;
+	weapon->SetGrade(grade);
+	weapon->SetQuality(quality);
+
+	return weapon;
 }

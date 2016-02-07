@@ -4,6 +4,7 @@
 #include "MiscLibrary.h"
 #include "Mech_RPGPlayerController.h"
 
+
 UGroup* UMiscLibrary::playerGroup = nullptr;
 TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::difficulty = GameEnums::Hard;
 
@@ -61,8 +62,7 @@ UGroup* UMiscLibrary::GetPlayerGroup() {
 		if (IsCharacterAlive(character)
 			&& IsValid(character)
 			&& character->IsValidLowLevel()
-			&& character->GetController() != nullptr
-			&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
+			&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
 			return character->GetGroup();
 		}
 	}
@@ -76,8 +76,7 @@ AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
 		if (IsCharacterAlive(character)
 			&& IsValid(character)
 			&& character->IsValidLowLevel()
-			&& character->GetController() != nullptr
-			&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
+			&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
 			return character;
 		}
 	}
@@ -127,11 +126,11 @@ TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, FVec
 }
 
 bool UMiscLibrary::IsCover(AActor* character) {
-	return character->GetClass()->IsChildOf(ACover::StaticClass());
+	return mIsChildOf(character, ACover::StaticClass());
 }
 
 bool UMiscLibrary::IsMechCharacter(AActor* character) {
-	return character->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass());
+	return mIsChildOf(character, AMech_RPGCharacter::StaticClass());
 }
 
 template<class T>
@@ -153,6 +152,11 @@ T* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotati
 	else return nullptr;
 }
 
+
+bool UMiscLibrary::IsChildOf(UObject* object, UClass* inClass)
+{
+	return object != nullptr ? object->GetClass()->IsChildOf(inClass) : false;
+}
 
 int UMiscLibrary::GetRandomEnum(int end) {
 	return rand() % (end - 1);

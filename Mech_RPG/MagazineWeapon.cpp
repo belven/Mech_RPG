@@ -61,16 +61,11 @@ void AMagazineWeapon::Fire(AMech_RPGCharacter* target) {
 AMagazineWeapon* AMagazineWeapon::CreateMagazineWeapon(AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings) {
 	if (inOwner && inOwner->GetWorld()) {
 		AMagazineWeapon* weapon = inOwner->GetWorld()->SpawnActor<AMagazineWeapon>(AMagazineWeapon::StaticClass());
-		weapon->settings = inSettings;
-		weapon->canFire = true;
-		weapon->AttachRootComponentToActor(inOwner);
-		weapon->lastTime = 0;
+		weapon->SetSettings(inSettings);
 		weapon->magazineSize = inSettings.magazineSize;
 		weapon->reloadAmount = inSettings.reloadAmount;
 		weapon->ammo = inSettings.magazineSize;
-		weapon->reloading = false;
 		weapon->SetOwner(inOwner);
-		weapon->GetOwner()->OnStopFiring.AddDynamic(weapon, &AWeapon::StopFire);
 		return weapon;
 	}
 	return NULL;

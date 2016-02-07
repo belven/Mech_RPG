@@ -9,6 +9,11 @@ float UFloatingStats_BP::GetHealthBarPercent()
 	return owner != nullptr ? UMiscLibrary::GetHealthPercent(owner) : 0.0f;
 }
 
+FText UFloatingStats_BP::GetRoleText()
+{
+	return owner != nullptr ? FindObject<UEnum>(ANY_PACKAGE, TEXT("GroupEnums"), true)->GetDisplayNameText(owner->GetRole()) : FText();
+}
+
 float UFloatingStats_BP::GetCastBarPercent()
 {
 	if (UMiscLibrary::IsCharacterAlive(owner) && owner->Channelling()) {

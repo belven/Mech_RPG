@@ -82,7 +82,7 @@ void UChannelledAbility::ActiveChannelAbility() {
 		currentChannelTime = 0;
 		owner->ApplyCrowdControl(EffectEnums::Move, true);
 		owner->ApplyCrowdControl(EffectEnums::Attack, true);
-		targetCharacter = NULL;
+		targetCharacter = nullptr;
 		targetLocation = FVector::ZeroVector;
 	}
 }
@@ -90,7 +90,7 @@ void UChannelledAbility::ActiveChannelAbility() {
 bool UChannelledAbility::PerformLineTrace() {
 	collision.IgnoreComponents.Empty();
 
-	if (owner->GetGroup() != NULL && owner->GetGroup()->HasMemebers()) {
+	if (owner->GetGroup() != nullptr && owner->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
 			if (member != targetCharacter) {
 				collision.AddIgnoredActor(member);
@@ -100,7 +100,7 @@ bool UChannelledAbility::PerformLineTrace() {
 
 	owner->GetWorld()->LineTraceSingleByObjectType(hit, owner->GetActorLocation(), targetLocation, objectCollision, collision);
 
-	bool targetTraced = hit.bBlockingHit && hit.GetActor() != NULL;
+	bool targetTraced = hit.bBlockingHit && hit.GetActor() != nullptr;
 	bool affectsAllies = abilityToActivate->GetAffectedTeam() == AOEEnums::Ally;
 
 	if (targetTraced && UMiscLibrary::IsMechCharacter(hit.GetActor())) {

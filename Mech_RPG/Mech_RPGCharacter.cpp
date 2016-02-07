@@ -8,13 +8,19 @@
 #include "Mech_RPGPlayerController.h"
 #include "Navigation/CrowdFollowingComponent.h"
 
+#define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(this, type, grade, quailty)
+#define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
+#define mCreateChannelledAbility(ability, Duration, loc, trace) UChannelledAbility::CreateChannelledAbility(this, ability, Duration, loc, trace)
+#define mCreatePresetRole(role) AMech_RPGCharacter::CreatePresetRole(role)
+
 TArray<AMech_RPGCharacter*> AMech_RPGCharacter::characters;
+bool AMech_RPGCharacter::settingUpGroups = false;
 
 AMech_RPGCharacter::AMech_RPGCharacter() {
 	static int32 ID = 0;
 	SetID(ID++);
 	SetActorTickEnabled(true);
-	
+
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
@@ -44,7 +50,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
 	startingRole = GroupEnums::DPS;
-	damageModifier = 1;
+	healthChangeModifier = 1;
 	defenceModifier = 0;
 	movementModifier = 1.0;
 
@@ -75,12 +81,6 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	AIControllerClass = ABaseAIController::StaticClass();
 }
 
-
-UWidgetComponent * AMech_RPGCharacter::GetStats()
-{
-	return stats;
-}
-
 AMech_RPGCharacter::~AMech_RPGCharacter() {
 	characters.Remove(this);
 	abilities.Empty();
@@ -90,10 +90,6 @@ AMech_RPGCharacter::~AMech_RPGCharacter() {
 	//if (stats != nullptr) {
 	//	delete stats;
 	//}
-}
-
-const TArray<AMech_RPGCharacter*>& AMech_RPGCharacter::GetCharacters() {
-	return characters;
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -144,8 +140,7 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 
 void AMech_RPGCharacter::BeginPlay() {
 	Super::BeginPlay();
-
-	channeling = false;
+	Reset();
 
 
 	if (!UseLoadout) {
@@ -183,18 +178,12 @@ void AMech_RPGCharacter::BeginPlay() {
 	}
 }
 
-TArray<UArmour*>& AMech_RPGCharacter::GetArmour() {
-	return armour;
-}
-
 UArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
 	for (UArmour* armour : GetArmour()) {
 		if (armour != nullptr && armour->GetArmourPosition() == pos) return armour;
 	}
 	return nullptr;
 }
-
-bool AMech_RPGCharacter::settingUpGroups = false;
 
 void AMech_RPGCharacter::SetUpGroup() {
 	if (group == nullptr) {
@@ -203,7 +192,6 @@ void AMech_RPGCharacter::SetUpGroup() {
 		for (AMech_RPGCharacter* character : charactersFound) {
 			if (character != this && character->team == team && character->GetGroup() != nullptr) {
 				SetGroup(character->GetGroup());
-				GetGroup()->AddMemeber(this);
 				break;
 			}
 		}
@@ -211,7 +199,6 @@ void AMech_RPGCharacter::SetUpGroup() {
 
 	if (group == nullptr) {
 		SetGroup(UGroup::CreateGroup(team));
-		group->AddMemeber(this);
 	}
 
 	ABaseAIController* con = Cast<ABaseAIController>(Controller);
@@ -245,9 +232,15 @@ void AMech_RPGCharacter::ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl
 void AMech_RPGCharacter::SwapWeapon() {
 	if (weapons.Num() > 1) {
 		if (weapons[0] == currentWeapon) {
+			if (OnSwappedWeapons.IsBound()) {
+				OnSwappedWeapons.Broadcast(currentWeapon, weapons[1]);
+			}
 			currentWeapon = weapons[1];
 		}
 		else {
+			if (OnSwappedWeapons.IsBound()) {
+				OnSwappedWeapons.Broadcast(currentWeapon, weapons[0]);
+			}
 			currentWeapon = weapons[0];
 		}
 	}
@@ -263,7 +256,7 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 }
 
 void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
-	if (GetGroup() != nullptr) {
+	if (GetGroup() != nullptr && !CompareGroup(healthChange.damager)) {
 		GetGroup()->GroupMemberHit(healthChange.damager, this);
 	}
 
@@ -316,6 +309,13 @@ void AMech_RPGCharacter::Reset()
 	abilities.Empty();
 	armour.Empty();
 	SetHealth(GetMaxHealth());
+
+	channeling = false;
+	SetDead(false);
+	OutOfCombat();
+	canAttack = 0;
+	canMove = 0;
+	canBeDamaged = 0;
 }
 
 void AMech_RPGCharacter::OutOfCombat() {
@@ -332,11 +332,6 @@ void AMech_RPGCharacter::OutOfCombat() {
 	}
 }
 
-bool AMech_RPGCharacter::GetInCombat()
-{
-	return inCombat;
-}
-
 void AMech_RPGCharacter::LookAt(AMech_RPGCharacter * other)
 {
 	FRotator rotation = GetActorRotation();
@@ -349,19 +344,18 @@ void AMech_RPGCharacter::LookAt(AMech_RPGCharacter * other)
 	SetActorRotation(rotation);
 }
 
-void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
-	if (newWeapon) {
-		weapons.Add(newWeapon);
-	}
-}
+void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility) {
+	static float armourValue = 5;
+	static float statModifier = 0;
+	static float lowHealth = 2000;
+	static float mediumHealth = lowHealth * 1.25;
+	static float highHealth = mediumHealth * 1.25;
+	startingRole = inRole;
 
-void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) {
 	Reset();
-	float armourValue = 5;
-	float statModifier = 0;
 
-	bool isPlayer = GetController() != nullptr ? GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass()) : false;
-	bool isAlly = GetController() != nullptr ? GetController()->GetClass()->IsChildOf(AAllyAIController::StaticClass()) : false;
+	bool isPlayer = mIsChildOf(GetController(), AMech_RPGPlayerController::StaticClass());
+	bool isAlly = mIsChildOf(GetController(), AAllyAIController::StaticClass());
 
 	if (isAlly || isPlayer) {
 		statModifier = GetModifierForDifficulty(UMiscLibrary::GetDifficulty());
@@ -369,64 +363,55 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 
 	switch (inRole) {
 	case GroupEnums::DPS:
-		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::SMG));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UGrenade::CreateAbility(7.0F, this, 450.0F), 1.0F, true));
+		AddWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, quaility));
+		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.0F, true, false));
 		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 200.0F));
 		SetDefenceModifier(0.0F + statModifier);
-		SetDamageModifier(1.0F + statModifier);
+		SetHealthChangeModifier(1.0F + statModifier);
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
-		SetMaxHealth(2500 * (1 + statModifier));
+		SetMaxHealth(lowHealth * (1 + statModifier));
 		break;
 
 	case GroupEnums::Healer:
-		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
-		AddAbility(UHeal::CreateAbility(15.0F, this, 500.0F));
-		AddAbility(UAoEHeal::CreateAbility(20.0F, this, 0.1F));
+		AddWeapon(mCreatePresetWeapon(WeaponEnums::Bio_Repair, grade, quaility));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Heal));
+		AddAbility(mCreatePresetAbility(AbilityEnums::AoEHeal));
 		SetDefenceModifier(0.0F + statModifier);
-		SetDamageModifier(1.0F + statModifier);
+		SetHealthChangeModifier(1.0F + statModifier);
 		SetMovementModifier(1.0F + statModifier);
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
-		SetMaxHealth(2000 * (1 + statModifier));
+		SetMaxHealth(lowHealth * (1 + statModifier));
 		break;
 
 	case GroupEnums::Tank:
-		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
-		AddAbility(UTaunt::CreateAbility(5.0F, this));
-		AddAbility(UStun::CreateAbility(10.0F, this, 4));
-		//AddAbility(UDefenceBoost::CreateAbility(7.0F, this, 0.5F));
+		AddWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Taunt));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Stun));
 		SetDefenceModifier(0.0F + statModifier);
-		SetDamageModifier(1.0F + statModifier);
+		SetHealthChangeModifier(1.0F + statModifier);
 		SetMovementModifier(1.0F + statModifier);
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
-		SetMaxHealth(3000 * (1 + statModifier));
+		SetMaxHealth(highHealth * (1 + statModifier));
 		break;
 
 	case GroupEnums::Sniper:
-		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Sniper));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(15.0F, this), 2.5F, true, true));
-		AddAbility(UCritBoost::CreateCritBoost(6, this, 55.0F));
+		AddWeapon(mCreatePresetWeapon(WeaponEnums::Sniper, grade, quaility));
+		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Snipe, 2.5F, false, false));
+		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
 		SetDefenceModifier(0.0F + statModifier);
-		SetDamageModifier(1.0F + statModifier);
+		SetHealthChangeModifier(1.0F + statModifier);
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
-		SetMaxHealth(2000 * (1 + statModifier));
+		SetMaxHealth(lowHealth * (1 + statModifier));
 		break;
 
-		//case GroupEnums::RPG:
-		//	AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::RPG));
-		//	AddAbility(UChannelledAbility::CreateChannelledAbility(this, UOrbitalStrike::CreateAbility(10, this, 0.2F), 3));
-		//	SetDefenceModifier(0 + statModifier);
-		//	SetDamageModifier(1.25 + statModifier);
-		//	break;
-
 	case GroupEnums::Support:
-		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Shotgun));
-		AddAbility(UDisable::CreateDisable(10.0F, this, 4.0F));
-		AddAbility(UCritBoost::CreateCritBoost(20, this, 100.0F));
-		//AddAbility(UOrbitalStrike::CreateAbility(15.0F, this, 0.55F));
+		AddWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Disable));
+		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
 		SetDefenceModifier(0.0F + statModifier);
-		SetDamageModifier(1.0F + statModifier);
+		SetHealthChangeModifier(1.0F + statModifier);
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
-		SetMaxHealth(2500 * (1 + statModifier));
+		SetMaxHealth(mediumHealth * (1 + statModifier));
 		break;
 
 	default:
@@ -435,6 +420,10 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole) 
 	}
 
 	SetHealth(GetMaxHealth());
+
+	if (weapons.Num() > 0) {
+		currentWeapon = weapons[0];
+	}
 
 	for (int i = 0; i < ArmourEnums::End; i++) {
 		armour.Add(UArmour::CreateArmour(armourValue, armourValue, armourValue, (ArmourEnums::ArmourPosition)i));
@@ -457,7 +446,7 @@ void AMech_RPGCharacter::SetupWithLoadout() {
 	SetMaxHealth(startingLoadout.maxHealth);
 	SetHealth(GetMaxHealth());
 	SetDefenceModifier(startingLoadout.defenceModifier);
-	SetDamageModifier(startingLoadout.damageModifier);
+	SetHealthChangeModifier(startingLoadout.damageModifier);
 	SetCanMove(startingLoadout.canMove);
 	SetCanAttack(startingLoadout.canAttack);
 	SetCanBeDamaged(startingLoadout.canBeDamaged);
@@ -467,10 +456,34 @@ void AMech_RPGCharacter::SetupWithLoadout() {
 	SetSpeed(startingLoadout.speed);
 }
 
+const TArray<AMech_RPGCharacter*>& AMech_RPGCharacter::GetCharacters() {
+	return characters;
+}
+
+void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
+	if (newWeapon) {
+		weapons.Add(newWeapon);
+	}
+}
+
+TArray<UArmour*>& AMech_RPGCharacter::GetArmour() {
+	return armour;
+}
+
+TEnumAsByte<GroupEnums::Role> AMech_RPGCharacter::GetRole()
+{
+	return startingRole;
+}
+
+
+bool AMech_RPGCharacter::GetInCombat()
+{
+	return inCombat;
+}
+
 bool AMech_RPGCharacter::HasAbilities() {
 	return GetAbilities().Num() > 0;
 }
-
 
 void AMech_RPGCharacter::SetChannelling(bool inChallenning) {
 	channeling = inChallenning;
@@ -532,7 +545,16 @@ UGroup* AMech_RPGCharacter::GetGroup() {
 }
 
 void AMech_RPGCharacter::SetGroup(UGroup* newVal) {
+	if (group != nullptr) {
+		group->RemoveMember(this);
+
+		if (!group->HasMemebers()) {
+			group->ConditionalBeginDestroy();
+		}
+	}
+
 	group = newVal;
+	group->AddMemeber(this);
 }
 
 int32 AMech_RPGCharacter::GetID() {
@@ -611,8 +633,8 @@ int32& AMech_RPGCharacter::GetCanMove() {
 	return canMove;
 }
 
-float AMech_RPGCharacter::GetDamageModifier() {
-	return MAX(damageModifier, 0.01F);
+float AMech_RPGCharacter::GetHealthChangeModifier() {
+	return MAX(healthChangeModifier, 0.01F);
 }
 
 float AMech_RPGCharacter::GetDefenceModifier() {
@@ -627,8 +649,8 @@ void AMech_RPGCharacter::SetCanMove(int32 newVal) {
 	canMove = newVal;
 }
 
-void AMech_RPGCharacter::SetDamageModifier(float newVal) {
-	damageModifier = newVal;
+void AMech_RPGCharacter::SetHealthChangeModifier(float newVal) {
+	healthChangeModifier = newVal;
 }
 
 void AMech_RPGCharacter::SetDefenceModifier(float newVal) {
@@ -663,4 +685,9 @@ void AMech_RPGCharacter::AddAbility(UAbility* newAbility) {
 	if (newAbility != nullptr) {
 		abilities.Add(newAbility);
 	}
+}
+
+UWidgetComponent * AMech_RPGCharacter::GetStats()
+{
+	return stats;
 }

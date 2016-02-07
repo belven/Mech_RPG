@@ -16,10 +16,15 @@ class MECH_RPG_API UStun : public UAbility
 private:
 	float duration;
 
+	UPROPERTY()
+	class AMech_RPGCharacter* targetCharacter;
+
 public :
 	static UStun* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float duration);
 	void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
 	
 	void StunEnd();
+
+	FTimerHandle TimerHandle_StunEnd;
 	
 };

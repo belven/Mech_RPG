@@ -2,6 +2,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Ability.h"
+#include "ChannelledAbility.h"
 #include "Mech_RPGCharacter.h"
 
 void UAbility::SetOnCooldown(UWorld* const World) {
@@ -39,4 +40,35 @@ void UAbility::ResetOnCooldown() {
 
 TEnumAsByte<AOEEnums::AffectedTeam> UAbility::GetAffectedTeam() {
 	return affectedTeam;
+}
+
+UAbility* UAbility::CreateChannelledPresetAbility(AMech_RPGCharacter * owner, AbilityEnums::Ability abilityToCreate, float inChannelDuration, bool inUsesLocation, bool inUsesTrace)
+{
+	return UChannelledAbility::CreateChannelledAbility(owner, CreatePresetAbility(owner, abilityToCreate), inChannelDuration, inUsesLocation, inUsesTrace);
+}
+
+UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums::Ability abilityToCreate)
+{
+	switch (abilityToCreate) {
+	case AbilityEnums::Heal:
+		return UHeal::CreateAbility(15.0F, owner, 500.0F);
+	case AbilityEnums::AoEHeal:
+		return UAoEHeal::CreateAbility(20.0F, owner, 0.1F);
+	case AbilityEnums::Stun:
+		return UStun::CreateAbility(10.0F, owner, 4);
+	case AbilityEnums::Disable:
+		return UDisable::CreateDisable(10.0F, owner, 4.0F);
+	case AbilityEnums::Taunt:
+		return UTaunt::CreateAbility(5.0F, owner);
+	case AbilityEnums::Grenade:
+		return UGrenade::CreateAbility(7.0F, owner, 600.0F);
+	case AbilityEnums::CritBoost:
+		return UCritBoost::CreateCritBoost(6, owner, 55.0F);
+	case AbilityEnums::Snipe:
+		return USnipe::CreateAbility(15.0F, owner);
+	case AbilityEnums::DefenceBoost:
+		return UDefenceBoost::CreateAbility(7.0F, owner, 0.25F);
+	}
+
+	return nullptr;
 }

@@ -100,6 +100,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostHealthChangeEvent, FHealthChang
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostBeginPlay, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopFiring);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfCombat);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSwappedWeapons, AWeapon*, oldWeapon, AWeapon*, newWeapon);
 
 UCLASS(Blueprintable)
 class AMech_RPGCharacter : public ACharacter {
@@ -153,9 +154,9 @@ private:
 		USphereComponent* aoe;
 
 	UPROPERTY()
-		class UWidgetComponent* stats;
+	class UWidgetComponent* stats;
 
-		TSubclassOf<class UFloatingStats_BP> widgetClass;
+	TSubclassOf<class UFloatingStats_BP> widgetClass;
 
 protected:
 
@@ -164,7 +165,7 @@ protected:
 public:
 	AMech_RPGCharacter();
 
-	void SetActorHiddenInGame(bool bNewHidden) override;
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 
 	class UWidgetComponent* GetStats();
 
@@ -186,15 +187,28 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 		void SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
-	
-	UFUNCTION(BlueprintCallable, Category = "Other")
-	void Reset();
 
-	FPreHealthChangeEvent OnPreHealthChange;
-	FPostHealthChangeEvent OnPostHealthChange;
-	FPostBeginPlay OnPostBeginPlay;
-	FStopFiring OnStopFiring;
-	FOutOfCombat OnOutOfCombat;
+	UFUNCTION(BlueprintCallable, Category = "Other")
+		void Reset();
+
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FPreHealthChangeEvent OnPreHealthChange;
+	
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FPostHealthChangeEvent OnPostHealthChange;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FPostBeginPlay OnPostBeginPlay;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FStopFiring OnStopFiring;
+	
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOutOfCombat OnOutOfCombat;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FSwappedWeapons OnSwappedWeapons;
 
 	void OutOfCombat();
 
@@ -211,6 +225,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		bool HasAbilities();
 
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
@@ -226,6 +241,9 @@ public:
 		bool UseLoadout = false;
 
 
+	UFUNCTION(BlueprintCallable, Category = "Role")
+		TEnumAsByte<GroupEnums::Role> GetRole();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
 		TEnumAsByte<GroupEnums::Role> startingRole;
 
@@ -233,7 +251,7 @@ public:
 		TEnumAsByte<TeamEnums::Team> team;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		float damageModifier;
+		float healthChangeModifier;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float defenceModifier;
@@ -353,17 +371,17 @@ public:
 	int32& GetCanAttack();
 	int32& GetCanMove();
 
-	float GetDamageModifier();
+	float GetHealthChangeModifier();
 	float GetDefenceModifier();
 
 	void SetCanAttack(int32 newVal);
 	void SetCanMove(int32 newVal);
 
-	void SetDamageModifier(float newVal);
+	void SetHealthChangeModifier(float newVal);
 	void SetDefenceModifier(float newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
-		virtual void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS);
+		virtual void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS, int32 grade = 0, int32 quaility = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
 		void SetupWithLoadout();
