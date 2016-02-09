@@ -44,7 +44,7 @@ class MECH_RPG_API AAOEHealthChange : public ATargetPoint
 	
 private:
 	FTempAOESettings settings;
-	int timesRan;
+	float currentLifetime;
 	FTimerHandle TimerHandle_AOERate;
 public:
 	AAOEHealthChange();

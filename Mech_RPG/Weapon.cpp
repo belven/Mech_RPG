@@ -60,11 +60,11 @@ void AWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
 	Super::SetOwner(inOwner);
 
 	if (partclSystem != nullptr) {
+		// TODO Attach to end of weapon
 		partclSystem->AttachTo(inOwner->GetRootComponent());
 	}
 
 	inOwner->OnStopFiring.AddDynamic(this, &AWeapon::StopFire);
-	AttachRootComponentToActor(inOwner);
 }
 
 float AWeapon::GetProgressBarPercent() {

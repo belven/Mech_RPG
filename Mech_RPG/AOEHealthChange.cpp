@@ -38,8 +38,8 @@ AAOEHealthChange* AAOEHealthChange::CreateAOEHealthChange(FTempAOESettings inSet
 }
 
 void  AAOEHealthChange::Activate() {
-	if (timesRan < settings.duration) {
-		timesRan++;
+	if (currentLifetime <= settings.duration) {
+		currentLifetime += settings.rate;
 
 		FHealthChange healthChange;
 		FVector locationToUse = settings.usesTarget && settings.target != NULL ? settings.target->GetActorLocation() : settings.location;

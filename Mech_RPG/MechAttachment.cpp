@@ -15,7 +15,7 @@ AMechAttachment::AMechAttachment() : Super()
 	PrimaryActorTick.bCanEverTick = true;
 
 	meshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MechAttachment_MeshComponent"));
-
+	SetRootComponent(meshComponent);
 }
 
 int32 AMechAttachment::GetGrade()
@@ -52,7 +52,6 @@ void AMechAttachment::SetOwner(AMech_RPGCharacter* inOwner)
 	}
 
 	if (mesh != nullptr) {
-		SetRootComponent(meshComponent);
 		meshComponent->SetStaticMesh(mesh);
 		meshComponent->SetMobility(EComponentMobility::Movable);
 		meshComponent->bOwnerNoSee = false;
@@ -82,6 +81,6 @@ void AMechAttachment::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
 	meshComponent->SetHiddenInGame(bNewHidden, true);
-	meshComponent->SetVisibility(bNewHidden, true);
+	meshComponent->SetVisibility(!bNewHidden, true);
 }
 
