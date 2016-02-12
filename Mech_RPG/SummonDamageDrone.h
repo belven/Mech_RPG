@@ -3,18 +3,17 @@
 #pragma once
 
 #include "Ability.h"
-#include "Grenade.generated.h"
+#include "SummonDamageDrone.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MECH_RPG_API UGrenade : public UAbility
+class MECH_RPG_API USummonDamageDrone : public UAbility
 {
 	GENERATED_BODY()
-	
 private:
-	float damage;
+	AMech_RPGCharacter* droneSummoned;
 
 public:
 
@@ -22,6 +21,6 @@ public:
 		bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		static UGrenade* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDamage);
+		static USummonDamageDrone* CreateAbility(float cooldown, AMech_RPGCharacter* owner);
 	
 };

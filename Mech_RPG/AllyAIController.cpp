@@ -39,7 +39,7 @@ void AAllyAIController::Tick(float DeltaTime) {
 			}
 			else {
 				AMech_RPGCharacter* player = GetOwner()->GetGroup()->GetPlayer();
-				if (player != NULL && player->GetDistanceTo(GetOwner()) > 300.0F) {
+				if (player != NULL && player->GetDistanceTo(GetOwner()) > (300.0F + (GetOwner()->GetGroup()->GetMembers().IndexOfByKey(GetOwner()) * 40))) {
 					MoveToActor(player);
 				}
 				else {

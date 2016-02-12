@@ -18,7 +18,7 @@ private:
 	AMech_RPGCharacter* lastTarget;
 public:
 
-	void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
+	bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
 	
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")

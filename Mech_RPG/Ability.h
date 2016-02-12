@@ -16,8 +16,11 @@ namespace AbilityEnums {
 	};
 }
 
+
+
 #pragma once
 #include "AOEHealthChange.h"
+#include "Tag.h"
 #include "Ability.generated.h"
 
 UCLASS(Blueprintable)
@@ -29,14 +32,30 @@ protected:
 
 private:
 	float cooldown = 1.0F;
-
 	bool onCooldown = false;
-
 	float currentTime = 0.0F;
 protected:
 	TEnumAsByte<AOEEnums::AffectedTeam> affectedTeam = AOEEnums::Enemy;
+	TArray<FTag> tags;
 
 public:
+	static const FString healTag;
+	static const FString damageTag;
+	static const FString buffTag;
+	static const FString debuffTag;
+	static const FString aoeTag;
+	static const FString needsTargetTag;
+
+	bool HasTag(FString name);
+	TArray<FTag>& GetTags();
+	FTag GetTag(FString name);
+
+	void AddTag(FString name, float value);
+	void RemoveTag(FString name);
+
+	float GetTagValue(FString name);
+	bool GetTagTrue(FString name);
+
 	void SetOnCooldown(UWorld* const World);
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
@@ -53,7 +72,7 @@ public:
 		void SetCooldown(float newCooldown);
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		virtual void Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) { check(0 && "You must override this") };
+		virtual bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) { check(0 && "You must override this") return false; };
 
 	FTimerHandle TimerHandle_AbilityOffCooldown;
 

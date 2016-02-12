@@ -17,7 +17,7 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
+		bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		static UTargetedHealthChange* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inChangeAmount, AOEEnums::AffectedTeam team);

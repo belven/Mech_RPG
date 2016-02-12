@@ -4,7 +4,7 @@
 #include "AoEHeal.h"
 
 
-void UAoEHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
+bool UAoEHeal::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (!targetLocation.IsZero()) {
 		FTempAOESettings settings;
 		settings.affectedTeam = GetAffectedTeam();
@@ -20,7 +20,9 @@ void UAoEHeal::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		settings.heals = true;
 		AAOEHealthChange::CreateAOEHealthChange(settings);
 		SetOnCooldown(owner->GetWorld());
+		return true;
 	}
+	return false;
 }
 
 UAoEHeal* UAoEHeal::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inHealAmount) {
@@ -29,5 +31,7 @@ UAoEHeal* UAoEHeal::CreateAbility(float cooldown, AMech_RPGCharacter* owner, flo
 	ability->healAmount = inHealAmount;
 	ability->affectedTeam = AOEEnums::Ally;
 	ability->owner = owner;
+	ability->AddTag(healTag, inHealAmount);
+	ability->AddTag(aoeTag, 700);
 	return ability;
 }

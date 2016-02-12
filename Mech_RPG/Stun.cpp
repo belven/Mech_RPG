@@ -3,7 +3,7 @@
 #include "Mech_RPG.h"
 #include "Stun.h"
 
-void UStun::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
+bool UStun::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (UMiscLibrary::IsCharacterAlive(target)) {
 		targetCharacter = target;
 		targetCharacter->ApplyCrowdControl(EffectEnums::Cast, false);
@@ -11,7 +11,9 @@ void UStun::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 		targetCharacter->ApplyCrowdControl(EffectEnums::Move, false);
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_StunEnd, this, &UStun::StunEnd, duration);
 		SetOnCooldown(owner->GetWorld());
+		return true;
 	}
+	return false;
 }
 
 void UStun::StunEnd() {
@@ -25,5 +27,6 @@ UStun* UStun::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float dur
 	ability->SetCooldown(cooldown);
 	ability->duration = duration;
 	ability->owner = owner;
+	ability->AddTag(debuffTag, duration);
 	return ability;
 }

@@ -93,7 +93,10 @@ void ABaseAIController::FireWeapon(AActor* hit) {
 			// Otherwise we've got a clear shot to the target
 			else {
 				weapon->Fire(target);
-				GetOwner()->GetGroup()->GroupMemberHit(GetOwner(), target);
+
+				if (!weapon->Heals()) {
+					GetOwner()->GetGroup()->GroupMemberHit(GetOwner(), target);
+				}
 			}
 		}
 
@@ -112,9 +115,11 @@ void ABaseAIController::PerformAbility() {
 		&& GetOwner()->CanCast()) {
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
 			if (ability != nullptr && !ability->OnCooldown()) {
-				ability->Activate(target, target->GetActorLocation());
-				GetOwner()->SetCurrentAbility(ability);
-				break;
+				if (ability->Activate(target, target->GetActorLocation())) {
+					GetOwner()->SetCurrentAbility(ability);
+					StopMovement();
+					break;
+				}
 			}
 		}
 	}

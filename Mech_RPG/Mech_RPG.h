@@ -9,6 +9,7 @@
 #define MIN(a,b) (a < b) ? (a) : (b)
 #define MAX(a,b) (a > b) ? (a) : (b)
 
+#include "Engine.h"
 #include "Taunt.h"
 #include "Heal.h"
 #include "Snipe.h"
@@ -23,6 +24,8 @@
 #include "TimedHealthChange.h"
 #include "AoEHeal.h"
 #include "DefenceBoost.h"
+#include "ParticleBomb.h"
+#include "SummonDamageDrone.h"
 
 #include "AOEHealthChange.h"
 

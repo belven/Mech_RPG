@@ -19,7 +19,7 @@ private:
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
+		bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		static UAoEHeal* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inHealAmount);

@@ -21,7 +21,7 @@ private:
 
 public :
 	static UStun* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float duration);
-	void Activate(AMech_RPGCharacter* target, FVector targetLocation) override;
+	bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
 	
 	void StunEnd();
 

@@ -4,7 +4,7 @@
 #include "CritBoost.h"
 #include "Weapon.h"
 
-void UCritBoost::Activate(AMech_RPGCharacter * target, FVector targetLocation)
+bool UCritBoost::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 {
 	if (owner->GetCurrentWeapon() != nullptr && count <= 0) {
 		weaponAffected = owner->GetCurrentWeapon();
@@ -12,7 +12,9 @@ void UCritBoost::Activate(AMech_RPGCharacter * target, FVector targetLocation)
 		weaponAffected->SetCritChance(weaponAffected->GetCritChance() + critMultiplier);
 		weaponAffected->OnFire.AddDynamic(this, &UCritBoost::OwnerFired);
 		count = 10;
+		return true;
 	}
+	return false;
 }
 
 void UCritBoost::OwnerFired() {
@@ -30,6 +32,8 @@ UCritBoost * UCritBoost::CreateCritBoost(float cooldown, AMech_RPGCharacter * ow
 	ability->SetCooldown(cooldown);
 	ability->critMultiplier = inCritMultiplier;
 	ability->owner = owner;
+	ability->AddTag(buffTag, inCritMultiplier);
+	ability->AddTag(needsTargetTag, 0);
 	return ability;
 }
 

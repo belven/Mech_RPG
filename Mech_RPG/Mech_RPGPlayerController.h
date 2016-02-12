@@ -44,6 +44,7 @@ public:
 
 	virtual	void BeginPlay() override;
 
+	void CharacterFive();
 	void CharacterFour();
 	void CharacterOne();
 	void CharacterThree();

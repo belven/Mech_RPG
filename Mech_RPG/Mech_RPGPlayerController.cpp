@@ -199,6 +199,7 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Two", IE_Released, this, &AMech_RPGPlayerController::CharacterTwo);
 	InputComponent->BindAction("Three", IE_Released, this, &AMech_RPGPlayerController::CharacterThree);
 	InputComponent->BindAction("Four", IE_Released, this, &AMech_RPGPlayerController::CharacterFour);
+	InputComponent->BindAction("Five", IE_Released, this, &AMech_RPGPlayerController::CharacterFive);
 
 	InputComponent->BindAction("SwapWeapons", IE_Released, this, &AMech_RPGPlayerController::SwapWeapons);
 	InputComponent->BindAction("ActivateAbility", IE_Released, this, &AMech_RPGPlayerController::ActivateAbility);
@@ -257,9 +258,9 @@ void AMech_RPGPlayerController::MoveToMouseCursor() {
 
 	GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
 
-	if (Hit.bBlockingHit) {
-		SetNewMoveDestination(Hit.ImpactPoint);
-	}
+	//if (Hit.bBlockingHit) {
+	SetNewMoveDestination(Hit.ImpactPoint);
+	//}
 }
 
 /**
@@ -269,7 +270,6 @@ void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation
 	APawn* const Pawn = GetPawn();
 	if (Pawn) {
 		UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
-		float const Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
 
 		if (NavSys) {
 			MoveToLocation(DestLocation);
@@ -361,16 +361,12 @@ void AMech_RPGPlayerController::OnAttackReleased() {
 
 AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 	FHitResult Hit;
-	FCollisionQueryParams collision;
-	collision.AddIgnoredActor(owner);
-
 	Hit = GetHitFromCursor();
 
 	if (Hit.bBlockingHit) {
-		AActor* targetFound;
-		targetFound = Hit.GetActor();
+		AActor* targetFound = Hit.GetActor();
 
-		if (targetFound != nullptr	&& IsMechCharacter(targetFound)) {
+		if (targetFound != nullptr && IsMechCharacter(targetFound)) {
 			return Cast<AMech_RPGCharacter>(targetFound);
 		}
 	}
@@ -407,7 +403,7 @@ void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 		// Does the owner have a group and is there more than 1 other person
 		if (group != nullptr && group->GetMembers().Num() > 1) {
 
-			// Does the character we want to swawp to exist
+			// Does the character we want to swap to exist
 			if (group->GetMembers().Num() > index - 1) {
 				AMech_RPGCharacter* character = group->GetMembers()[index - 1];
 
@@ -424,7 +420,7 @@ void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 
 FHitResult AMech_RPGPlayerController::GetHitFromCursor() {
 	static FHitResult Hit;
-	GetHitResultUnderCursor(ECollisionChannel::ECC_Pawn, false, Hit);
+	GetHitResultUnderCursor(ECollisionChannel::ECC_Pawn, true, Hit);
 	return Hit;
 }
 
@@ -434,6 +430,10 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetOwner() {
 
 void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
 	owner = newVal;
+}
+
+void AMech_RPGPlayerController::CharacterFive() {
+	PerformAllyCommand(5);
 }
 
 void AMech_RPGPlayerController::CharacterFour() {
@@ -484,26 +484,27 @@ void AMech_RPGPlayerController::ActivateAbility() {
 
 		SetupCollision();
 
-		//We're targetting the ground so get selected location
+		//We're targeting the ground so get selected location
 		if (cursorTarget == nullptr) {
 			hit = GetHitFromCursor();
-			location = hit.bBlockingHit ? hit.ImpactPoint : FVector::ZeroVector;
+			location = hit.ImpactPoint;
 		}
 		else {
 			location = cursorTarget->GetActorLocation();
 		}
 
-		//Only use an ability if we have LoS to our target/location
-		if (!UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), location)) {
-			MoveToLocation(location);
-			return;
-		}
-
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
 			if (ability != nullptr && !ability->OnCooldown()) {
-				ability->Activate(cursorTarget, location);
 
-				if (ability->OnCooldown() || GetOwner()->Channelling()) {
+				if (ability->GetTagTrue(ability->needsTargetTag)) {
+					//Only use an ability if we have LoS to our target/location
+					if (!UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), location)) {
+						MoveToLocation(location);
+						break;
+					}
+				}
+
+				if (ability->Activate(cursorTarget, location)) {
 					GetOwner()->SetCurrentAbility(ability);
 					StopMovement();
 					break;

@@ -6,11 +6,12 @@ TEnumAsByte<GroupEnums::Role> ABoss::GetRandomRole() {
 	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
 }
 
-void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole , int32 grade , int32 quaility) {
+void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility) {
 	FMagazineWeaponParams params;
 	float statModifier = 0;
 	int armourValue = 5;
 
+	startingRole = inRole;
 	Reset();
 
 	switch (UMiscLibrary::GetDifficulty()) {
@@ -36,7 +37,9 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole , int32 grade 
 
 		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(this, params));
 		AddAbility(UDamageBoost::CreateAbility(7, this, 0.5));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 400.0F), 2, true, true));
+		//AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 400.0F), 2, true, true));
+		//AddAbility(UOrbitalStrike::CreateAbility(30, this, 350));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UParticleBomb::CreateAbility(30.0F, this, 0.6F), 4.5F, false, true));
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
@@ -48,8 +51,8 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole , int32 grade 
 		params.range = 400;
 
 		AddWeapon(AWeapon::CreateWeapon(this, params));
-		AddAbility(UTaunt::CreateAbility(5, this));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UImmobilise::CreateAbility(10, this, 5), 2.5, true, true));
+		AddAbility(UAbility::CreatePresetAbility(this, AbilityEnums::Taunt));
+		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Stun, 2.5, true, true));
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
@@ -72,11 +75,10 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole , int32 grade 
 		break;
 	case GroupEnums::Healer:
 		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
-		GetWeapons()[0]->SetChangeAmount(GetWeapons()[0]->GetChangeAmount() * 1.4);
 		AddAbility(UHeal::CreateAbility(5, this, 800));
 		AddAbility(UDisable::CreateDisable(10, this, 5));
 		SetDefenceModifier(0 + statModifier);
-		SetHealthChangeModifier(1 + statModifier);
+		SetHealthChangeModifier(1.5 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
 		break;

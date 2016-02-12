@@ -5,6 +5,59 @@
 #include "ChannelledAbility.h"
 #include "Mech_RPGCharacter.h"
 
+const FString UAbility::healTag = "Heal";
+const FString UAbility::damageTag = "Damage";
+const FString UAbility::buffTag = "Buff";
+const FString UAbility::debuffTag = "Debuff";
+const FString UAbility::aoeTag = "AoE";
+const FString UAbility::needsTargetTag = "Needs Target";
+
+bool UAbility::HasTag(FString name)
+{
+	for (FTag tag : GetTags()) {
+		if (tag.name.Equals(name)) return true;
+	}
+
+	return false;
+}
+
+TArray<FTag>& UAbility::GetTags()
+{
+	return tags;
+}
+
+FTag UAbility::GetTag(FString name)
+{
+	for (FTag tag : GetTags()) {
+		if (tag.name.Equals(name)) return tag;
+	}
+
+	return FTag();
+}
+
+void UAbility::AddTag(FString name, float value)
+{
+	tags.Add(FTag(name, value));
+}
+
+void UAbility::RemoveTag(FString name)
+{
+	tags.Add(GetTag(name));
+}
+
+float UAbility::GetTagValue(FString name)
+{
+	return GetTag(name).value;
+}
+
+bool UAbility::GetTagTrue(FString name)
+{
+	if (HasTag(name)) {
+		return GetTag(name).value >= 1;
+	}
+	return true;
+}
+
 void UAbility::SetOnCooldown(UWorld* const World) {
 	onCooldown = true;
 	currentTime = GetCooldown() - 0.1;

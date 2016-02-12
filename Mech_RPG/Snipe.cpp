@@ -10,5 +10,6 @@ USnipe* USnipe::CreateAbility(float cooldown, AMech_RPGCharacter* owner) {
 	ability->changeAmount = 0.8F;
 	ability->owner = owner;
 	ability->affectedTeam = AOEEnums::Enemy;
+	ability->AddTag(damageTag, 0.8F);
 	return ability;
 }

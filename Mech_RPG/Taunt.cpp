@@ -6,7 +6,7 @@
 #include "Mech_RPGPlayerController.h"
 #include "BaseAIController.h"
 
-void UTaunt::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
+bool UTaunt::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	bool targetFound = false;
 
 	if (target && target->GetGroup()) {
@@ -23,7 +23,9 @@ void UTaunt::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
 
 	if (targetFound) {
 		SetOnCooldown(owner->GetWorld());
+		return true;
 	}
+	return false;
 }
 
 UTaunt* UTaunt::CreateAbility(float cooldown, AMech_RPGCharacter* owner) {

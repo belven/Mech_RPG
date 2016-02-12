@@ -3,13 +3,13 @@
 #pragma once
 
 #include "Ability.h"
-#include "Grenade.generated.h"
+#include "ParticleBomb.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MECH_RPG_API UGrenade : public UAbility
+class MECH_RPG_API UParticleBomb : public UAbility
 {
 	GENERATED_BODY()
 	
@@ -22,6 +22,7 @@ public:
 		bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		static UGrenade* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDamage);
+		static UParticleBomb* CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDamage);
+	
 	
 };

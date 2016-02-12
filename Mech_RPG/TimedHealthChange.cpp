@@ -3,13 +3,15 @@
 #include "Mech_RPG.h"
 #include "TimedHealthChange.h"
 
-void UTimedHealthChange::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
+bool UTimedHealthChange::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (target != NULL) {
 		this->target = target;
 		timeLeft = duration;
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_TimeTick, this, &UTimedHealthChange::TimeTick, rate);
 		SetOnCooldown(owner->GetWorld());
+		return true;
 	}
+	return false;
 }
 
 void UTimedHealthChange::TimeTick() {

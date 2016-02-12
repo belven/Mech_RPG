@@ -211,8 +211,8 @@ void AMech_RPGCharacter::SetUpGroup() {
 }
 
 
-void AMech_RPGCharacter::ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool positive) {
-	int amount = positive ? -1 : 1;
+void AMech_RPGCharacter::ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool remove) {
+	int amount = remove ? -1 : 1;
 
 	switch (controlModifications) {
 	case EffectEnums::Attack:
@@ -407,6 +407,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 
 	case GroupEnums::Support:
 		AddWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
+		AddAbility(USummonDamageDrone::CreateAbility(20, this));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Disable));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
 		SetDefenceModifier(0.0F + statModifier);

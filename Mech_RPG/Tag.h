@@ -8,6 +8,16 @@ USTRUCT(BlueprintType)
 struct FTag {
 	GENERATED_USTRUCT_BODY()
 public:
+	FTag() {
+		name = "Unknown";
+		value = 0.0;
+	}
+
+	FTag(FString inTag, float inValue) {
+		name = inTag;
+		value = inValue;
+	};
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tag")
 		FString name;
 

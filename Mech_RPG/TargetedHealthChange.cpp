@@ -4,13 +4,14 @@
 #include "TargetedHealthChange.h"
 #include "Mech_RPGCharacter.h"
 
-void UTargetedHealthChange::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
+bool UTargetedHealthChange::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (UMiscLibrary::IsCharacterAlive(target)) {
 		FHealthChange healthChange;
-		float tempChangeAmount = healthChange.heals = affectedTeam == AOEEnums::Ally;
+		float tempChangeAmount = 0.0F;
+		healthChange.heals = affectedTeam == AOEEnums::Ally;
 
 		tempChangeAmount = (changeAmount <= 2.0F) ? target->GetMaxHealth() * changeAmount : changeAmount;
-
+		
 		healthChange.damager = owner;
 		healthChange.target = target;
 		healthChange.weaponUsed = nullptr;
@@ -18,7 +19,9 @@ void UTargetedHealthChange::Activate(AMech_RPGCharacter* target, FVector targetL
 
 		target->ChangeHealth(healthChange);
 		SetOnCooldown(owner->GetWorld());
+		return true;
 	}
+	return false;
 }
 
 UTargetedHealthChange* UTargetedHealthChange::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inChangeAmount, AOEEnums::AffectedTeam team) {
@@ -27,5 +30,12 @@ UTargetedHealthChange* UTargetedHealthChange::CreateAbility(float cooldown, AMec
 	ability->changeAmount = inChangeAmount;
 	ability->owner = owner;
 	ability->affectedTeam = team;
+
+	if (team == AOEEnums::Ally) {
+		ability->AddTag(healTag, inChangeAmount);
+	}
+	else {
+		ability->AddTag(damageTag, inChangeAmount);
+	}
 	return ability;
 }

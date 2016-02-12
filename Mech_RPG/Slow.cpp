@@ -4,8 +4,8 @@
 #include "Slow.h"
 
 
-void USlow::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
-
+bool USlow::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
+	return false;
 }
 
 

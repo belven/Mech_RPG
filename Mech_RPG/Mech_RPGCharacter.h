@@ -210,7 +210,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FSwappedWeapons OnSwappedWeapons;
 
-	void OutOfCombat();
+	virtual void OutOfCombat();
 
 	bool GetInCombat();
 

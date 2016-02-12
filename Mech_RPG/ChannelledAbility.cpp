@@ -15,7 +15,7 @@ UChannelledAbility::UChannelledAbility() : Super() {
 	}
 }
 
-void UChannelledAbility::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
+bool UChannelledAbility::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (!channelling) {
 		channelling = true;
 		owner->SetChannelling(true);
@@ -25,7 +25,9 @@ void UChannelledAbility::Activate(AMech_RPGCharacter* target, FVector targetLoca
 		targetCharacter = target;
 		this->targetLocation = targetLocation;
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
+		return true;
 	}
+	return false;
 }
 
 bool UChannelledAbility::Channelling() {

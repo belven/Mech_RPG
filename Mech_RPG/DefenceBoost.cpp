@@ -3,10 +3,11 @@
 #include "Mech_RPG.h"
 #include "DefenceBoost.h"
 
-void UDefenceBoost::Activate(AMech_RPGCharacter* target, FVector targetLocation) {
+bool UDefenceBoost::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	SetOnCooldown(owner->GetWorld());
 	owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_DefenceBoostEnded, this, &UDefenceBoost::ResetDefenceBoost, GetCooldown() * 0.5);
 	owner->SetDefenceModifier(owner->GetDefenceModifier() + DefenceModifier);
+	return true;
 }
 
 UDefenceBoost* UDefenceBoost::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inDefenceMultiplier) {
@@ -15,6 +16,8 @@ UDefenceBoost* UDefenceBoost::CreateAbility(float cooldown, AMech_RPGCharacter* 
 	ability->DefenceModifier = inDefenceMultiplier;
 	ability->owner = owner;
 	ability->affectedTeam = AOEEnums::Ally;
+	ability->AddTag(buffTag, inDefenceMultiplier);
+	ability->AddTag(needsTargetTag, 0);
 	return ability;
 }
 
