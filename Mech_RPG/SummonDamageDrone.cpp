@@ -12,7 +12,6 @@ bool USummonDamageDrone::Activate(class AMech_RPGCharacter* target, FVector targ
 		FNavLocation nav;
 		owner->GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(owner->GetActorLocation(), 200, nav);
 		droneSummoned->SetActorLocation(nav.Location);
-		droneSummoned->Reset();
 	}
 	else {
 		FNavLocation nav;
@@ -20,20 +19,24 @@ bool USummonDamageDrone::Activate(class AMech_RPGCharacter* target, FVector targ
 
 		while (droneSummoned == nullptr && count < 10) {
 			owner->GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(owner->GetActorLocation(), 200, nav);
-			droneSummoned = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(owner->GetWorld(), nav.Location, owner->GetActorRotation(), ADrone::StaticClass());
+			droneSummoned = UMiscLibrary::SpawnCharacter<ADrone>(owner->GetWorld(), nav.Location, owner->GetActorRotation(), ADrone::StaticClass());
 			count++;
+		}
+
+		if (droneSummoned != nullptr) {
+			droneSummoned->SetGroup(owner->GetGroup());
+			droneSummoned->CreatePresetRole(GroupEnums::DPS);
+			SetOnCooldown(owner->GetWorld());
+			droneSummoned->team = owner->team;
 		}
 	}
 
 	if (droneSummoned != nullptr) {
 		FVector loc;
-		droneSummoned->team = owner->team;
 		loc = droneSummoned->GetActorLocation();
 		loc.Z += (droneSummoned->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
 		droneSummoned->SetActorLocation(loc);
-		droneSummoned->SetGroup(owner->GetGroup());
-		droneSummoned->CreatePresetRole(GroupEnums::DPS);
-		SetOnCooldown(owner->GetWorld());
+		droneSummoned->SetDead(false);
 		return true;
 	}
 	return false;

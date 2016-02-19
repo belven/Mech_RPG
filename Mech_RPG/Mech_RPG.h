@@ -26,6 +26,7 @@
 #include "DefenceBoost.h"
 #include "ParticleBomb.h"
 #include "SummonDamageDrone.h"
+#include "Shield.h"
 
 #include "AOEHealthChange.h"
 

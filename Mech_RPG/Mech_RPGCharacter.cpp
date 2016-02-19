@@ -282,6 +282,7 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 	}
 
 	if (health <= 0) {
+		health = 0;
 		SetDead(true);
 		SetActorHiddenInGame(true);
 		OnStopFiring.Broadcast();
@@ -408,8 +409,8 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	case GroupEnums::Support:
 		AddWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
 		AddAbility(USummonDamageDrone::CreateAbility(20, this));
+		AddAbility(UShield::CreateShield(20, this, 0.35F));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Disable));
-		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);

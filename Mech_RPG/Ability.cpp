@@ -8,9 +8,13 @@
 const FString UAbility::healTag = "Heal";
 const FString UAbility::damageTag = "Damage";
 const FString UAbility::buffTag = "Buff";
-const FString UAbility::debuffTag = "Debuff";
+const FString UAbility::debuffTag = "De-buff";
 const FString UAbility::aoeTag = "AoE";
 const FString UAbility::needsTargetTag = "Needs Target";
+
+const TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::supportAbilities;
+const TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::offensiveAbilities;
+const TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::defensiveAbilities;
 
 bool UAbility::HasTag(FString name)
 {

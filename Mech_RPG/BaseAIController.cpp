@@ -115,7 +115,13 @@ void ABaseAIController::PerformAbility() {
 		&& GetOwner()->CanCast()) {
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
 			if (ability != nullptr && !ability->OnCooldown()) {
-				if (ability->Activate(target, target->GetActorLocation())) {
+				if (ability->HasTag(UAbility::healTag) && GetOwner()->GetGroup()->GetLowHealthMember() != nullptr) {
+					if (ability->Activate(GetOwner()->GetGroup()->GetLowHealthMember(), target->GetActorLocation())) {
+						GetOwner()->SetCurrentAbility(ability);
+						StopMovement();
+						break;
+					}
+				} else if (ability->Activate(target, target->GetActorLocation())) {
 					GetOwner()->SetCurrentAbility(ability);
 					StopMovement();
 					break;

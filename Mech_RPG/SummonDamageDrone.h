@@ -13,7 +13,7 @@ class MECH_RPG_API USummonDamageDrone : public UAbility
 {
 	GENERATED_BODY()
 private:
-	AMech_RPGCharacter* droneSummoned;
+	class ADrone* droneSummoned;
 
 public:
 

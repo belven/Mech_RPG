@@ -62,6 +62,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		AMech_RPGCharacter* GetRandomMember();
 
+	AMech_RPGCharacter * GetLowHealthMember();
+
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		AMech_RPGCharacter* GetPlayer();
 

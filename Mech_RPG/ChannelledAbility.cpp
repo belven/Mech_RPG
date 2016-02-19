@@ -67,7 +67,19 @@ void UChannelledAbility::ActiveChannelAbility() {
 		if (currentChannelTime > 0) {
 			reset = false;
 			currentChannelTime -= 0.1F;
-			DrawDebugLine(owner->GetWorld(), owner->GetActorLocation(), targetLocation, FColor::Blue, false, 0.2, 0, 5);
+
+			if (abilityToActivate->HasTag(UAbility::aoeTag)) {
+
+				//FMatrix TM;
+				//TM.SetOrigin(targetLocation);
+				//TM.SetAxis(0, FVector(1, 0, 1)); //x
+				//TM.SetAxis(1, FVector(0, 1, 1)); //y
+				//TM.SetAxis(2, FVector(0, 0, 1)); //z
+				//DrawDebugCircle(owner->GetWorld(), TM, abilityToActivate->GetTagValue(UAbility::aoeTag), 40, UMiscLibrary::GetRelativeColour(owner), false, 0.1F, 0, 5, false);
+				//DrawDebugSphere(owner->GetWorld(), targetLocation, abilityToActivate->GetTagValue(UAbility::aoeTag), 40, UMiscLibrary::GetRelativeColour(owner), false, 0.1F, 0);
+			}
+
+			DrawDebugLine(owner->GetWorld(), owner->GetActorLocation(), targetLocation, UMiscLibrary::GetRelativeColour(owner), false, 0.1F, 0, 10);
 			owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
 		}
 		else if (!usesTrace || targetCharacter == owner || (usesTrace && PerformLineTrace())) {

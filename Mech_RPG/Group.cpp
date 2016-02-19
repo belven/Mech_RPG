@@ -68,6 +68,22 @@ AMech_RPGCharacter* UGroup::GetRandomMember()
 	}
 }
 
+AMech_RPGCharacter* UGroup::GetLowHealthMember()
+{
+	AMech_RPGCharacter* lowestHealthMember = nullptr;
+	for (AMech_RPGCharacter* member : members) {
+		if (UMiscLibrary::IsCharacterAlive(member) && UMiscLibrary::GetMissingHealth(member) > 1) {
+			if (lowestHealthMember != nullptr && UMiscLibrary::GetMissingHealth(lowestHealthMember) < UMiscLibrary::GetMissingHealth(member)) {
+				lowestHealthMember = member;
+			}
+			else {
+				lowestHealthMember = member;
+			}
+		}
+	}
+	return lowestHealthMember;
+}
+
 AMech_RPGCharacter* UGroup::GetPlayer() {
 	if (HasMemebers()) {
 		for (AMech_RPGCharacter* character : members) {

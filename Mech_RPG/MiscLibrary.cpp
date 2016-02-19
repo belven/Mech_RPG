@@ -17,6 +17,18 @@ TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::GetDifficulty()
 	return difficulty;
 }
 
+FColor UMiscLibrary::GetRelativeColour(AMech_RPGCharacter* character) {
+	if (GetPlayer() != nullptr) {
+		if (character->CompareGroup(GetPlayer())) {
+			return FColor::Green;
+		}
+		else {
+			return FColor::Red;
+		}
+	}
+	return FColor::Red;
+}
+
 void UMiscLibrary::SetDifficulty(GameEnums::Difficulty newDifficulty)
 {
 	difficulty = newDifficulty;

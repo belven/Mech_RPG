@@ -18,9 +18,9 @@ ADrone::ADrone() : Super() {
 void ADrone::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility) {
 	Super::CreatePresetRole(inRole, grade, quaility);
 	SetMaxHealth(GetMaxHealth() * 0.25F);
-	SetHealth(GetMaxHealth());
 	GetAbilities().Empty();
 	AddAbility(UTargetedHealthChange::CreateAbility(7, this, 0.25F, AOEEnums::Enemy));
+	SetHealth(GetMaxHealth());
 }
 
 void ADrone::OutOfCombat() {

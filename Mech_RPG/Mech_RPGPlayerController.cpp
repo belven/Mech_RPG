@@ -14,7 +14,7 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/Character_Interface.Character_Interface_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/Character_Pane.Character_Pane_C"));
 
 	if (characterPaneClass.Class != nullptr) {
 		WidgetTemplate = characterPaneClass.Class;
@@ -27,7 +27,7 @@ void AMech_RPGPlayerController::BeginPlay() {
 		characterPane = CreateWidget<UUserWidget>(this, WidgetTemplate);
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
-		characterPane->SetPositionInViewport(FVector2D(1000, 200));
+		characterPane->SetPositionInViewport(FVector2D(700, 200));
 	}
 }
 

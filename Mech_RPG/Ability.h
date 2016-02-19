@@ -37,7 +37,9 @@ private:
 protected:
 	TEnumAsByte<AOEEnums::AffectedTeam> affectedTeam = AOEEnums::Enemy;
 	TArray<FTag> tags;
-
+	static const TArray<TEnumAsByte<AbilityEnums::Ability>> supportAbilities;
+	static const TArray<TEnumAsByte<AbilityEnums::Ability>> offensiveAbilities;
+	static const TArray<TEnumAsByte<AbilityEnums::Ability>> defensiveAbilities;
 public:
 	static const FString healTag;
 	static const FString damageTag;
