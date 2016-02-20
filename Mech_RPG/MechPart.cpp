@@ -2,14 +2,14 @@
 
 #pragma once
 #include "Mech_RPG.h"
-#include "MechAttachment.h"
+#include "MechPart.h"
 #include "Mech_RPGCharacter.h"
 
 
 /**
  * Sets default values for this actor's properties
  */
-AMechAttachment::AMechAttachment() : Super()
+AMechPart::AMechPart() : Super()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -18,32 +18,32 @@ AMechAttachment::AMechAttachment() : Super()
 	SetRootComponent(meshComponent);
 }
 
-int32 AMechAttachment::GetGrade()
+int32 AMechPart::GetGrade()
 {
 	return grade;
 }
 
-int32 AMechAttachment::GetQuality()
+int32 AMechPart::GetQuality()
 {
 	return quality;
 }
 
-void AMechAttachment::SetGrade(int32 newGrade)
+void AMechPart::SetGrade(int32 newGrade)
 {
 	grade = newGrade;
 }
 
-void AMechAttachment::SetQuality(int32 newQuality)
+void AMechPart::SetQuality(int32 newQuality)
 {
 	quality = newQuality;
 }
 
-AMech_RPGCharacter * AMechAttachment::GetOwner()
+AMech_RPGCharacter * AMechPart::GetOwner()
 {
 	return owner;
 }
 
-void AMechAttachment::SetOwner(AMech_RPGCharacter* inOwner)
+void AMechPart::SetOwner(AMech_RPGCharacter* inOwner)
 {
 	owner = inOwner;
 
@@ -64,20 +64,20 @@ void AMechAttachment::SetOwner(AMech_RPGCharacter* inOwner)
 }
 
 // Called when the game starts or when spawned
-void AMechAttachment::BeginPlay()
+void AMechPart::BeginPlay()
 {
 	Super::BeginPlay();
 
 }
 
 // Called every frame
-void AMechAttachment::Tick(float DeltaTime)
+void AMechPart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void AMechAttachment::SetActorHiddenInGame(bool bNewHidden)
+void AMechPart::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
 	meshComponent->SetHiddenInGame(bNewHidden, true);

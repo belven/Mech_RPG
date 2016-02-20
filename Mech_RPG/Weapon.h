@@ -25,7 +25,8 @@ namespace QualityEnums {
 }
 
 #pragma once
-#include "MechAttachment.h"
+
+#include "MechPart.h"
 #include "Armour.h"
 #include "MiscLibrary.h"
 #include "Weapon.generated.h"
@@ -48,16 +49,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 		TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		TEnumAsByte<QualityEnums::Quality> quality = (QualityEnums::Quality) UMiscLibrary::GetRandomEnum(QualityEnums::End);
+		TEnumAsByte<QualityEnums::Quality> quality = QualityEnums::Base;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		int32 grade = rand() % 2;
-
+		int32 grade = 0;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFired);
 
 UCLASS(Blueprintable)
-class MECH_RPG_API AWeapon : public AMechAttachment {
+class MECH_RPG_API AWeapon : public AMechPart {
 	GENERATED_BODY()
 protected:
 	FWeaponParams settings;

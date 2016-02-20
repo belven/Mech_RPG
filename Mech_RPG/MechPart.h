@@ -3,10 +3,10 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "MechAttachment.generated.h"
+#include "MechPart.generated.h"
 
 UCLASS(Blueprintable)
-class MECH_RPG_API AMechAttachment : public AActor
+class MECH_RPG_API AMechPart : public AActor
 {
 	GENERATED_BODY()
 private:
@@ -16,7 +16,7 @@ private:
 
 public:	
 	// Sets default values for this actor's properties
-	AMechAttachment();
+	AMechPart();
 
 	int32 GetGrade();
 	int32 GetQuality();
