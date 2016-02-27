@@ -27,8 +27,8 @@ void UDamageSpawnTrigger::BossHealthChange(FHealthChange damage) {
 			amount--;
 
 			// Spawn adds
-			if (OnSpawnTrigger.IsBound()) {
-				OnSpawnTrigger.Broadcast();
+			if (OnTrigger.IsBound()) {
+				OnTrigger.Broadcast();
 			}
 
 			if (amount == 0) {

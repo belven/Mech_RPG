@@ -15,7 +15,7 @@ AMech_RPGGameMode::AMech_RPGGameMode()
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/Player"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
+		//DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
 	static ConstructorHelpers::FClassFinder<AHUD> hud(TEXT("/Game/TopDown/Blueprints/UI/HUD.HUD_C"));

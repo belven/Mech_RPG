@@ -4,10 +4,11 @@
 #include "Mech_RPGPlayerController.h"
 #include "AllyAIController.h"
 #include "AI/Navigation/NavigationSystem.h"
-//#include "Navigation/CrowdFollowingComponent.h"
+#include "Interactable.h"
+
+#define mCanSee(location) UMiscLibrary::CanSee(GetOwner()->GetWorld(), GetOwner()->GetActorLocation(), location)
 
 AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
-	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
 	bShowMouseCursor = true;
 	bAttackTarget = false;
 	DefaultMouseCursor = EMouseCursor::Hand;
@@ -72,6 +73,9 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			if (cursorTarget != nullptr && !cursorTarget->IsDead()) {
 				CurrentMouseCursor = EMouseCursor::Crosshairs;
 			}
+			else if (GetInteractableUnderCursor() != nullptr) {
+				CurrentMouseCursor = EMouseCursor::GrabHand;
+			}
 			else {
 				CurrentMouseCursor = EMouseCursor::Hand;
 			}
@@ -82,15 +86,41 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 				swapWeapons = false;
 			}
 
-			if (IsTargetValid(cursorTarget) && bAttackTarget) {
-				target = cursorTarget;
-				AttackTarget(DeltaTime);
+			// Are we trying to interact with an Interactable
+			if (lastAction == PlayerControllerEnums::Interactable) {
+				if (mCanSee(lastTargetInteractable->GetActorLocation())
+					&& GetOwner()->GetDistanceTo(lastTargetInteractable) <= interactionRange) {
+					lastTargetInteractable->Interact(GetOwner()); 
+					lastAction = PlayerControllerEnums::None;
+				}
+				else {
+					MoveToActor(lastTargetInteractable);
+				}
 			}
-			else if (IsTargetValid(target)) {
-				AttackTarget(DeltaTime);
+			// Are we trying to use an ability
+			else if (lastAction == PlayerControllerEnums::Ability && lastCharacterTarget != nullptr) {
+				if (mCanSee(lastCharacterTarget->GetActorLocation())) {
+					ActivateAbility();
+				}
+				else {
+					MoveToActor(lastCharacterTarget);
+				}
 			}
-			else {
-				GetOwner()->OnStopFiring.Broadcast();
+			// Are we trying to interact with a character
+			else if (lastAction == PlayerControllerEnums::Attack) {
+				// Are we requesting a new target to attack
+				if (bAttackTarget && IsTargetValid(cursorTarget)) {
+					target = cursorTarget;
+					AttackTarget(DeltaTime);
+				}
+				// Is our current target valid
+				else if (IsTargetValid(target)) {
+					AttackTarget(DeltaTime);
+				}
+				// No valid target so stop firing
+				else {
+					GetOwner()->OnStopFiring.Broadcast();
+				}
 			}
 		}
 		else {
@@ -120,7 +150,7 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 		GetOwner()->LookAt(target);
 	}
 	// Have we traced to another character or cover
-	else if (UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), target->GetActorLocation())) {
+	else if (mCanSee(target->GetActorLocation())) {
 		FireWeapon(target);
 		GetOwner()->LookAt(target);
 	}
@@ -352,7 +382,14 @@ void AMech_RPGPlayerController::PanDownReleased()
 }
 
 void AMech_RPGPlayerController::OnAttackPressed() {
-	bAttackTarget = true;
+	if (GetInteractableUnderCursor() != nullptr) {
+		lastAction = PlayerControllerEnums::Interactable;
+		lastTargetInteractable = GetInteractableUnderCursor();
+	}
+	else {
+		bAttackTarget = true;
+		lastAction = PlayerControllerEnums::Attack;
+	}
 }
 
 void AMech_RPGPlayerController::OnAttackReleased() {
@@ -373,8 +410,26 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
 	return nullptr;
 }
 
+AInteractable* AMech_RPGPlayerController::GetInteractableUnderCursor() {
+	FHitResult Hit;
+	Hit = GetHitFromCursor();
+
+	if (Hit.bBlockingHit) {
+		AActor* targetFound = Hit.GetActor();
+
+		if (targetFound != nullptr && IsInteractable(targetFound)) {
+			return Cast<AInteractable>(targetFound);
+		}
+	}
+	return nullptr;
+}
+
 bool AMech_RPGPlayerController::IsMechCharacter(AActor* character) {
 	return character->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass());
+}
+
+bool AMech_RPGPlayerController::IsInteractable(AActor* character) {
+	return character->GetClass()->IsChildOf(AInteractable::StaticClass());
 }
 
 bool AMech_RPGPlayerController::IsCover(AActor* character) {
@@ -476,6 +531,7 @@ void AMech_RPGPlayerController::SwapWeapons() {
 void AMech_RPGPlayerController::ActivateAbility() {
 	FHitResult hit;
 	FVector location;
+	AMech_RPGCharacter* tempCharacter = cursorTarget != nullptr ? cursorTarget : lastCharacterTarget;
 
 	if (IsOwnerValid()
 		&& GetOwner()->HasAbilities()
@@ -485,12 +541,13 @@ void AMech_RPGPlayerController::ActivateAbility() {
 		SetupCollision();
 
 		//We're targeting the ground so get selected location
-		if (cursorTarget == nullptr) {
+		if (tempCharacter == nullptr) {
 			hit = GetHitFromCursor();
 			location = hit.ImpactPoint;
 		}
-		else {
-			location = cursorTarget->GetActorLocation();
+		else if(tempCharacter != nullptr){
+			location = tempCharacter->GetActorLocation();
+			lastCharacterTarget = tempCharacter;
 		}
 
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
@@ -498,15 +555,18 @@ void AMech_RPGPlayerController::ActivateAbility() {
 
 				if (ability->GetTagTrue(ability->needsTargetTag)) {
 					//Only use an ability if we have LoS to our target/location
-					if (!UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), location)) {
+					if (!mCanSee(location)) {
 						MoveToLocation(location);
+						lastUsedAbility = ability;
+						lastAction = PlayerControllerEnums::Ability;
 						break;
 					}
 				}
 
-				if (ability->Activate(cursorTarget, location)) {
+				if (ability->Activate(tempCharacter, location)) {
 					GetOwner()->SetCurrentAbility(ability);
 					StopMovement();
+					lastAction = PlayerControllerEnums::None;
 					break;
 				}
 			}

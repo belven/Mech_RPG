@@ -21,7 +21,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
 		static USpawnTrigger* CreateSpawnTrigger(ABoss* inBoss);
 
-	FTriggerSpawn OnSpawnTrigger;
+	FTriggerSpawn OnTrigger;
 
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
 		virtual void SetBoss(ABoss* inBoss);

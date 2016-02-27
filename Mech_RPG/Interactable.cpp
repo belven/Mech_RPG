@@ -1,6 +1,7 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
+#include "Mech_RPGCharacter.h"
 #include "Interactable.h"
 
 
@@ -18,11 +19,3 @@ void AInteractable::BeginPlay()
 	Super::BeginPlay();
 	
 }
-
-// Called every frame
-void AInteractable::Tick( float DeltaTime )
-{
-	Super::Tick( DeltaTime );
-
-}
-

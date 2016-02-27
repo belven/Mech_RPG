@@ -5,6 +5,16 @@
 
 class AMech_RPGCharacter;
 
+UENUM(BlueprintType)
+namespace PlayerControllerEnums {
+	enum LastUsed {
+		None,
+		Ability,
+		Attack,
+		Interactable
+	};
+}
+
 UCLASS()
 class AMech_RPGPlayerController : public APlayerController {
 	GENERATED_BODY()
@@ -24,6 +34,15 @@ private:
 	FCollisionQueryParams collision;
 	FCollisionObjectQueryParams objectCollision;
 	FHitResult hit;
+
+	class AInteractable* lastTargetInteractable;
+	class AMech_RPGCharacter* lastCharacterTarget;
+	UAbility* lastUsedAbility;
+
+	PlayerControllerEnums::LastUsed lastAction;
+
+	float interactionRange = 100;
+
 public:
 	AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer);
 
@@ -33,9 +52,12 @@ public:
 	void SetOwner(AMech_RPGCharacter* newVal);
 
 	bool IsMechCharacter(AActor* character);
+	bool IsInteractable(AActor * character);
 	bool IsCover(AActor* character);
 
 	AMech_RPGCharacter* GetTargetUnderCursor();
+	class AInteractable* GetInteractableUnderCursor();
+
 	FHitResult GetHitFromCursor();
 
 	bool IsTargetValid(AMech_RPGCharacter* inTarget);

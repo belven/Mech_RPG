@@ -9,17 +9,16 @@ UCLASS()
 class MECH_RPG_API AInteractable : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AInteractable();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
 
-	
-	
+	virtual void Interact(class AMech_RPGCharacter* character) {
+		check(0 && "You must override this");
+	}
+
 };

@@ -28,7 +28,7 @@ void AAddSpawningMechanic::BeginPlay() {
 			trigger = UDamageSpawnTrigger::CreateDamageSpawnTrigger(GetBoss(), spawnAmount, 0.15);
 		}
 
-		trigger->OnSpawnTrigger.AddUniqueDynamic(this, &AAddSpawningMechanic::TriggerSpawn);
+		trigger->OnTrigger.AddUniqueDynamic(this, &AAddSpawningMechanic::TriggerSpawn);
 		trigger->SetBoss(GetBoss());
 		trigger->SetAmount(spawnAmount); 
 	}
