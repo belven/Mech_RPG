@@ -30,7 +30,11 @@ public:
 		static float GetMissingHealth(AMech_RPGCharacter* character);
 
 	static TEnumAsByte<GameEnums::Difficulty> GetDifficulty();
+	
+	template<class T> static void InitialiseArray(TArray<T>& emptyArray, T* items);
+
 	static FColor GetRelativeColour(AMech_RPGCharacter * character);
+
 	static void SetDifficulty(GameEnums::Difficulty newDifficulty);
 
 	static bool CanSee(UWorld * world, FVector pointA, FVector pointB);

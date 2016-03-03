@@ -80,6 +80,8 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	}
 
 	AIControllerClass = ABaseAIController::StaticClass();
+
+
 }
 
 AMech_RPGCharacter::~AMech_RPGCharacter() {
@@ -141,6 +143,10 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 
 void AMech_RPGCharacter::BeginPlay() {
 	Super::BeginPlay();
+	if (IsPendingKill()) {
+		return;
+	}
+
 	Reset();
 
 
@@ -176,6 +182,13 @@ void AMech_RPGCharacter::BeginPlay() {
 		stats->SetRelativeTransform(trans);
 		stats->AttachTo(GetRootComponent());
 		stats->SetDrawSize(FVector2D(100, 50));
+	}
+	
+	if (inventory == nullptr) {
+		inventory = NewObject<UInventory>(UInventory::StaticClass());
+		if (inventory != nullptr) {
+			inventory->SetMaxItemCount(10);
+		}
 	}
 }
 
@@ -257,6 +270,7 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 }
 
 void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
+	inventory->AddItem(AItem::CreateItem(GetWorld(), this));
 	if (GetGroup() != nullptr && !CompareGroup(healthChange.damager)) {
 		GetGroup()->GroupMemberHit(healthChange.damager, this);
 	}
@@ -320,6 +334,11 @@ void AMech_RPGCharacter::Reset()
 	canBeDamaged = 0;
 }
 
+void AMech_RPGCharacter::ResetInvunrelbility()
+{
+	ApplyCrowdControl(EffectEnums::Damage, true);
+}
+
 void AMech_RPGCharacter::OutOfCombat() {
 	inCombat = false;
 	OnStopFiring.Broadcast();
@@ -331,6 +350,8 @@ void AMech_RPGCharacter::OutOfCombat() {
 		SetActorHiddenInGame(false);
 		SetActorEnableCollision(true);
 		SetHealth(GetMaxHealth() * 0.2);
+		ApplyCrowdControl(EffectEnums::Damage, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::ResetInvunrelbility, 3.0F);
 	}
 }
 

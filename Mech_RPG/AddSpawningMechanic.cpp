@@ -43,11 +43,12 @@ void AAddSpawningMechanic::TriggerSpawn() {
 		FNavLocation nav;
 		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), 400, nav);
 		nav.Location.Z = GetActorLocation().Z;
-		AMech_RPGCharacter* character = GetWorld()->SpawnActor<AMech_RPGCharacter>(classToSpawn, nav.Location, GetActorRotation());
+		AMech_RPGCharacter* character = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(GetWorld(), nav.Location, GetActorRotation(), classToSpawn);
 		if (character != nullptr) {
 			character->SpawnDefaultController();
 			character->CreatePresetRole((GroupEnums::Role)UMiscLibrary::GetRandomEnum(GroupEnums::End));
 			character->SetGroup(GetGroup());
+			character->team = team;
 			spawnAmount--;
 		}
 	}

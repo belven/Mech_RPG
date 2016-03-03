@@ -17,6 +17,11 @@ TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::GetDifficulty()
 	return difficulty;
 }
 
+template<class T>
+void UMiscLibrary::InitialiseArray(TArray<T>& emptyArray, T* items) {
+	emptyArray.Append(items, ARRAY_COUNT(items));
+}
+
 FColor UMiscLibrary::GetRelativeColour(AMech_RPGCharacter* character) {
 	if (GetPlayer() != nullptr) {
 		if (character->CompareGroup(GetPlayer())) {
@@ -152,8 +157,10 @@ T* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotati
 	AMech_RPGCharacter* character = nullptr;
 
 	while (character == nullptr && count < 10) {
+		FActorSpawnParameters params;
+		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 		world->GetNavigationSystem()->GetRandomPointInNavigableRadius(location, 100, nav);
-		character = world->SpawnActor<T>(classToSpawn, nav.Location, rotation);
+		character = world->SpawnActor<T>(classToSpawn, nav.Location, rotation, params);
 		count++;
 	}
 

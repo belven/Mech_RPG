@@ -23,29 +23,14 @@ int32 AMechPart::GetGrade()
 	return grade;
 }
 
-int32 AMechPart::GetQuality()
-{
-	return quality;
-}
-
 void AMechPart::SetGrade(int32 newGrade)
 {
 	grade = newGrade;
 }
 
-void AMechPart::SetQuality(int32 newQuality)
-{
-	quality = newQuality;
-}
-
-AMech_RPGCharacter * AMechPart::GetOwner()
-{
-	return owner;
-}
-
 void AMechPart::SetOwner(AMech_RPGCharacter* inOwner)
 {
-	owner = inOwner;
+	Super::SetOwner(inOwner);
 
 	if (mesh == nullptr && meshClass != nullptr) {
 		mesh = GetWorld()->SpawnActor<UStaticMesh>(meshClass);

@@ -45,10 +45,10 @@ void  AAOEHealthChange::Activate() {
 		FVector locationToUse = settings.usesTarget && settings.target != NULL ? settings.target->GetActorLocation() : settings.location;
 		//DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, FColor::Blue, false, settings.rate, 0);
 
-		if (!partclSystem->IsActive()) {
+	/*	if (!partclSystem->IsActive()) {
 			partclSystem->SetVectorParameter(FName(TEXT("Size")), FVector(settings.radius * 2));
 			partclSystem->Activate(true);
-		}
+		}*/
 
 		healthChange.damager = settings.owner;
 

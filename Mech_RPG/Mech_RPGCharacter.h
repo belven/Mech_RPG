@@ -25,6 +25,7 @@ namespace EffectEnums {
 #include "Group.h"
 #include "Array.h"
 #include "Ability.h"
+#include "Inventory.h"
 #include "FloatingStats_BP.h"
 #include "Mech_RPGCharacter.generated.h"
 
@@ -128,12 +129,16 @@ private:
 	static TArray<AMech_RPGCharacter*> characters;
 
 	FTimerHandle TimerHandle_OutOfCombat;
+	FTimerHandle TimerHandle_Invunrelbility;
 
 	UPROPERTY()
 		TArray<AWeapon*> weapons;
 
 	UPROPERTY()
 		AWeapon* currentWeapon;
+
+	UPROPERTY()
+		UInventory* inventory;
 
 	UPROPERTY()
 		UGroup* group;
@@ -190,7 +195,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void Reset();
-
+	
+	UFUNCTION(BlueprintCallable, Category = "Other")
+		void ResetInvunrelbility();
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FPreHealthChangeEvent OnPreHealthChange;

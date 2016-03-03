@@ -121,7 +121,8 @@ void ABaseAIController::PerformAbility() {
 						StopMovement();
 						break;
 					}
-				} else if (ability->Activate(target, target->GetActorLocation())) {
+				}
+				else if (ability->Activate(target, target->GetActorLocation())) {
 					GetOwner()->SetCurrentAbility(ability);
 					StopMovement();
 					break;
@@ -147,32 +148,45 @@ void ABaseAIController::MoveToLocation(FVector location) {
 
 void ABaseAIController::FindTarget() {
 	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
+	float range = weapon->GetRange();
 	SetupCollision();
 
 	if (weapon != nullptr && !weapon->Heals()) {
-		float range = weapon->GetRange();
-
-		for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
-			//TArray<FHitResult> results;
-			//GetWorld()->LineTraceMultiByChannel(results, GetOwner()->GetActorLocation(), character->GetActorLocation(), ECollisionChannel::ECC_WorldStatic);
-			//bool canSee = (results.Num() == 0);
-
-			if (IsTargetValid(character) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
-				if (character->GetGroup() != nullptr && character->GetGroup()->HasMemebers()) {
-					SetTarget(character->GetGroup()->GetRandomMember());
+		if (target != nullptr && UMiscLibrary::IsCharacterAlive(target = target->GetGroup()->GetRandomMember())) {
+			SetTarget(target);
+		}
+		else {
+			for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
+				if (IsTargetValid(character) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
+					if (character->GetGroup() != nullptr && character->GetGroup()->HasMemebers()) {
+						SetTarget(character->GetGroup()->GetRandomMember());
+					}
+					else {
+						SetTarget(character);
+					}
+					break;
 				}
-				else {
-					SetTarget(character);
-				}
-				break;
 			}
 		}
 	}
-	else if (weapon != nullptr && GetOwner()->GetGroup() != nullptr && GetOwner()->GetGroup()->HasMemebers()) {
+	else if (weapon != nullptr && GetOwner()->GetGroup() != nullptr) {
+		bool targetFound = false;
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
 			if (UMiscLibrary::IsCharacterAlive(character) && UMiscLibrary::GetMissingHealth(character) > 0) {
 				SetTarget(character);
+				targetFound = true;
 				break;
+			}
+		}
+
+		if (!targetFound) {
+			for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
+				if (IsTargetValid(character) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
+					if (UMiscLibrary::GetMissingHealth(character) > 0) {
+						SetTarget(character->GetGroup()->GetRandomMember());
+						break;
+					}
+				}
 			}
 		}
 	}
