@@ -21,6 +21,12 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 		WidgetTemplate = characterPaneClass.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryClass(TEXT("/Game/TopDown/Blueprints/UI/ItemsUI/Inventory.Inventory_C"));
+
+	if (inventoryClass.Class != nullptr) {
+		inventoryTemplate = inventoryClass.Class;
+	}
+
 }
 
 void AMech_RPGPlayerController::BeginPlay() {
@@ -28,7 +34,13 @@ void AMech_RPGPlayerController::BeginPlay() {
 		characterPane = CreateWidget<UUserWidget>(this, WidgetTemplate);
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
-		characterPane->SetPositionInViewport(FVector2D(700, 200));
+		characterPane->SetPositionInViewport(FVector2D(400, 200));
+	}
+	if (inventoryTemplate != nullptr) {
+		inventory = CreateWidget<UInventoryUI>(this, inventoryTemplate);
+		inventory->AddToViewport();
+		inventory->SetVisibility(ESlateVisibility::Hidden);
+		inventory->SetPositionInViewport(FVector2D(700, 200));
 	}
 }
 
@@ -259,6 +271,7 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("ResetZoom", IE_Pressed, this, &AMech_RPGPlayerController::ResetZoom);
 	InputComponent->BindAction("CharacterPane", IE_Pressed, this, &AMech_RPGPlayerController::OpenCharacterPane);
+	InputComponent->BindAction("Inventory", IE_Pressed, this, &AMech_RPGPlayerController::OpenInventory);
 	//	InputComponent->BindAction("UpdateRotation", IE_Pressed, this, &AMech_RPGPlayerController::UpdateRotation);
 }
 
@@ -277,6 +290,24 @@ void AMech_RPGPlayerController::OpenCharacterPane() {
 		//SetPause(true);
 		characterPaneOpen = true;
 		characterPane->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void AMech_RPGPlayerController::OpenInventory()
+{
+	if (inventoryOpen) {
+		FInputModeGameAndUI data;
+		SetInputMode(data);
+		//SetPause(false);
+		inventoryOpen = false;
+		inventory->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else {
+		FInputModeUIOnly data;
+		SetInputMode(data);
+		//SetPause(true);
+		inventoryOpen = true;
+		inventory->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
@@ -485,6 +516,7 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetOwner() {
 
 void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
 	owner = newVal;
+	inventory->SetOwner(owner);
 }
 
 void AMech_RPGPlayerController::CharacterFive() {

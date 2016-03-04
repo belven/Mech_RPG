@@ -11,12 +11,15 @@ UCLASS()
 class MECH_RPG_API UInventoryUI : public UUserWidget
 {
 	GENERATED_BODY()
-private:
+protected:
 	AMech_RPGCharacter* owner;
 
 public:
-	void SetOwner(AMech_RPGCharacter* inOwner);
-	AMech_RPGCharacter* GetOwner();
-	
-	
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		void SetOwner(AMech_RPGCharacter* inOwner);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		AMech_RPGCharacter* GetOwner();
+
+
 };

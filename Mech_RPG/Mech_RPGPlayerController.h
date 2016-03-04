@@ -1,6 +1,7 @@
 #pragma once
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "InventoryUI.h"
 #include "Mech_RPGPlayerController.generated.h"
 
 class AMech_RPGCharacter;
@@ -30,6 +31,7 @@ private:
 	bool panDown;
 
 	bool characterPaneOpen = false;
+	bool inventoryOpen = false;
 
 	FCollisionQueryParams collision;
 	FCollisionObjectQueryParams objectCollision;
@@ -122,10 +124,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = UI)
 	TSubclassOf<UUserWidget> WidgetTemplate;
+	TSubclassOf<UUserWidget> inventoryTemplate;
 
 
 	UUserWidget* characterPane;
+	UInventoryUI* inventory;
 	void OpenCharacterPane();
+	void OpenInventory();
 
 protected:
 	/**

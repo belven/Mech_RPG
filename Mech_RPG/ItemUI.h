@@ -11,14 +11,13 @@ UCLASS()
 class MECH_RPG_API UItemUI : public UUserWidget
 {
 	GENERATED_BODY()
-private:
+protected:
 	AItem* owner;
 
 public:
-	void SetItem(AItem* inItem);
-	AItem* GetItem();
-	
-	
-	
-	
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		void SetItem(AItem* inItem);
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		AItem* GetItem();	
 };

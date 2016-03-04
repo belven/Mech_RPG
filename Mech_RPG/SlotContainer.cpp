@@ -14,72 +14,42 @@ void USlotContainer::SetItems(TArray<AItem*> newVal) {
 	items = newVal;
 }
 
+AItem* USlotContainer::GetExistingItemWithSpace(AItem* inItem) {
+	for (AItem* item : GetItems()) {
+		// Finds the first item with space available and a matching name
+		if (item != nullptr && item->GetName().Equals(inItem->GetName()) && item->HasSpace()) {
+			return item;
+		}
+	}
+	return nullptr;
+}
+
 /* Adds an item to the inventory, if it finds an item with less than StackSize it adds the amount
 * else it will create a new item with the remaining amount and set the one found to StackSize
 *
 * @return the input item with the amount set to the remainder if any, i.e. if it's not 0 then the inventory was full
 */
 AItem* USlotContainer::AddItem(AItem* itemToAdd) {
+	AItem* existingItem = GetExistingItemWithSpace(itemToAdd);
+	
+	// Check all existing matching items to see if they have space
+	while (itemToAdd->GetAmount() > 0 && existingItem != nullptr) {
+		int amountToAdd = itemToAdd->GetAmount();
+		existingItem->TakeFrom(itemToAdd);
 
-	AItem* tempitem = NULL;
-
-	for (AItem* item : GetItems()) {
-		// Finds the first item with space available and a matching name
-		if (item != nullptr && item->GetName().Equals(itemToAdd->GetName()) && item->GetAmount() < item->GetStackSize()) {
-			tempitem = item;
-			break;
-		}
+		// Try to find another item to add to
+		existingItem = GetExistingItemWithSpace(itemToAdd);
 	}
+	
+	// Keep adding new items until we're either full or added all items
+	while (itemToAdd->GetAmount() > 0 && HasSpace()) {
+		// Make a new item
+		AItem* newItem = itemToAdd->Copy();
+		newItem->SetAmount(0);
+		newItem->TakeFrom(itemToAdd);		
 
-	// If we found an item
-	if (tempitem != NULL) {
-		int32 amountOfSpace = itemToAdd->GetStackSize() - itemToAdd->GetAmount();
-
-		// If there is enough space left just add to it
-		if (amountOfSpace >= 0) {
-			tempitem->SetAmount(tempitem->GetAmount() + itemToAdd->GetAmount());
-			itemToAdd->SetAmount(0);
-		}
-		else {
-			// Otherwise max the amount of the current and add a new item to the inventory
-			// At this stage will we need to check if their inventory is full and possibly add multiple items 
-			if (HasSpace()) {
-
-				// Get the space left in the current item
-				int amount = tempitem->GetStackSize() - tempitem->GetAmount();
-				tempitem->SetAmount(amount);
-
-				// Set the amount to the amount left - the difference
-				amount = itemToAdd->GetAmount() - amount;
-				itemToAdd->SetAmount(amount);
-
-				// While we still have items to add and space
-				while (amount > 0 && HasSpace()) {
-
-					// Make a new item
-					AItem* newItem = tempitem->Copy();
-
-					// If we're greater than stack size just set the amount to max size
-					newItem->SetAmount(amount < tempitem->GetStackSize() ? amount : tempitem->GetStackSize());
-					GetItems().Add(newItem);
-
-					// Update the amount
-					amount -= newItem->GetAmount();
-				}
-
-				// This may not always be 0, if not then the inventory was filled up with no more space
-				itemToAdd->SetAmount(amount);
-			}
-		}
-
-	}
-	else if (HasSpace()) {
-		// We didn't find an existing item so add it
-		// At this stage will we need to check if their inventory is full
-		GetItems().Add(itemToAdd->Copy());
-
-		// Set item amount to 0 so we know that all the items have been taken
-		itemToAdd->SetAmount(0);
+		// Add the new item
+		GetItems().Add(newItem);
 	}
 
 	return itemToAdd;

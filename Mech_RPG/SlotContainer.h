@@ -23,6 +23,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Slot Container")
 		void SetItems(TArray<AItem*> newVal);
 
+	AItem * GetExistingItemWithSpace(AItem* inItem);
+
 	UFUNCTION(BlueprintCallable, Category = "Slot Container")
 		AItem* AddItem(AItem* itemToAdd);
 

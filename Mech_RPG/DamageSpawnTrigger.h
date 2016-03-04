@@ -17,7 +17,7 @@ public:
 		float percent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
-		float lastHealthPecent;
+		float percentDamageTaken;
 
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
 		static UDamageSpawnTrigger* CreateDamageSpawnTrigger(ABoss* inBoss, int32 inAmount, float inPercent);

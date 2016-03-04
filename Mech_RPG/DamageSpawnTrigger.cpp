@@ -15,25 +15,27 @@ void UDamageSpawnTrigger::SetBoss(ABoss* inBoss) {
 	Super::SetBoss(inBoss);
 	if (inBoss != NULL) {
 		inBoss->OnPostHealthChange.AddUniqueDynamic(this, &UDamageSpawnTrigger::BossHealthChange);
-		lastHealthPecent = inBoss->GetHealth() / inBoss->GetMaxHealth();
 	}
 }
 
 void UDamageSpawnTrigger::BossHealthChange(FHealthChange damage) {
 	if (GetBoss() != NULL && GetAmount() > 0) {
-		float healthPercent = GetBoss()->GetHealth() / GetBoss()->GetMaxHealth();
-		if (lastHealthPecent - healthPercent >= percent) {
-			lastHealthPecent = healthPercent;
-			amount--;
+		// Convert damage taken to a percent of the bosses maxHealth
+		float healthPercent = damage.healthChange / GetBoss()->GetMaxHealth();
+		percentDamageTaken += healthPercent;
+
+		while (percentDamageTaken >= percent && GetAmount() > 0) {
+			percentDamageTaken -= percent;
 
 			// Spawn adds
 			if (OnTrigger.IsBound()) {
 				OnTrigger.Broadcast();
+				amount--;
 			}
+		}
 
-			if (amount == 0) {
-				GetBoss()->OnPostHealthChange.RemoveDynamic(this, &UDamageSpawnTrigger::BossHealthChange);
-			}
+		if (amount == 0) {
+			GetBoss()->OnPostHealthChange.RemoveDynamic(this, &UDamageSpawnTrigger::BossHealthChange);
 		}
 	}
 }

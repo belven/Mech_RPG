@@ -8,7 +8,7 @@
 #include "Item.h"
 #include "Mech_RPGCharacter.h"
 
-AItem::AItem() : Super(){
+AItem::AItem() : Super() {
 	SetActorEnableCollision(false);
 }
 
@@ -26,6 +26,22 @@ FString AItem::GetName() {
 
 void AItem::SetName(FString newVal) {
 	name = newVal;
+}
+
+void AItem::TakeFrom(AItem* otherItem) {
+	// Get the amount of items needed to add
+	int amountToAdd = otherItem->GetAmount();
+
+	// Can we just add to this item
+	if (GetRemainingSpace() >= amountToAdd) {
+		SetAmount(GetAmount() + otherItem->GetAmount());
+		otherItem->SetAmount(0);
+	}
+	else {
+		// If we're greater than stack size just set the amount to max size
+		otherItem->SetAmount(otherItem->GetAmount() - GetRemainingSpace());
+		SetAmount(GetStackSize());
+	}
 }
 
 int32 AItem::GetGrade() {
@@ -54,6 +70,14 @@ void AItem::SetOwner(AMech_RPGCharacter* newVal) {
 	owner = newVal;
 }
 
+bool AItem::HasSpace() {
+	return GetAmount() < GetStackSize();
+}
+
+int32 AItem::GetRemainingSpace() {
+	return GetStackSize() - GetAmount();
+}
+
 int32 AItem::GetAmount() {
 	return amount;
 }
@@ -71,14 +95,7 @@ void AItem::SetStackSize(int32 newVal) {
 }
 
 AItem* AItem::Copy() {
-	AItem* newItem = NewObject<AItem>(StaticClass());
-	newItem->SetName(GetName());
-	newItem->SetAmount(GetAmount());
-	newItem->SetStackSize(GetStackSize());
-	newItem->SetType(GetType());
-	newItem->SetGrade(GetGrade());
-	newItem->SetOwner(GetOwner());
-	return  newItem;
+	return CreateItem(GetWorld(), GetOwner(), GetName(), GetAmount(), GetGrade(), GetQuality(), GetStackSize());
 }
 
 AItem * AItem::CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString inName, int32 inAmount, int32 inGrade, int32 inQuality, int32 inStackSize)
@@ -90,7 +107,7 @@ AItem * AItem::CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString in
 	newItem->SetName(inName);
 	newItem->SetAmount(inAmount);
 	newItem->SetStackSize(inStackSize);
-	//newItem->SetType(GetType());
+	//SetType(GetType());
 	newItem->SetGrade(inGrade);
 	newItem->SetOwner(inOwner);
 	newItem->SetQuality(inQuality);

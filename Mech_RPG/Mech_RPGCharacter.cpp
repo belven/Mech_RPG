@@ -183,11 +183,17 @@ void AMech_RPGCharacter::BeginPlay() {
 		stats->AttachTo(GetRootComponent());
 		stats->SetDrawSize(FVector2D(100, 50));
 	}
-	
+
 	if (inventory == nullptr) {
 		inventory = NewObject<UInventory>(UInventory::StaticClass());
 		if (inventory != nullptr) {
-			inventory->SetMaxItemCount(10);
+			int invSize = 20;
+			inventory->SetMaxItemCount(invSize);
+			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
+			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
+			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 2", 4, 0, 0, 2));
+			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 3", 0, 0, 0, 2));
+			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));
 		}
 	}
 }
@@ -270,7 +276,6 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 }
 
 void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
-	inventory->AddItem(AItem::CreateItem(GetWorld(), this));
 	if (GetGroup() != nullptr && !CompareGroup(healthChange.damager)) {
 		GetGroup()->GroupMemberHit(healthChange.damager, this);
 	}
@@ -337,6 +342,11 @@ void AMech_RPGCharacter::Reset()
 void AMech_RPGCharacter::ResetInvunrelbility()
 {
 	ApplyCrowdControl(EffectEnums::Damage, true);
+}
+
+UInventory * AMech_RPGCharacter::GetInventory()
+{
+	return inventory;
 }
 
 void AMech_RPGCharacter::OutOfCombat() {

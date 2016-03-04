@@ -48,6 +48,9 @@ public:
 		void SetName(FString newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
+		void TakeFrom(AItem* otherItem);
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
 		int32 GetGrade();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
@@ -58,6 +61,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		virtual void SetOwner(AMech_RPGCharacter* newVal);
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		bool HasSpace();
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		int32 GetRemainingSpace();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		int32 GetAmount();
@@ -75,40 +84,31 @@ public:
 		AItem* Copy();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		static AItem* CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString inName = "Test", int32 inAmount = 1, int32 inGrade = 0, int32 inQuality = 0, int32 inStackSize = 1);
+		static AItem* CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString inName = "Test", int32 inAmount = 1, int32 inGrade = 0, int32 inQuality = 0, int32 inStackSize = 3);
 
 	FORCEINLINE AItem& operator+(AItem &aitem)
 	{
-		AItem* nitem = NewObject<AItem>(AItem::StaticClass());
-		if (nitem)
-		{
-			nitem->amount = aitem.amount + amount;
-		}
-
+		AItem* nitem = aitem.Copy();
+		nitem->amount = aitem.amount + amount;
 		return *nitem;
 	}
 
 	FORCEINLINE AItem& operator+=(AItem &aitem)
 	{
 		amount += aitem.amount;
-
 		return *this;
 	}
+
 	FORCEINLINE AItem& operator-(AItem &aitem)
 	{
-		AItem* nitem = NewObject<AItem>(AItem::StaticClass());
-		if (nitem)
-		{
-			nitem->amount = aitem.amount - amount;
-		}
-
+		AItem* nitem = aitem.Copy();
+		nitem->amount = aitem.amount - amount;
 		return *nitem;
 	}
 
 	FORCEINLINE AItem& operator-=(AItem &aitem)
 	{
 		amount -= aitem.amount;
-
 		return *this;
 	}
 

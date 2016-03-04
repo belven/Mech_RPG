@@ -199,6 +199,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void ResetInvunrelbility();
 
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		UInventory* GetInventory();
+
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FPreHealthChangeEvent OnPreHealthChange;
 	
