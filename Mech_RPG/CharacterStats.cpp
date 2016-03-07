@@ -5,6 +5,8 @@
 #include "Mech_RPGCharacter.h"
 #include "Mech_RPGPlayerController.h"
 
+#define mWBL UWidgetBlueprintLibrary
+
 float UCharacterStats::GetHealthBarPercent()
 {
 	return owner != nullptr ? UMiscLibrary::GetHealthPercent(owner) : 0.0f;
@@ -63,6 +65,28 @@ FString UCharacterStats::GetDPSText()
 	}
 
 	return DPSText;
+}
+
+FReply UCharacterStats::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	startDrag = true;
+	//return mWBL::CaptureMouse(mWBL::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton), this).NativeReply;
+
+	return FReply::Handled();
+}
+
+FReply UCharacterStats::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	startDrag = false;
+	//return mWBL::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton)->NativeReply;
+
+	return FReply::Handled();
+}
+
+FReply UCharacterStats::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+
+	return FReply::Handled();
 }
 
 FString UCharacterStats::GetMovementSpeedText()

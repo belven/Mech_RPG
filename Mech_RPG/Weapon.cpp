@@ -10,7 +10,8 @@
 #include "Bio_Rifle.h"
 
 AWeapon::AWeapon() : Super() {
-	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ArbitraryParticleName"));
+	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WeaponParticle"));
+	audioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("WeaponAudio"));
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/Gun_Flash"));
 	if (ParticleSystemClass.Succeeded()) {
@@ -78,12 +79,17 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 
 	if (isCrit) {
 		changeAmount = changeAmount * 2;
+		healthChange.crit = true;
 	}
 
 	if (partclSystem != nullptr && !partclSystem->IsActive()) {
 		partclSystem->Activate(true);
 		partclSystem->ActivateSystem(true);
 		partclSystem->SetActorParameter(FName(TEXT("BeamTarget")), target);
+	}
+
+	if (audioComp != nullptr && !audioComp->IsPlaying()) {
+		audioComp->Play(0);
 	}
 
 	healthChange.damager = GetOwner();
@@ -119,6 +125,10 @@ void AWeapon::StopFire()
 {
 	if (partclSystem != nullptr) {
 		partclSystem->Deactivate();
+	}
+
+	if (audioComp != nullptr) {
+		audioComp->Stop();
 	}
 }
 

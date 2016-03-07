@@ -3,11 +3,10 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
+#include "Runtime/SlateCore/Public/Input/Reply.h"
+#include "Runtime/UMG/Public/Blueprint/WidgetBlueprintLibrary.h"
 #include "CharacterStats.generated.h"
 
-/**
- *
- */
 UCLASS()
 class MECH_RPG_API UCharacterStats : public UUserWidget
 {
@@ -15,6 +14,7 @@ class MECH_RPG_API UCharacterStats : public UUserWidget
 private:
 	UPROPERTY()
 	class AMech_RPGCharacter* owner;
+	bool startDrag = false;
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Stats")
@@ -28,6 +28,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Stats")
 		FString GetDPSText();
+
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Stats")
 		FString GetMovementSpeedText();

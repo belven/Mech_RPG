@@ -6,7 +6,7 @@
 
 
 UGroup* UMiscLibrary::playerGroup = nullptr;
-TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::difficulty = GameEnums::Medium;
+TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::difficulty = GameEnums::Hard;
 
 float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
 	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;

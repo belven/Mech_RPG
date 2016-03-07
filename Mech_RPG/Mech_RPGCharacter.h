@@ -49,7 +49,10 @@ public:
 		TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		bool heals;
+		bool heals = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		bool crit = false;
 };
 
 
@@ -161,7 +164,9 @@ private:
 	UPROPERTY()
 	class UWidgetComponent* stats;
 
-	TSubclassOf<class UFloatingStats_BP> widgetClass;
+	TSubclassOf<class UFloatingStats_BP> widgetClass; 
+	TSubclassOf<class UFloatingTextUI> floatingTextClass;
+	
 
 protected:
 

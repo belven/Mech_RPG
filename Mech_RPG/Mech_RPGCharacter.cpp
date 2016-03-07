@@ -6,7 +6,7 @@
 #include "AllyAIController.h"
 #include "Blueprint/UserWidget.h"
 #include "Mech_RPGPlayerController.h"
-#include "Navigation/CrowdFollowingComponent.h"
+#include "FloatingTextUI.h"
 
 #define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(this, type, grade, quailty)
 #define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
@@ -72,6 +72,12 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 		stats->AttachTo(GetRootComponent());
 	}
 
+	static ConstructorHelpers::FClassFinder<UFloatingTextUI> floatingTextWidget(TEXT("/Game/TopDown/Blueprints/UI/Floating_Text"));
+
+	if (floatingTextWidget.Succeeded()) {
+		floatingTextClass = floatingTextWidget.Class;
+	}
+	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> newMesh(TEXT("/Game/TopDown/Meshes/Mecha_2.Mecha_2"));
 
 	if (newMesh.Succeeded()) {
@@ -293,12 +299,14 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 		health += healthChange.healthChange;
 	}
 	else if (canBeDamaged == 0) {
-		health -= (healthChange.healthChange * (1 - resistance));
+		health -= (healthChange.healthChange *= (1 - resistance));
 	}
 
 	if (OnPostHealthChange.IsBound()) {
 		OnPostHealthChange.Broadcast(healthChange);
 	}
+
+	UFloatingTextUI::CreateFloatingText(floatingTextClass, healthChange);
 
 	if (health <= 0) {
 		health = 0;

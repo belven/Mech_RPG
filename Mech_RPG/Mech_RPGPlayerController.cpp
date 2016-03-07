@@ -34,13 +34,11 @@ void AMech_RPGPlayerController::BeginPlay() {
 		characterPane = CreateWidget<UUserWidget>(this, WidgetTemplate);
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
-		characterPane->SetPositionInViewport(FVector2D(400, 200));
 	}
 	if (inventoryTemplate != nullptr) {
 		inventory = CreateWidget<UInventoryUI>(this, inventoryTemplate);
 		inventory->AddToViewport();
 		inventory->SetVisibility(ESlateVisibility::Hidden);
-		inventory->SetPositionInViewport(FVector2D(700, 200));
 	}
 }
 
@@ -573,11 +571,11 @@ void AMech_RPGPlayerController::ActivateAbility() {
 		SetupCollision();
 
 		//We're targeting the ground so get selected location
-		if (tempCharacter == nullptr) {
+		if (!UMiscLibrary::IsCharacterAlive(tempCharacter)) {
 			hit = GetHitFromCursor();
 			location = hit.ImpactPoint;
 		}
-		else if(tempCharacter != nullptr){
+		else if(UMiscLibrary::IsCharacterAlive(tempCharacter)){
 			location = tempCharacter->GetActorLocation();
 			lastCharacterTarget = tempCharacter;
 		}
@@ -585,7 +583,7 @@ void AMech_RPGPlayerController::ActivateAbility() {
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
 			if (ability != nullptr && !ability->OnCooldown()) {
 
-				if (ability->GetTagTrue(ability->needsTargetTag)) {
+				if (ability->GetTagTrue(ability->needsTargetTag) ) {
 					//Only use an ability if we have LoS to our target/location
 					if (!mCanSee(location)) {
 						MoveToLocation(location);

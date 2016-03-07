@@ -15,6 +15,13 @@ ABio_Rifle::ABio_Rifle() : Super() {
 		partclSystem->bAutoActivate = false;
 		partclSystem->SetActorParameter(FName(TEXT("BeamSource")), this);
 	}
+
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> soundClass(TEXT("/Game/TopDown/Sounds/Bio_Rifle_Cue.Bio_Rifle_Cue"));
+
+	if (soundClass.Succeeded()) {
+		audioComp->SetSound(soundClass.Object);
+	}
 }
 
 ABio_Rifle* ABio_Rifle::CreateBioRifle(AMech_RPGCharacter* inOwner) {

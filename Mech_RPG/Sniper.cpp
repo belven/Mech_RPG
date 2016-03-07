@@ -7,7 +7,13 @@ ASniper::ASniper() : Super() {
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> sniper(TEXT("/Game/TopDown/Meshes/Sniper"));
 	if (sniper.Succeeded()) {
 		mesh = sniper.Object;
-	}	 	
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> soundClass(TEXT("/Game/TopDown/Sounds/Sniper_Cue.Sniper_Cue"));
+
+	if (soundClass.Succeeded()) {
+		audioComp->SetSound(soundClass.Object);
+	}
 }
 
 ASniper* ASniper::CreateSniper(AMech_RPGCharacter* inOwner) {
