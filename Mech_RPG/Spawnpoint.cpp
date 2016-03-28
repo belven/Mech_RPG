@@ -28,7 +28,7 @@ void ASpawnpoint::SetUpCharacter(AMech_RPGCharacter* character, UGroup* group, G
 	FVector loc;
 	character->team = team;
 	loc = character->GetActorLocation();
-	loc.Z += (character->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
+	loc.Z += (character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 	character->SetActorLocation(loc);
 	character->SetGroup(group);
 	character->CreatePresetRole(role);

@@ -315,7 +315,7 @@ void AMech_RPGPlayerController::OpenInventory()
 void AMech_RPGPlayerController::MoveToMouseCursor() {
 	FHitResult Hit;
 
-	GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
+	GetHitResultUnderCursor(ECollisionChannel::ECC_WorldStatic, false, Hit);
 
 	//if (Hit.bBlockingHit) {
 	SetNewMoveDestination(Hit.ImpactPoint);
@@ -680,8 +680,8 @@ void AMech_RPGPlayerController::AllyMove(int index) {
 		if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 			static FHitResult Hit;
-
-			GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, Hit);
+			
+			GetHitResultUnderCursor(ECollisionChannel::ECC_WorldStatic, false, Hit);
 
 			if (con != nullptr && Hit.bBlockingHit) {
 				con->SetPlayerControlledLocation(Hit.ImpactPoint);

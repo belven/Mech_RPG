@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Mech_RPGPlayerController.h"
 #include "FloatingTextUI.h"
+#include "Group.h"
 
 #define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(this, type, grade, quailty)
 #define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
@@ -313,6 +314,8 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 		SetDead(true);
 		SetActorHiddenInGame(true);
 		OnStopFiring.Broadcast();
+		healthChange.damager->OnEnemyKilled.Broadcast(this);
+		healthChange.damager->GetGroup()->OnGroupEnemyKilled.Broadcast(this);
 	}
 }
 

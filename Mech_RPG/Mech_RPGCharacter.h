@@ -102,6 +102,7 @@ public:
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPreHealthChangeEvent, FHealthChange, healthChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostHealthChangeEvent, FHealthChange, healthChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostBeginPlay, AMech_RPGCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopFiring);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfCombat);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSwappedWeapons, AWeapon*, oldWeapon, AWeapon*, newWeapon);
@@ -224,6 +225,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FSwappedWeapons OnSwappedWeapons;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FEnemyKilled OnEnemyKilled;
 
 	virtual void OutOfCombat();
 

@@ -21,6 +21,7 @@ namespace GroupEnums {
 class AMech_RPGCharacter;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMemberDamageEvent, AMech_RPGCharacter*, attacker, AMech_RPGCharacter*, damagedMember);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupEnemyKilled, AMech_RPGCharacter*, character);
 
 UCLASS(Blueprintable)
 class MECH_RPG_API UGroup : public UObject {
@@ -72,6 +73,10 @@ public:
 
 	bool HasMemebers();
 
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FGroupEnemyKilled OnGroupEnemyKilled;
+	
+	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FMemberDamageEvent OnMemberDamageEvent;
 
 	UFUNCTION(BlueprintCallable, Category = "Group")

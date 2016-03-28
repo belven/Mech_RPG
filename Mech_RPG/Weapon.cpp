@@ -82,9 +82,11 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 		healthChange.crit = true;
 	}
 
-	if (partclSystem != nullptr && !partclSystem->IsActive()) {
-		partclSystem->Activate(true);
-		partclSystem->ActivateSystem(true);
+	if (partclSystem != nullptr) {
+		if (!partclSystem->IsActive()) {
+			partclSystem->Activate(true);
+			partclSystem->ActivateSystem(true);
+		}
 		partclSystem->SetActorParameter(FName(TEXT("BeamTarget")), target);
 	}
 

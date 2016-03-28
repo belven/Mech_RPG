@@ -8,7 +8,7 @@ bool UShield::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 		shieldHealth = shieldAmount >= 2 ? shieldAmount : target->GetMaxHealth() * shieldAmount;
 		this->target = target;
 		SetOnCooldown(owner->GetWorld());
-		target->OnPreHealthChange.AddDynamic(this, &UShield::ChangeHealth);
+		target->OnPreHealthChange.AddUniqueDynamic(this, &UShield::ChangeHealth);
 		return true;
 	}
 	return false;
