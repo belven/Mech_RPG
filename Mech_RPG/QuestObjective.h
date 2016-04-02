@@ -14,7 +14,7 @@ UCLASS(Blueprintable)
 class MECH_RPG_API UQuestObjective : public UObject
 {
 	GENERATED_BODY()
-private:
+protected:
 
 	FString objectiveName;
 

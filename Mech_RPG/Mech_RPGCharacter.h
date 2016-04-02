@@ -103,9 +103,16 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPreHealthChangeEvent, FHealthChange
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostHealthChangeEvent, FHealthChange, healthChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostBeginPlay, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, AMech_RPGCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNPCInteractEvent, AMech_RPGCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemPickUpEvent, AItem*, item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractEvent, AInteractable*, interactable);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestAdded, UQuest*, quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopFiring);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfCombat);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSwappedWeapons, AWeapon*, oldWeapon, AWeapon*, newWeapon);
+
+class UQuest;
+class AInteractable;
 
 UCLASS(Blueprintable)
 class AMech_RPGCharacter : public ACharacter {
@@ -157,6 +164,9 @@ private:
 		TArray<UArmour*> armour;
 
 	UPROPERTY()
+		TArray<UQuest*> quests;
+
+	UPROPERTY()
 		UAbility* currentAbility;
 
 	UPROPERTY()
@@ -165,9 +175,9 @@ private:
 	UPROPERTY()
 	class UWidgetComponent* stats;
 
-	TSubclassOf<class UFloatingStats_BP> widgetClass; 
+	TSubclassOf<class UFloatingStats_BP> widgetClass;
 	TSubclassOf<class UFloatingTextUI> floatingTextClass;
-	
+
 
 protected:
 
@@ -196,12 +206,21 @@ public:
 
 	float GetTotalResistance(DamageEnums::DamageType damageType);
 
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		TArray<UQuest*>& GetQuests();
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		void AddQuest(UQuest* newQuest);
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		void AbandonQuest(UQuest* quest);
+
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 		void SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
 
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void Reset();
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void ResetInvunrelbility();
 
@@ -210,7 +229,16 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FPreHealthChangeEvent OnPreHealthChange;
-	
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FNPCInteractEvent OnNPCInteractEvent;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FItemPickUpEvent OnItemPickUpEvent;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FInteractEvent OnInteractEvent;
+
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FPostHealthChangeEvent OnPostHealthChange;
 
@@ -219,15 +247,30 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FStopFiring OnStopFiring;
-	
+
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FOutOfCombat OnOutOfCombat;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FSwappedWeapons OnSwappedWeapons;
+		FSwappedWeapons OnSwappedWeapons;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FEnemyKilled OnEnemyKilled;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FQuestAdded OnQuestAdded;
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void EnemyKilled(AMech_RPGCharacter * character);
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void Interact(AInteractable * interactable);
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void NPCInteract(AMech_RPGCharacter * character);
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void ItemPickup(AItem* item);
 
 	virtual void OutOfCombat();
 
@@ -316,6 +359,7 @@ public:
 		void SetHealth(float newVal);
 
 	void ChangeHealth(FHealthChange healthChange);
+
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		bool IsDead();

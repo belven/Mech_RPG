@@ -17,7 +17,10 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void Interact(class AMech_RPGCharacter* character) {
+	UFUNCTION(BlueprintNativeEvent, Category = "Quests")
+		void Interact(class AMech_RPGCharacter* character);
+
+	virtual void Interact_Implementation(class AMech_RPGCharacter* character) {
 		check(0 && "You must override this");
 	}
 

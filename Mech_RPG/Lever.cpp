@@ -8,7 +8,7 @@ ALever::ALever() : Super() {
 
 }
 
-void ALever::Interact(AMech_RPGCharacter * character)
+void ALever::Interact_Implementation(AMech_RPGCharacter * character)
 {
 
 }

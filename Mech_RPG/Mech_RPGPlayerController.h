@@ -5,13 +5,14 @@
 #include "Mech_RPGPlayerController.generated.h"
 
 class AMech_RPGCharacter;
+class UQuestDisplayUI;
 
 UENUM(BlueprintType)
 namespace PlayerControllerEnums {
 	enum LastUsed {
 		None,
 		Ability,
-		Attack,
+		NPCInteract,
 		Interactable
 	};
 }
@@ -125,10 +126,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = UI)
 	TSubclassOf<UUserWidget> WidgetTemplate;
 	TSubclassOf<UUserWidget> inventoryTemplate;
+	TSubclassOf<UUserWidget> questListTemplate;
 
 
 	UUserWidget* characterPane;
 	UInventoryUI* inventory;
+	UQuestDisplayUI* questList;
+
 	void OpenCharacterPane();
 	void OpenInventory();
 
@@ -138,7 +142,7 @@ protected:
 	 */
 	uint32 bMoveToMouseCursor : 1;
 	/**
-	 * True if the controlled character should attack thier target.
+	 * True if the controlled character should attack their target.
 	 */
 	uint32 bAttackTarget : 1;
 
@@ -170,10 +174,13 @@ protected:
 	/**
 	 * Input handlers for Attack action.
 	 */
-	void OnAttackPressed();
-	void OnAttackReleased();
+	void OnRightClickPressed();
+	void OnRightClickReleased();
 
 	void AttackTarget(float DeltaTime);
 	void FireWeapon(AActor* hit);
 	void SetupCollision();
+	
+	UFUNCTION(BlueprintCallable, Category = "Events")
+	void AddQuest(UQuest * newQuest);
 };

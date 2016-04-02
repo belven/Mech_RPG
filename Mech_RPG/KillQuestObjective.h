@@ -11,7 +11,8 @@ class MECH_RPG_API UKillQuestObjective : public UQuestObjective
 	GENERATED_BODY()
 
 private:
-	int killCount;
+	int killCount = 0;
+	int kills = 0;
 	TSubclassOf<AMech_RPGCharacter> killClass;
 
 public:
@@ -28,5 +29,5 @@ public:
 		void EnemyKilled(AMech_RPGCharacter* character);
 
 	UFUNCTION(BlueprintCallable, Category = "Kill Quest Objective")
-		static UKillQuestObjective* CreateKillQuestObjective(int32 inKillCount, TSubclassOf<AMech_RPGCharacter> inKillClass);
+		static UKillQuestObjective* CreateKillQuestObjective(FString name, int32 inKillCount, TSubclassOf<AMech_RPGCharacter> inKillClass);
 };

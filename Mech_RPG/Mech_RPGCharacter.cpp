@@ -8,6 +8,8 @@
 #include "Mech_RPGPlayerController.h"
 #include "FloatingTextUI.h"
 #include "Group.h"
+#include "Interactable.h"
+#include "Quest.h"
 
 #define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(this, type, grade, quailty)
 #define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
@@ -282,6 +284,29 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 	return MAX(totalResistance, 1);
 }
 
+TArray<UQuest*>& AMech_RPGCharacter::GetQuests()
+{
+	return quests;
+}
+
+void AMech_RPGCharacter::AddQuest(UQuest * newQuest)
+{
+	for(UQuest* quest : GetQuests())
+	{
+		if (quest->GetQuestName().Equals(newQuest->GetQuestName())) {
+			return;
+		}
+	}
+
+	quests.Add(newQuest);
+	OnQuestAdded.Broadcast(newQuest);
+}
+
+void AMech_RPGCharacter::AbandonQuest(UQuest* quest)
+{
+	quests.Remove(quest);
+}
+
 void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 	if (GetGroup() != nullptr && !CompareGroup(healthChange.damager)) {
 		GetGroup()->GroupMemberHit(healthChange.damager, this);
@@ -290,16 +315,15 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 	if (OnPreHealthChange.IsBound()) {
 		OnPreHealthChange.Broadcast(healthChange);
 	}
-
-	float resistance = (GetTotalResistance(healthChange.damageType) / 100);
-
-	resistance *= (1 + GetDefenceModifier());
-	resistance = MIN(0.99F, resistance);
-
+	
 	if (healthChange.heals) {
 		health += healthChange.healthChange;
 	}
 	else if (canBeDamaged == 0) {
+		float resistance = (GetTotalResistance(healthChange.damageType) / 100);
+
+		resistance *= (1 + GetDefenceModifier());
+		resistance = MIN(0.99F, resistance);
 		health -= (healthChange.healthChange *= (1 - resistance));
 	}
 
@@ -314,9 +338,14 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 		SetDead(true);
 		SetActorHiddenInGame(true);
 		OnStopFiring.Broadcast();
-		healthChange.damager->OnEnemyKilled.Broadcast(this);
-		healthChange.damager->GetGroup()->OnGroupEnemyKilled.Broadcast(this);
+		healthChange.damager->EnemyKilled(this);
 	}
+}
+
+void AMech_RPGCharacter::EnemyKilled(AMech_RPGCharacter* character)
+{
+	if(OnEnemyKilled.IsBound())	OnEnemyKilled.Broadcast(character);
+	GetGroup()->GroupEnemyKilled(character);
 }
 
 void AMech_RPGCharacter::SetActorHiddenInGame(bool bNewHidden)
@@ -358,6 +387,43 @@ void AMech_RPGCharacter::ResetInvunrelbility()
 UInventory * AMech_RPGCharacter::GetInventory()
 {
 	return inventory;
+}
+
+void AMech_RPGCharacter::NPCInteract(AMech_RPGCharacter* character)
+{
+	if (character->GetQuests().Num() > 0) {
+		for (UQuest* quest : character->GetQuests()) {
+			if (!GetQuests().Contains(quest)) {
+				AddQuest(quest);
+			}
+		}
+	}
+
+	if (OnNPCInteractEvent.IsBound()) {
+		OnNPCInteractEvent.Broadcast(character);
+	}
+
+	GetGroup()->NPCInteract(character);
+}
+
+void AMech_RPGCharacter::Interact(AInteractable * interactable)
+{
+	interactable->Interact(this);
+
+	if (OnInteractEvent.IsBound()) {
+		OnInteractEvent.Broadcast(interactable);
+	}
+
+	GetGroup()->Interact(interactable);
+}
+
+void AMech_RPGCharacter::ItemPickup(AItem* item)
+{
+	if (OnItemPickUpEvent.IsBound()) {
+		OnItemPickUpEvent.Broadcast(item);
+	}
+
+	GetGroup()->ItemPickup(item);
 }
 
 void AMech_RPGCharacter::OutOfCombat() {

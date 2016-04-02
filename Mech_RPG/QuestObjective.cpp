@@ -29,12 +29,12 @@ void UQuestObjective::NotifyQuest() {
 		GetQuest()->ObjectiveUpdated(this);
 	}
 
-	if (OnObjectiveCompleted.IsBound() && IsComplete()) {
-		OnObjectiveCompleted.Broadcast(this);
-	}
-	else if (OnObjectiveUpdated.IsBound()) {
-		OnObjectiveUpdated.Broadcast(this);
-	}
+	//if (OnObjectiveCompleted.IsBound() && IsComplete()) {
+	//	OnObjectiveCompleted.Broadcast(this);
+	//}
+	//else if (OnObjectiveUpdated.IsBound()) {
+	//	OnObjectiveUpdated.Broadcast(this);
+	//}
 }
 
 FString UQuestObjective::GetObjectiveName()

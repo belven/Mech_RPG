@@ -12,6 +12,7 @@ UQuest* UQuest::CreateQuest(AMech_RPGCharacter* character, TArray<UQuestObjectiv
 	tempQuest->SetObjectives(objectives);
 	tempQuest->SetRewards(rewards);
 	tempQuest->SetQuestName(qName);
+	character->AddQuest(tempQuest);
 
 	for (UQuestObjective* objective : objectives) {
 		objective->SetUpListeners(tempQuest);
@@ -44,23 +45,23 @@ bool UQuest::IsComplete() {
 
 /* Adds a new objective to the quest */
 void UQuest::AddObjective(UQuestObjective* inObjective) {
-	if (inObjective != NULL) {
+	if (inObjective != nullptr) {
 		objectives.Add(inObjective);
 	}
 }
 
 /* Adds a new reward to the quest */
 void UQuest::AddReward(UQuestReward* inReward) {
-	if (inReward != NULL) {
+	if (inReward != nullptr) {
 		rewards.Add(inReward);
 	}
 }
 
 /* Loops through the rewards giving the rewards to the quest owner */
 void UQuest::GiveRewards() {
-	if (GetOwner() != NULL) {
+	if (GetOwner() != nullptr) {
 		for (UQuestReward* reward : GetRewards()) {
-			if (reward != NULL) {
+			if (reward != nullptr) {
 				reward->GiveReward(GetOwner());
 			}
 		}
@@ -107,9 +108,9 @@ UQuestObjective* UQuest::GetFirstObjective()
 	{
 		return objectives[0];
 	}
-	return NULL;
+	return nullptr;
 }
 
 void UQuest::AbandonQuest() {
-
+	GetOwner()->AbandonQuest(this);
 }

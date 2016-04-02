@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "Mech_RPGPlayerController.h"
 #include "AllyAIController.h"
+#include "QuestDisplayUI.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "Interactable.h"
 
@@ -27,6 +28,14 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 		inventoryTemplate = inventoryClass.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> questListClass(TEXT("/Game/TopDown/Blueprints/UI/QuestList.QuestList_C"));
+
+	if (questListClass.Class != nullptr) {
+		questListTemplate = questListClass.Class;
+	}
+
+	
+
 }
 
 void AMech_RPGPlayerController::BeginPlay() {
@@ -35,11 +44,19 @@ void AMech_RPGPlayerController::BeginPlay() {
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
 	}
+
 	if (inventoryTemplate != nullptr) {
 		inventory = CreateWidget<UInventoryUI>(this, inventoryTemplate);
 		inventory->AddToViewport();
 		inventory->SetVisibility(ESlateVisibility::Hidden);
 	}
+
+	if (questListTemplate != nullptr) {
+		questList = CreateWidget<UQuestDisplayUI>(this, questListTemplate);
+		questList->AddToViewport();
+		questList->SetVisibility(ESlateVisibility::Visible);
+		questList->SetPositionInViewport(FVector2D(900, 100));
+	}		
 }
 
 /**
@@ -100,8 +117,8 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			if (lastAction == PlayerControllerEnums::Interactable) {
 				if (mCanSee(lastTargetInteractable->GetActorLocation())
 					&& GetOwner()->GetDistanceTo(lastTargetInteractable) <= interactionRange) {
-					lastTargetInteractable->Interact(GetOwner()); 
 					lastAction = PlayerControllerEnums::None;
+					GetOwner()->Interact(lastTargetInteractable);
 				}
 				else {
 					MoveToActor(lastTargetInteractable);
@@ -117,7 +134,7 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 				}
 			}
 			// Are we trying to interact with a character
-			else if (lastAction == PlayerControllerEnums::Attack) {
+			else if (lastAction == PlayerControllerEnums::NPCInteract) {
 				// Are we requesting a new target to attack
 				if (bAttackTarget && IsTargetValid(cursorTarget)) {
 					target = cursorTarget;
@@ -130,6 +147,17 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 				// No valid target so stop firing
 				else {
 					GetOwner()->OnStopFiring.Broadcast();
+				}
+
+				if (UMiscLibrary::IsCharacterAlive(cursorTarget) && cursorTarget->CompareGroup(GetOwner())) {
+					if (mCanSee(cursorTarget->GetActorLocation())
+						&& GetOwner()->GetDistanceTo(cursorTarget) <= interactionRange) {
+						lastAction = PlayerControllerEnums::None;
+						GetOwner()->NPCInteract(cursorTarget);
+					}
+					else {
+						MoveToActor(cursorTarget);
+					}
 				}
 			}
 		}
@@ -182,6 +210,13 @@ void AMech_RPGPlayerController::SetupCollision() {
 	}
 }
 
+void AMech_RPGPlayerController::AddQuest(UQuest * newQuest)
+{
+	if (questList != nullptr) {
+		questList->GenerateQuests();
+	}
+}
+
 TArray<AMech_RPGCharacter*> AMech_RPGPlayerController::GetCharactersInRange(float range) {
 	return UMiscLibrary::GetCharactersInRange(range, GetOwner());
 }
@@ -230,8 +265,8 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AMech_RPGPlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AMech_RPGPlayerController::OnSetDestinationReleased);
 
-	InputComponent->BindAction("Attack", IE_Pressed, this, &AMech_RPGPlayerController::OnAttackPressed);
-	InputComponent->BindAction("Attack", IE_Released, this, &AMech_RPGPlayerController::OnAttackReleased);
+	InputComponent->BindAction("Attack", IE_Pressed, this, &AMech_RPGPlayerController::OnRightClickPressed);
+	InputComponent->BindAction("Attack", IE_Released, this, &AMech_RPGPlayerController::OnRightClickReleased);
 
 	InputComponent->BindAction("GroupAttack", IE_Pressed, this, &AMech_RPGPlayerController::GroupAttack);
 
@@ -343,7 +378,7 @@ void AMech_RPGPlayerController::OnSetDestinationPressed() {
 	bMoveToMouseCursor = true;
 
 	target = nullptr;
-	OnAttackReleased();
+	OnRightClickReleased();
 	MoveToMouseCursor();
 }
 
@@ -410,18 +445,18 @@ void AMech_RPGPlayerController::PanDownReleased()
 	panDown = false;
 }
 
-void AMech_RPGPlayerController::OnAttackPressed() {
+void AMech_RPGPlayerController::OnRightClickPressed() {
 	if (GetInteractableUnderCursor() != nullptr) {
 		lastAction = PlayerControllerEnums::Interactable;
 		lastTargetInteractable = GetInteractableUnderCursor();
 	}
 	else {
 		bAttackTarget = true;
-		lastAction = PlayerControllerEnums::Attack;
+		lastAction = PlayerControllerEnums::NPCInteract;
 	}
 }
 
-void AMech_RPGPlayerController::OnAttackReleased() {
+void AMech_RPGPlayerController::OnRightClickReleased() {
 	bAttackTarget = false;
 }
 
@@ -515,6 +550,9 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetOwner() {
 void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
 	owner = newVal;
 	inventory->SetOwner(owner);
+	questList->SetCharacter(owner);
+	questList->GenerateQuests();
+	owner->OnQuestAdded.AddDynamic(this, &AMech_RPGPlayerController::AddQuest);
 }
 
 void AMech_RPGPlayerController::CharacterFive() {
@@ -575,7 +613,7 @@ void AMech_RPGPlayerController::ActivateAbility() {
 			hit = GetHitFromCursor();
 			location = hit.ImpactPoint;
 		}
-		else if(UMiscLibrary::IsCharacterAlive(tempCharacter)){
+		else if (UMiscLibrary::IsCharacterAlive(tempCharacter)) {
 			location = tempCharacter->GetActorLocation();
 			lastCharacterTarget = tempCharacter;
 		}
@@ -583,7 +621,7 @@ void AMech_RPGPlayerController::ActivateAbility() {
 		for (UAbility* ability : GetOwner()->GetAbilities()) {
 			if (ability != nullptr && !ability->OnCooldown()) {
 
-				if (ability->GetTagTrue(ability->needsTargetTag) ) {
+				if (ability->GetTagTrue(ability->needsTargetTag)) {
 					//Only use an ability if we have LoS to our target/location
 					if (!mCanSee(location)) {
 						MoveToLocation(location);
@@ -680,7 +718,7 @@ void AMech_RPGPlayerController::AllyMove(int index) {
 		if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 			static FHitResult Hit;
-			
+
 			GetHitResultUnderCursor(ECollisionChannel::ECC_WorldStatic, false, Hit);
 
 			if (con != nullptr && Hit.bBlockingHit) {

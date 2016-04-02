@@ -4,6 +4,8 @@
 #include "Group.h"
 #include "Mech_RPGCharacter.h"
 #include "Mech_RPGPlayerController.h"
+#include "Item.h"
+#include "Interactable.h"
 
 UGroup::UGroup() : Super() {
 
@@ -109,6 +111,34 @@ bool UGroup::HasMemebers() {
 	return members.Num() > 0;
 }
 
+void UGroup::GroupEnemyKilled(AMech_RPGCharacter* character)
+{
+	if (OnGroupEnemyKilled.IsBound()) OnGroupEnemyKilled.Broadcast(character);
+}
+
 TEnumAsByte<GroupEnums::Role> UGroup::GetRandomRole() {
 	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
+}
+
+
+
+void UGroup::Interact(AInteractable * interactable)
+{
+	if (OnInteractEvent.IsBound()) {
+		OnInteractEvent.Broadcast(interactable);
+	}
+}
+
+void UGroup::ItemPickup(AItem* item)
+{
+	if (OnItemPickUpEvent.IsBound()) {
+		OnItemPickUpEvent.Broadcast(item);
+	}
+}
+
+void UGroup::NPCInteract(AMech_RPGCharacter * character)
+{
+	if (OnNPCInteractEvent.IsBound()) {
+		OnNPCInteractEvent.Broadcast(character);
+	}
 }

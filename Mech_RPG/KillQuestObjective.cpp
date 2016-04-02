@@ -14,25 +14,29 @@ void UKillQuestObjective::SetUpListeners(UQuest* quest) {
 
 bool UKillQuestObjective::IsComplete()
 {
-	return killCount <= 0;
+	return kills == killCount;
 }
 
 FString UKillQuestObjective::GetObjectiveText() {
-	return "";
+	return "Kills " + FString::FromInt(kills) + "/" + FString::FromInt(killCount);
 }
 
 void UKillQuestObjective::EnemyKilled(AMech_RPGCharacter* character)
 {
-	if (character->GetClass()->IsChildOf(killClass)) {
-			killCount -= 1;
-			NotifyQuest();
+	if (character->GetClass()->IsChildOf(killClass) && !IsComplete()) {
+		kills += 1;
+		NotifyQuest();
+	}
+	else if (IsComplete()) {
+		character->GetGroup()->OnGroupEnemyKilled.RemoveDynamic(this, &UKillQuestObjective::EnemyKilled);
 	}
 }
 
-UKillQuestObjective* UKillQuestObjective::CreateKillQuestObjective(int32 inKillCount, TSubclassOf<AMech_RPGCharacter> inKillClass)
+UKillQuestObjective* UKillQuestObjective::CreateKillQuestObjective(FString name, int32 inKillCount, TSubclassOf<AMech_RPGCharacter> inKillClass)
 {
 	UKillQuestObjective* Objective = NewObject<UKillQuestObjective>(UKillQuestObjective::StaticClass());
 	Objective->killCount = inKillCount;
 	Objective->killClass = inKillClass;
+	Objective->SetObjectiveName(name);
 	return Objective;
 }

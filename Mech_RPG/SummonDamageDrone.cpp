@@ -12,6 +12,7 @@ bool USummonDamageDrone::Activate(class AMech_RPGCharacter* target, FVector targ
 		FNavLocation nav;
 		owner->GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(owner->GetActorLocation(), 200, nav);
 		droneSummoned->SetActorLocation(nav.Location);
+		SetOnCooldown(owner->GetWorld());
 	}
 	else {
 		FNavLocation nav;
@@ -36,7 +37,7 @@ bool USummonDamageDrone::Activate(class AMech_RPGCharacter* target, FVector targ
 		loc = droneSummoned->GetActorLocation();
 		loc.Z += (droneSummoned->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
 		droneSummoned->SetActorLocation(loc);
-		droneSummoned->SetDead(false);
+		droneSummoned->BeginPlay();
 		return true;
 	}
 	return false;

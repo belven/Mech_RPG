@@ -19,9 +19,14 @@ namespace GroupEnums {
 #include "Group.generated.h"
 
 class AMech_RPGCharacter;
+class AItem;
+class AInteractable;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMemberDamageEvent, AMech_RPGCharacter*, attacker, AMech_RPGCharacter*, damagedMember);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupEnemyKilled, AMech_RPGCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupNPCInteractEvent, AMech_RPGCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupItemPickUpEvent, AItem*, item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupInteractEvent, AInteractable*, interactable);
 
 UCLASS(Blueprintable)
 class MECH_RPG_API UGroup : public UObject {
@@ -75,10 +80,31 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FGroupEnemyKilled OnGroupEnemyKilled;
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void GroupEnemyKilled(AMech_RPGCharacter* character);
 	
 	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FMemberDamageEvent OnMemberDamageEvent;
+		FMemberDamageEvent OnMemberDamageEvent;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FGroupNPCInteractEvent OnNPCInteractEvent;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FGroupItemPickUpEvent OnItemPickUpEvent;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FGroupInteractEvent OnInteractEvent;
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		static TEnumAsByte<GroupEnums::Role> GetRandomRole();
+	
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void Interact(AInteractable * interactable);
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void NPCInteract(AMech_RPGCharacter * character);
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void ItemPickup(AItem* item);
 };

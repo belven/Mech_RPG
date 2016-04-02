@@ -15,5 +15,5 @@ class MECH_RPG_API ALever : public AInteractable
 public:
 	ALever();
 	
-	virtual void Interact(class AMech_RPGCharacter* character);
+	virtual void Interact_Implementation(class AMech_RPGCharacter* character);
 };
