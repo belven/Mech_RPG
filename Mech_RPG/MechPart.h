@@ -29,8 +29,8 @@ public:
 
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 protected:
-	UStaticMeshComponent* meshComponent;
-	TSubclassOf<UStaticMesh> meshClass;
-	UStaticMesh* mesh;
+	UStaticMeshComponent* meshComponent = nullptr;
+	TSubclassOf<UStaticMesh> meshClass = nullptr;
+	UStaticMesh* mesh = nullptr;
 	
 };

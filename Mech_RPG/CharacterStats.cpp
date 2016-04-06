@@ -114,7 +114,9 @@ float UCharacterStats::GetCastBarPercent()
 
 FLinearColor UCharacterStats::GetColour()
 {
-	if (owner != nullptr && owner->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
+	if (owner != nullptr 
+		&& owner->GetController() != nullptr 
+		&& owner->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
 		return FLinearColor(0.01, 0.3, 0); //Green
 	}
 	else {

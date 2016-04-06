@@ -5,6 +5,11 @@
 #include "Group.h"
 #include "AI/Navigation/NavigationSystem.h"
 
+AAllyAIController::AAllyAIController() : Super() {
+	SetActorTickEnabled(true);
+	PrimaryActorTick.bCanEverTick = true;
+}
+
 void AAllyAIController::Tick(float DeltaTime) {
 	if (GetOwner() && GetOwner()->GetDemandedController() == NULL) {
 		if (GetOwner()->IsDead()) {

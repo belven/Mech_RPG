@@ -28,10 +28,8 @@ void ADrone::OutOfCombat() {
 }
 void ADrone::SetDead(bool newVal) {
 	Super::SetDead(newVal);
-
-	if (!newVal) {
-		SetActorHiddenInGame(false);
-		SetActorEnableCollision(true);
-		SetHealth(GetMaxHealth());
+	if (newVal) {
+		//AMech_RPGCharacter::OutOfCombat();
+		//SetHealth(GetMaxHealth());
 	}
 }

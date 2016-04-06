@@ -11,16 +11,13 @@
 UCLASS()
 class MECH_RPG_API AAllyAIController : public ABaseAIController {
 	GENERATED_BODY()
-private:
+protected:
 	FVector playerControlledLocation;
-
-
-public:
-	virtual	void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+public:
+	AAllyAIController();
+	virtual	void BeginPlay() override;
 	FVector GetPlayerControlledLocation();
 	void SetPlayerControlledLocation(FVector newVal);
 	void FindTargetInWeaponRage();
-
-
 };

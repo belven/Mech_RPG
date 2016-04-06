@@ -34,13 +34,13 @@ struct FHealthChange {
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		AMech_RPGCharacter* target;
+		AMech_RPGCharacter* target = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		AMech_RPGCharacter* damager;
+		AMech_RPGCharacter* damager = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		AWeapon* weaponUsed;
+		AWeapon* weaponUsed = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float healthChange = 0;
@@ -146,16 +146,16 @@ private:
 		TArray<AWeapon*> weapons;
 
 	UPROPERTY()
-		AWeapon* currentWeapon;
+		AWeapon* currentWeapon = nullptr;
 
 	UPROPERTY()
-		UInventory* inventory;
+		UInventory* inventory = nullptr;
 
 	UPROPERTY()
-		UGroup* group;
+		UGroup* group = nullptr;
 
 	UPROPERTY()
-		AController* demandedController;
+		AController* demandedController = nullptr;
 
 	UPROPERTY()
 		TArray<UAbility*> abilities;
@@ -167,16 +167,16 @@ private:
 		TArray<UQuest*> quests;
 
 	UPROPERTY()
-		UAbility* currentAbility;
+		UAbility* currentAbility = nullptr;
 
 	UPROPERTY()
-		USphereComponent* aoe;
+		USphereComponent* aoe = nullptr;
 
 	UPROPERTY()
-	class UWidgetComponent* stats;
+	class UWidgetComponent* stats = nullptr;
 
-	TSubclassOf<class UFloatingStats_BP> widgetClass;
-	TSubclassOf<class UFloatingTextUI> floatingTextClass;
+	TSubclassOf<class UFloatingStats_BP> widgetClass = nullptr;
+	TSubclassOf<class UFloatingTextUI> floatingTextClass = nullptr;
 
 
 protected:
@@ -223,6 +223,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void ResetInvunrelbility();
+
+	UFUNCTION(BlueprintCallable, Category = "Other")
+		void RemoveFromPlay();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		UInventory* GetInventory();

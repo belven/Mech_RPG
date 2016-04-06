@@ -337,6 +337,7 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 		health = 0;
 		SetDead(true);
 		SetActorHiddenInGame(true);
+		if (GetCurrentWeapon() != nullptr) GetCurrentWeapon()->SetActorHiddenInGame(true);
 		OnStopFiring.Broadcast();
 		healthChange.damager->EnemyKilled(this);
 	}
@@ -372,8 +373,8 @@ void AMech_RPGCharacter::Reset()
 	SetHealth(GetMaxHealth());
 
 	channeling = false;
-	SetDead(false);
-	OutOfCombat();
+	inCombat = false;
+
 	canAttack = 0;
 	canMove = 0;
 	canBeDamaged = 0;
@@ -436,10 +437,24 @@ void AMech_RPGCharacter::OutOfCombat() {
 		SetDead(false);
 		SetActorHiddenInGame(false);
 		SetActorEnableCollision(true);
+
 		SetHealth(GetMaxHealth() * 0.2);
 		ApplyCrowdControl(EffectEnums::Damage, false);
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::ResetInvunrelbility, 3.0F);
 	}
+	else if (IsDead()) {
+		Reset();
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::RemoveFromPlay, 30.0F);
+	}
+}
+
+void AMech_RPGCharacter::RemoveFromPlay()
+{
+	stats->DestroyComponent();
+	group->RemoveMember(this);
+	//inventory->BeginDestroy();
+	currentWeapon->Destroy();
+	Destroy();
 }
 
 void AMech_RPGCharacter::LookAt(AMech_RPGCharacter * other)

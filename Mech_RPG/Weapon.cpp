@@ -21,6 +21,7 @@ AWeapon::AWeapon() : Super() {
 	}
 }
 
+
 float AWeapon::GetChangeAmount() {
 	float tempDamage = settings.healthChange * (1 + (GetGrade() * 0.25));
 	tempDamage *= (1 + (GetQuality() * 0.07));

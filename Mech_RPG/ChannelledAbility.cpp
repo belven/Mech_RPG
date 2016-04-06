@@ -102,7 +102,7 @@ void UChannelledAbility::ActiveChannelAbility() {
 }
 
 bool UChannelledAbility::PerformLineTrace() {
-	collision.IgnoreComponents.Empty();
+	collision.ClearIgnoredComponents();
 
 	if (owner->GetGroup() != nullptr && owner->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {

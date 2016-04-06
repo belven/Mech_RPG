@@ -63,7 +63,7 @@ protected:
 	FWeaponParams settings;
 	bool canFire = true;
 	float lastTime = 0;
-	UAudioComponent* audioComp;
+	UAudioComponent* audioComp = nullptr;
 
 public:
 	AWeapon();

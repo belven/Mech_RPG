@@ -8,37 +8,41 @@
 
 
 bool USummonDamageDrone::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
-	if (droneSummoned != nullptr && droneSummoned->IsDead()) {
+	/*if (droneSummoned != nullptr && droneSummoned->IsDead()) {
 		FNavLocation nav;
-		owner->GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(owner->GetActorLocation(), 200, nav);
+		owner->GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(owner->GetActorLocation(), 400, nav);
 		droneSummoned->SetActorLocation(nav.Location);
 		SetOnCooldown(owner->GetWorld());
 	}
-	else {
+	else*/
+
+	if (droneSummoned != nullptr && droneSummoned->IsDead()) {
+		droneSummoned->Destroy();
+		droneSummoned->GetGroup()->RemoveMember(droneSummoned);
+		droneSummoned = nullptr;
+	}
+
+	if (droneSummoned == nullptr ) {
 		FNavLocation nav;
-		int count = 0;
+		int count = 0;	
 
 		while (droneSummoned == nullptr && count < 10) {
 			owner->GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(owner->GetActorLocation(), 200, nav);
-			droneSummoned = UMiscLibrary::SpawnCharacter<ADrone>(owner->GetWorld(), nav.Location, owner->GetActorRotation(), ADrone::StaticClass());
+			FVector loc;
+			loc = nav.Location;
+			//loc.Z += (droneSummoned->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
+			droneSummoned = UMiscLibrary::SpawnCharacter<ADrone>(owner->GetWorld(), loc, owner->GetActorRotation(), ADrone::StaticClass());
 			count++;
 		}
 
 		if (droneSummoned != nullptr) {
 			droneSummoned->SetGroup(owner->GetGroup());
 			droneSummoned->CreatePresetRole(GroupEnums::DPS);
-			SetOnCooldown(owner->GetWorld());
 			droneSummoned->team = owner->team;
+			droneSummoned->SetDead(false);
+			SetOnCooldown(owner->GetWorld());
+			return true;
 		}
-	}
-
-	if (droneSummoned != nullptr) {
-		FVector loc;
-		loc = droneSummoned->GetActorLocation();
-		loc.Z += (droneSummoned->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight());
-		droneSummoned->SetActorLocation(loc);
-		droneSummoned->BeginPlay();
-		return true;
 	}
 	return false;
 }

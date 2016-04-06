@@ -5,7 +5,7 @@
 #include "Navigation/CrowdFollowingComponent.h"
 #include "AI/Navigation/NavigationSystem.h"
 
-ABaseAIController::ABaseAIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
+ABaseAIController::ABaseAIController() : Super() {
 	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
@@ -56,7 +56,7 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 
 
 void ABaseAIController::SetupCollision() {
-	collision.IgnoreComponents.Empty();
+	collision.ClearIgnoredComponents();
 
 	if (GetOwner()->GetGroup() != nullptr && GetOwner()->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : GetOwner()->GetGroup()->GetMembers()) {

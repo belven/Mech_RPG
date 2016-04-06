@@ -5,6 +5,7 @@
 #include "AllyAIController.h"
 #include "QuestDisplayUI.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "Interactable.h"
 
 #define mCanSee(location) UMiscLibrary::CanSee(GetOwner()->GetWorld(), GetOwner()->GetActorLocation(), location)
@@ -34,7 +35,8 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 		questListTemplate = questListClass.Class;
 	}
 
-	
+	SetActorTickEnabled(true);
+	PrimaryActorTick.bCanEverTick = true;
 
 }
 
@@ -56,7 +58,7 @@ void AMech_RPGPlayerController::BeginPlay() {
 		questList->AddToViewport();
 		questList->SetVisibility(ESlateVisibility::Visible);
 		questList->SetPositionInViewport(FVector2D(900, 100));
-	}		
+	}
 }
 
 /**
@@ -199,7 +201,7 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 }
 
 void AMech_RPGPlayerController::SetupCollision() {
-	collision.IgnoreComponents.Empty();
+	collision.ClearIgnoredComponents();
 
 	if (owner->GetGroup() != nullptr && owner->GetGroup()->HasMemebers()) {
 		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
@@ -361,13 +363,10 @@ void AMech_RPGPlayerController::MoveToMouseCursor() {
  * Navigate player to the given world location.
  */
 void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation) {
-	APawn* const Pawn = GetPawn();
-	if (Pawn) {
-		UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
+	UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
 
-		if (NavSys) {
-			MoveToLocation(DestLocation);
-		}
+	if (UMiscLibrary::IsCharacterAlive(GetOwner()) && NavSys != nullptr) {
+		MoveToLocation(DestLocation);
 	}
 }
 
@@ -552,7 +551,7 @@ void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
 	inventory->SetOwner(owner);
 	questList->SetCharacter(owner);
 	questList->GenerateQuests();
-	owner->OnQuestAdded.AddDynamic(this, &AMech_RPGPlayerController::AddQuest);
+	owner->OnQuestAdded.AddUniqueDynamic(this, &AMech_RPGPlayerController::AddQuest);
 }
 
 void AMech_RPGPlayerController::CharacterFive() {

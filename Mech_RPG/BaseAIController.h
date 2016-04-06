@@ -11,7 +11,7 @@ UCLASS()
 class MECH_RPG_API ABaseAIController : public AAIController {
 	GENERATED_BODY()
 
-private:
+protected:
 	AMech_RPGCharacter* characterOwner;
 
 	AMech_RPGCharacter* target;
@@ -25,7 +25,7 @@ private:
 
 	virtual void Tick(float DeltaTime) override;
 public:
-	ABaseAIController(const FObjectInitializer& ObjectInitializer);
+	ABaseAIController();
 	void AttackTarget(float DeltaTime);
 	void FindTarget();
 
