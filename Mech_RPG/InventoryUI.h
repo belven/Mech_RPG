@@ -21,5 +21,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		AMech_RPGCharacter* GetOwner();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Quests")
+		void GenerateInventory();
+
 
 };

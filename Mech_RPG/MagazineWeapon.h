@@ -41,7 +41,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MagazineWeapon")
 		float GetAmmo();
 
-	static AMagazineWeapon* CreateMagazineWeapon(AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings);
+	static AMagazineWeapon* CreateMagazineWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent() override;

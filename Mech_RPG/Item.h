@@ -81,7 +81,7 @@ public:
 		void SetStackSize(int32 newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		AItem* Copy();
+		virtual AItem* Copy();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		static AItem* CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString inName = "Test", int32 inAmount = 1, int32 inGrade = 0, int32 inQuality = 0, int32 inStackSize = 3);
@@ -117,8 +117,8 @@ protected:
 	FString name;
 	int32 grade;
 	AMech_RPGCharacter* owner;
-	int32 amount;
-	int32 stackSize;
+	int32 amount = 1;
+	int32 stackSize = 1;
 	int32 quality;
 
 };

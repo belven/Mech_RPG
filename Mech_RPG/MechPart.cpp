@@ -44,7 +44,9 @@ void AMechPart::SetOwner(AMech_RPGCharacter* inOwner)
 		meshComponent->CastShadow = true;
 		meshComponent->SetHiddenInGame(false);
 		meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		AttachRootComponentTo(owner->GetMesh(), "RightHand");
+		if (inOwner != nullptr) {
+			AttachRootComponentTo(owner->GetMesh(), "RightHand");
+		}
 	}
 }
 

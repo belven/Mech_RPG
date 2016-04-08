@@ -18,7 +18,7 @@ public:
 	ASMG();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static ASMG* CreateSMG(AMech_RPGCharacter* inOwner);
+		static ASMG* CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner);
 
 	
 };

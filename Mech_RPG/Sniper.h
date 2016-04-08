@@ -18,6 +18,9 @@ public:
 	ASniper();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static ASniper* CreateSniper(AMech_RPGCharacter* inOwner);
+		static ASniper* CreateSniper(UWorld* world, AMech_RPGCharacter* inOwner);
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		virtual AItem* Copy();
 
 };

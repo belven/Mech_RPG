@@ -11,8 +11,8 @@ ASMG::ASMG() : Super() {
 }
 
 
-ASMG* ASMG::CreateSMG(AMech_RPGCharacter* inOwner) {
-	if (inOwner && inOwner->GetWorld()) {
+ASMG* ASMG::CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner) {
+	if (world != nullptr) {
 		FMagazineWeaponParams magSettings;
 		magSettings.healthChange = 42;
 		magSettings.range = 1000;
@@ -21,7 +21,7 @@ ASMG* ASMG::CreateSMG(AMech_RPGCharacter* inOwner) {
 		magSettings.magazineSize = 20;
 		magSettings.reloadAmount = 4;
 
-		ASMG* weapon = inOwner->GetWorld()->SpawnActor<ASMG>(ASMG::StaticClass());
+		ASMG* weapon = world->SpawnActor<ASMG>(ASMG::StaticClass());
 		weapon->SetSettings(magSettings);
 		weapon->SetOwner(inOwner);
 		return weapon;

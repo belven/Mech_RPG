@@ -228,7 +228,10 @@ public:
 		void RemoveFromPlay();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		UInventory* GetInventory();
+		UInventory* GetInventory(); 
+	
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		AItem* AddItem(AItem* itemToAdd);
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FPreHealthChangeEvent OnPreHealthChange;

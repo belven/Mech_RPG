@@ -24,8 +24,8 @@ ABio_Rifle::ABio_Rifle() : Super() {
 	}
 }
 
-ABio_Rifle* ABio_Rifle::CreateBioRifle(AMech_RPGCharacter* inOwner) {
-	if (inOwner && inOwner->GetWorld()) {
+ABio_Rifle* ABio_Rifle::CreateBioRifle(UWorld* world, AMech_RPGCharacter* inOwner) {
+	if (world != nullptr) {
 		FOverheatWeaponParams overheatSettings;
 		overheatSettings.healthChange = 40;
 		overheatSettings.range = 600;
@@ -34,7 +34,7 @@ ABio_Rifle* ABio_Rifle::CreateBioRifle(AMech_RPGCharacter* inOwner) {
 		overheatSettings.heatLosePerTick = 0.05;
 		overheatSettings.heatGenerated = 0.05;
 
-		ABio_Rifle* weapon = inOwner->GetWorld()->SpawnActor<ABio_Rifle>(ABio_Rifle::StaticClass());
+		ABio_Rifle* weapon = world->SpawnActor<ABio_Rifle>(ABio_Rifle::StaticClass());
 		weapon->SetSettings(overheatSettings);
 		weapon->heatLosePerTick = overheatSettings.heatLosePerTick;
 		weapon->heatGenerated = overheatSettings.heatGenerated;

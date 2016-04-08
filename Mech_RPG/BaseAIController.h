@@ -22,11 +22,11 @@ protected:
 	bool collisionSet = false;
 
 	FHitResult hit;
-
-	virtual void Tick(float DeltaTime) override;
 public:
 	ABaseAIController();
 	void AttackTarget(float DeltaTime);
+
+	virtual void Tick(float DeltaTime) override;
 	void FindTarget();
 
 	void PerformAbility();

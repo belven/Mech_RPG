@@ -13,9 +13,9 @@ class MECH_RPG_API AAllyAIController : public ABaseAIController {
 	GENERATED_BODY()
 protected:
 	FVector playerControlledLocation;
-	virtual void Tick(float DeltaTime) override;
 public:
 	AAllyAIController();
+	virtual void Tick(float DeltaTime) override;
 	virtual	void BeginPlay() override;
 	FVector GetPlayerControlledLocation();
 	void SetPlayerControlledLocation(FVector newVal);

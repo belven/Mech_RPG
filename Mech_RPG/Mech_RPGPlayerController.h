@@ -44,7 +44,7 @@ private:
 
 	PlayerControllerEnums::LastUsed lastAction;
 
-	float interactionRange = 100;
+	float interactionRange = 300;
 
 public:
 	AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer);

@@ -41,6 +41,7 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 }
 
 void AMech_RPGPlayerController::BeginPlay() {
+	Super::BeginPlay();
 	if (WidgetTemplate != nullptr) {
 		characterPane = CreateWidget<UUserWidget>(this, WidgetTemplate);
 		characterPane->AddToViewport();
@@ -51,6 +52,7 @@ void AMech_RPGPlayerController::BeginPlay() {
 		inventory = CreateWidget<UInventoryUI>(this, inventoryTemplate);
 		inventory->AddToViewport();
 		inventory->SetVisibility(ESlateVisibility::Hidden);
+		inventory->SetPositionInViewport(FVector2D(600, 100));
 	}
 
 	if (questListTemplate != nullptr) {
@@ -66,6 +68,7 @@ void AMech_RPGPlayerController::BeginPlay() {
  */
 void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 	Super::PlayerTick(DeltaTime);
+	//UE_LOG(LogTemp, Log, TEXT("PlayerTick"));
 
 	//Do we have an owner
 	if (GetOwner()) {
@@ -121,6 +124,7 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 					&& GetOwner()->GetDistanceTo(lastTargetInteractable) <= interactionRange) {
 					lastAction = PlayerControllerEnums::None;
 					GetOwner()->Interact(lastTargetInteractable);
+					inventory->GenerateInventory();
 				}
 				else {
 					MoveToActor(lastTargetInteractable);

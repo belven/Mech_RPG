@@ -11,7 +11,7 @@
 #include "Interactable.h"
 #include "Quest.h"
 
-#define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(this, type, grade, quailty)
+#define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)
 #define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
 #define mCreateChannelledAbility(ability, Duration, loc, trace) UChannelledAbility::CreateChannelledAbility(this, ability, Duration, loc, trace)
 #define mCreatePresetRole(role) AMech_RPGCharacter::CreatePresetRole(role)
@@ -80,7 +80,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	if (floatingTextWidget.Succeeded()) {
 		floatingTextClass = floatingTextWidget.Class;
 	}
-	
+
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> newMesh(TEXT("/Game/TopDown/Meshes/Mecha_2.Mecha_2"));
 
 	if (newMesh.Succeeded()) {
@@ -291,7 +291,7 @@ TArray<UQuest*>& AMech_RPGCharacter::GetQuests()
 
 void AMech_RPGCharacter::AddQuest(UQuest * newQuest)
 {
-	for(UQuest* quest : GetQuests())
+	for (UQuest* quest : GetQuests())
 	{
 		if (quest->GetQuestName().Equals(newQuest->GetQuestName())) {
 			return;
@@ -315,7 +315,7 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 	if (OnPreHealthChange.IsBound()) {
 		OnPreHealthChange.Broadcast(healthChange);
 	}
-	
+
 	if (healthChange.heals) {
 		health += healthChange.healthChange;
 	}
@@ -345,7 +345,7 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 
 void AMech_RPGCharacter::EnemyKilled(AMech_RPGCharacter* character)
 {
-	if(OnEnemyKilled.IsBound())	OnEnemyKilled.Broadcast(character);
+	if (OnEnemyKilled.IsBound())	OnEnemyKilled.Broadcast(character);
 	GetGroup()->GroupEnemyKilled(character);
 }
 
@@ -390,6 +390,15 @@ UInventory * AMech_RPGCharacter::GetInventory()
 	return inventory;
 }
 
+AItem* AMech_RPGCharacter::AddItem(AItem* itemToAdd)
+{
+	if (OnItemPickUpEvent.IsBound()) {
+		OnItemPickUpEvent.Broadcast(itemToAdd);
+	}
+
+	return GetInventory()->AddItem(itemToAdd);
+}
+
 void AMech_RPGCharacter::NPCInteract(AMech_RPGCharacter* character)
 {
 	if (character->GetQuests().Num() > 0) {
@@ -423,7 +432,7 @@ void AMech_RPGCharacter::ItemPickup(AItem* item)
 	if (OnItemPickUpEvent.IsBound()) {
 		OnItemPickUpEvent.Broadcast(item);
 	}
-
+	item->SetOwner(this);
 	GetGroup()->ItemPickup(item);
 }
 
@@ -663,7 +672,15 @@ AWeapon* AMech_RPGCharacter::GetCurrentWeapon() {
 }
 
 void AMech_RPGCharacter::SetCurrentWeapon(AWeapon* newVal) {
-	currentWeapon = newVal;
+	if (newVal != nullptr) {
+		if (currentWeapon != nullptr) {
+			currentWeapon->SetActorHiddenInGame(true);
+		}
+
+		newVal->SetActorHiddenInGame(false);
+		newVal->SetOwner(this);
+		currentWeapon = newVal;
+	}
 }
 
 UGroup* AMech_RPGCharacter::GetGroup() {

@@ -9,6 +9,9 @@ ABaseAIController::ABaseAIController() : Super() {
 	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+	PrimaryActorTick.bCanEverTick = true;
+	SetActorTickEnabled(true);
+	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
 void ABaseAIController::Tick(float DeltaTime) {

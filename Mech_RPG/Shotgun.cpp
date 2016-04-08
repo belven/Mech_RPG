@@ -10,8 +10,8 @@ AShotgun::AShotgun() : Super() {
 	}
 }
 
-AShotgun* AShotgun::CreateShotgun(AMech_RPGCharacter* inOwner) {
-	if (inOwner && inOwner->GetWorld()) {
+AShotgun* AShotgun::CreateShotgun(UWorld* world, AMech_RPGCharacter* inOwner) {
+	if (world != nullptr) {
 		FMagazineWeaponParams magSettings;
 		magSettings.healthChange = 150;
 		magSettings.range = 400;
@@ -20,7 +20,7 @@ AShotgun* AShotgun::CreateShotgun(AMech_RPGCharacter* inOwner) {
 		magSettings.magazineSize = 5;
 		magSettings.reloadAmount = 1;
 
-		AShotgun* weapon = inOwner->GetWorld()->SpawnActor<AShotgun>(AShotgun::StaticClass());
+		AShotgun* weapon = world->SpawnActor<AShotgun>(AShotgun::StaticClass());
 		weapon->SetSettings(magSettings);
 		weapon->SetOwner(inOwner);
 		return weapon;

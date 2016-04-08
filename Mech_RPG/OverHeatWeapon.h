@@ -37,7 +37,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "OverHeatWeapon")
 	float GetHeatLevel();
 
-	static AOverHeatWeapon* CreateOverHeatWeapon(AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings);
+	static AOverHeatWeapon* CreateOverHeatWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent() override;

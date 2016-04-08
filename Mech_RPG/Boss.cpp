@@ -35,7 +35,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		params.reloadAmount = 4;
 		params.heals = false;
 
-		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(this, params));
+		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(GetWorld(), this, params));
 		AddAbility(UDamageBoost::CreateAbility(7, this, 0.5));
 		//AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 400.0F), 2, true, true));
 		//AddAbility(UOrbitalStrike::CreateAbility(30, this, 350));
@@ -50,7 +50,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		params.fireRate = 1;
 		params.range = 400;
 
-		AddWeapon(AWeapon::CreateWeapon(this, params));
+		AddWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
 		AddAbility(UAbility::CreatePresetAbility(this, AbilityEnums::Taunt));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Stun, 2.5, true, true));
 		SetDefenceModifier(0 + statModifier);
@@ -66,7 +66,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		params.reloadAmount = 1;
 		params.heals = false;
 
-		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(this, params));
+		AddWeapon(AMagazineWeapon::CreateMagazineWeapon(GetWorld(), this, params));
 		AddAbility(USnipe::CreateAbility(7, this));
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1 + statModifier);
@@ -74,7 +74,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
 		break;
 	case GroupEnums::Healer:
-		AddWeapon(AWeapon::CreatePresetWeapon(this, WeaponEnums::Bio_Repair));
+		AddWeapon(AWeapon::CreatePresetWeapon(GetWorld(), this, WeaponEnums::Bio_Repair));
 		AddAbility(UHeal::CreateAbility(5, this, 800));
 		AddAbility(UDisable::CreateDisable(10, this, 5));
 		SetDefenceModifier(0 + statModifier);

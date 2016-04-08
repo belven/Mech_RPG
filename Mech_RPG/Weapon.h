@@ -68,7 +68,11 @@ protected:
 public:
 	AWeapon();
 	float GetChangeAmount();
-	float GetRange();
+	float GetRange(); 
+	
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		virtual AItem* Copy();
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Particles)
 		UParticleSystemComponent* partclSystem;
@@ -86,7 +90,7 @@ public:
 		virtual void StopFire();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AWeapon* CreateWeapon(AMech_RPGCharacter* inOwner, FWeaponParams inSettings);
+		static AWeapon* CreateWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FWeaponParams inSettings);
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FFired OnFire;
@@ -109,5 +113,5 @@ public:
 		virtual float GetProgressBarPercent();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AWeapon* CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type = WeaponEnums::SMG, int32 grade = 0, int32 quality = 0);
+		static AWeapon* CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type = WeaponEnums::SMG, int32 grade = 0, int32 quality = 0);
 };

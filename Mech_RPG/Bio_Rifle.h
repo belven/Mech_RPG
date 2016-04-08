@@ -17,6 +17,6 @@ public:
 	ABio_Rifle();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static ABio_Rifle* CreateBioRifle(AMech_RPGCharacter* inOwner);
+		static ABio_Rifle* CreateBioRifle(UWorld* world, AMech_RPGCharacter* inOwner);
 
 };

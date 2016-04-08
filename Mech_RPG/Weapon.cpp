@@ -32,6 +32,11 @@ float AWeapon::GetRange() {
 	return settings.range;
 }
 
+AItem* AWeapon::Copy()
+{
+	return CreateWeapon(GetWorld(), GetOwner(), settings);
+}
+
 void AWeapon::SetChangeAmount(float newVal) {
 	settings.healthChange = newVal;
 }
@@ -48,9 +53,9 @@ DamageEnums::DamageType AWeapon::GetChangeAmountType() {
 	return settings.damageType;
 }
 
-AWeapon* AWeapon::CreateWeapon(AMech_RPGCharacter* inOwner, FWeaponParams inSettings) {
-	if (inOwner && inOwner->GetWorld()) {
-		AWeapon* weapon = inOwner->GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass());
+AWeapon* AWeapon::CreateWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FWeaponParams inSettings) {
+	if (world != nullptr) {
+		AWeapon* weapon = world->SpawnActor<AWeapon>(AWeapon::StaticClass());
 		weapon->SetSettings(inSettings);
 		weapon->SetOwner(inOwner);
 		return weapon;
@@ -61,12 +66,14 @@ AWeapon* AWeapon::CreateWeapon(AMech_RPGCharacter* inOwner, FWeaponParams inSett
 void AWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
 	Super::SetOwner(inOwner);
 
-	if (partclSystem != nullptr) {
-		// TODO Attach to end of weapon
-		partclSystem->AttachTo(inOwner->GetRootComponent());
-	}
+	if (inOwner != nullptr) {
+		if (partclSystem != nullptr) {
+			// TODO Attach to end of weapon
+			partclSystem->AttachTo(inOwner->GetRootComponent());
+		}
 
-	inOwner->OnStopFiring.AddDynamic(this, &AWeapon::StopFire);
+		inOwner->OnStopFiring.AddDynamic(this, &AWeapon::StopFire);
+	}
 }
 
 float AWeapon::GetProgressBarPercent() {
@@ -175,34 +182,36 @@ void AWeapon::SetSettings(FWeaponParams newSettings)
 	settings = newSettings;
 }
 
-AWeapon* AWeapon::CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type, int32 grade, int32 quality) {
+AWeapon* AWeapon::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type, int32 grade, int32 quality) {
 	FMagazineWeaponParams magSettings;
 	AWeapon* weapon = nullptr;
 
 	switch (type) {
 	case WeaponEnums::SMG:
-		weapon = ASMG::CreateSMG(inOwner);
+		weapon = ASMG::CreateSMG(world, inOwner);
 		break;
 	case WeaponEnums::Bio_Repair:
-		weapon = ABio_Rifle::CreateBioRifle(inOwner);
+		weapon = ABio_Rifle::CreateBioRifle(world, inOwner);
 		break;
 	case WeaponEnums::RPG:
 		magSettings.healthChange = 500;
 		magSettings.range = 1300;
 		magSettings.fireRate = 2.5;
 		magSettings.heals = false;
-		weapon = CreateWeapon(inOwner, magSettings);
+		weapon = CreateWeapon(world, inOwner, magSettings);
 		break;
 	case WeaponEnums::Shotgun:
-		weapon = AShotgun::CreateShotgun(inOwner);
+		weapon = AShotgun::CreateShotgun(world, inOwner);
 		break;
 	case WeaponEnums::Sniper:
-		weapon = ASniper::CreateSniper(inOwner);
+		weapon = ASniper::CreateSniper(world, inOwner);
 		break;
 	}
 
 	weapon->SetGrade(grade);
 	weapon->SetQuality(quality);
+	weapon->SetName("Test Weapon");
 
 	return weapon;
 }
+

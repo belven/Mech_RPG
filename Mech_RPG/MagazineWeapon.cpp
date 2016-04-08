@@ -28,7 +28,7 @@ void AMagazineWeapon::Tick(float DeltaTime) {
 
 void AMagazineWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
 	Super::SetOwner(inOwner);
-	inOwner->OnOutOfCombat.AddUniqueDynamic(this, &AMagazineWeapon::FullReload);
+	if (inOwner != nullptr) { inOwner->OnOutOfCombat.AddUniqueDynamic(this, &AMagazineWeapon::FullReload); }
 }
 
 void AMagazineWeapon::FullReload() {
@@ -58,9 +58,9 @@ void AMagazineWeapon::Fire(AMech_RPGCharacter* target) {
 }
 
 
-AMagazineWeapon* AMagazineWeapon::CreateMagazineWeapon(AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings) {
-	if (inOwner && inOwner->GetWorld()) {
-		AMagazineWeapon* weapon = inOwner->GetWorld()->SpawnActor<AMagazineWeapon>(AMagazineWeapon::StaticClass());
+AMagazineWeapon* AMagazineWeapon::CreateMagazineWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings) {
+	if (world != nullptr) {
+		AMagazineWeapon* weapon = world->SpawnActor<AMagazineWeapon>(AMagazineWeapon::StaticClass());
 		weapon->SetSettings(inSettings);
 		weapon->magazineSize = inSettings.magazineSize;
 		weapon->reloadAmount = inSettings.reloadAmount;

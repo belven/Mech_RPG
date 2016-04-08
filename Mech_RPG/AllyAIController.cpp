@@ -6,11 +6,13 @@
 #include "AI/Navigation/NavigationSystem.h"
 
 AAllyAIController::AAllyAIController() : Super() {
-	SetActorTickEnabled(true);
-	PrimaryActorTick.bCanEverTick = true;
+	//SetActorTickEnabled(true);
+	//PrimaryActorTick.bCanEverTick = true;
+	//PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
 void AAllyAIController::Tick(float DeltaTime) {
+	//UE_LOG(LogTemp, Log, TEXT("AAllyAIController Tick"));
 	if (GetOwner() && GetOwner()->GetDemandedController() == NULL) {
 		if (GetOwner()->IsDead()) {
 			//UnPossess();
@@ -56,6 +58,7 @@ void AAllyAIController::Tick(float DeltaTime) {
 }
 
 void AAllyAIController::BeginPlay() {
+	Super::BeginPlay();
 	SetPlayerControlledLocation(FVector::ZeroVector);
 }
 

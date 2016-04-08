@@ -16,8 +16,8 @@ ASniper::ASniper() : Super() {
 	}
 }
 
-ASniper* ASniper::CreateSniper(AMech_RPGCharacter* inOwner) {
-	if (inOwner && inOwner->GetWorld()) {
+ASniper* ASniper::CreateSniper(UWorld* world, AMech_RPGCharacter* inOwner) {
+	if (world != nullptr) {
 		FMagazineWeaponParams magSettings;
 		magSettings.healthChange = 300;
 		magSettings.range = 1500;
@@ -27,10 +27,16 @@ ASniper* ASniper::CreateSniper(AMech_RPGCharacter* inOwner) {
 		magSettings.reloadAmount = 1;
 		magSettings.critChance = 45;
 
-		ASniper* weapon = inOwner->GetWorld()->SpawnActor<ASniper>(ASniper::StaticClass());
+		ASniper* weapon = world->SpawnActor<ASniper>(ASniper::StaticClass());
 		weapon->SetSettings(magSettings);
 		weapon->SetOwner(inOwner);
+		weapon->SetName("Sniper");
 		return weapon;
 	}
 	return NULL;
+}
+
+AItem* ASniper::Copy()
+{
+	return CreateSniper(GetWorld(), GetOwner());
 }
