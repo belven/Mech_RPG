@@ -6,14 +6,18 @@
 #include "Shotgun.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class MECH_RPG_API AShotgun : public AMagazineWeapon
 {
 	GENERATED_BODY()
 public:
-		UFUNCTION(BlueprintCallable, Category = "Weapon")
+	AShotgun();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		static AShotgun* CreateShotgun(UWorld* world, AMech_RPGCharacter* inOwner);
-		AShotgun();
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		virtual AItem* Copy();
 };

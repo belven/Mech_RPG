@@ -17,6 +17,7 @@ private:
 
 
 public:
+	AItemPickup();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUp")
 		AItem* item;
 	

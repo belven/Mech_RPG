@@ -8,21 +8,12 @@ namespace WeaponEnums {
 		Bio_Repair,
 		SMG,
 		Shotgun,
-		RPG
-	};
-}
-
-UENUM(BlueprintType)
-namespace QualityEnums {
-	enum Quality {
-		Base,
-		Iron,
-		Steel,
-		Titianium,
-		Unobtainium,
+		RPG,
 		End
 	};
 }
+
+
 
 #pragma once
 

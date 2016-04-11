@@ -16,6 +16,18 @@ namespace ItemEnumns
 	};
 }
 
+UENUM(BlueprintType)
+namespace QualityEnums {
+	enum Quality {
+		Base,
+		Iron,
+		Steel,
+		Titianium,
+		Unobtainium,
+		End
+	};
+}
+
 #pragma once
 #include "UnrealString.h"
 #include "Item.generated.h"
@@ -29,9 +41,11 @@ class AItem : public AActor
 public:
 	AItem();
 
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		static AItem* CreateItemByType(ItemEnumns::ItemType type, UWorld* world, int32 grade, int32 quality);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		ItemEnumns::ItemType GetType();
+	ItemEnumns::ItemType GetType();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		void SetQuality(int32 newQuality);
@@ -112,6 +126,7 @@ public:
 		return *this;
 	}
 
+	static int32 HighestItemLevel;
 protected:
 	TEnumAsByte<ItemEnumns::ItemType> type;
 	FString name;

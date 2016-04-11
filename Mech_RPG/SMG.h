@@ -20,5 +20,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		static ASMG* CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner);
 
-	
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		virtual AItem* Copy();	
 };

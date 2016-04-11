@@ -193,7 +193,7 @@ void AMech_RPGCharacter::BeginPlay() {
 		stats->SetDrawSize(FVector2D(100, 50));
 	}
 
-	if (inventory == nullptr) {
+	/*if (inventory == nullptr) {
 		inventory = NewObject<UInventory>(UInventory::StaticClass());
 		if (inventory != nullptr) {
 			int invSize = 20;
@@ -204,7 +204,7 @@ void AMech_RPGCharacter::BeginPlay() {
 			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 3", 0, 0, 0, 2));
 			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));
 		}
-	}
+	}*/
 }
 
 UArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
@@ -237,7 +237,6 @@ void AMech_RPGCharacter::SetUpGroup() {
 
 	group->OnMemberDamageEvent.AddUniqueDynamic(this, &AMech_RPGCharacter::SetInCombat);
 }
-
 
 void AMech_RPGCharacter::ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool remove) {
 	int amount = remove ? -1 : 1;
@@ -341,6 +340,46 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 		OnStopFiring.Broadcast();
 		healthChange.damager->EnemyKilled(this);
 	}
+}
+
+AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemType type) {
+	int32 totalItems = 0;
+	int32 lowestGrade = AItem::HighestItemLevel;
+	int32 totalGrade = 0;
+	float averageGrade = 0;
+
+	int32 lowestQuality = 20;
+	int32 totalQuality = 0;
+	float averageQuality = 0;
+
+	for (AMech_RPGCharacter* member : inGroup->GetMembers()) {
+		for (AItem* item : member->GetInventory()->GetItems()) {
+			if (item->GetType() == type) {
+				totalItems++;
+				totalGrade += item->GetGrade();
+				totalQuality += item->GetQuality();
+
+				if (item->GetQuality() < lowestQuality) {
+					lowestQuality = item->GetQuality();
+				}
+
+				if (item->GetGrade() < lowestGrade) {
+					lowestGrade = item->GetGrade();
+				}
+			}
+		}
+	}
+
+	averageGrade = totalGrade / totalItems;
+	averageQuality = totalQuality / totalItems;
+
+	bool upgradeGrade = rand() % 100 <= 70;// upgradeGradeChance;
+	bool upgradeQuality = rand() % 100 <= 70; //upgradeQualityChance;
+
+	if (upgradeGrade) averageGrade++;
+	if (upgradeQuality) averageQuality++;
+
+	return AItem::CreateItemByType(type, GetWorld(), (int32)(upgradeGrade), (int32)(upgradeQuality));
 }
 
 void AMech_RPGCharacter::EnemyKilled(AMech_RPGCharacter* character)
@@ -610,7 +649,6 @@ TEnumAsByte<GroupEnums::Role> AMech_RPGCharacter::GetRole()
 	return startingRole;
 }
 
-
 bool AMech_RPGCharacter::GetInCombat()
 {
 	return inCombat;
@@ -635,6 +673,7 @@ UAbility* AMech_RPGCharacter::GetCurrentAbility() {
 void AMech_RPGCharacter::SetCurrentAbility(UAbility* inAbility) {
 	currentAbility = inAbility;
 }
+
 float AMech_RPGCharacter::GetEnergy() {
 	return energy;
 }

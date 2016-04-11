@@ -23,7 +23,23 @@ AShotgun* AShotgun::CreateShotgun(UWorld* world, AMech_RPGCharacter* inOwner) {
 		AShotgun* weapon = world->SpawnActor<AShotgun>(AShotgun::StaticClass());
 		weapon->SetSettings(magSettings);
 		weapon->SetOwner(inOwner);
+		weapon->SetName("Shotgun");
+		weapon->magazineSize = magSettings.magazineSize;
+		weapon->reloadAmount = magSettings.reloadAmount;
+		weapon->ammo = magSettings.magazineSize;
 		return weapon;
 	}
 	return NULL;
+}
+
+AItem* AShotgun::Copy()
+{
+	AShotgun* weapon = GetWorld()->SpawnActor<AShotgun>(AShotgun::StaticClass());
+	weapon->SetSettings(settings);
+	weapon->SetOwner(GetOwner());
+	weapon->magazineSize = magazineSize;
+	weapon->reloadAmount = reloadAmount;
+	weapon->ammo = magazineSize;
+	weapon->SetName(GetName());
+	return weapon;
 }

@@ -366,6 +366,9 @@ public:
 
 	void ChangeHealth(FHealthChange healthChange);
 
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
+		AItem* CalucluateItemDrop(UGroup * inGroup, ItemEnumns::ItemType type = ItemEnumns::Weapon);
+
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		bool IsDead();

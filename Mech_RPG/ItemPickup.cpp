@@ -3,9 +3,18 @@
 #include "Mech_RPG.h"
 #include "ItemPickup.h"
 
+AItemPickup::AItemPickup() : Super()
+{
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> sniper(TEXT("/Game/TopDown/Meshes/Sniper"));
+	if (sniper.Succeeded()) {
+		mesh = sniper.Object;
+		GetStaticMeshComponent()->SetStaticMesh(mesh);
+	}
+}
+
 void AItemPickup::Interact_Implementation(class AMech_RPGCharacter* character)
 {
-	if (character->AddItem(item)->GetAmount() == 0) {
+	if (item != nullptr && character->AddItem(item)->GetAmount() == 0) {
 		Destroy();
 	}
 }

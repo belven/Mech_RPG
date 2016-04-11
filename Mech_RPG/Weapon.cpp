@@ -159,6 +159,7 @@ void AWeapon::SetCritChance(float newVal) {
 }
 
 void AWeapon::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
 	if (!canFire) {
 		lastTime += DeltaTime;
 

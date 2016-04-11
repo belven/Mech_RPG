@@ -19,4 +19,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		static ABio_Rifle* CreateBioRifle(UWorld* world, AMech_RPGCharacter* inOwner);
 
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		virtual AItem* Copy();
+
 };

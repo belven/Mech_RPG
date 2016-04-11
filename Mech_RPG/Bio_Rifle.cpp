@@ -39,9 +39,20 @@ ABio_Rifle* ABio_Rifle::CreateBioRifle(UWorld* world, AMech_RPGCharacter* inOwne
 		weapon->heatLosePerTick = overheatSettings.heatLosePerTick;
 		weapon->heatGenerated = overheatSettings.heatGenerated;
 		weapon->SetOwner(inOwner);
+		weapon->SetName("Bio Rifle");
 		return weapon;
 	}
 	return NULL;
 }
 
+AItem* ABio_Rifle::Copy()
+{
+	ABio_Rifle* weapon = GetWorld()->SpawnActor<ABio_Rifle>(ABio_Rifle::StaticClass());
+	weapon->SetSettings(settings);
+	weapon->SetOwner(GetOwner());
+	weapon->heatLosePerTick = heatLosePerTick;
+	weapon->heatGenerated = heatGenerated;
+	weapon->SetName(GetName());
+	return weapon;
+}
 

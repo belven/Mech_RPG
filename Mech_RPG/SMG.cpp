@@ -24,8 +24,24 @@ ASMG* ASMG::CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner) {
 		ASMG* weapon = world->SpawnActor<ASMG>(ASMG::StaticClass());
 		weapon->SetSettings(magSettings);
 		weapon->SetOwner(inOwner);
+		weapon->SetName("SMG");
+		weapon->magazineSize = magSettings.magazineSize;
+		weapon->reloadAmount = magSettings.reloadAmount;
+		weapon->ammo = magSettings.magazineSize;
 		return weapon;
 	}
 	return NULL;
+}
+
+AItem* ASMG::Copy()
+{
+	ASMG* weapon = GetWorld()->SpawnActor<ASMG>(ASMG::StaticClass());
+	weapon->SetSettings(settings);
+	weapon->SetOwner(GetOwner());
+	weapon->magazineSize = magazineSize;
+	weapon->reloadAmount = reloadAmount;
+	weapon->ammo = magazineSize;
+	weapon->SetName(GetName());
+	return weapon;
 }
 

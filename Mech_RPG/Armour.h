@@ -8,8 +8,7 @@ namespace ArmourEnums {
 		Chest,
 		Left_Arm,
 		Right_Arm,
-		End,
-		Other
+		End
 	};
 }
 
@@ -18,7 +17,8 @@ namespace ArmourGrades {
 	enum ArmourGrade {
 		Light,
 		Medium,
-		Heavy
+		Heavy,
+		End
 	};
 }
 
@@ -68,5 +68,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		static float GetDeafultValue(ArmourGrades::ArmourGrade grade);
 
-	static UArmour* CreateArmour(float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition);
+	static UArmour* CreateArmour(float inResistance, ArmourEnums::ArmourPosition inArmourPosition, int32 grade = 1, int32 quality = 1);
+
+	static UArmour* CreateArmour(float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition, int32 grade = 1, int32 quality = 1);
 };

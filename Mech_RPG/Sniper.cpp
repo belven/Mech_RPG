@@ -31,6 +31,9 @@ ASniper* ASniper::CreateSniper(UWorld* world, AMech_RPGCharacter* inOwner) {
 		weapon->SetSettings(magSettings);
 		weapon->SetOwner(inOwner);
 		weapon->SetName("Sniper");
+		weapon->magazineSize = magSettings.magazineSize;
+		weapon->reloadAmount = magSettings.reloadAmount;
+		weapon->ammo = magSettings.magazineSize;
 		return weapon;
 	}
 	return NULL;
@@ -38,5 +41,12 @@ ASniper* ASniper::CreateSniper(UWorld* world, AMech_RPGCharacter* inOwner) {
 
 AItem* ASniper::Copy()
 {
-	return CreateSniper(GetWorld(), GetOwner());
+	ASniper* weapon = GetWorld()->SpawnActor<ASniper>(ASniper::StaticClass());
+	weapon->SetSettings(settings);
+	weapon->SetOwner(GetOwner());
+	weapon->SetName(GetName());
+	weapon->magazineSize = magazineSize;
+	weapon->reloadAmount = reloadAmount;
+	weapon->ammo = magazineSize;
+	return weapon;
 }

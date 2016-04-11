@@ -60,11 +60,18 @@ TEnumAsByte<ArmourEnums::ArmourPosition> UArmour::GetArmourPosition() {
 	return armourPosition;
 }
 
-UArmour* UArmour::CreateArmour(float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition) {
+UArmour* UArmour::CreateArmour(float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition, int32 grade, int32 quality) {
 	UArmour* tempArmour = NewObject<UArmour>(StaticClass());
 	tempArmour->armourPosition = inArmourPosition;
 	tempArmour->physicalResistance = inPhysicalResistance;
 	tempArmour->blastResistance = inBlastResistance;
 	tempArmour->energyResistance = inEnergyResistance;
+	//tempArmour->SetGrade(grade);
+	//tempArmour->SetQuality(grade);
 	return tempArmour;
+}
+
+UArmour* UArmour::CreateArmour(float inResistance, ArmourEnums::ArmourPosition inArmourPosition, int32 grade, int32 quality)
+{
+	return CreateArmour(inResistance, inResistance, inResistance, inArmourPosition, grade, quality);
 }

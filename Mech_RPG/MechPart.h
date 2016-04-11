@@ -10,15 +10,11 @@ class MECH_RPG_API AMechPart : public AItem
 {
 	GENERATED_BODY()
 private:
-		int32 grade;
 
 public:	
 	// Sets default values for this actor's properties
 	AMechPart();
 
-	int32 GetGrade();
-
-	void SetGrade(int32 newGrade);
 	virtual	void SetOwner(AMech_RPGCharacter* inOwner);
 
 	// Called when the game starts or when spawned

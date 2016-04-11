@@ -12,20 +12,10 @@
 AMechPart::AMechPart() : Super()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	//PrimaryActorTick.bCanEverTick = true;
 
 	meshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MechAttachment_MeshComponent"));
 	SetRootComponent(meshComponent);
-}
-
-int32 AMechPart::GetGrade()
-{
-	return grade;
-}
-
-void AMechPart::SetGrade(int32 newGrade)
-{
-	grade = newGrade;
 }
 
 void AMechPart::SetOwner(AMech_RPGCharacter* inOwner)
@@ -67,6 +57,7 @@ void AMechPart::Tick(float DeltaTime)
 void AMechPart::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
+	GetRootComponent()->SetHiddenInGame(bNewHidden, true);
 	meshComponent->SetHiddenInGame(bNewHidden, true);
 	meshComponent->SetVisibility(!bNewHidden, true);
 }

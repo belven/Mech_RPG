@@ -6,10 +6,24 @@
 ///////////////////////////////////////////////////////////
 #include "Mech_RPG.h"
 #include "Item.h"
+#include "Weapon.h"
+#include "Armour.h"
 #include "Mech_RPGCharacter.h"
+
+int32 AItem::HighestItemLevel = 100;
 
 AItem::AItem() : Super() {
 	SetActorEnableCollision(false);
+}
+
+AItem* AItem::CreateItemByType(ItemEnumns::ItemType type, UWorld* world, int32 grade, int32 quality) {
+	switch (type) {
+	case ItemEnumns::Weapon:
+		return AWeapon::CreatePresetWeapon(world, nullptr, (WeaponEnums::WeaponType)UMiscLibrary::GetRandomEnum(WeaponEnums::End), grade, quality);
+	//case ItemEnumns::Armour:
+		//return UArmour::CreateArmour(UArmour::GetDeafultValue((ArmourGrades::ArmourGrade)UMiscLibrary::GetRandomEnum(ArmourGrades::End)), (ArmourEnums::ArmourPosition) UMiscLibrary::GetRandomEnum(ArmourEnums::End),  grade, quality);
+	}
+	return nullptr;
 }
 
 ItemEnumns::ItemType AItem::GetType() {
