@@ -34,8 +34,12 @@ FString UArmour::GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
 float UArmour::GetDeafultValue(ArmourGrades::ArmourGrade grade) {
 	switch (grade) {
 	case ArmourGrades::Light:
-		return 8.0F;
+		return 4.0F;
+	case ArmourGrades::MediumLight:
+		return 6.0F;
 	case ArmourGrades::Medium:
+		return 8.0F;
+	case ArmourGrades::MediumHeavy:
 		return 10.0F;
 	case ArmourGrades::Heavy:
 		return 12.0F;

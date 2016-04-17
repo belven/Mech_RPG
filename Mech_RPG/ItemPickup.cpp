@@ -1,6 +1,7 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
+#include "MechPart.h"
 #include "ItemPickup.h"
 
 AItemPickup::AItemPickup() : Super()
@@ -10,11 +11,20 @@ AItemPickup::AItemPickup() : Super()
 		mesh = sniper.Object;
 		GetStaticMeshComponent()->SetStaticMesh(mesh);
 	}
+	GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetStaticMeshComponent()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	SetMobility(EComponentMobility::Movable);
 }
 
 void AItemPickup::Interact_Implementation(class AMech_RPGCharacter* character)
 {
 	if (item != nullptr && character->AddItem(item)->GetAmount() == 0) {
+		SetActorHiddenInGame(true);
+		Destroy();
+	}
+	// No Item so remove anyway
+	else {
+		SetActorHiddenInGame(true);
 		Destroy();
 	}
 }
@@ -23,5 +33,9 @@ AItemPickup* AItemPickup::CreateItemPickup(AItem* item)
 {
 	AItemPickup* newItem = item->GetOwner()->GetWorld()->SpawnActor<AItemPickup>(AItemPickup::StaticClass());
 	newItem->item = item;
+
+	if (item->GetClass()->IsChildOf(AMechPart::StaticClass())) {
+		newItem->GetStaticMeshComponent()->SetStaticMesh(Cast<AMechPart>(item)->mesh);
+	}
 	return newItem;
 }

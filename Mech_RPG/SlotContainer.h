@@ -44,6 +44,7 @@ public:
 		bool HasSpace();
 
 private:
+	UPROPERTY()
 	TArray<AItem*> items;
 	int32 maxItemCount;
 

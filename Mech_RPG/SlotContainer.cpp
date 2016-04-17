@@ -15,7 +15,7 @@ void USlotContainer::SetItems(TArray<AItem*> newVal) {
 }
 
 AItem* USlotContainer::GetExistingItemWithSpace(AItem* inItem) {
-	for (AItem* item : GetItems()) {
+	for (AItem* item : items) {
 		// Finds the first item with space available and a matching name
 		if (item != nullptr && item->GetName().Equals(inItem->GetName()) && item->HasSpace()) {
 			return item;
@@ -48,14 +48,14 @@ AItem* USlotContainer::AddItem(AItem* itemToAdd) {
 		newItem->SetAmount(0);
 		newItem->TakeFrom(itemToAdd);
 		// Add the new item
-		GetItems().Add(newItem);
+		items.Add(newItem);
 	}
 
 	return itemToAdd;
 }
 
 bool USlotContainer::HasSpace() {
-	return GetItems().Num() < GetMaxItemCount();
+	return items.Num() < GetMaxItemCount();
 }
 
 /* This will reduce the an items amount by the given item if found */
@@ -64,7 +64,7 @@ bool USlotContainer::RemoveItem(AItem* itemToRemove) {
 	// Is there only one item of this type in out inventory
 	bool isAtMax = GetItemAmount(itemToRemove->GetName()) == itemToRemove->GetStackSize();
 
-	for (AItem* item : GetItems()) {
+	for (AItem* item : items) {
 
 		// Find the first item with the same name and is either the only item or not at max stack size
 		if (item->GetName().Equals(itemToRemove->GetName()) && (isAtMax || item->GetAmount() < item->GetStackSize())) {
@@ -75,7 +75,7 @@ bool USlotContainer::RemoveItem(AItem* itemToRemove) {
 				return false;
 			}
 			else if (amountLeft == 0) { // Simply remove it if the amount left is 0
-				GetItems().Remove(item);
+				items.Remove(item);
 				return true;
 			}
 			else { // Just change the amount
@@ -91,7 +91,7 @@ bool USlotContainer::RemoveItem(AItem* itemToRemove) {
 /* Returns the total amount of items for the given name */
 int32 USlotContainer::GetItemAmount(FString name) {
 	int32 total = 0;
-	for (AItem* item : GetItems()) {
+	for (AItem* item : items) {
 		if (item->GetName().Equals(name)) {
 			total += item->GetAmount();
 		}

@@ -50,6 +50,31 @@ bool UChannelledAbility::OnCooldown() {
 	return abilityToActivate->OnCooldown();
 }
 
+bool UChannelledAbility::HasTag(FString name)
+{
+	return abilityToActivate->HasTag(name);
+}
+
+TArray<FTag>& UChannelledAbility::GetTags()
+{
+	return abilityToActivate->GetTags();
+}
+
+FTag UChannelledAbility::GetTag(FString name)
+{
+	return abilityToActivate->GetTag(name);
+}
+
+float UChannelledAbility::GetTagValue(FString name)
+{
+	return abilityToActivate->GetTagValue(name);
+}
+
+bool UChannelledAbility::GetTagTrue(FString name)
+{
+	return abilityToActivate->GetTagTrue(name);
+}
+
 float UChannelledAbility::GetCurrentTimeRemaining() {
 	return abilityToActivate->GetCurrentTimeRemaining();
 }
@@ -76,7 +101,7 @@ void UChannelledAbility::ActiveChannelAbility() {
 				//TM.SetAxis(1, FVector(0, 1, 1)); //y
 				//TM.SetAxis(2, FVector(0, 0, 1)); //z
 				//DrawDebugCircle(owner->GetWorld(), TM, abilityToActivate->GetTagValue(UAbility::aoeTag), 40, UMiscLibrary::GetRelativeColour(owner), false, 0.1F, 0, 5, false);
-				//DrawDebugSphere(owner->GetWorld(), targetLocation, abilityToActivate->GetTagValue(UAbility::aoeTag), 40, UMiscLibrary::GetRelativeColour(owner), false, 0.1F, 0);
+				DrawDebugSphere(owner->GetWorld(), targetLocation, abilityToActivate->GetTagValue(UAbility::aoeTag), 10, UMiscLibrary::GetRelativeColour(owner), false, 0.1F, 0);
 			}
 
 			DrawDebugLine(owner->GetWorld(), owner->GetActorLocation(), targetLocation, UMiscLibrary::GetRelativeColour(owner), false, 0.1F, 0, 10);

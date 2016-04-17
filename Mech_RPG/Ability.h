@@ -48,15 +48,15 @@ public:
 	static const FString aoeTag;
 	static const FString needsTargetTag;
 
-	bool HasTag(FString name);
-	TArray<FTag>& GetTags();
-	FTag GetTag(FString name);
+	virtual bool HasTag(FString name);
+	virtual TArray<FTag>& GetTags();
+	virtual FTag GetTag(FString name);
 
-	void AddTag(FString name, float value);
-	void RemoveTag(FString name);
+	virtual void AddTag(FString name, float value);
+	virtual void RemoveTag(FString name);
 
-	float GetTagValue(FString name);
-	bool GetTagTrue(FString name);
+	virtual float GetTagValue(FString name);
+	virtual bool GetTagTrue(FString name);
 
 	void SetOnCooldown(UWorld* const World);
 

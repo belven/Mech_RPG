@@ -18,36 +18,52 @@ void ABaseAIController::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
 	if (GetOwner() && GetOwner()->GetDemandedController() == nullptr) {
-		if (GetOwner()->IsDead()) {
-			//UnPossess();
-			//GetOwner()->Destroy(true);
-		}
-		else {
-			if (!IsTargetValid(GetTarget())) {
-				GetOwner()->OnStopFiring.Broadcast();
-				FindTarget();
+		if (!GetOwner()->IsDead() && !GetOwner()->Channelling()) {
+			bool abilityUsed = false;
+
+			for (UAbility* ability : GetOwner()->GetAbilities()) {
+				if (!ability->OnCooldown() && PerformAbility(ability)) {
+					abilityUsed = true;
+					break;
+				}
 			}
 
-			if (IsTargetValid(GetTarget())) {
-				AttackTarget(DeltaTime);
-			}
-			else {
-				GetOwner()->OnStopFiring.Broadcast();
+			if (!abilityUsed) {
+				if (GetOwner()->GetCurrentWeapon()->Heals()) {
+					FindTarget(true);
+
+					if (IsTargetValid(target, true) && UMiscLibrary::GetMissingHealth(target) > 0) {
+						AttackTarget(DeltaTime);
+					}
+				}
+				else {
+					FindTarget(false);
+
+					if (IsTargetValid(target, false)) {
+						AttackTarget(DeltaTime);
+					}
+				}
 			}
 		}
 	}
 }
 
+void ABaseAIController::OwnerPostBeginPlay(AMech_RPGCharacter* mech)
+{
+	GetOwner()->GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(this, &ABaseAIController::GroupMemberDamaged);
+
+}
+
 void ABaseAIController::AttackTarget(float DeltaTime) {
 	// Are we targeting ourselves
 	if (target == GetOwner()) {
-		PerformAbility();
+		//PerformAbility();
 		FireWeapon(nullptr);
 		GetOwner()->LookAt(target);
 	}
 	// Have we traced to another character or cover
 	else if (UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), target->GetActorLocation())) {
-		PerformAbility();
+		//PerformAbility();
 		FireWeapon(target);
 		GetOwner()->LookAt(target);
 	}
@@ -56,7 +72,6 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 		MoveToLocation(target->GetActorLocation());
 	}
 }
-
 
 void ABaseAIController::SetupCollision() {
 	collision.ClearIgnoredComponents();
@@ -68,6 +83,17 @@ void ABaseAIController::SetupCollision() {
 			}
 		}
 	}
+}
+
+UAbility* ABaseAIController::GetOwnerAbilityByTag(FString tag)
+{
+	if (!GetOwner()->Channelling()
+		&& GetOwner()->CanCast()) {
+		for (UAbility* ability : GetOwner()->GetAbilities()) {
+			if (!ability->OnCooldown() && ability->HasTag(tag)) return ability;
+		}
+	}
+	return nullptr;
 }
 
 void ABaseAIController::FireWeapon(AActor* hit) {
@@ -112,27 +138,29 @@ void ABaseAIController::FireWeapon(AActor* hit) {
 	}
 }
 
-void ABaseAIController::PerformAbility() {
-	if (GetOwner()->HasAbilities()
-		&& !GetOwner()->Channelling()
-		&& GetOwner()->CanCast()) {
-		for (UAbility* ability : GetOwner()->GetAbilities()) {
-			if (ability != nullptr && !ability->OnCooldown()) {
-				if (ability->HasTag(UAbility::healTag) && GetOwner()->GetGroup()->GetLowHealthMember() != nullptr) {
-					if (ability->Activate(GetOwner()->GetGroup()->GetLowHealthMember(), target->GetActorLocation())) {
-						GetOwner()->SetCurrentAbility(ability);
-						StopMovement();
-						break;
-					}
-				}
-				else if (ability->Activate(target, target->GetActorLocation())) {
-					GetOwner()->SetCurrentAbility(ability);
-					StopMovement();
-					break;
-				}
-			}
+bool ABaseAIController::PerformAbility(UAbility* ability) {
+	bool affectsAllies = ability->GetAffectedTeam() == AOEEnums::Ally;
+	/*
+		if (ability->HasTag(UAbility::damageTag) || ability->HasTag(UAbility::debuffTag)) {
+			affectsAllies = false;
 		}
+		else if (ability->HasTag(UAbility::healTag) || ability->HasTag(UAbility::buffTag)) {
+			affectsAllies = true;
+		}*/
+
+	FindTarget(affectsAllies);
+
+	if (IsTargetValid(target, affectsAllies) && ShouldHeal(ability) && ability->Activate(target, target->GetActorLocation())) {
+		GetOwner()->SetCurrentAbility(ability);
+		StopMovement();
+		return true;
 	}
+
+	return false;
+}
+
+bool ABaseAIController::ShouldHeal(UAbility* ability) {
+	return !ability->HasTag(UAbility::healTag) || ability->GetTagValue(UAbility::healTag) <= UMiscLibrary::GetMissingHealth(target);
 }
 
 void ABaseAIController::MoveToActor(AActor* target) {
@@ -149,18 +177,24 @@ void ABaseAIController::MoveToLocation(FVector location) {
 	}
 }
 
-void ABaseAIController::FindTarget() {
-	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
-	float range = weapon->GetRange();
-	SetupCollision();
+void ABaseAIController::FindTarget(bool ally) {
+	float range = GetOwner()->GetCurrentWeapon()->GetRange();
+	//SetupCollision();
 
-	if (weapon != nullptr && !weapon->Heals()) {
-		if (target != nullptr && UMiscLibrary::IsCharacterAlive(target = target->GetGroup()->GetRandomMember())) {
+	if (IsTargetValid(target, ally) && (!ally || UMiscLibrary::GetMissingHealth(target) > 0)) {
+		return;
+	}
+	else {
+		target = nullptr;
+	}
+
+	if (!ally) {
+		if (target != nullptr && IsTargetValid(target = target->GetGroup()->GetRandomMember(), ally)) {
 			SetTarget(target);
 		}
 		else {
 			for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
-				if (IsTargetValid(character) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
+				if (IsTargetValid(character, ally) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
 					if (character->GetGroup() != nullptr && character->GetGroup()->HasMemebers()) {
 						SetTarget(character->GetGroup()->GetRandomMember());
 					}
@@ -172,10 +206,10 @@ void ABaseAIController::FindTarget() {
 			}
 		}
 	}
-	else if (weapon != nullptr && GetOwner()->GetGroup() != nullptr) {
+	else {
 		bool targetFound = false;
 		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
-			if (UMiscLibrary::IsCharacterAlive(character) && UMiscLibrary::GetMissingHealth(character) > 0) {
+			if (IsTargetValid(character, ally) && UMiscLibrary::GetMissingHealth(character) > 0) {
 				SetTarget(character);
 				targetFound = true;
 				break;
@@ -184,7 +218,7 @@ void ABaseAIController::FindTarget() {
 
 		if (!targetFound) {
 			for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
-				if (IsTargetValid(character) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
+				if (IsTargetValid(character, ally) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
 					if (UMiscLibrary::GetMissingHealth(character) > 0) {
 						SetTarget(character->GetGroup()->GetRandomMember());
 						break;
@@ -207,21 +241,28 @@ AMech_RPGCharacter* ABaseAIController::GetTarget() {
 	return target;
 }
 
-bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget) {
-	if (UMiscLibrary::IsCharacterAlive(inTarget)) {
-		if (GetOwner()->GetCurrentWeapon()) {
-			if (GetOwner()->GetCurrentWeapon()->Heals()) {
-				return inTarget->CompareGroup(GetOwner()) && UMiscLibrary::GetMissingHealth(inTarget) > 0;
-			}
-			else {
-				return !inTarget->CompareGroup(GetOwner());
-			}
-		}
+bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget, bool ally) {
+	bool valid = UMiscLibrary::IsCharacterAlive(inTarget) && ally == GetOwner()->CompareGroup(inTarget);
+
+	if (!valid) {
+		GetOwner()->OnStopFiring.Broadcast();
 	}
-	return false;
+	return valid;
 }
 
 void ABaseAIController::SetOwner(AMech_RPGCharacter* newVal) {
+	if (characterOwner != nullptr && characterOwner->GetGroup() != nullptr) {
+		characterOwner->GetGroup()->OnMemberDamageEvent.RemoveDynamic(this, &ABaseAIController::GroupMemberDamaged);
+	}
+
+	if (newVal != nullptr) {
+		newVal->OnPostBeginPlay.AddUniqueDynamic(this, &ABaseAIController::OwnerPostBeginPlay);
+
+		if (newVal->GetGroup() != nullptr) {
+			newVal->GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(this, &ABaseAIController::GroupMemberDamaged);
+		}
+	}
+
 	characterOwner = newVal;
 }
 
@@ -230,12 +271,7 @@ void ABaseAIController::SetTarget(AMech_RPGCharacter* newVal) {
 }
 
 void ABaseAIController::GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
-	if (!GetTarget() || !IsTargetValid(GetTarget())) {
-		if (IsTargetValid(attacker)) {
-			SetTarget(attacker);
-		}
-		else if (IsTargetValid(damagedMember)) {
-			SetTarget(damagedMember);
-		}
+	if (!GetTarget()) {
+		SetTarget(attacker);
 	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Mech_RPG.h"
+#include "ItemPickup.h"
 #include "Engine.h"
 #include "Armour.h"
 #include "BaseAIController.h"
@@ -9,6 +10,7 @@
 #include "FloatingTextUI.h"
 #include "Group.h"
 #include "Interactable.h"
+#include "LaserSniper.h"
 #include "Quest.h"
 
 #define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)
@@ -193,18 +195,18 @@ void AMech_RPGCharacter::BeginPlay() {
 		stats->SetDrawSize(FVector2D(100, 50));
 	}
 
-	/*if (inventory == nullptr) {
+	if (inventory == nullptr) {
 		inventory = NewObject<UInventory>(UInventory::StaticClass());
 		if (inventory != nullptr) {
 			int invSize = 20;
 			inventory->SetMaxItemCount(invSize);
-			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
+			/*inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
 			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
 			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 2", 4, 0, 0, 2));
 			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 3", 0, 0, 0, 2));
-			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));
+			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));*/
 		}
-	}*/
+	}
 }
 
 UArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
@@ -339,6 +341,10 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 		if (GetCurrentWeapon() != nullptr) GetCurrentWeapon()->SetActorHiddenInGame(true);
 		OnStopFiring.Broadcast();
 		healthChange.damager->EnemyKilled(this);
+
+		if (GetGroup()->GetPlayer() == nullptr) {
+			AItemPickup::CreateItemPickup(GetCurrentWeapon()->Copy())->SetActorLocation(GetActorLocation());
+		}
 	}
 }
 
@@ -431,11 +437,13 @@ UInventory * AMech_RPGCharacter::GetInventory()
 
 AItem* AMech_RPGCharacter::AddItem(AItem* itemToAdd)
 {
+	AItem* item = GetInventory()->AddItem(itemToAdd);
+
 	if (OnItemPickUpEvent.IsBound()) {
 		OnItemPickUpEvent.Broadcast(itemToAdd);
 	}
 
-	return GetInventory()->AddItem(itemToAdd);
+	return item;
 }
 
 void AMech_RPGCharacter::NPCInteract(AMech_RPGCharacter* character)
@@ -492,7 +500,7 @@ void AMech_RPGCharacter::OutOfCombat() {
 	}
 	else if (IsDead()) {
 		Reset();
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::RemoveFromPlay, 30.0F);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::RemoveFromPlay, 6.0F);
 	}
 }
 
@@ -518,8 +526,10 @@ void AMech_RPGCharacter::LookAt(AMech_RPGCharacter * other)
 }
 
 void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility) {
-	static float armourValue = 5;
-	static float statModifier = 0;
+	float blastResistance = 5;
+	float phsyicalResistance = 5;
+	float energyResistance = 5;
+	float statModifier = 0;
 	static float lowHealth = 2000;
 	static float mediumHealth = lowHealth * 1.25;
 	static float highHealth = mediumHealth * 1.25;
@@ -541,7 +551,9 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 200.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
+		blastResistance = UArmour::GetDeafultValue(ArmourGrades::Light);
+		phsyicalResistance = UArmour::GetDeafultValue(ArmourGrades::MediumLight);
+		energyResistance = UArmour::GetDeafultValue(ArmourGrades::Light);
 		SetMaxHealth(lowHealth * (1 + statModifier));
 		break;
 
@@ -549,10 +561,13 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		AddWeapon(mCreatePresetWeapon(WeaponEnums::Bio_Repair, grade, quaility));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Heal));
 		AddAbility(mCreatePresetAbility(AbilityEnums::AoEHeal));
+		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 200.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
 		SetMovementModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
+		blastResistance = UArmour::GetDeafultValue(ArmourGrades::Light);
+		phsyicalResistance = UArmour::GetDeafultValue(ArmourGrades::MediumLight);
+		energyResistance = UArmour::GetDeafultValue(ArmourGrades::Light);
 		SetMaxHealth(lowHealth * (1 + statModifier));
 		break;
 
@@ -563,17 +578,21 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
 		SetMovementModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
+		blastResistance = UArmour::GetDeafultValue(ArmourGrades::MediumHeavy);
+		phsyicalResistance = UArmour::GetDeafultValue(ArmourGrades::Heavy);
+		energyResistance = UArmour::GetDeafultValue(ArmourGrades::Medium);
 		SetMaxHealth(highHealth * (1 + statModifier));
 		break;
 
 	case GroupEnums::Sniper:
-		AddWeapon(mCreatePresetWeapon(WeaponEnums::Sniper, grade, quaility));
+		AddWeapon(ALaserSniper::CreateLaserSniper(GetWorld(), this));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Snipe, 2.5F, false, false));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
+		blastResistance = UArmour::GetDeafultValue(ArmourGrades::Light);
+		phsyicalResistance = UArmour::GetDeafultValue(ArmourGrades::MediumLight);
+		energyResistance = UArmour::GetDeafultValue(ArmourGrades::Light);
 		SetMaxHealth(lowHealth * (1 + statModifier));
 		break;
 
@@ -584,7 +603,9 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		AddAbility(mCreatePresetAbility(AbilityEnums::Disable));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
+		blastResistance = UArmour::GetDeafultValue(ArmourGrades::MediumLight);
+		phsyicalResistance = UArmour::GetDeafultValue(ArmourGrades::Medium);
+		energyResistance = UArmour::GetDeafultValue(ArmourGrades::MediumLight);
 		SetMaxHealth(mediumHealth * (1 + statModifier));
 		break;
 
@@ -600,7 +621,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	}
 
 	for (int i = 0; i < ArmourEnums::End; i++) {
-		armour.Add(UArmour::CreateArmour(armourValue, armourValue, armourValue, (ArmourEnums::ArmourPosition)i));
+		armour.Add(UArmour::CreateArmour(phsyicalResistance, blastResistance, energyResistance, (ArmourEnums::ArmourPosition)i));
 	}
 }
 

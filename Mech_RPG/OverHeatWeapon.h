@@ -10,9 +10,9 @@ struct FOverheatWeaponParams : public FWeaponParams {
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		float heatGenerated;
+		float heatGenerated = 0.05;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		float heatLosePerTick;
+		float heatLosePerTick = 0.05;
 };
 
 UCLASS()

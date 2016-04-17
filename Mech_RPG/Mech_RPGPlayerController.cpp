@@ -317,15 +317,15 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 
 void AMech_RPGPlayerController::OpenCharacterPane() {
 	if (characterPaneOpen) {
-		FInputModeGameAndUI data;
-		SetInputMode(data);
+		//FInputModeGameAndUI data;
+		//SetInputMode(data);
 		//SetPause(false);
 		characterPaneOpen = false;
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
 	}
 	else {
-		FInputModeUIOnly data;
-		SetInputMode(data);
+		//FInputModeUIOnly data;
+		//SetInputMode(data);
 		//SetPause(true);
 		characterPaneOpen = true;
 		characterPane->SetVisibility(ESlateVisibility::Visible);

@@ -16,7 +16,9 @@ UENUM(BlueprintType)
 namespace ArmourGrades {
 	enum ArmourGrade {
 		Light,
+		MediumLight,
 		Medium,
+		MediumHeavy,
 		Heavy,
 		End
 	};

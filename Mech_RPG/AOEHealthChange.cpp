@@ -43,7 +43,7 @@ void  AAOEHealthChange::Activate() {
 
 		FHealthChange healthChange;
 		FVector locationToUse = settings.usesTarget && settings.target != NULL ? settings.target->GetActorLocation() : settings.location;
-		//DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, FColor::Blue, false, settings.rate, 0);
+		DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, UMiscLibrary::GetRelativeColour(settings.owner), false, settings.rate, 0);
 
 	/*	if (!partclSystem->IsActive()) {
 			partclSystem->SetVectorParameter(FName(TEXT("Size")), FVector(settings.radius * 2));

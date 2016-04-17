@@ -24,9 +24,9 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	UStaticMesh* mesh = nullptr;
 protected:
 	UStaticMeshComponent* meshComponent = nullptr;
 	TSubclassOf<UStaticMesh> meshClass = nullptr;
-	UStaticMesh* mesh = nullptr;
 	
 };

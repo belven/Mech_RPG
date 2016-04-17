@@ -13,12 +13,8 @@ AAllyAIController::AAllyAIController() : Super() {
 
 void AAllyAIController::Tick(float DeltaTime) {
 	//UE_LOG(LogTemp, Log, TEXT("AAllyAIController Tick"));
-	if (GetOwner() && GetOwner()->GetDemandedController() == NULL) {
-		if (GetOwner()->IsDead()) {
-			//UnPossess();
-			//GetOwner()->Destroy(true);
-		}
-		else if (GetPlayerControlledLocation() != FVector::ZeroVector) {
+	if (GetOwner() && !GetOwner()->IsDead() && GetOwner()->GetDemandedController() == NULL) {
+		if (GetPlayerControlledLocation() != FVector::ZeroVector) {
 			float dist = FVector::Dist(GetPlayerControlledLocation(), GetOwner()->GetActorLocation());
 			if (dist > 1800.0F) {
 				SetPlayerControlledLocation(FVector::ZeroVector);
@@ -28,23 +24,12 @@ void AAllyAIController::Tick(float DeltaTime) {
 			}
 			else {
 				SetPlayerControlledLocation(FVector::ZeroVector);
-
-				FindTargetInWeaponRage();
-
-				if (IsTargetValid(GetTarget())) {
-					AttackTarget(DeltaTime);
-				}
 			}
 		}
 		else {
-			if (!IsTargetValid(GetTarget())) {
-				FindTarget();
-			}
+			Super::Tick(DeltaTime);
 
-			if (IsTargetValid(GetTarget())) {
-				AttackTarget(DeltaTime);
-			}
-			else {
+			if (!IsTargetValid(GetTarget(), false) && !IsTargetValid(GetTarget(), true)) {
 				AMech_RPGCharacter* player = GetOwner()->GetGroup()->GetPlayer();
 				if (player != NULL && player->GetDistanceTo(GetOwner()) > (300.0F + (GetOwner()->GetGroup()->GetMembers().IndexOfByKey(GetOwner()) * 40))) {
 					MoveToActor(player);
@@ -70,27 +55,3 @@ void AAllyAIController::SetPlayerControlledLocation(FVector newVal) {
 	playerControlledLocation = newVal;
 }
 
-void AAllyAIController::FindTargetInWeaponRage() {
-	float weaponRange = GetOwner()->GetCurrentWeapon()->GetRange();
-
-	if (!GetOwner()->GetCurrentWeapon()->Heals()) {
-		for (AMech_RPGCharacter* character : GetCharactersInRange(weaponRange)) {
-			if (!character->CompareGroup(GetOwner())) {
-				SetTarget(character);
-				break;
-			}
-		}
-	}
-	else {
-		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
-			for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
-				if (UMiscLibrary::IsCharacterAlive(character)
-					&& UMiscLibrary::GetMissingHealth(character) > 0
-					&& character->GetDistanceTo(GetOwner()) <= weaponRange) {
-					SetTarget(character);
-					break;
-				}
-			}
-		}
-	}
-}

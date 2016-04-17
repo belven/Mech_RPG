@@ -27,16 +27,23 @@ public:
 	void AttackTarget(float DeltaTime);
 
 	virtual void Tick(float DeltaTime) override;
-	void FindTarget();
 
-	void PerformAbility();
+	UFUNCTION(BlueprintCallable, Category = "Group")
+	virtual void OwnerPostBeginPlay(AMech_RPGCharacter* mech);
+	void FindTarget(bool ally = false);
+
+
+	bool PerformAbility(UAbility* ability);
 	void FireWeapon(AActor* hit);
 	void SetupCollision();
+	bool ShouldHeal(UAbility* ability);
+
+	UAbility* GetOwnerAbilityByTag(FString tag);
 	
 	AMech_RPGCharacter* GetOwner();
 	AMech_RPGCharacter* GetTarget();
 
-	bool IsTargetValid(AMech_RPGCharacter* inTarget);
+	bool IsTargetValid(AMech_RPGCharacter* inTarget, bool ally = false);
 
 	void SetOwner(AMech_RPGCharacter* newVal);
 	void SetTarget(AMech_RPGCharacter* newVal);

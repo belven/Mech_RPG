@@ -38,5 +38,12 @@ UTimedHealthChange* UTimedHealthChange::CreateTimedHealthChange(AMech_RPGCharact
 	ability->affectedTeam = inHeals ? AOEEnums::Ally : AOEEnums::Enemy;
 	ability->changeAmount = inChangeAmount;
 	ability->SetCooldown(cooldown);
+
+	if (inHeals) {
+		ability->AddTag(healTag, inChangeAmount);
+	}
+	else {
+		ability->AddTag(damageTag, inChangeAmount);
+	}
 	return ability;
 }

@@ -23,6 +23,6 @@ public:
 	
 	virtual void Interact_Implementation(class AMech_RPGCharacter* character);
 
-	AItemPickup* CreateItemPickup(AItem* item);
+	static AItemPickup* CreateItemPickup(AItem* item);
 	
 };

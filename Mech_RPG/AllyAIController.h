@@ -19,5 +19,4 @@ public:
 	virtual	void BeginPlay() override;
 	FVector GetPlayerControlledLocation();
 	void SetPlayerControlledLocation(FVector newVal);
-	void FindTargetInWeaponRage();
 };

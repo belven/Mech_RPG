@@ -59,6 +59,21 @@ public:
 		bool OnCooldown() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
+		virtual bool HasTag(FString name) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		virtual TArray<FTag>& GetTags() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		virtual FTag GetTag(FString name) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		virtual float GetTagValue(FString name) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		virtual bool GetTagTrue(FString name) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
 		float GetCurrentTimeRemaining() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
