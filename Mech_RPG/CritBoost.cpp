@@ -1,6 +1,7 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
+#include "Mech_RPGCharacter.h"
 #include "CritBoost.h"
 #include "Weapon.h"
 

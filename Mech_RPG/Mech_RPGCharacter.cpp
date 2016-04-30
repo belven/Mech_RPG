@@ -1,5 +1,8 @@
 #pragma once
 #include "Mech_RPG.h"
+#include "Abilities.h"
+#include "Weapons.h"
+
 #include "ItemPickup.h"
 #include "Engine.h"
 #include "Armour.h"
@@ -10,7 +13,6 @@
 #include "FloatingTextUI.h"
 #include "Group.h"
 #include "Interactable.h"
-#include "LaserSniper.h"
 #include "Quest.h"
 
 #define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)
@@ -69,7 +71,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	team = TeamEnums::Paladins;
 	characters.Add(this);
 
-	static ConstructorHelpers::FClassFinder<UFloatingStats_BP> statsWidget(TEXT("/Game/TopDown/Blueprints/UI/FloatingStats"));
+	static ConstructorHelpers::FClassFinder<UFloatingStats_BP> statsWidget(TEXT("/Game/TopDown/Blueprints/UI/CharacterUI/FloatingStats"));
 
 	if (statsWidget.Succeeded()) {
 		widgetClass = statsWidget.Class;
@@ -77,7 +79,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 		stats->AttachTo(GetRootComponent());
 	}
 
-	static ConstructorHelpers::FClassFinder<UFloatingTextUI> floatingTextWidget(TEXT("/Game/TopDown/Blueprints/UI/Floating_Text"));
+	static ConstructorHelpers::FClassFinder<UFloatingTextUI> floatingTextWidget(TEXT("/Game/TopDown/Blueprints/UI/CharacterUI/Floating_Text"));
 
 	if (floatingTextWidget.Succeeded()) {
 		floatingTextClass = floatingTextWidget.Class;
@@ -100,6 +102,11 @@ AMech_RPGCharacter::~AMech_RPGCharacter() {
 	abilities.Empty();
 	weapons.Empty();
 	armour.Empty();
+
+	if (mIsChildOf(GetController(), AMech_RPGPlayerController::StaticClass())) {
+		UMiscLibrary::SetPlayerController(nullptr);
+	}
+
 
 	//if (stats != nullptr) {
 	//	delete stats;
@@ -138,16 +145,17 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 			float regen = !inCombat ? GetMaxHealth() * 0.15 : healthRegen;
 			health += regen * DeltaTime;
 		}
-
-		if (GetHealth() > GetMaxHealth()) {
-			health = GetMaxHealth();
-		}
-
-		if (stats->GetUserWidgetObject() != nullptr) {
-			UFloatingStats_BP* statsBP = Cast<UFloatingStats_BP>(stats->GetUserWidgetObject());
-
-			statsBP->Tick(DeltaTime);
-			statsBP->SetOwner(this);
+		
+		CLAMP(health, GetMaxHealth(), 0);
+		
+		if (stats->GetUserWidgetObject() != nullptr && stats->GetUserWidgetObject() != nullptr) {
+			if (mIsChildOf(GetController(), AMech_RPGPlayerController::StaticClass()) && GetTopDownCamera() != nullptr) {
+				UMiscLibrary::SetCameraRot(FRotator(-GetTopDownCamera()->GetComponentRotation().Pitch, UMiscLibrary::GetWidgetYaw(GetTopDownCamera()) + 90, 0));
+				GetStats()->SetWorldRotation(UMiscLibrary::GetCameraRot());
+			}
+			else if (GetStats() != nullptr) {
+				GetStats()->SetWorldRotation(UMiscLibrary::GetCameraRot());
+			}
 		}
 	}
 }
@@ -159,8 +167,7 @@ void AMech_RPGCharacter::BeginPlay() {
 	}
 
 	Reset();
-
-
+	
 	if (!UseLoadout) {
 		CreatePresetRole(startingRole);
 	}
@@ -169,7 +176,7 @@ void AMech_RPGCharacter::BeginPlay() {
 	}
 
 	if (weapons.Num() > 0) {
-		currentWeapon = weapons[0];
+		SetCurrentWeapon(weapons[0]);
 	}
 
 	if (abilities.Num() > 0) {
@@ -177,10 +184,6 @@ void AMech_RPGCharacter::BeginPlay() {
 	}
 
 	SetUpGroup();
-
-	if (OnPostBeginPlay.IsBound()) {
-		OnPostBeginPlay.Broadcast(this);
-	}
 
 	if (widgetClass != nullptr) {
 		UFloatingStats_BP* widget = CreateWidget<UFloatingStats_BP>(GetWorld(), widgetClass);
@@ -207,6 +210,11 @@ void AMech_RPGCharacter::BeginPlay() {
 			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));*/
 		}
 	}
+	
+	if (OnPostBeginPlay.IsBound()) {
+		OnPostBeginPlay.Broadcast(this);
+	}
+
 }
 
 UArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {

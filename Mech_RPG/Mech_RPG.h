@@ -9,38 +9,8 @@
 #define MIN(a,b) (a < b) ? (a) : (b)
 #define MAX(a,b) (a > b) ? (a) : (b)
 
-#include "Engine.h"
-#include "Taunt.h"
-#include "Heal.h"
-#include "Snipe.h"
-#include "Grenade.h"
-#include "Disable.h"
-#include "Stun.h"
-#include "DamageBoost.h"
-#include "OrbitalStrike.h"
-#include "Immobilise.h"
-#include "ChannelledAbility.h"
-#include "CritBoost.h"
-#include "TimedHealthChange.h"
-#include "AoEHeal.h"
-#include "DefenceBoost.h"
-#include "ParticleBomb.h"
-#include "SummonDamageDrone.h"
-#include "Shield.h"
-
-#include "AOEHealthChange.h"
-
 #include "Cover.h"
-
-//#include "Mech_RPGCharacter.h"
-//#include "Mech_RPGPlayerController.h"
-//#include "BaseAIController.h"
-//#include "AllyAIController.h"
-
-#include "MagazineWeapon.h"
-#include "OverHeatWeapon.h"
 #include "MiscLibrary.h"
-#include "Armour.h"
 
 #include "Runtime/UMG/Public/UMG.h"
 #include "Runtime/UMG/Public/UMGStyle.h"

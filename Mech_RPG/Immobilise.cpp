@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Immobilise.h"
+#include "Mech_RPGCharacter.h"
 
 
 bool UImmobilise::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {

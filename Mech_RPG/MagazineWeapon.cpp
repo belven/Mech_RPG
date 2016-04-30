@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Mech_RPGCharacter.h"
+#include "MagazineWeapon.h"
 
 void AMagazineWeapon::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);

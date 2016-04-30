@@ -2,6 +2,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "AOEHealthChange.h"
+#include "Mech_RPGCharacter.h"
 
 
 bool UOrbitalStrike::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {

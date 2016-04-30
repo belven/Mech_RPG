@@ -41,16 +41,17 @@ private:
 	class AInteractable* lastTargetInteractable;
 	class AMech_RPGCharacter* lastCharacterTarget;
 	UAbility* lastUsedAbility;
+	AItem* selectedItem;
 
 	PlayerControllerEnums::LastUsed lastAction;
 
-	float interactionRange = 500;
+	float interactionRange = 200;
 
 public:
 	AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(BlueprintCallable, Category = "Owner")
-	AMech_RPGCharacter* GetOwner();
+		AMech_RPGCharacter* GetOwner();
 
 	void SetOwner(AMech_RPGCharacter* newVal);
 
@@ -124,7 +125,7 @@ public:
 	TArray<AMech_RPGCharacter*> GetCharactersInRange(float range);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = UI)
-	TSubclassOf<UUserWidget> WidgetTemplate;
+		TSubclassOf<UUserWidget> WidgetTemplate;
 	TSubclassOf<UUserWidget> inventoryTemplate;
 	TSubclassOf<UUserWidget> questListTemplate;
 
@@ -136,6 +137,11 @@ public:
 	void OpenCharacterPane();
 	void OpenInventory();
 
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		AItem* GetSelectedItem() { return selectedItem; }
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void SelectedItem(AItem* val) { selectedItem = val; }
 protected:
 	/**
 	 * True if the controlled character should navigate to the mouse cursor.
@@ -180,7 +186,7 @@ protected:
 	void AttackTarget(float DeltaTime);
 	void FireWeapon(AActor* hit);
 	void SetupCollision();
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Events")
-	void AddQuest(UQuest * newQuest);
+		void AddQuest(UQuest * newQuest);
 };

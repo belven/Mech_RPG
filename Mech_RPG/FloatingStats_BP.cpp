@@ -3,6 +3,7 @@
 #include "Mech_RPG.h"
 #include "FloatingStats_BP.h"
 #include "Mech_RPGCharacter.h"
+#include "ChannelledAbility.h"
 
 float UFloatingStats_BP::GetHealthBarPercent()
 {
@@ -51,11 +52,5 @@ void UFloatingStats_BP::SetOwner(AMech_RPGCharacter* newOwner)
 
 void UFloatingStats_BP::Tick(float DeltaTime)
 {
-	AMech_RPGCharacter* player = UMiscLibrary::GetPlayer();
 
-	if (player != nullptr) {
-		FRotator rot(-player->GetTopDownCamera()->GetComponentRotation().Pitch, UMiscLibrary::GetWidgetYaw(player->GetTopDownCamera()) + 90, 0);
-
-		owner->GetStats()->SetWorldRotation(rot);
-	}
 }

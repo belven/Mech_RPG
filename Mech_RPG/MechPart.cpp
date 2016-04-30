@@ -28,24 +28,18 @@ void AMechPart::SetOwner(AMech_RPGCharacter* inOwner)
 
 	if (mesh != nullptr) {
 		meshComponent->SetStaticMesh(mesh);
-		meshComponent->SetMobility(EComponentMobility::Movable);
-		meshComponent->bOwnerNoSee = false;
-		meshComponent->bCastDynamicShadow = true;
-		meshComponent->CastShadow = true;
+		//meshComponent->SetMobility(EComponentMobility::Movable);
+		/*meshComponent->bOwnerNoSee = false;
+		meshComponent->bCastDynamicShadow = true
+		meshComponent->CastShadow = true;*/
 		meshComponent->SetHiddenInGame(false);
 		meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		if (inOwner != nullptr) {
-			AttachRootComponentTo(owner->GetMesh(), "RightHand");
+		if (inOwner != nullptr && inOwner->GetMesh() != nullptr) {
+			AttachRootComponentTo(inOwner->GetMesh(), "RightHand");
 		}
 	}
 }
 
-// Called when the game starts or when spawned
-void AMechPart::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
 
 // Called every frame
 void AMechPart::Tick(float DeltaTime)

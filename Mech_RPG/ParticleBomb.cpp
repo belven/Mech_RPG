@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "ParticleBomb.h"
+#include "Mech_RPGCharacter.h"
 
 
 bool UParticleBomb::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {

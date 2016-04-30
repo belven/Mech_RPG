@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Shotgun.h"
+#include "Mech_RPGCharacter.h"
 
 AShotgun::AShotgun() : Super() {
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> Shotgun(TEXT("/Game/TopDown/Meshes/Shotgun"));

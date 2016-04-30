@@ -3,10 +3,10 @@
 #include "Engine.h"
 #include "Mech_RPGPlayerController.h"
 #include "AllyAIController.h"
+#include "Mech_RPGCharacter.h"
 #include "QuestDisplayUI.h"
-#include "AI/Navigation/NavigationSystem.h"
-#include "Navigation/CrowdFollowingComponent.h"
 #include "Interactable.h"
+#include "Weapons.h"
 
 #define mCanSee(location) UMiscLibrary::CanSee(GetOwner()->GetWorld(), GetOwner()->GetActorLocation(), location)
 
@@ -17,7 +17,7 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
 	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/Character_Pane.Character_Pane_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/CharacterUI/Character_Pane.Character_Pane_C"));
 
 	if (characterPaneClass.Class != nullptr) {
 		WidgetTemplate = characterPaneClass.Class;
@@ -141,7 +141,7 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			}
 			// Are we trying to interact with a character
 			else if (lastAction == PlayerControllerEnums::NPCInteract) {
-				// Are we requesting a new target to attack
+				// Are we requesting a new target to attack			
 				if (bAttackTarget && IsTargetValid(cursorTarget)) {
 					target = cursorTarget;
 					AttackTarget(DeltaTime);
@@ -155,16 +155,16 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 					GetOwner()->OnStopFiring.Broadcast();
 				}
 
-				if (UMiscLibrary::IsCharacterAlive(cursorTarget) && cursorTarget->CompareGroup(GetOwner())) {
-					if (mCanSee(cursorTarget->GetActorLocation())
-						&& GetOwner()->GetDistanceTo(cursorTarget) <= interactionRange) {
-						lastAction = PlayerControllerEnums::None;
-						GetOwner()->NPCInteract(cursorTarget);
-					}
-					else {
-						MoveToActor(cursorTarget);
-					}
-				}
+				//if (UMiscLibrary::IsCharacterAlive(cursorTarget) && cursorTarget->CompareGroup(GetOwner())) {
+				//	if (mCanSee(cursorTarget->GetActorLocation())
+				//		&& GetOwner()->GetDistanceTo(cursorTarget) <= interactionRange) {
+				//		lastAction = PlayerControllerEnums::None;
+				//		GetOwner()->NPCInteract(cursorTarget);
+				//	}
+				//	else {
+				//		MoveToActor(cursorTarget);
+				//	}
+				//}
 			}
 		}
 		else {
@@ -335,15 +335,15 @@ void AMech_RPGPlayerController::OpenCharacterPane() {
 void AMech_RPGPlayerController::OpenInventory()
 {
 	if (inventoryOpen) {
-		FInputModeGameAndUI data;
-		SetInputMode(data);
+		//FInputModeGameAndUI data;
+		//SetInputMode(data);
 		//SetPause(false);
 		inventoryOpen = false;
 		inventory->SetVisibility(ESlateVisibility::Hidden);
 	}
 	else {
-		FInputModeUIOnly data;
-		SetInputMode(data);
+		//FInputModeUIOnly data;
+		//SetInputMode(data);
 		//SetPause(true);
 		inventoryOpen = true;
 		inventory->SetVisibility(ESlateVisibility::Visible);

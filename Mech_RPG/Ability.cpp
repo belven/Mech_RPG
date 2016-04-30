@@ -2,7 +2,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Ability.h"
-#include "ChannelledAbility.h"
+#include "Abilities.h"
 #include "Mech_RPGCharacter.h"
 
 const FString UAbility::healTag = "Heal";

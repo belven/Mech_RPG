@@ -7,6 +7,7 @@
 
 
 #define mIsChildOf(inUObject, checkClass) UMiscLibrary::IsChildOf(inUObject, checkClass)
+#define CLAMP(value, max, min) (value = (MAX(MIN(value, max), min)))
 
 UENUM(BlueprintType)
 namespace GameEnums {
@@ -24,13 +25,15 @@ class MECH_RPG_API UMiscLibrary : public UObject {
 private:
 	static UGroup* playerGroup;
 	static TEnumAsByte<GameEnums::Difficulty> difficulty;
+	static class AMech_RPGPlayerController* playerController;
+	static FRotator cameraRot;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static float GetMissingHealth(AMech_RPGCharacter* character);
 
 	static TEnumAsByte<GameEnums::Difficulty> GetDifficulty();
-	
+
 	template<class T> static void InitialiseArray(TArray<T>& emptyArray, T* items);
 
 	static FColor GetRelativeColour(AMech_RPGCharacter * character);
@@ -87,4 +90,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static UWorld* GetActorWorld(AActor* actor);
 
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static class AMech_RPGPlayerController* GetPlayerController();
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static void SetPlayerController(AMech_RPGPlayerController* newController);
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static FRotator GetCameraRot() { return cameraRot; }
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static void SetCameraRot(FRotator val) { cameraRot = val; }
 };

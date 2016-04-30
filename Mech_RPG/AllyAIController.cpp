@@ -3,6 +3,7 @@
 #include "AllyAIController.h"
 #include "Mech_RPGCharacter.h"
 #include "Group.h"
+#include "Weapons.h"
 #include "AI/Navigation/NavigationSystem.h"
 
 AAllyAIController::AAllyAIController() : Super() {

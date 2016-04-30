@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Heal.h"
+#include "Mech_RPGCharacter.h"
 
 
 

@@ -60,5 +60,8 @@ public:
 		AMech_RPGCharacter* GetOwner();
 
 	UFUNCTION(BlueprintCallable, Category = "Stats")
-		void SetOwner(class AMech_RPGCharacter* newOwner);
+		void SetOwner(class AMech_RPGCharacter* newOwner); 
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Abilities")
+		void UpdateAbilityBar();
 };

@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Grenade.h"
+#include "Mech_RPGCharacter.h"
 
 bool UGrenade::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (!targetLocation.IsZero()) {

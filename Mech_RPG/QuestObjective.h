@@ -16,10 +16,10 @@ class MECH_RPG_API UQuestObjective : public UObject
 	GENERATED_BODY()
 protected:
 
-	FString objectiveName;
+	FString objectiveName = "Name Not Set";
 
-	UQuest* quest;
-	bool complete;
+	UQuest* quest = nullptr;
+	bool complete = false;
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FObjectiveCompleted OnObjectiveCompleted;

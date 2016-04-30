@@ -6,14 +6,17 @@
 #include "AbilityBar.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class MECH_RPG_API UAbilityBar : public UWidgetBlueprint
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Abilities")
+		void GenerateAbilityBar();
+
+
+
 };

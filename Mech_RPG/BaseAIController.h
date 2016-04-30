@@ -13,14 +13,7 @@ class MECH_RPG_API ABaseAIController : public AAIController {
 
 protected:
 	AMech_RPGCharacter* characterOwner;
-
 	AMech_RPGCharacter* target;
-
-	FCollisionQueryParams collision;
-	FCollisionObjectQueryParams objectCollision;
-
-	bool collisionSet = false;
-
 	FHitResult hit;
 public:
 	ABaseAIController();
@@ -35,7 +28,6 @@ public:
 
 	bool PerformAbility(UAbility* ability);
 	void FireWeapon(AActor* hit);
-	void SetupCollision();
 	bool ShouldHeal(UAbility* ability);
 
 	UAbility* GetOwnerAbilityByTag(FString tag);

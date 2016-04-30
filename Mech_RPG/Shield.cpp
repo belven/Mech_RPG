@@ -2,6 +2,8 @@
 
 #include "Mech_RPG.h"
 #include "Shield.h"
+#include "Mech_RPGCharacter.h"
+
 bool UShield::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 {
 	if (target != nullptr) {

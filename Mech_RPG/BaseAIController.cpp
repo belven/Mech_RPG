@@ -2,13 +2,10 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "BaseAIController.h"
-#include "Navigation/CrowdFollowingComponent.h"
-#include "AI/Navigation/NavigationSystem.h"
+#include "Mech_RPGCharacter.h"
+#include "Weapons.h"
 
 ABaseAIController::ABaseAIController() : Super() {
-	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"))) {
-	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickEnabled(true);
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -44,6 +41,10 @@ void ABaseAIController::Tick(float DeltaTime) {
 					}
 				}
 			}
+
+			if (!UMiscLibrary::IsCharacterAlive(GetTarget())) {
+				GetOwner()->OnStopFiring.Broadcast();
+			}
 		}
 	}
 }
@@ -70,18 +71,6 @@ void ABaseAIController::AttackTarget(float DeltaTime) {
 	// We've hit some scenery so move towards the target
 	else if (GetWorld()->GetNavigationSystem()) {
 		MoveToLocation(target->GetActorLocation());
-	}
-}
-
-void ABaseAIController::SetupCollision() {
-	collision.ClearIgnoredComponents();
-
-	if (GetOwner()->GetGroup() != nullptr && GetOwner()->GetGroup()->HasMemebers()) {
-		for (AMech_RPGCharacter* member : GetOwner()->GetGroup()->GetMembers()) {
-			if (member != target) {
-				collision.AddIgnoredActor(member);
-			}
-		}
 	}
 }
 
@@ -140,13 +129,6 @@ void ABaseAIController::FireWeapon(AActor* hit) {
 
 bool ABaseAIController::PerformAbility(UAbility* ability) {
 	bool affectsAllies = ability->GetAffectedTeam() == AOEEnums::Ally;
-	/*
-		if (ability->HasTag(UAbility::damageTag) || ability->HasTag(UAbility::debuffTag)) {
-			affectsAllies = false;
-		}
-		else if (ability->HasTag(UAbility::healTag) || ability->HasTag(UAbility::buffTag)) {
-			affectsAllies = true;
-		}*/
 
 	FindTarget(affectsAllies);
 
@@ -179,7 +161,6 @@ void ABaseAIController::MoveToLocation(FVector location) {
 
 void ABaseAIController::FindTarget(bool ally) {
 	float range = GetOwner()->GetCurrentWeapon()->GetRange();
-	//SetupCollision();
 
 	if (IsTargetValid(target, ally) && (!ally || UMiscLibrary::GetMissingHealth(target) > 0)) {
 		return;
@@ -208,12 +189,11 @@ void ABaseAIController::FindTarget(bool ally) {
 	}
 	else {
 		bool targetFound = false;
-		for (AMech_RPGCharacter* character : GetOwner()->GetGroup()->GetMembers()) {
-			if (IsTargetValid(character, ally) && UMiscLibrary::GetMissingHealth(character) > 0) {
-				SetTarget(character);
-				targetFound = true;
-				break;
-			}
+
+		AMech_RPGCharacter* character = GetOwner()->GetGroup()->GetLowHealthMember();
+		if (IsTargetValid(character, ally)) {
+			targetFound = true;
+			SetTarget(character);
 		}
 
 		if (!targetFound) {
@@ -243,10 +223,7 @@ AMech_RPGCharacter* ABaseAIController::GetTarget() {
 
 bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget, bool ally) {
 	bool valid = UMiscLibrary::IsCharacterAlive(inTarget) && ally == GetOwner()->CompareGroup(inTarget);
-
-	if (!valid) {
-		GetOwner()->OnStopFiring.Broadcast();
-	}
+	
 	return valid;
 }
 
@@ -271,7 +248,7 @@ void ABaseAIController::SetTarget(AMech_RPGCharacter* newVal) {
 }
 
 void ABaseAIController::GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
-	if (!GetTarget()) {
+	if (!UMiscLibrary::IsCharacterAlive(GetTarget())) {
 		SetTarget(attacker);
 	}
 }

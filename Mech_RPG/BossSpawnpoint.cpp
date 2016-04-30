@@ -3,7 +3,6 @@
 #include "Mech_RPG.h"
 #include "BossSpawnpoint.h"
 #include "Boss.h"
-#include "HealMechanic.h"
 #include "DamageBoostMechanic.h"
 
 #define loop(i, max) for(i = 0; i < max; i++)
@@ -58,7 +57,7 @@ void ABossSpawnpoint::BeginPlay() {
 			}
 		}
 
-		SetUpCharacter(character, group, role);
+		SetUpCharacter(Cast<AMech_RPGCharacter>(character), group, role);
 	}
 
 	if (spawnAdds) {

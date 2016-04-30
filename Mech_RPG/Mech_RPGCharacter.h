@@ -186,6 +186,7 @@ protected:
 public:
 	AMech_RPGCharacter();
 
+
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 
 	class UWidgetComponent* GetStats();
@@ -469,4 +470,5 @@ public:
 
 	float GetModifierForDifficulty(TEnumAsByte<GameEnums::Difficulty> difficulty);
 };
+
 

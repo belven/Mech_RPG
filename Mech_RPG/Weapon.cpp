@@ -2,12 +2,8 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Weapon.h"
-#include "OverHeatWeapon.h"
-#include "MagazineWeapon.h"
-#include "SMG.h"
-#include "Shotgun.h"
-#include "Sniper.h"
-#include "Bio_Rifle.h"
+#include "Weapons.h"
+#include "Mech_RPGCharacter.h"
 
 AWeapon::AWeapon() : Super() {
 	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WeaponParticle"));
@@ -72,7 +68,7 @@ void AWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
 			partclSystem->AttachTo(inOwner->GetRootComponent());
 		}
 
-		inOwner->OnStopFiring.AddDynamic(this, &AWeapon::StopFire);
+		inOwner->OnStopFiring.AddUniqueDynamic(this, &AWeapon::StopFire);
 	}
 }
 

@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "AoEHeal.h"
+#include "Mech_RPGCharacter.h"
 
 
 bool UAoEHeal::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {

@@ -92,7 +92,7 @@ public:
 	float GetCritChance();
 	void SetCritChance(float newVal);
 
-	virtual void Tick(float DeltaTime);
+	virtual void Tick(float DeltaTime) override;
 	bool Heals();
 	void SetHeals(bool newVal);
 

@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Spawnpoint.h"
+#include "Mech_RPGCharacter.h"
 
 
 ASpawnpoint::ASpawnpoint() {

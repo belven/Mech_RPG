@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Disable.h"
+#include "Mech_RPGCharacter.h"
 
 
 bool UDisable::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {

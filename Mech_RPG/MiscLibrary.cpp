@@ -3,10 +3,14 @@
 #include "Mech_RPG.h"
 #include "MiscLibrary.h"
 #include "Mech_RPGPlayerController.h"
+#include "Mech_RPGCharacter.h"
+#include "Group.h"
 
 
 UGroup* UMiscLibrary::playerGroup = nullptr;
+AMech_RPGPlayerController* UMiscLibrary::playerController = nullptr;
 TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::difficulty = GameEnums::Hard;
+FRotator UMiscLibrary::cameraRot = FRotator(90, 90, 0);
 
 float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
 	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;
@@ -15,6 +19,14 @@ float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
 TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::GetDifficulty()
 {
 	return difficulty;
+}
+
+AMech_RPGPlayerController* UMiscLibrary::GetPlayerController() {
+	return playerController;
+}
+
+void UMiscLibrary::SetPlayerController(AMech_RPGPlayerController* newController) {
+	playerController = newController;
 }
 
 template<class T>
@@ -88,14 +100,19 @@ UGroup* UMiscLibrary::GetPlayerGroup() {
 }
 
 AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
-	//return playerGroup != nullptr ? playerGroup->GetPlayer() : GetPlayerGroup() != nullptr ? playerGroup->GetPlayer() : nullptr;
-	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
-		if (IsCharacterAlive(character)
-			&& IsValid(character)
-			&& character->IsValidLowLevel()
-			&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
-			return character;
+	if (GetPlayerController() == nullptr) {
+		for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+			if (IsCharacterAlive(character)
+				&& IsValid(character)
+				&& character->IsValidLowLevel()
+				&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
+				playerController = Cast<AMech_RPGPlayerController>(character->GetController());
+				return character;
+			}
 		}
+	}
+	else {
+		return GetPlayerController()->GetOwner();
 	}
 	return nullptr;
 }

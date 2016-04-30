@@ -42,7 +42,7 @@ ABio_Rifle* ABio_Rifle::CreateBioRifle(UWorld* world, AMech_RPGCharacter* inOwne
 		weapon->SetName("Bio Rifle");
 		return weapon;
 	}
-	return NULL;
+	return nullptr;
 }
 
 AItem* ABio_Rifle::Copy()

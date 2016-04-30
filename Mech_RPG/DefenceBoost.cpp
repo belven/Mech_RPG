@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "DefenceBoost.h"
+#include "Mech_RPGCharacter.h"
 
 bool UDefenceBoost::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	SetOnCooldown(owner->GetWorld());

@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "PlayerSpawnpoint.h"
+#include "Mech_RPGCharacter.h"
 
 void APlayerSpawnpoint::BeginPlay() {
 	if (GetWorld() != nullptr) {
