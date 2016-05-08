@@ -163,4 +163,8 @@ AMech_RPGCharacter* UCharacterStats::GetOwner()
 void UCharacterStats::SetOwner(AMech_RPGCharacter* newOwner)
 {
 	owner = newOwner;
+
+	if(newOwner != nullptr) {
+		newOwner->SetCharacterStats(this);
+	}
 }

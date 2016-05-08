@@ -5,6 +5,8 @@
 #include "Mech_RPGPlayerController.h"
 #include "Mech_RPGCharacter.h"
 #include "Group.h"
+#include "Ability.h"
+#include "ChannelledAbility.h"
 
 
 UGroup* UMiscLibrary::playerGroup = nullptr;
@@ -35,7 +37,7 @@ void UMiscLibrary::InitialiseArray(TArray<T>& emptyArray, T* items) {
 }
 
 FColor UMiscLibrary::GetRelativeColour(AMech_RPGCharacter* character) {
-	if (GetPlayer() != nullptr) {
+	if (GetPlayer() != nullptr && character != nullptr) {
 		if (character->CompareGroup(GetPlayer())) {
 			return FColor::Green;
 		}
@@ -100,8 +102,8 @@ UGroup* UMiscLibrary::GetPlayerGroup() {
 }
 
 AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
-	if (GetPlayerController() == nullptr) {
-		for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+	if (GetPlayerController() != nullptr) {
+	/*	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
 			if (IsCharacterAlive(character)
 				&& IsValid(character)
 				&& character->IsValidLowLevel()
@@ -111,7 +113,7 @@ AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
 			}
 		}
 	}
-	else {
+	else {*/
 		return GetPlayerController()->GetOwner();
 	}
 	return nullptr;

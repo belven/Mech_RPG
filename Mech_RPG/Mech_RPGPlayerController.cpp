@@ -381,6 +381,10 @@ void AMech_RPGPlayerController::OnSetDestinationPressed() {
 	bMoveToMouseCursor = true;
 
 	target = nullptr;
+	lastCharacterTarget = nullptr;
+	lastTargetInteractable = nullptr;
+	lastUsedAbility = nullptr;
+	lastAction = PlayerControllerEnums::None;
 	OnRightClickReleased();
 	MoveToMouseCursor();
 }
@@ -530,7 +534,7 @@ void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 				AMech_RPGCharacter* character = group->GetMembers()[index - 1];
 
 				// Are we swapping to ourselves
-				if (GetOwner() != character && !character->IsDead()) {
+				if (character != nullptr && GetOwner() != character && !character->IsDead()) {
 					character->SetDemandedController(this);
 
 					GetOwner()->SetDemandedController(character->GetController());

@@ -64,4 +64,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Abilities")
 		void UpdateAbilityBar();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Abilities")
+		void UpdateHealthBar();
 };

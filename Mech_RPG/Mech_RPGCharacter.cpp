@@ -11,6 +11,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Mech_RPGPlayerController.h"
 #include "FloatingTextUI.h"
+#include "CharacterStats.h"
 #include "Group.h"
 #include "Interactable.h"
 #include "Quest.h"
@@ -93,8 +94,6 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	}
 
 	AIControllerClass = ABaseAIController::StaticClass();
-
-
 }
 
 AMech_RPGCharacter::~AMech_RPGCharacter() {
@@ -106,11 +105,6 @@ AMech_RPGCharacter::~AMech_RPGCharacter() {
 	if (mIsChildOf(GetController(), AMech_RPGPlayerController::StaticClass())) {
 		UMiscLibrary::SetPlayerController(nullptr);
 	}
-
-
-	//if (stats != nullptr) {
-	//	delete stats;
-	//}
 }
 
 void AMech_RPGCharacter::PossessedBy(AController* NewController) {
@@ -144,10 +138,16 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 		if (GetHealth() < GetMaxHealth()) {
 			float regen = !inCombat ? GetMaxHealth() * 0.15 : healthRegen;
 			health += regen * DeltaTime;
+
+			GetFloatingStats()->UpdateHealthBar();
+
+			if (GetCharacterStats() != nullptr) {
+				GetCharacterStats()->UpdateHealthBar();
+			}
 		}
-		
+
 		CLAMP(health, GetMaxHealth(), 0);
-		
+
 		if (stats->GetUserWidgetObject() != nullptr && stats->GetUserWidgetObject() != nullptr) {
 			if (mIsChildOf(GetController(), AMech_RPGPlayerController::StaticClass()) && GetTopDownCamera() != nullptr) {
 				UMiscLibrary::SetCameraRot(FRotator(-GetTopDownCamera()->GetComponentRotation().Pitch, UMiscLibrary::GetWidgetYaw(GetTopDownCamera()) + 90, 0));
@@ -167,7 +167,7 @@ void AMech_RPGCharacter::BeginPlay() {
 	}
 
 	Reset();
-	
+
 	if (!UseLoadout) {
 		CreatePresetRole(startingRole);
 	}
@@ -186,9 +186,9 @@ void AMech_RPGCharacter::BeginPlay() {
 	SetUpGroup();
 
 	if (widgetClass != nullptr) {
-		UFloatingStats_BP* widget = CreateWidget<UFloatingStats_BP>(GetWorld(), widgetClass);
-		widget->SetOwner(this);
-		stats->SetWidget(widget);
+		floatingStats = CreateWidget<UFloatingStats_BP>(GetWorld(), widgetClass);
+		floatingStats->SetOwner(this);
+		stats->SetWidget(floatingStats);
 
 		FTransform trans;
 		trans.SetLocation(FVector(-0.000035, 7.999790, 111.999756));
@@ -210,11 +210,24 @@ void AMech_RPGCharacter::BeginPlay() {
 			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));*/
 		}
 	}
-	
+
 	if (OnPostBeginPlay.IsBound()) {
 		OnPostBeginPlay.Broadcast(this);
 	}
 
+	GetFloatingStats()->UpdateHealthBar();
+
+	if (GetCharacterStats() != nullptr) {
+		GetCharacterStats()->UpdateHealthBar();
+	}
+}
+
+void AMech_RPGCharacter::SetCharacterStats(class UCharacterStats* val) {
+	characterStats = val;
+
+	if (GetCharacterStats() != nullptr) {
+		GetCharacterStats()->UpdateHealthBar();
+	}
 }
 
 UArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
@@ -293,11 +306,6 @@ float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType)
 	return MAX(totalResistance, 1);
 }
 
-TArray<UQuest*>& AMech_RPGCharacter::GetQuests()
-{
-	return quests;
-}
-
 void AMech_RPGCharacter::AddQuest(UQuest * newQuest)
 {
 	for (UQuest* quest : GetQuests())
@@ -336,6 +344,11 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 		health -= (healthChange.healthChange *= (1 - resistance));
 	}
 
+	PostHealthChange(healthChange);
+}
+
+void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
+{
 	if (OnPostHealthChange.IsBound()) {
 		OnPostHealthChange.Broadcast(healthChange);
 	}
@@ -353,6 +366,12 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 		if (GetGroup()->GetPlayer() == nullptr) {
 			AItemPickup::CreateItemPickup(GetCurrentWeapon()->Copy())->SetActorLocation(GetActorLocation());
 		}
+	}
+
+	GetFloatingStats()->UpdateHealthBar();
+
+	if (GetCharacterStats() != nullptr) {
+		GetCharacterStats()->UpdateHealthBar();
 	}
 }
 
@@ -398,7 +417,7 @@ AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemT
 
 void AMech_RPGCharacter::EnemyKilled(AMech_RPGCharacter* character)
 {
-	if (OnEnemyKilled.IsBound())	OnEnemyKilled.Broadcast(character);
+	if (OnEnemyKilled.IsBound()) OnEnemyKilled.Broadcast(character);
 	GetGroup()->GroupEnemyKilled(character);
 }
 
@@ -436,11 +455,6 @@ void AMech_RPGCharacter::Reset()
 void AMech_RPGCharacter::ResetInvunrelbility()
 {
 	ApplyCrowdControl(EffectEnums::Damage, true);
-}
-
-UInventory * AMech_RPGCharacter::GetInventory()
-{
-	return inventory;
 }
 
 AItem* AMech_RPGCharacter::AddItem(AItem* itemToAdd)
@@ -659,84 +673,14 @@ void AMech_RPGCharacter::SetupWithLoadout() {
 	SetSpeed(startingLoadout.speed);
 }
 
-const TArray<AMech_RPGCharacter*>& AMech_RPGCharacter::GetCharacters() {
-	return characters;
-}
-
 void AMech_RPGCharacter::AddWeapon(AWeapon* newWeapon) {
 	if (newWeapon) {
 		weapons.Add(newWeapon);
 	}
 }
 
-TArray<UArmour*>& AMech_RPGCharacter::GetArmour() {
-	return armour;
-}
-
-TEnumAsByte<GroupEnums::Role> AMech_RPGCharacter::GetRole()
-{
-	return startingRole;
-}
-
-bool AMech_RPGCharacter::GetInCombat()
-{
-	return inCombat;
-}
-
-bool AMech_RPGCharacter::HasAbilities() {
-	return GetAbilities().Num() > 0;
-}
-
-void AMech_RPGCharacter::SetChannelling(bool inChallenning) {
-	channeling = inChallenning;
-}
-
-bool AMech_RPGCharacter::Channelling() {
-	return channeling;
-}
-
-UAbility* AMech_RPGCharacter::GetCurrentAbility() {
-	return currentAbility;
-}
-
-void AMech_RPGCharacter::SetCurrentAbility(UAbility* inAbility) {
-	currentAbility = inAbility;
-}
-
-float AMech_RPGCharacter::GetEnergy() {
-	return energy;
-}
-
-float AMech_RPGCharacter::GetHealth() {
-	return health;
-}
-
-void AMech_RPGCharacter::SetEnergy(float newVal) {
-	energy = newVal;
-}
-
-void AMech_RPGCharacter::SetHealth(float newVal) {
-	health = newVal;
-}
-
-TArray<AWeapon*>& AMech_RPGCharacter::GetWeapons() {
-	return weapons;
-}
-
-void AMech_RPGCharacter::SetWeapons(TArray<AWeapon*> newVal) {
-	weapons = newVal;
-}
-
-bool AMech_RPGCharacter::IsDead() {
-	return isDead;
-}
-
 void AMech_RPGCharacter::SetDead(bool newVal) {
 	isDead = newVal;
-}
-
-AWeapon* AMech_RPGCharacter::GetCurrentWeapon() {
-	return currentWeapon;
 }
 
 void AMech_RPGCharacter::SetCurrentWeapon(AWeapon* newVal) {
@@ -749,10 +693,6 @@ void AMech_RPGCharacter::SetCurrentWeapon(AWeapon* newVal) {
 		newVal->SetOwner(this);
 		currentWeapon = newVal;
 	}
-}
-
-UGroup* AMech_RPGCharacter::GetGroup() {
-	return group;
 }
 
 void AMech_RPGCharacter::SetGroup(UGroup* newVal) {
@@ -768,137 +708,31 @@ void AMech_RPGCharacter::SetGroup(UGroup* newVal) {
 	group->AddMemeber(this);
 }
 
-int32 AMech_RPGCharacter::GetID() {
-	return id;
-}
-
-void AMech_RPGCharacter::SetID(int32 newVal) {
-	id = newVal;
-}
-
 bool AMech_RPGCharacter::CompareGroup(UGroup* inGroup) {
 	return GetGroup() != nullptr ? GetGroup()->Compare(inGroup) : true;
 }
 
 bool AMech_RPGCharacter::CompareGroup(AMech_RPGCharacter* inCharacter) {
-	return inCharacter != nullptr && inCharacter->GetGroup() != nullptr ? CompareGroup(inCharacter->GetGroup()) : true;
-}
-
-AController* AMech_RPGCharacter::GetDemandedController() {
-	return demandedController;
-}
-
-void AMech_RPGCharacter::SetDemandedController(AController* newVal) {
-	demandedController = newVal;
-}
-
-TArray<UAbility*>& AMech_RPGCharacter::GetAbilities() {
-	return abilities;
-}
-
-void AMech_RPGCharacter::SetAbilities(TArray<UAbility*> newVal) {
-	abilities = newVal;
-}
-
-USphereComponent* AMech_RPGCharacter::GetAOE() {
-	return aoe;
-}
-
-void AMech_RPGCharacter::SetAOE(USphereComponent* newVal) {
-	aoe = newVal;
-}
-
-float AMech_RPGCharacter::GetHealthRegen() {
-	return healthRegen;
-}
-
-void AMech_RPGCharacter::SetHealthRegen(float newVal) {
-	healthRegen = newVal;
-}
-
-float AMech_RPGCharacter::GetMaxHealth() {
-	return maxHealth;
-}
-
-void AMech_RPGCharacter::SetMaxHealth(float newVal) {
-	maxHealth = newVal;
-}
-
-bool AMech_RPGCharacter::CanAttack() {
-	return canAttack == 0;
-}
-
-bool AMech_RPGCharacter::CanMove() {
-	return canMove == 0;
-}
-
-bool AMech_RPGCharacter::CanCast() {
-	return canUseAbilities == 0;
-}
-
-int32& AMech_RPGCharacter::GetCanAttack() {
-	return canAttack;
-}
-
-int32& AMech_RPGCharacter::GetCanMove() {
-	return canMove;
-}
-
-float AMech_RPGCharacter::GetHealthChangeModifier() {
-	return MAX(healthChangeModifier, 0.01F);
-}
-
-float AMech_RPGCharacter::GetDefenceModifier() {
-	return MIN(defenceModifier, 0.99F);
-}
-
-void AMech_RPGCharacter::SetCanAttack(int32 newVal) {
-	canAttack = newVal;
-}
-
-void AMech_RPGCharacter::SetCanMove(int32 newVal) {
-	canMove = newVal;
-}
-
-void AMech_RPGCharacter::SetHealthChangeModifier(float newVal) {
-	healthChangeModifier = newVal;
-}
-
-void AMech_RPGCharacter::SetDefenceModifier(float newVal) {
-	defenceModifier = newVal;
-}
-
-bool AMech_RPGCharacter::GetCanBeDamaged() {
-	return canBeDamaged == 0;
-}
-
-float AMech_RPGCharacter::GetMovementModifier() {
-	return movementModifier;
-}
-
-float AMech_RPGCharacter::GetSpeed() {
-	return speed;
-}
-
-void AMech_RPGCharacter::SetCanBeDamaged(int32 newVal) {
-	canBeDamaged = newVal;
-}
-
-void AMech_RPGCharacter::SetMovementModifier(float newVal) {
-	movementModifier = newVal;
-}
-
-void AMech_RPGCharacter::SetSpeed(float newVal) {
-	speed = newVal;
+	return this != nullptr && inCharacter != nullptr && inCharacter->GetGroup() != nullptr ? CompareGroup(inCharacter->GetGroup()) : true;
 }
 
 void AMech_RPGCharacter::AddAbility(UAbility* newAbility) {
 	if (newAbility != nullptr) {
 		abilities.Add(newAbility);
+
+		if (GetCharacterStats() != nullptr) {
+			GetCharacterStats()->UpdateAbilityBar();
+		}
 	}
 }
 
-UWidgetComponent * AMech_RPGCharacter::GetStats()
+void AMech_RPGCharacter::RemoveAbility(UAbility* newAbility)
 {
-	return stats;
+	if (newAbility != nullptr && abilities.Contains(newAbility)) {
+		abilities.Remove(newAbility);
+
+		if (GetCharacterStats() != nullptr) {
+			GetCharacterStats()->UpdateAbilityBar();
+		}
+	}
 }

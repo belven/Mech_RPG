@@ -16,7 +16,6 @@ namespace EffectEnums {
 	};
 }
 
-
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
@@ -54,7 +53,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		bool crit = false;
 };
-
 
 USTRUCT(BlueprintType)
 struct FLoadout {
@@ -97,8 +95,6 @@ public:
 		float movementModifier = 1;
 };
 
-
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPreHealthChangeEvent, FHealthChange, healthChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostHealthChangeEvent, FHealthChange, healthChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostBeginPlay, AMech_RPGCharacter*, character);
@@ -118,11 +114,8 @@ UCLASS(Blueprintable)
 class AMech_RPGCharacter : public ACharacter {
 	GENERATED_BODY()
 private:
-	/**
-	 * Camera boom positioning the camera above the character
-	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* TopDownCameraComponent;
+		class UCameraComponent* TopDownCameraComponent;
 
 	float energy;
 	float health;
@@ -170,34 +163,29 @@ private:
 		UAbility* currentAbility = nullptr;
 
 	UPROPERTY()
-		USphereComponent* aoe = nullptr;
+		class UWidgetComponent* stats = nullptr;
 
 	UPROPERTY()
-	class UWidgetComponent* stats = nullptr;
+		class UFloatingStats_BP* floatingStats = nullptr;
+	class UCharacterStats* characterStats = nullptr;
 
 	TSubclassOf<class UFloatingStats_BP> widgetClass = nullptr;
 	TSubclassOf<class UFloatingTextUI> floatingTextClass = nullptr;
-
-
 protected:
-
 	virtual ~AMech_RPGCharacter();
-
 public:
 	AMech_RPGCharacter();
 
-
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 
-	class UWidgetComponent* GetStats();
+	FORCEINLINE class UWidgetComponent* GetStats()
+	{
+		return stats;
+	}
 
-	static const TArray<AMech_RPGCharacter*>& GetCharacters();
-
-	class UCameraComponent* GetTopDownCamera() { return TopDownCameraComponent; };
-
-	void SetTopDownCamera(class UCameraComponent* newCamera) {
-		TopDownCameraComponent = newCamera;
-	};
+	class UFloatingStats_BP* GetFloatingStats() {
+		return floatingStats;
+	}
 
 	void MirrorCamera(AMech_RPGCharacter* other)
 	{
@@ -206,9 +194,6 @@ public:
 	}
 
 	float GetTotalResistance(DamageEnums::DamageType damageType);
-
-	UFUNCTION(BlueprintCallable, Category = "Quest")
-		TArray<UQuest*>& GetQuests();
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 		void AddQuest(UQuest* newQuest);
@@ -228,9 +213,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void RemoveFromPlay();
 
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		UInventory* GetInventory(); 
-	
+	UFUNCTION(BlueprintCallable, Category = "Other")
+		void PostHealthChange(FHealthChange healthChange);
+
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		AItem* AddItem(AItem* itemToAdd);
 
@@ -281,22 +266,51 @@ public:
 
 	virtual void OutOfCombat();
 
-	bool GetInCombat();
+	FORCEINLINE bool GetInCombat()
+	{
+		return inCombat;
+	}
+
+	static const TArray<AMech_RPGCharacter*>& GetCharacters() {
+		return characters;
+	}
+
+	class UCameraComponent* GetTopDownCamera() { return TopDownCameraComponent; };
+
+	void SetTopDownCamera(class UCameraComponent* newCamera) {
+		TopDownCameraComponent = newCamera;
+	};
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		FORCEINLINE	TArray<UQuest*>& GetQuests()
+	{
+		return quests;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		FORCEINLINE	UInventory * GetInventory() {
+		return inventory;
+	}
 
 	void LookAt(AMech_RPGCharacter* other);
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		bool Channelling();
+		FORCEINLINE	bool Channelling() {
+		return channeling;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		void SetChannelling(bool inChallenning);
+		void SetChannelling(bool inChallenning) {
+		channeling = inChallenning;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		bool HasAbilities();
-
+		FORCEINLINE	bool HasAbilities() {
+		return GetAbilities().Num() > 0;
+	}
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+		class USpringArmComponent* CameraBoom;
 
 	void SetUpGroup();
 
@@ -308,10 +322,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 		bool UseLoadout = false;
-
-
-	UFUNCTION(BlueprintCallable, Category = "Role")
-		TEnumAsByte<GroupEnums::Role> GetRole();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
 		TEnumAsByte<GroupEnums::Role> startingRole;
@@ -337,9 +347,10 @@ public:
 	virtual	void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 
-
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		TArray<UArmour*>& GetArmour();
+		FORCEINLINE	TArray<UArmour*>& GetArmour() {
+		return armour;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		UArmour* GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
@@ -347,111 +358,98 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CrowdControl")
 		void ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool positive);
 
-	UFUNCTION(BlueprintCallable, Category = "Ability")
-		UAbility* GetCurrentAbility();
+	UFUNCTION(BlueprintCallable, Category = "Role")
+		FORCEINLINE TEnumAsByte<GroupEnums::Role> GetRole()
+	{
+		return startingRole;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		void SetCurrentAbility(UAbility* inAbility);
+		FORCEINLINE UAbility* GetCurrentAbility() {
+		return currentAbility;
+	}
 
-	UFUNCTION(BlueprintCallable, Category = "ID")
-		float GetEnergy();
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		void SetCurrentAbility(UAbility* inAbility) {
+		currentAbility = inAbility;
+	}
 
-	UFUNCTION(BlueprintCallable, Category = "ID")
-		float GetHealth();
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		FORCEINLINE float GetHealth() {
+		return health;
+	}
 
-	UFUNCTION(BlueprintCallable, Category = "Group")
-		void SetEnergy(float newVal);
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		void SetHealth(float newVal) {
+		health = newVal;
+	}
 
-	UFUNCTION(BlueprintCallable, Category = "Group")
-		void SetHealth(float newVal);
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		void ChangeHealth(FHealthChange healthChange);
 
-	void ChangeHealth(FHealthChange healthChange);
-
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable, Category = "Items")
 		AItem* CalucluateItemDrop(UGroup * inGroup, ItemEnumns::ItemType type = ItemEnumns::Weapon);
 
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		FORCEINLINE	bool IsDead() {
+		return isDead;
+	}
 
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		bool IsDead();
-
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
+	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void SetDead(bool newVal);
-
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		void AddWeapon(AWeapon* newWeapon);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		TArray<AWeapon*>& GetWeapons();
+		FORCEINLINE	TArray<AWeapon*>& GetWeapons() {
+		return weapons;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		void SetWeapons(TArray<AWeapon*> newVal);
+		void SetWeapons(TArray<AWeapon*> newVal) {
+		weapons = newVal;
+	}
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
-		AWeapon* GetCurrentWeapon();
+	void SwapWeapon();
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
+		FORCEINLINE AWeapon* GetCurrentWeapon() {
+		return currentWeapon;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		void SetCurrentWeapon(AWeapon* newVal);
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
-		UGroup* GetGroup();
+	UFUNCTION(BlueprintCallable, Category = "Group")
+		FORCEINLINE	UGroup* GetGroup() {
+		return group;
+	}
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetGroup(UGroup* newVal);
-
-	UFUNCTION(BlueprintCallable, Category = "Health")
-		int32 GetID();
-
-	UFUNCTION(BlueprintCallable, Category = "Health")
-		void SetID(int32 newVal);
-
-	UFUNCTION(BlueprintCallable, Category = "Health")
-		float GetHealthRegen();
-
-	UFUNCTION(BlueprintCallable, Category = "Health")
-		void SetHealthRegen(float newVal);
 
 	bool CompareGroup(UGroup* inGroup);
 
 	bool CompareGroup(AMech_RPGCharacter* inCharacter);
 
-	AController* GetDemandedController();
-	void SetDemandedController(AController* newVal);
-
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-		TArray<UAbility*>& GetAbilities();
+		FORCEINLINE TArray<UAbility*>& GetAbilities() {
+		return abilities;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-		void SetAbilities(TArray<UAbility*> newVal);
+		void SetAbilities(TArray<UAbility*> newVal) {
+		abilities = newVal;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 		void AddAbility(UAbility* newAbility);
 
-	void SwapWeapon();
-
-	USphereComponent* GetAOE();
-	void SetAOE(USphereComponent* newVal);
-
-	UFUNCTION(BlueprintCallable, Category = "Health")
-		float GetMaxHealth();
-	void SetMaxHealth(float newVal);
-
-	bool CanAttack();
-	bool CanMove();
-	bool CanCast();
-	int32& GetCanAttack();
-	int32& GetCanMove();
-
-	float GetHealthChangeModifier();
-	float GetDefenceModifier();
-
-	void SetCanAttack(int32 newVal);
-	void SetCanMove(int32 newVal);
-
-	void SetHealthChangeModifier(float newVal);
-	void SetDefenceModifier(float newVal);
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+		void RemoveAbility(UAbility* newAbility);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
 		virtual void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS, int32 grade = 0, int32 quaility = 0);
@@ -459,16 +457,111 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Role")
 		void SetupWithLoadout();
 
-	bool GetCanBeDamaged();
-	void SetCanBeDamaged(int32 newVal);
-
-	float GetMovementModifier();
-	float GetSpeed();
-
-	void SetMovementModifier(float newVal);
-	void SetSpeed(float newVal);
-
 	float GetModifierForDifficulty(TEnumAsByte<GameEnums::Difficulty> difficulty);
+
+	FORCEINLINE AController* GetDemandedController() {
+		return demandedController;
+	}
+
+	FORCEINLINE void SetDemandedController(AController* newVal) {
+		demandedController = newVal;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		FORCEINLINE	float GetMaxHealth() {
+		return maxHealth;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		void SetMaxHealth(float newVal) {
+		maxHealth = newVal;
+	}
+
+	FORCEINLINE	int32 GetID() {
+		return id;
+	}
+
+	FORCEINLINE void SetID(int32 newVal) {
+		id = newVal;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		FORCEINLINE	float GetHealthRegen() {
+		return healthRegen;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		void SetHealthRegen(float newVal) {
+		healthRegen = newVal;
+	}
+
+	FORCEINLINE bool CanAttack() {
+		return canAttack == 0;
+	}
+
+	FORCEINLINE bool CanMove() {
+		return canMove == 0;
+	}
+
+	FORCEINLINE bool CanCast() {
+		return canUseAbilities == 0;
+	}
+
+	FORCEINLINE int32& GetCanAttack() {
+		return canAttack;
+	}
+
+	FORCEINLINE int32& GetCanMove() {
+		return canMove;
+	}
+
+	FORCEINLINE float GetHealthChangeModifier() {
+		return MAX(healthChangeModifier, 0.01F);
+	}
+
+	FORCEINLINE float GetDefenceModifier() {
+		return MIN(defenceModifier, 0.99F);
+	}
+
+	FORCEINLINE void SetCanAttack(int32 newVal) {
+		canAttack = newVal;
+	}
+
+	FORCEINLINE void SetCanMove(int32 newVal) {
+		canMove = newVal;
+	}
+
+	FORCEINLINE void SetHealthChangeModifier(float newVal) {
+		healthChangeModifier = newVal;
+	}
+
+	FORCEINLINE void SetDefenceModifier(float newVal) {
+		defenceModifier = newVal;
+	}
+
+	FORCEINLINE bool GetCanBeDamaged() {
+		return canBeDamaged == 0;
+	}
+
+	FORCEINLINE void SetCanBeDamaged(int32 newVal) {
+		canBeDamaged = newVal;
+	}
+
+	FORCEINLINE float GetMovementModifier() {
+		return movementModifier;
+	}
+
+	FORCEINLINE void SetMovementModifier(float newVal) {
+		movementModifier = newVal;
+	}
+
+	FORCEINLINE float GetSpeed() {
+		return speed;
+	}
+
+	FORCEINLINE void SetSpeed(float newVal) {
+		speed = newVal;
+	}
+	FORCEINLINE class UCharacterStats* GetCharacterStats() const { return characterStats; }
+	void SetCharacterStats(class UCharacterStats* val);
 };
-
-

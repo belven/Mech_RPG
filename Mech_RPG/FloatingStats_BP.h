@@ -36,5 +36,8 @@ public:
 
 	void SetOwner(class AMech_RPGCharacter* newOwner);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Stats")
+		void UpdateHealthBar();
+
 	void Tick(float DeltaTime);
 };
