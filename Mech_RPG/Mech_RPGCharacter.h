@@ -452,7 +452,7 @@ public:
 		void RemoveAbility(UAbility* newAbility);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
-		virtual void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS, int32 grade = 0, int32 quaility = 0);
+		virtual void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS, int32 grade = 1, int32 quaility = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
 		void SetupWithLoadout();

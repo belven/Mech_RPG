@@ -3,15 +3,16 @@
 UENUM(BlueprintType)
 namespace AbilityEnums {
 	enum Ability {
-		Heal,
 		AoEHeal,
-		Stun,
-		Disable,
-		Taunt,
-		Grenade,
 		CritBoost,
-		Snipe,
+		Disable,
 		DefenceBoost,
+		Grenade,
+		Heal,
+		Snipe,
+		Shield,
+		Stun,
+		Taunt,
 		End
 	};
 }
@@ -37,9 +38,9 @@ private:
 protected:
 	TEnumAsByte<AOEEnums::AffectedTeam> affectedTeam = AOEEnums::Enemy;
 	TArray<FTag> tags;
-	static const TArray<TEnumAsByte<AbilityEnums::Ability>> supportAbilities;
-	static const TArray<TEnumAsByte<AbilityEnums::Ability>> offensiveAbilities;
-	static const TArray<TEnumAsByte<AbilityEnums::Ability>> defensiveAbilities;
+	static TArray<TEnumAsByte<AbilityEnums::Ability>> supportAbilities;
+	static TArray<TEnumAsByte<AbilityEnums::Ability>> offensiveAbilities;
+	static TArray<TEnumAsByte<AbilityEnums::Ability>> defensiveAbilities;
 public:
 	static const FString healTag;
 	static const FString damageTag;
@@ -83,5 +84,11 @@ public:
 	static UAbility* CreateChannelledPresetAbility(AMech_RPGCharacter* owner, AbilityEnums::Ability abilityToCreate, float inChannelDuration, bool inUsesLocation = false, bool inUsesTrace = false);
 
 	static UAbility* CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums::Ability abilityToCreate);
+
+	static TArray<TEnumAsByte<AbilityEnums::Ability>> CreateSupportAbilityList();
+
+	static TArray<TEnumAsByte<AbilityEnums::Ability>> CreateOffensiveAbilityList();
+
+	static TArray<TEnumAsByte<AbilityEnums::Ability>> CreateDefensiveAbilityList();
 
 };

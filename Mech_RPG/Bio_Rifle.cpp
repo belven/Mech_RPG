@@ -49,10 +49,9 @@ AItem* ABio_Rifle::Copy()
 {
 	ABio_Rifle* weapon = GetWorld()->SpawnActor<ABio_Rifle>(ABio_Rifle::StaticClass());
 	weapon->SetSettings(settings);
-	weapon->SetOwner(GetOwner());
 	weapon->heatLosePerTick = heatLosePerTick;
 	weapon->heatGenerated = heatGenerated;
-	weapon->SetName(GetName());
+	weapon->CloneItemSettings(this);
 	return weapon;
 }
 

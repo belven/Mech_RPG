@@ -4,10 +4,10 @@
 #include "KillQuestObjective.h"
 #include "Quest.h"
 
-void UKillQuestObjective::SetUpListeners(UQuest* quest) {
-	Super::SetUpListeners(quest);
-	if (quest->GetOwner() != NULL) {
-		AMech_RPGCharacter* character = quest->GetOwner();
+void UKillQuestObjective::SetUpListeners(UQuest* inQuest) {
+	Super::SetUpListeners(inQuest);
+	if (inQuest != nullptr && inQuest->GetOwner() != nullptr) {
+		AMech_RPGCharacter* character = inQuest->GetOwner();
 		character->GetGroup()->OnGroupEnemyKilled.AddUniqueDynamic(this, &UKillQuestObjective::EnemyKilled);
 	}
 }

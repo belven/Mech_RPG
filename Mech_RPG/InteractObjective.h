@@ -20,7 +20,7 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Interactive Quest Objective")
-		virtual void SetUpListeners(UQuest* quest) override;
+		virtual void SetUpListeners(UQuest* inQuest) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Interactive Quest Objective")
 		virtual bool IsComplete() override;

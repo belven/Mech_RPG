@@ -8,6 +8,7 @@
 AWeapon::AWeapon() : Super() {
 	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WeaponParticle"));
 	audioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("WeaponAudio"));
+	SetType(ItemEnumns::Weapon);
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/Gun_Flash"));
 	if (ParticleSystemClass.Succeeded()) {
@@ -179,11 +180,11 @@ void AWeapon::SetSettings(FWeaponParams newSettings)
 	settings = newSettings;
 }
 
-AWeapon* AWeapon::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type, int32 grade, int32 quality) {
+AWeapon* AWeapon::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality) {
 	FMagazineWeaponParams magSettings;
 	AWeapon* weapon = nullptr;
 
-	switch (type) {
+	switch (weaponType) {
 	case WeaponEnums::SMG:
 		weapon = ASMG::CreateSMG(world, inOwner);
 		break;
@@ -205,9 +206,12 @@ AWeapon* AWeapon::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner,
 		break;
 	}
 
-	weapon->SetGrade(grade);
-	weapon->SetQuality(quality);
-	weapon->SetName("Test Weapon");
+	weapon->SetGrade(weaponGrade);
+	weapon->SetQuality(weaponQuality);
+
+	if (weapon->GetName().IsEmpty()) {
+		weapon->SetName("Test Weapon");
+	}
 
 	return weapon;
 }

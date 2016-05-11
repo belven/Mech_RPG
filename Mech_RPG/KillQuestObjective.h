@@ -17,10 +17,10 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Kill Quest Objective")
-		virtual void SetUpListeners(UQuest* quest) override;
+		virtual void SetUpListeners(UQuest* inQuest) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Kill Quest Objective")
-	virtual bool IsComplete() override;
+		virtual bool IsComplete() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Kill Quest Objective")
 		virtual FString GetObjectiveText();

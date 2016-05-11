@@ -12,7 +12,7 @@ bool UGrenade::Activate(class AMech_RPGCharacter* target, FVector targetLocation
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 1;
-		settings.radius = 300;
+		settings.radius = 450;
 		settings.location = targetLocation;
 		settings.damageType = DamageEnums::Blast;
 		settings.duration = 1;
@@ -31,6 +31,6 @@ UGrenade* UGrenade::CreateAbility(float cooldown, AMech_RPGCharacter* owner, flo
 	ability->damage = inDamage;
 	ability->owner = owner;
 	ability->AddTag(damageTag, inDamage);
-	ability->AddTag(aoeTag, 300);
+	ability->AddTag(aoeTag, 450);
 	return ability;
 }

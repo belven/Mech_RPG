@@ -34,7 +34,8 @@ void UGroup::SetMembers(TArray<AMech_RPGCharacter*> newVal) {
 }
 
 void UGroup::AddMemeber(AMech_RPGCharacter* memberToAdd) {
-	members.AddUnique(memberToAdd);
+	//members.AddUnique(memberToAdd);
+	members.Add(memberToAdd);
 }
 
 void UGroup::RemoveMember(AMech_RPGCharacter* memberToRemove) {

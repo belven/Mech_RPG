@@ -104,5 +104,5 @@ public:
 		virtual float GetProgressBarPercent();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AWeapon* CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> type = WeaponEnums::SMG, int32 grade = 0, int32 quality = 0);
+		static AWeapon* CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType = WeaponEnums::SMG, int32 weaponGrade = 0, int32 weaponQuality = 0);
 };

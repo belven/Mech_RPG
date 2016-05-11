@@ -45,7 +45,9 @@ public:
 
 private:
 	UPROPERTY()
-	TArray<AItem*> items;
-	int32 maxItemCount;
+		TArray<AItem*> items;
+
+	UPROPERTY()
+		int32 maxItemCount = 20;
 
 };

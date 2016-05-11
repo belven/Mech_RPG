@@ -14,7 +14,9 @@ class MECH_RPG_API UQuestUI : public UUserWidget
 	GENERATED_BODY()
 
 private:
-	UQuest* quest;
+
+	UPROPERTY()
+		UQuest* quest;
 public:
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 		UQuest* GetQuest();

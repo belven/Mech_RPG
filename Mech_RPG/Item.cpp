@@ -12,8 +12,19 @@
 
 int32 AItem::HighestItemLevel = 100;
 
+void AItem::CloneItemSettings(AItem* cloneFromItem)
+{
+	SetName(cloneFromItem->GetName());
+	SetGrade(cloneFromItem->GetGrade());
+	SetQuality(cloneFromItem->GetQuality());
+	SetType(cloneFromItem->GetType());
+	SetOwner(cloneFromItem->GetOwner());
+}
+
 AItem::AItem() : Super() {
 	SetActorEnableCollision(false);
+	SetGrade(1);
+
 }
 
 AItem* AItem::CreateItemByType(ItemEnumns::ItemType type, UWorld* world, int32 grade, int32 quality) {
@@ -67,7 +78,7 @@ void AItem::SetGrade(int32 newVal) {
 }
 
 AMech_RPGCharacter* AItem::GetOwner() {
-	return owner;
+	return itemOwner;
 }
 
 int32 AItem::GetQuality()
@@ -81,7 +92,7 @@ void AItem::SetQuality(int32 newQuality)
 }
 
 void AItem::SetOwner(AMech_RPGCharacter* newVal) {
-	owner = newVal;
+	itemOwner = newVal;
 }
 
 bool AItem::HasSpace() {
@@ -111,6 +122,8 @@ void AItem::SetStackSize(int32 newVal) {
 AItem* AItem::Copy() {
 	return CreateItem(GetWorld(), GetOwner(), GetName(), GetAmount(), GetGrade(), GetQuality(), GetStackSize());
 }
+
+
 
 AItem * AItem::CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString inName, int32 inAmount, int32 inGrade, int32 inQuality, int32 inStackSize)
 {

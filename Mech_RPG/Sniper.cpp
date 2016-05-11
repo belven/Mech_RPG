@@ -43,8 +43,7 @@ AItem* ASniper::Copy()
 {
 	ASniper* weapon = GetWorld()->SpawnActor<ASniper>(ASniper::StaticClass());
 	weapon->SetSettings(settings);
-	weapon->SetOwner(GetOwner());
-	weapon->SetName(GetName());
+	weapon->CloneItemSettings(this);
 	weapon->magazineSize = magazineSize;
 	weapon->reloadAmount = reloadAmount;
 	weapon->ammo = magazineSize;

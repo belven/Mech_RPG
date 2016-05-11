@@ -223,6 +223,16 @@ void AMech_RPGPlayerController::AddQuest(UQuest * newQuest)
 	}
 }
 
+void AMech_RPGPlayerController::PlayerItemPickup(AItem* item)
+{
+	inventory->GenerateInventory();
+}
+
+void AMech_RPGPlayerController::PlayerSwappedWeapons(AWeapon* oldWeapon, AWeapon* newWeapon)
+{
+	//characterPane->UpdateWeaponBar();
+}
+
 TArray<AMech_RPGCharacter*> AMech_RPGPlayerController::GetCharactersInRange(float range) {
 	return UMiscLibrary::GetCharactersInRange(range, GetOwner());
 }
@@ -313,7 +323,6 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Inventory", IE_Pressed, this, &AMech_RPGPlayerController::OpenInventory);
 	//	InputComponent->BindAction("UpdateRotation", IE_Pressed, this, &AMech_RPGPlayerController::UpdateRotation);
 }
-
 
 void AMech_RPGPlayerController::OpenCharacterPane() {
 	if (characterPaneOpen) {
@@ -560,6 +569,8 @@ void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
 	questList->SetCharacter(owner);
 	questList->GenerateQuests();
 	owner->OnQuestAdded.AddUniqueDynamic(this, &AMech_RPGPlayerController::AddQuest);
+	owner->OnItemPickUpEvent.AddUniqueDynamic(this, &AMech_RPGPlayerController::PlayerItemPickup);
+	inventory->GenerateInventory();
 }
 
 void AMech_RPGPlayerController::CharacterFive() {

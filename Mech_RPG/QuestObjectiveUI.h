@@ -12,7 +12,8 @@ class MECH_RPG_API UQuestObjectiveUI : public UUserWidget
 {
 	GENERATED_BODY()
 protected:
-	UQuestObjective* objective;
+	UPROPERTY()
+		UQuestObjective* objective;
 public:
 	UFUNCTION(BlueprintCallable, Category = "Objective")
 		UQuestObjective* GetObjective();

@@ -12,9 +12,35 @@ const FString UAbility::debuffTag = "Debuff";
 const FString UAbility::aoeTag = "AoE";
 const FString UAbility::needsTargetTag = "Needs Target";
 
-const TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::supportAbilities;
-const TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::offensiveAbilities;
-const TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::defensiveAbilities;
+TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::supportAbilities = CreateSupportAbilityList();
+TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::offensiveAbilities = CreateOffensiveAbilityList();
+TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::defensiveAbilities = CreateDefensiveAbilityList();
+
+TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::CreateSupportAbilityList()
+{
+	TArray<TEnumAsByte<AbilityEnums::Ability>> abilities;
+	abilities.Add(AbilityEnums::Heal);
+	abilities.Add(AbilityEnums::AoEHeal);
+	return abilities;
+}
+
+TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::CreateOffensiveAbilityList()
+{
+	TArray<TEnumAsByte<AbilityEnums::Ability>> abilities;
+	abilities.Add(AbilityEnums::Grenade);
+	abilities.Add(AbilityEnums::Snipe);
+	abilities.Add(AbilityEnums::CritBoost);
+	return abilities;
+}
+
+TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::CreateDefensiveAbilityList()
+{
+	TArray<TEnumAsByte<AbilityEnums::Ability>> abilities;
+	abilities.Add(AbilityEnums::Disable);
+	abilities.Add(AbilityEnums::Stun);
+	abilities.Add(AbilityEnums::Taunt);
+	return abilities;
+}
 
 bool UAbility::HasTag(FString name)
 {
@@ -118,13 +144,15 @@ UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums:
 	case AbilityEnums::Taunt:
 		return UTaunt::CreateAbility(5.0F, owner);
 	case AbilityEnums::Grenade:
-		return UGrenade::CreateAbility(7.0F, owner, 600.0F);
+		return UGrenade::CreateAbility(7.0F, owner, 800.0F);
 	case AbilityEnums::CritBoost:
 		return UCritBoost::CreateCritBoost(6, owner, 55.0F);
 	case AbilityEnums::Snipe:
 		return USnipe::CreateAbility(15.0F, owner);
 	case AbilityEnums::DefenceBoost:
 		return UDefenceBoost::CreateAbility(7.0F, owner, 0.25F);
+	case AbilityEnums::Shield:
+		return UShield::CreateShield(20, owner, 0.35F);
 	}
 
 	return nullptr;

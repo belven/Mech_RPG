@@ -6,7 +6,7 @@
 #include "Quest.h"
 
 
-void UItemObjective::SetUpListeners(UQuest* quest)
+void UItemObjective::SetUpListeners(UQuest* inQuest)
 {
 	quest->GetOwner()->GetGroup()->OnItemPickUpEvent.AddDynamic(this, &UItemObjective::PlayerItemPickup);
 }

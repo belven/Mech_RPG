@@ -2,6 +2,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "InventoryUI.h"
+#include "CharacterStats.h"
 #include "Mech_RPGPlayerController.generated.h"
 
 class AMech_RPGCharacter;
@@ -189,4 +190,10 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void AddQuest(UQuest * newQuest);
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void PlayerItemPickup(AItem* item);
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void PlayerSwappedWeapons(AWeapon* oldWeapon, AWeapon* newWeapon);
 };

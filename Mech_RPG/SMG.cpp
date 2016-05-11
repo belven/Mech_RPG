@@ -37,11 +37,10 @@ AItem* ASMG::Copy()
 {
 	ASMG* weapon = GetWorld()->SpawnActor<ASMG>(ASMG::StaticClass());
 	weapon->SetSettings(settings);
-	weapon->SetOwner(GetOwner());
 	weapon->magazineSize = magazineSize;
 	weapon->reloadAmount = reloadAmount;
 	weapon->ammo = magazineSize;
-	weapon->SetName(GetName());
+	weapon->CloneItemSettings(this);
 	return weapon;
 }
 

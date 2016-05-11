@@ -45,7 +45,7 @@ public:
 		static AItem* CreateItemByType(ItemEnumns::ItemType type, UWorld* world, int32 grade, int32 quality);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-	ItemEnumns::ItemType GetType();
+		ItemEnumns::ItemType GetType();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		void SetQuality(int32 newQuality);
@@ -127,13 +127,27 @@ public:
 	}
 
 	static int32 HighestItemLevel;
-protected:
-	TEnumAsByte<ItemEnumns::ItemType> type;
-	FString name;
-	int32 grade;
-	AMech_RPGCharacter* owner;
-	int32 amount = 1;
-	int32 stackSize = 1;
-	int32 quality;
 
+	void CloneItemSettings(AItem* cloneFromItem);
+protected:
+	UPROPERTY()
+		TEnumAsByte<ItemEnumns::ItemType> type;
+
+	UPROPERTY()
+		FString name;
+
+	UPROPERTY()
+		int32 grade = 1;
+
+	UPROPERTY()
+		AMech_RPGCharacter* itemOwner;
+
+	UPROPERTY()
+		int32 amount = 1;
+
+	UPROPERTY()
+		int32 stackSize = 1;
+
+	UPROPERTY()
+		int32 quality = 0;
 };

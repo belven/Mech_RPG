@@ -6,7 +6,7 @@
 #include "Mech_RPGCharacter.h"
 #include "Quest.h"
 
-void UInteractObjective::SetUpListeners(UQuest* quest)
+void UInteractObjective::SetUpListeners(UQuest* inQuest)
 {
 	quest->GetOwner()->GetGroup()->OnInteractEvent.AddDynamic(this, &UInteractObjective::PlayerInteraction);
 }

@@ -15,11 +15,14 @@ class MECH_RPG_API UQuestObjective : public UObject
 {
 	GENERATED_BODY()
 protected:
+	UPROPERTY()
+		FString objectiveName = "Name Not Set";
 
-	FString objectiveName = "Name Not Set";
+	UPROPERTY()
+		UQuest* quest = nullptr;
 
-	UQuest* quest = nullptr;
-	bool complete = false;
+	UPROPERTY()
+		bool complete = false;
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FObjectiveCompleted OnObjectiveCompleted;
@@ -28,11 +31,11 @@ public:
 		FObjectiveUpdated OnObjectiveUpdated;
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
-		virtual void SetUpListeners(UQuest* quest);
+		virtual void SetUpListeners(UQuest* inQuest);
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
 		virtual bool IsComplete() { check(0 && "You must override this"); return false; };
-	
+
 	UFUNCTION(BlueprintCallable, Category = Quest)
 		UQuest* GetQuest();
 
@@ -40,7 +43,7 @@ public:
 		void SetQuest(UQuest* newVal);
 
 	UFUNCTION(BlueprintCallable, Category = QuestObjective)
-		void SetQuestObjective(FString objectiveName = "Test Objective");
+		void SetQuestObjective(FString inObjectiveName = "Test Objective");
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
 		void NotifyQuest();

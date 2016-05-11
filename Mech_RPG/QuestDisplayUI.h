@@ -14,7 +14,8 @@ class MECH_RPG_API UQuestDisplayUI : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	AMech_RPGCharacter* character;
+	UPROPERTY()
+		AMech_RPGCharacter* character;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Quests")

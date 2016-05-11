@@ -13,6 +13,8 @@
 #include "FloatingTextUI.h"
 #include "CharacterStats.h"
 #include "Group.h"
+#include "Ability.h"
+#include "ChannelledAbility.h"
 #include "Interactable.h"
 #include "Quest.h"
 
@@ -121,7 +123,7 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 		}
 	}
 
-	Controller = NewController;
+	//Controller = NewController;
 }
 
 void AMech_RPGCharacter::Tick(float DeltaTime) {
@@ -168,6 +170,8 @@ void AMech_RPGCharacter::BeginPlay() {
 
 	Reset();
 
+	inventory = NewObject<UInventory>(UInventory::StaticClass());
+
 	if (!UseLoadout) {
 		CreatePresetRole(startingRole);
 	}
@@ -177,6 +181,7 @@ void AMech_RPGCharacter::BeginPlay() {
 
 	if (weapons.Num() > 0) {
 		SetCurrentWeapon(weapons[0]);
+		AddItem(GetCurrentWeapon());
 	}
 
 	if (abilities.Num() > 0) {
@@ -198,8 +203,6 @@ void AMech_RPGCharacter::BeginPlay() {
 		stats->SetDrawSize(FVector2D(100, 50));
 	}
 
-	if (inventory == nullptr) {
-		inventory = NewObject<UInventory>(UInventory::StaticClass());
 		if (inventory != nullptr) {
 			int invSize = 20;
 			inventory->SetMaxItemCount(invSize);
@@ -209,7 +212,7 @@ void AMech_RPGCharacter::BeginPlay() {
 			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 3", 0, 0, 0, 2));
 			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));*/
 		}
-	}
+	
 
 	if (OnPostBeginPlay.IsBound()) {
 		OnPostBeginPlay.Broadcast(this);
@@ -364,11 +367,13 @@ void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 		healthChange.damager->EnemyKilled(this);
 
 		if (GetGroup()->GetPlayer() == nullptr) {
-			AItemPickup::CreateItemPickup(GetCurrentWeapon()->Copy())->SetActorLocation(GetActorLocation());
+			AItemPickup::CreateItemPickup(CalucluateItemDrop(GetGroup(), GetCurrentWeapon()->GetType()))->SetActorLocation(GetActorLocation());
 		}
 	}
 
-	GetFloatingStats()->UpdateHealthBar();
+	if (GetFloatingStats() != nullptr) {
+		GetFloatingStats()->UpdateHealthBar();
+	}
 
 	if (GetCharacterStats() != nullptr) {
 		GetCharacterStats()->UpdateHealthBar();
@@ -409,10 +414,19 @@ AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemT
 	bool upgradeGrade = rand() % 100 <= 70;// upgradeGradeChance;
 	bool upgradeQuality = rand() % 100 <= 70; //upgradeQualityChance;
 
-	if (upgradeGrade) averageGrade++;
-	if (upgradeQuality) averageQuality++;
+	//if (upgradeGrade) 
+		averageGrade++;
+	//if (upgradeQuality)
+		averageQuality++;
 
-	return AItem::CreateItemByType(type, GetWorld(), (int32)(upgradeGrade), (int32)(upgradeQuality));
+	AItem* newItem = AItem::CreateItemByType(type, GetWorld(), round(averageGrade), round(averageQuality));
+
+	if (newItem != nullptr) {
+		newItem->SetOwner(this);
+		return newItem;
+	}
+
+	return nullptr;
 }
 
 void AMech_RPGCharacter::EnemyKilled(AMech_RPGCharacter* character)
@@ -569,7 +583,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		AddWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, quaility));
-		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.0F, true, false));
+		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, false));
 		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 200.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
@@ -621,7 +635,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	case GroupEnums::Support:
 		AddWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
 		AddAbility(USummonDamageDrone::CreateAbility(20, this));
-		AddAbility(UShield::CreateShield(20, this, 0.35F));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Shield));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Disable));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
@@ -690,22 +704,29 @@ void AMech_RPGCharacter::SetCurrentWeapon(AWeapon* newVal) {
 		}
 
 		newVal->SetActorHiddenInGame(false);
-		newVal->SetOwner(this);
+		newVal->SetOwner(this);	
+
+		if (OnSwappedWeapons.IsBound()) {
+			OnSwappedWeapons.Broadcast(currentWeapon, newVal);
+		}
+
 		currentWeapon = newVal;
 	}
 }
 
 void AMech_RPGCharacter::SetGroup(UGroup* newVal) {
-	if (group != nullptr) {
-		group->RemoveMember(this);
+	if (newVal != nullptr) {
+		if (group != nullptr) {
+			group->RemoveMember(this);
 
-		if (!group->HasMemebers()) {
-			group->ConditionalBeginDestroy();
+			if (!group->HasMemebers()) {
+				group->ConditionalBeginDestroy();
+			}
 		}
-	}
 
-	group = newVal;
-	group->AddMemeber(this);
+		group = newVal;
+		group->AddMemeber(this);
+	}
 }
 
 bool AMech_RPGCharacter::CompareGroup(UGroup* inGroup) {

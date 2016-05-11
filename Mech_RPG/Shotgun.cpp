@@ -37,10 +37,9 @@ AItem* AShotgun::Copy()
 {
 	AShotgun* weapon = GetWorld()->SpawnActor<AShotgun>(AShotgun::StaticClass());
 	weapon->SetSettings(settings);
-	weapon->SetOwner(GetOwner());
 	weapon->magazineSize = magazineSize;
 	weapon->reloadAmount = reloadAmount;
 	weapon->ammo = magazineSize;
-	weapon->SetName(GetName());
+	weapon->CloneItemSettings(this);
 	return weapon;
 }
