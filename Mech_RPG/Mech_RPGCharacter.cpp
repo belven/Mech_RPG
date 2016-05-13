@@ -13,10 +13,13 @@
 #include "FloatingTextUI.h"
 #include "CharacterStats.h"
 #include "Group.h"
-#include "Ability.h"
-#include "ChannelledAbility.h"
+#include "Abilities/Ability.h"
+#include "Abilities/ChannelledAbility.h"
 #include "Interactable.h"
 #include "Quest.h"
+#include "Mech_RPGPlayerController.h"
+#include "Math/UnrealMathUtility.h"
+#include "Map.h"
 
 #define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)
 #define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
@@ -115,6 +118,7 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 
 	if (con) {
 		con->SetOwner(this);
+		UMiscLibrary::SetPlayerController(con);
 	}
 	else {
 		ABaseAIController* con = Cast<ABaseAIController>(NewController);
@@ -131,11 +135,11 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 	if (!isDead) {
 		GetCharacterMovement()->MaxWalkSpeed = speed * movementModifier;
 
-		for (AWeapon* weapon : weapons) {
+		/*for (AWeapon* weapon : weapons) {
 			if (weapon) {
 				weapon->Tick(DeltaTime);
 			}
-		}
+		}*/
 
 		if (GetHealth() < GetMaxHealth()) {
 			float regen = !inCombat ? GetMaxHealth() * 0.15 : healthRegen;
@@ -203,16 +207,16 @@ void AMech_RPGCharacter::BeginPlay() {
 		stats->SetDrawSize(FVector2D(100, 50));
 	}
 
-		if (inventory != nullptr) {
-			int invSize = 20;
-			inventory->SetMaxItemCount(invSize);
-			/*inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
-			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
-			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 2", 4, 0, 0, 2));
-			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 3", 0, 0, 0, 2));
-			inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));*/
-		}
-	
+	if (inventory != nullptr) {
+		int invSize = 20;
+		inventory->SetMaxItemCount(invSize);
+		/*inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
+		inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
+		inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 2", 4, 0, 0, 2));
+		inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 3", 0, 0, 0, 2));
+		inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));*/
+	}
+
 
 	if (OnPostBeginPlay.IsBound()) {
 		OnPostBeginPlay.Broadcast(this);
@@ -367,7 +371,7 @@ void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 		healthChange.damager->EnemyKilled(this);
 
 		if (GetGroup()->GetPlayer() == nullptr) {
-			AItemPickup::CreateItemPickup(CalucluateItemDrop(GetGroup(), GetCurrentWeapon()->GetType()))->SetActorLocation(GetActorLocation());
+			AItemPickup::CreateItemPickup(CalucluateItemDrop(healthChange.damager->GetGroup(), GetCurrentWeapon()->GetType()))->SetActorLocation(GetActorLocation());
 		}
 	}
 
@@ -381,14 +385,22 @@ void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 }
 
 AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemType type) {
-	int32 totalItems = 0;
-	int32 lowestGrade = AItem::HighestItemLevel;
-	int32 totalGrade = 0;
-	float averageGrade = 0;
+	TMultiMap<int32, int32> gradeMap;
+	int32 outputGrade;
+	int32 outputQuality;
+	bool upgradeGrade = FMath::RandHelper(100) <= 70;// upgradeGradeChance;
+	bool upgradeQuality = FMath::RandHelper(100) <= 70; //upgradeQualityChance;
 
-	int32 lowestQuality = 20;
-	int32 totalQuality = 0;
-	float averageQuality = 0;
+	float totalItems = 0;
+	float lowestGrade = AItem::HighestItemLevel;
+	float totalGrade = 0;
+	float meanGrade = 0;
+	int32 modeGrade = 0;
+
+	float lowestQuality = 20;
+	float totalQuality = 0;
+	float meanQuality = 0;
+	int32 modeQuality = 0;
 
 	for (AMech_RPGCharacter* member : inGroup->GetMembers()) {
 		for (AItem* item : member->GetInventory()->GetItems()) {
@@ -396,6 +408,13 @@ AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemT
 				totalItems++;
 				totalGrade += item->GetGrade();
 				totalQuality += item->GetQuality();
+
+				if (!gradeMap.Contains(item->GetGrade())) {
+					gradeMap.Add(item->GetGrade(), 1);
+				}
+				else {
+					gradeMap.Add(item->GetGrade(), (int32)(*gradeMap.Find(item->GetGrade()) + 1));
+				}
 
 				if (item->GetQuality() < lowestQuality) {
 					lowestQuality = item->GetQuality();
@@ -408,18 +427,33 @@ AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemT
 		}
 	}
 
-	averageGrade = totalGrade / totalItems;
-	averageQuality = totalQuality / totalItems;
+	meanGrade = totalGrade / totalItems;
+	meanQuality = totalQuality / totalItems;
 
-	bool upgradeGrade = rand() % 100 <= 70;// upgradeGradeChance;
-	bool upgradeQuality = rand() % 100 <= 70; //upgradeQualityChance;
+	TPair<int32, int32> heighestValue;
+	heighestValue.Key = 1;
+	heighestValue.Value = 0;
+
+	for (auto& map : gradeMap) {
+		// Found a higher quantity
+		if (map.Value > heighestValue.Value) {
+			heighestValue = map;
+		}
+		// Found the same quantity, only set if the grade is higher
+		else if (map.Value == heighestValue.Value && map.Key > heighestValue.Key) {
+			heighestValue = map;
+		}
+	}
 
 	//if (upgradeGrade) 
-		averageGrade++;
+	meanGrade++;
 	//if (upgradeQuality)
-		averageQuality++;
+	meanQuality++;
 
-	AItem* newItem = AItem::CreateItemByType(type, GetWorld(), round(averageGrade), round(averageQuality));
+	outputGrade = FMath::RoundHalfToEven(MAX(meanGrade, heighestValue.Key));
+	outputQuality = FMath::RoundHalfToEven(meanQuality);
+
+	AItem* newItem = AItem::CreateItemByType(type, GetWorld(), outputGrade, outputQuality);
 
 	if (newItem != nullptr) {
 		newItem->SetOwner(this);
@@ -517,6 +551,13 @@ void AMech_RPGCharacter::ItemPickup(AItem* item)
 	}
 	item->SetOwner(this);
 	GetGroup()->ItemPickup(item);
+}
+
+void AMech_RPGCharacter::NotifyActorBeginCursorOver()
+{
+	if (UMiscLibrary::GetPlayerController() != nullptr) {
+		UMiscLibrary::GetPlayerController()->MouseOverActor(this, TargetEnums::Character);
+	}
 }
 
 void AMech_RPGCharacter::OutOfCombat() {
@@ -704,7 +745,7 @@ void AMech_RPGCharacter::SetCurrentWeapon(AWeapon* newVal) {
 		}
 
 		newVal->SetActorHiddenInGame(false);
-		newVal->SetOwner(this);	
+		newVal->SetOwner(this);
 
 		if (OnSwappedWeapons.IsBound()) {
 			OnSwappedWeapons.Broadcast(currentWeapon, newVal);

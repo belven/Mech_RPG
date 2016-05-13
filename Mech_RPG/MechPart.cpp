@@ -12,9 +12,10 @@
 AMechPart::AMechPart() : Super()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	//PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
 
 	meshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MechAttachment_MeshComponent"));
+	//meshComponent->Owner = this;
 	SetRootComponent(meshComponent);
 }
 
@@ -54,5 +55,13 @@ void AMechPart::SetActorHiddenInGame(bool bNewHidden)
 	GetRootComponent()->SetHiddenInGame(bNewHidden, true);
 	meshComponent->SetHiddenInGame(bNewHidden, true);
 	meshComponent->SetVisibility(!bNewHidden, true);
+
+	if (!bNewHidden && GetOwner() != nullptr && GetOwner()->GetMesh() != nullptr) {
+		AttachRootComponentTo(GetOwner()->GetMesh(), "RightHand");
+	}
+	else if (GetOwner() != nullptr && GetOwner()->GetMesh() != nullptr)
+	{
+		meshComponent->DetachFromParent();
+	}
 }
 

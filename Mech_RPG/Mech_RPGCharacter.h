@@ -23,7 +23,7 @@ namespace EffectEnums {
 #include "Weapon.h"
 #include "Group.h"
 #include "Array.h"
-#include "Ability.h"
+#include "Abilities/Ability.h"
 #include "Inventory.h"
 #include "FloatingStats_BP.h"
 #include "Mech_RPGCharacter.generated.h"
@@ -263,6 +263,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void ItemPickup(AItem* item);
+
+	virtual void NotifyActorBeginCursorOver() override;
 
 	virtual void OutOfCombat();
 

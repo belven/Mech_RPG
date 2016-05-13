@@ -37,6 +37,7 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 
 	SetActorTickEnabled(true);
 	PrimaryActorTick.bCanEverTick = true;
+	bEnableMouseOverEvents = true;
 
 }
 
@@ -325,7 +326,7 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 }
 
 void AMech_RPGPlayerController::OpenCharacterPane() {
-	if (characterPaneOpen) {
+	if (characterPane->GetVisibility() == ESlateVisibility::Visible) {
 		//FInputModeGameAndUI data;
 		//SetInputMode(data);
 		//SetPause(false);
@@ -343,7 +344,7 @@ void AMech_RPGPlayerController::OpenCharacterPane() {
 
 void AMech_RPGPlayerController::OpenInventory()
 {
-	if (inventoryOpen) {
+	if (inventory->GetVisibility() == ESlateVisibility::Visible) {
 		//FInputModeGameAndUI data;
 		//SetInputMode(data);
 		//SetPause(false);
@@ -357,6 +358,35 @@ void AMech_RPGPlayerController::OpenInventory()
 		inventoryOpen = true;
 		inventory->SetVisibility(ESlateVisibility::Visible);
 	}
+}
+
+void AMech_RPGPlayerController::MouseOverActor(AActor* inActor, TEnumAsByte<TargetEnums::MouseOverTarget> targeType)
+{
+	/*switch (targeType)
+	{
+	case TargetEnums::Character:
+		CurrentMouseCursor = EMouseCursor::Crosshairs;
+		break;
+	case TargetEnums::Interactable:
+		CurrentMouseCursor = EMouseCursor::GrabHand;
+		break;
+	case TargetEnums::ItemPickup:
+		CurrentMouseCursor = EMouseCursor::GrabHandClosed;
+		break;
+	default:
+		CurrentMouseCursor = EMouseCursor::Hand;
+		break;
+	}*/
+}
+
+void AMech_RPGPlayerController::NotifyActorEndCursorOver()
+{
+	CurrentMouseCursor = EMouseCursor::Hand;
+}
+
+void AMech_RPGPlayerController::NotifyActorBeginCursorOver()
+{
+
 }
 
 /**

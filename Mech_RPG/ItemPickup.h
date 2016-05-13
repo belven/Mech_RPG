@@ -24,5 +24,7 @@ public:
 	virtual void Interact_Implementation(class AMech_RPGCharacter* character);
 
 	static AItemPickup* CreateItemPickup(AItem* item);
+
+	virtual void NotifyActorBeginCursorOver() override;
 	
 };

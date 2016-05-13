@@ -98,6 +98,9 @@ public:
 		virtual AItem* Copy();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
+	virtual FString GetTooltipText();
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
 		static AItem* CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString inName = "Test", int32 inAmount = 1, int32 inGrade = 0, int32 inQuality = 0, int32 inStackSize = 3);
 
 	FORCEINLINE AItem& operator+(AItem &aitem)

@@ -8,7 +8,7 @@
 #include "Item.h"
 #include "Weapon.h"
 #include "Armour.h"
-#include "Ability.h"
+#include "Abilities/Ability.h"
 #include "Mech_RPGPlayerController.h"
 
 void UInventoryUI::SetOwner(AMech_RPGCharacter* inOwner)

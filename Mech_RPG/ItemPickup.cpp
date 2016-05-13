@@ -39,3 +39,8 @@ AItemPickup* AItemPickup::CreateItemPickup(AItem* item)
 	}
 	return newItem;
 }
+
+void AItemPickup::NotifyActorBeginCursorOver()
+{
+
+}

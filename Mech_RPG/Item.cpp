@@ -125,6 +125,11 @@ AItem* AItem::Copy() {
 
 
 
+FString AItem::GetTooltipText()
+{
+	return "";
+}
+
 AItem * AItem::CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString inName, int32 inAmount, int32 inGrade, int32 inQuality, int32 inStackSize)
 {
 	FActorSpawnParameters params;

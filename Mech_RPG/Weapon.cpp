@@ -77,6 +77,15 @@ float AWeapon::GetProgressBarPercent() {
 	return -1;
 }
 
+FString AWeapon::GetTooltipText()
+{
+	FString lnBreak = " \n";
+	FString dpsString = FString::FromInt(round(GetChangeAmount() * (1 / settings.fireRate)));
+	FString damageType = FindObject<UEnum>(ANY_PACKAGE, TEXT("DamageEnums"), true)->GetDisplayNameText(settings.damageType).ToString();
+
+	return GetName() + lnBreak + "DPS: " + dpsString + lnBreak + "Damage Type: " + damageType;
+}
+
 void AWeapon::Fire(AMech_RPGCharacter* target) {
 	FHealthChange healthChange;
 	float changeAmount = GetChangeAmount() * GetOwner()->GetHealthChangeModifier();

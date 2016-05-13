@@ -18,6 +18,15 @@ namespace PlayerControllerEnums {
 	};
 }
 
+UENUM(BlueprintType)
+namespace TargetEnums {
+enum MouseOverTarget {
+	Character,
+	ItemPickup,
+	Interactable
+};
+}
+
 UCLASS()
 class AMech_RPGPlayerController : public APlayerController {
 	GENERATED_BODY()
@@ -137,6 +146,10 @@ public:
 
 	void OpenCharacterPane();
 	void OpenInventory();
+
+	void MouseOverActor(AActor* inActor, TEnumAsByte<TargetEnums::MouseOverTarget> targeType);
+	virtual void NotifyActorEndCursorOver() override;
+	virtual void NotifyActorBeginCursorOver() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		AItem* GetSelectedItem() { return selectedItem; }

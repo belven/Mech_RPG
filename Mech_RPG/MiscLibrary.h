@@ -34,6 +34,8 @@ public:
 
 	static TEnumAsByte<GameEnums::Difficulty> GetDifficulty();
 
+	static const FString lnBreak;
+
 	template<class T> static void InitialiseArray(TArray<T>& emptyArray, T* items);
 
 	static FColor GetRelativeColour(AMech_RPGCharacter * character);

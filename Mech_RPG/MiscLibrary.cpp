@@ -5,14 +5,15 @@
 #include "Mech_RPGPlayerController.h"
 #include "Mech_RPGCharacter.h"
 #include "Group.h"
-#include "Ability.h"
-#include "ChannelledAbility.h"
+#include "Abilities/Ability.h"
+#include "Abilities/ChannelledAbility.h"
 
 
 UGroup* UMiscLibrary::playerGroup = nullptr;
 AMech_RPGPlayerController* UMiscLibrary::playerController = nullptr;
 TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::difficulty = GameEnums::Hard;
 FRotator UMiscLibrary::cameraRot = FRotator(90, 90, 0);
+const FString UMiscLibrary::lnBreak = "\n";
 
 float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
 	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;
