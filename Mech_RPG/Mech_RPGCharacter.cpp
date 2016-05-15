@@ -16,7 +16,7 @@
 #include "Abilities/Ability.h"
 #include "Abilities/ChannelledAbility.h"
 #include "Interactable.h"
-#include "Quest.h"
+#include "Quests/Quest.h"
 #include "Mech_RPGPlayerController.h"
 #include "Math/UnrealMathUtility.h"
 #include "Map.h"

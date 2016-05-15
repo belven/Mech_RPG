@@ -19,7 +19,7 @@ public:
 
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Quests")
+	UFUNCTION(BlueprintNativeEvent, Category = "Interactable")
 		void Interact(class AMech_RPGCharacter* character);
 
 	virtual void Interact_Implementation(class AMech_RPGCharacter* character) {

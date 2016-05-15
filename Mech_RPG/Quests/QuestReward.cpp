@@ -2,28 +2,16 @@
 
 #include "Mech_RPG.h"
 #include "QuestReward.h"
-#include "Item.h"
+#include "Quest.h"
 #include "Mech_RPGCharacter.h"
 
 void UQuestReward::GiveReward(AMech_RPGCharacter* questOwner) {
-
+	if (questToGive != nullptr) {
+		questOwner->AddQuest(questToGive);
+	}
 }
-
 
 UQuestReward* UQuestReward::CreateQuestReward() {
 	UQuestReward* tempQuestReward = NewObject<UQuestReward>(UQuestReward::StaticClass());
 	return tempQuestReward;
 }
-
-
-TArray<AItem*> UQuestReward::GetRewards() {
-	return rewards;
-}
-
-
-void UQuestReward::SetRewards(TArray<AItem*> newVal) {
-	rewards = newVal;
-}
-
-
-

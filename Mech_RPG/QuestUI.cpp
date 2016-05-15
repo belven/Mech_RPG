@@ -2,8 +2,8 @@
 
 #include "Mech_RPG.h"
 #include "QuestUI.h"
-#include "Quest.h"
-#include "QuestObjective.h"
+#include "Quests/Quest.h"
+#include "Quests/QuestObjective.h"
 
 
 UQuest* UQuestUI::GetQuest()

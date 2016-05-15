@@ -6,29 +6,40 @@
 #include "QuestReward.generated.h"
 
 class AMech_RPGCharacter;
-class AItem;
 
 UCLASS()
 class MECH_RPG_API UQuestReward : public UObject
 {
 	GENERATED_BODY()
 private:
-	TArray<AItem*> rewards;
+	UQuest* questToGive;
+	UQuest* owningQuest;
 
 public:
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
-		void GiveReward(AMech_RPGCharacter* questOwner);
+		virtual	void GiveReward(AMech_RPGCharacter* questOwner);
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
 		static UQuestReward* CreateQuestReward();
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
-		TArray<AItem*> GetRewards();
+		UQuest* GetQuestToGive() {
+		return questToGive;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
-		void SetRewards(TArray<AItem*> newVal);
-	
-	
-	
+		void SetQuestToGive(UQuest* val) {
+		questToGive = val;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		UQuest* GetOwningQuest() {
+		return owningQuest;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		void SetOwningQuest(UQuest* val) {
+		owningQuest = val;
+	}
 };
