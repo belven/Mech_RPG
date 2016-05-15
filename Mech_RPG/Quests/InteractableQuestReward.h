@@ -12,6 +12,8 @@ class MECH_RPG_API UInteractableQuestReward : public UQuestReward
 	GENERATED_BODY()
 
 private:
+
+	UPROPERTY()
 	AInteractable* interactable;
 public:
 

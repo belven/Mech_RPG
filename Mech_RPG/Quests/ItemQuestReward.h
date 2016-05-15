@@ -13,8 +13,9 @@ class MECH_RPG_API UItemQuestReward : public UQuestReward
 {
 	GENERATED_BODY()
 private:
-
-	TArray<AItem*> rewards;
+	
+	UPROPERTY()
+		TArray<AItem*> rewards;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Quest")

@@ -127,7 +127,7 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 		}
 	}
 
-	//Controller = NewController;
+	Controller = NewController;
 }
 
 void AMech_RPGCharacter::Tick(float DeltaTime) {
@@ -323,6 +323,7 @@ void AMech_RPGCharacter::AddQuest(UQuest * newQuest)
 	}
 
 	quests.Add(newQuest);
+	newQuest->SetOwner(this);
 	OnQuestAdded.Broadcast(newQuest);
 }
 

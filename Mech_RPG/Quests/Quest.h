@@ -20,10 +20,14 @@ private:
 	/** quest name */
 	FString questName;
 
-	TArray<UQuestReward*> rewards;
-	TArray<UQuestObjective*> objectives;
-	AMech_RPGCharacter* owner;
+	UPROPERTY()
+		TArray<UQuestReward*> rewards;
 
+	UPROPERTY()
+		TArray<UQuestObjective*> objectives;
+
+	UPROPERTY()
+		AMech_RPGCharacter* owner;
 public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
@@ -48,7 +52,7 @@ public:
 		void SetObjectives(TArray<UQuestObjective*> newVal);
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
-		static UQuest* CreateQuest(AMech_RPGCharacter* character, TArray<UQuestObjective*> objectives, TArray<UQuestReward*> rewards, FString qName = "Default Quest");
+		static UQuest* CreateQuest(AMech_RPGCharacter* character, TArray<UQuestObjective*> inObjectives, TArray<UQuestReward*> inRewards, FString qName = "Default Quest");
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
 		void ObjectiveUpdated(UQuestObjective* objective);
@@ -75,5 +79,5 @@ public:
 		UQuestObjective* GetFirstObjective();
 
 	UFUNCTION(BlueprintCallable, Category = Quest)
-		void AbandonQuest();	
+		void AbandonQuest();
 };

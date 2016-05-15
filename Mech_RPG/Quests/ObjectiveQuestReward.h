@@ -12,6 +12,8 @@ class MECH_RPG_API UObjectiveQuestReward : public UQuestReward
 	GENERATED_BODY()
 
 private:
+
+	UPROPERTY()
 	UQuestObjective* objective;
 
 public:

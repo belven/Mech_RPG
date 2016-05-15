@@ -60,7 +60,7 @@ void AMech_RPGPlayerController::BeginPlay() {
 		questList = CreateWidget<UQuestDisplayUI>(this, questListTemplate);
 		questList->AddToViewport();
 		questList->SetVisibility(ESlateVisibility::Visible);
-		questList->SetPositionInViewport(FVector2D(900, 100));
+		questList->SetPositionInViewport(FVector2D(1200, 100));
 	}
 }
 

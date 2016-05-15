@@ -7,19 +7,19 @@
 #include "Mech_RPGCharacter.h"
 
 /* Creates a new quest with the given parameters, the last two are optional */
-UQuest* UQuest::CreateQuest(AMech_RPGCharacter* character, TArray<UQuestObjective*> objectives, TArray<UQuestReward*> rewards, FString qName) {
+UQuest* UQuest::CreateQuest(AMech_RPGCharacter* character, TArray<UQuestObjective*> inObjectives, TArray<UQuestReward*> inRewards, FString qName) {
 	UQuest* tempQuest = NewObject<UQuest>(UQuest::StaticClass());
 	tempQuest->SetOwner(character);
-	tempQuest->SetObjectives(objectives);
-	tempQuest->SetRewards(rewards);
+	tempQuest->SetObjectives(inObjectives);
+	tempQuest->SetRewards(inRewards);
 	tempQuest->SetQuestName(qName);
-	character->AddQuest(tempQuest);
+	//character->AddQuest(tempQuest);
 
-	for (UQuestObjective* objective : objectives) {
+	for (UQuestObjective* objective : inObjectives) {
 		objective->SetUpListeners(tempQuest);
 	}
 
-	for (UQuestReward* reward : rewards) {
+	for (UQuestReward* reward : inRewards) {
 		reward->SetOwningQuest(tempQuest);
 	}
 
