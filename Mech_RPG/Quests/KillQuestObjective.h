@@ -11,9 +11,12 @@ class MECH_RPG_API UKillQuestObjective : public UQuestObjective
 	GENERATED_BODY()
 
 private:
-	int killCount = 0;
-	int kills = 0;
-	TSubclassOf<AMech_RPGCharacter> killClass;
+	UPROPERTY()
+		int killCount = 0;
+	UPROPERTY()
+		int kills = 0;
+	UPROPERTY()
+		TSubclassOf<AMech_RPGCharacter> killClass;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Kill Quest Objective")

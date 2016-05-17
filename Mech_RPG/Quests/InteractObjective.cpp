@@ -8,6 +8,7 @@
 
 void UInteractObjective::SetUpListeners(UQuest* inQuest)
 {
+	Super::SetUpListeners(inQuest);
 	quest->GetOwner()->GetGroup()->OnInteractEvent.AddDynamic(this, &UInteractObjective::PlayerInteraction);
 }
 
@@ -18,10 +19,10 @@ bool UInteractObjective::IsComplete()
 
 FString UInteractObjective::GetObjectiveText()
 {
-	return "";
+	return IsComplete() ? "Task Complete" : "Activate " + interactable->GetName();
 }
 
-void UInteractObjective::PlayerInteraction(AInteractable * inInteractable)
+void UInteractObjective::PlayerInteraction(AInteractable* inInteractable)
 {
 	if (inInteractable == interactable) {
 		complete = true;
@@ -29,9 +30,10 @@ void UInteractObjective::PlayerInteraction(AInteractable * inInteractable)
 	}
 }
 
-UInteractObjective* UInteractObjective::CreateInterractObjective(AInteractable* inInteractable)
+UInteractObjective* UInteractObjective::CreateInterractObjective(FString name, AInteractable* inInteractable)
 {
 	UInteractObjective* Objective = NewObject<UInteractObjective>(UInteractObjective::StaticClass());
 	Objective->interactable = inInteractable;
+	Objective->SetObjectiveName(name);
 	return Objective;
 }

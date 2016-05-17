@@ -12,8 +12,11 @@ class MECH_RPG_API UQuestReward : public UObject
 {
 	GENERATED_BODY()
 private:
-	UQuest* questToGive;
-	UQuest* owningQuest;
+	UPROPERTY()
+		UQuest* questToGive;
+
+	UPROPERTY()
+		UQuest* owningQuest;
 
 public:
 

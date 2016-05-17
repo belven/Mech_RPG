@@ -11,11 +11,11 @@ UCLASS()
 class MECH_RPG_API UItemObjective : public UQuestObjective
 {
 	GENERATED_BODY()
-	
+
 private:
-	AItem* item;
-	bool complete = false;
-	
+	UPROPERTY()
+		AItem* item;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Interactive Quest Objective")
 		virtual void SetUpListeners(UQuest* inQuest) override;
@@ -30,5 +30,5 @@ public:
 		void PlayerItemPickup(AItem* inItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Interactive Quest Objective")
-		static UItemObjective* CreateItemObjective(AItem* inItem);
+		static UItemObjective* CreateItemObjective(FString name, AItem* inItem);
 };

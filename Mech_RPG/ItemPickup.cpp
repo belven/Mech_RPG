@@ -3,6 +3,7 @@
 #include "Mech_RPG.h"
 #include "MechPart.h"
 #include "ItemPickup.h"
+#include "Mech_RPGCharacter.h"
 
 AItemPickup::AItemPickup() : Super()
 {

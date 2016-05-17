@@ -18,7 +18,8 @@ class MECH_RPG_API UQuest : public UObject
 private:
 
 	/** quest name */
-	FString questName;
+	UPROPERTY()
+		FString questName;
 
 	UPROPERTY()
 		TArray<UQuestReward*> rewards;

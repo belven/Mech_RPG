@@ -22,7 +22,7 @@ protected:
 		UQuest* quest = nullptr;
 
 	UPROPERTY()
-		bool complete = false;
+		bool itemsCollected = false;
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FObjectiveCompleted OnObjectiveCompleted;

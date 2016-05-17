@@ -14,7 +14,7 @@ class MECH_RPG_API UObjectiveQuestReward : public UQuestReward
 private:
 
 	UPROPERTY()
-	UQuestObjective* objective;
+		UQuestObjective* objective;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Quest")

@@ -509,11 +509,15 @@ void AMech_RPGCharacter::ResetInvunrelbility()
 AItem* AMech_RPGCharacter::AddItem(AItem* itemToAdd)
 {
 	AItem* item = GetInventory()->AddItem(itemToAdd);
+	itemToAdd->SetOwner(this);
 
+	if (GetGroup() != nullptr) {
+		GetGroup()->ItemPickup(itemToAdd);
+	}
+	
 	if (OnItemPickUpEvent.IsBound()) {
 		OnItemPickUpEvent.Broadcast(itemToAdd);
 	}
-
 	return item;
 }
 
@@ -547,11 +551,6 @@ void AMech_RPGCharacter::Interact(AInteractable * interactable)
 
 void AMech_RPGCharacter::ItemPickup(AItem* item)
 {
-	if (OnItemPickUpEvent.IsBound()) {
-		OnItemPickUpEvent.Broadcast(item);
-	}
-	item->SetOwner(this);
-	GetGroup()->ItemPickup(item);
 }
 
 void AMech_RPGCharacter::NotifyActorBeginCursorOver()
