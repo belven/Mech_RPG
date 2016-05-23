@@ -14,12 +14,10 @@ class MECH_RPG_API AItemPickup : public AInteractable
 {
 	GENERATED_BODY()
 private:
-
-
+	UPROPERTY(EditAnywhere, Category = "PickUp")
+		AItem* item;
 public:
 	AItemPickup();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PickUp")
-		AItem* item;
 	
 	virtual void Interact_Implementation(class AMech_RPGCharacter* character);
 

@@ -12,7 +12,7 @@ AItemPickup::AItemPickup() : Super()
 		mesh = sniper.Object;
 		GetStaticMeshComponent()->SetStaticMesh(mesh);
 	}
-	GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GetStaticMeshComponent()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
 	SetMobility(EComponentMobility::Movable);
 }

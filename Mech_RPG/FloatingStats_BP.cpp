@@ -28,7 +28,7 @@ float UFloatingStats_BP::GetCastBarPercent()
 
 FLinearColor UFloatingStats_BP::GetHealthBarFillColorAndOpacity()
 {
-	if (owner != nullptr && owner->team == TeamEnums::Paladins) {
+	if (owner != nullptr && owner->GetTeam() == TeamEnums::Paladins) {
 		return FLinearColor(0, 0.79, 0.067); //Green
 	}
 	else {

@@ -61,7 +61,6 @@ void UInventoryUI::EquipItems()
 		AItem* item = itemUI->GetItem();
 		if (item != nullptr && item->GetClass()->IsChildOf(AWeapon::StaticClass())) {
 			GetOwner()->SetCurrentWeapon(Cast<AWeapon>(item));
-			GetOwner()->AddWeapon(Cast<AWeapon>(item));
 		}
 		/*else if (item->GetClass()->IsChildOf(UArmour::StaticClass())) {
 			GetOwner()->AddArmour(Cast<UArmour>(item));

@@ -48,7 +48,7 @@ void AAddSpawningMechanic::TriggerSpawn() {
 			character->SpawnDefaultController();
 			character->CreatePresetRole((GroupEnums::Role)UMiscLibrary::GetRandomEnum(GroupEnums::End));
 			character->SetGroup(GetGroup());
-			character->team = team;
+			character->SetTeam(GetTeam());
 			spawnAmount--;
 		}
 	}

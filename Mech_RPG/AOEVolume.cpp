@@ -19,7 +19,7 @@ void AAOEVolume::Tick(float DeltaTime) {
 
 				if (character != NULL 
 					&& !character->IsDead() 
-					&& character->team == affectedTeam) {
+					&& character->GetTeam() == affectedTeam) {
 					FHealthChange damage;
 					damage.healthChange = healthChange * DeltaTime;
 					damage.damager = owner;

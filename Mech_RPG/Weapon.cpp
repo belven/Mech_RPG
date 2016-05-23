@@ -67,6 +67,7 @@ void AWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
 		if (partclSystem != nullptr) {
 			// TODO Attach to end of weapon
 			partclSystem->AttachTo(inOwner->GetRootComponent());
+			partclSystem->SetActorParameter(FName(TEXT("BeamSource")), this);
 		}
 
 		inOwner->OnStopFiring.AddUniqueDynamic(this, &AWeapon::StopFire);

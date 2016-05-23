@@ -30,25 +30,33 @@ AItem* USlotContainer::GetExistingItemWithSpace(AItem* inItem) {
 * @return the input item with the amount set to the remainder if any, i.e. if it's not 0 then the inventory was full
 */
 AItem* USlotContainer::AddItem(AItem* itemToAdd) {
-	AItem* existingItem = GetExistingItemWithSpace(itemToAdd);
-
-	// Check all existing matching items to see if they have space
-	while (itemToAdd->GetAmount() > 0 && existingItem != nullptr) {
-		int amountToAdd = itemToAdd->GetAmount();
-		existingItem->TakeFrom(itemToAdd);
-
-		// Try to find another item to add to
-		existingItem = GetExistingItemWithSpace(itemToAdd);
+	if (HasSpace() && itemToAdd->GetAmount() <= itemToAdd->GetStackSize()) {
+		items.Add(itemToAdd);
+		AItem* tempItem = itemToAdd->Copy();
+		tempItem->SetAmount(0);
+		return tempItem;
 	}
+	else {
+		AItem* existingItem = GetExistingItemWithSpace(itemToAdd);
 
-	// Keep adding new items until we're either full or added all items
-	while (itemToAdd->GetAmount() > 0 && HasSpace()) {
-		// Make a new item
-		AItem* newItem = itemToAdd->Copy();
-		newItem->SetAmount(0);
-		newItem->TakeFrom(itemToAdd);
-		// Add the new item
-		items.Add(newItem);
+		// Check all existing matching items to see if they have space
+		while (itemToAdd->GetAmount() > 0 && existingItem != nullptr) {
+			int amountToAdd = itemToAdd->GetAmount();
+			existingItem->TakeFrom(itemToAdd);
+
+			// Try to find another item to add to
+			existingItem = GetExistingItemWithSpace(itemToAdd);
+		}
+
+		// Keep adding new items until we're either full or added all items
+		while (itemToAdd->GetAmount() > 0 && HasSpace()) {
+			// Make a new item
+			AItem* newItem = itemToAdd->Copy();
+			newItem->SetAmount(0);
+			newItem->TakeFrom(itemToAdd);
+			// Add the new item
+			items.Add(newItem);
+		}
 	}
 
 	return itemToAdd;

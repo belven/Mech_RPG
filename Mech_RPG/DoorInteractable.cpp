@@ -5,7 +5,12 @@
 
 void ADoorInteractable::Interact_Implementation(class AMech_RPGCharacter* character)
 {
-	if (canBeUsed) {
-
+	if (open) {
+		Close();
+		open = false;
+	}
+	else {
+		Open();
+		open = true;
 	}
 }

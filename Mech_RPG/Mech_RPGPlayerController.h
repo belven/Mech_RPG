@@ -72,7 +72,7 @@ public:
 	AMech_RPGCharacter* GetTargetUnderCursor();
 	class AInteractable* GetInteractableUnderCursor();
 
-	FHitResult GetHitFromCursor();
+	FHitResult GetHitFromCursor(ECollisionChannel channel = ECollisionChannel::ECC_Pawn);
 
 	bool IsTargetValid(AMech_RPGCharacter* inTarget);
 

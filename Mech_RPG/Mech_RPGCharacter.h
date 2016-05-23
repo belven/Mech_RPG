@@ -135,8 +135,35 @@ private:
 	FTimerHandle TimerHandle_OutOfCombat;
 	FTimerHandle TimerHandle_Invunrelbility;
 
-	UPROPERTY()
-		TArray<AWeapon*> weapons;
+	UPROPERTY(EditAnywhere, Category = "Loadout")
+		int32 canUseAbilities;
+
+	UPROPERTY(EditAnywhere, Category = "Loadout")
+		FLoadout startingLoadout;
+
+	UPROPERTY(EditAnywhere, Category = "Loadout")
+		bool UseLoadout = false;
+
+	UPROPERTY(EditAnywhere, Category = "Role")
+		TEnumAsByte<GroupEnums::Role> startingRole;
+
+	UPROPERTY(EditAnywhere, Category = "Group")
+		TEnumAsByte<TeamEnums::Team> team;
+
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float healthChangeModifier;
+
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float defenceModifier;
+
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float maxHealth;
+
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float speed;
+
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float movementModifier;
 
 	UPROPERTY()
 		AWeapon* currentWeapon = nullptr;
@@ -167,6 +194,8 @@ private:
 
 	UPROPERTY()
 		class UFloatingStats_BP* floatingStats = nullptr;
+
+	UPROPERTY()
 	class UCharacterStats* characterStats = nullptr;
 
 	TSubclassOf<class UFloatingStats_BP> widgetClass = nullptr;
@@ -260,10 +289,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void NPCInteract(AMech_RPGCharacter * character);
-
-	UFUNCTION(BlueprintCallable, Category = "Events")
-		void ItemPickup(AItem* item);
-
+	
 	virtual void NotifyActorBeginCursorOver() override;
 
 	virtual void OutOfCombat();
@@ -316,37 +342,10 @@ public:
 
 	void SetUpGroup();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		int32 canUseAbilities;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		FLoadout startingLoadout;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-		bool UseLoadout = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
-		TEnumAsByte<GroupEnums::Role> startingRole;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Group")
-		TEnumAsByte<TeamEnums::Team> team;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		float healthChangeModifier;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		float defenceModifier;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		float maxHealth;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-		float speed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
-		float movementModifier;
-
 	virtual	void BeginPlay() override;
+
+	void SetUpWidgets();
+
 	virtual void PossessedBy(AController* NewController) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
@@ -363,7 +362,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Role")
 		FORCEINLINE TEnumAsByte<GroupEnums::Role> GetRole()
 	{
-		return startingRole;
+		return StartingRole();
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
@@ -399,21 +398,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void SetDead(bool newVal);
-
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		void AddWeapon(AWeapon* newWeapon);
-
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		FORCEINLINE	TArray<AWeapon*>& GetWeapons() {
-		return weapons;
-	}
-
-	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		void SetWeapons(TArray<AWeapon*> newVal) {
-		weapons = newVal;
-	}
-
-	void SwapWeapon();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
 		FORCEINLINE AWeapon* GetCurrentWeapon() {
@@ -566,4 +550,8 @@ public:
 	}
 	FORCEINLINE class UCharacterStats* GetCharacterStats() const { return characterStats; }
 	void SetCharacterStats(class UCharacterStats* val);
+	TEnumAsByte<TeamEnums::Team> GetTeam() const { return team; }
+	void SetTeam(TEnumAsByte<TeamEnums::Team> val) { team = val; }
+	TEnumAsByte<GroupEnums::Role> StartingRole() const { return startingRole; }
+	void StartingRole(TEnumAsByte<GroupEnums::Role> val) { startingRole = val; }
 };

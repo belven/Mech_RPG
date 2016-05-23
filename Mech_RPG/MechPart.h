@@ -14,6 +14,7 @@ private:
 public:	
 	// Sets default values for this actor's properties
 	AMechPart();
+	~AMechPart();
 
 	virtual	void SetOwner(AMech_RPGCharacter* inOwner);
 	

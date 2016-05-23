@@ -27,7 +27,7 @@ AMech_RPGCharacter* ASpawnpoint::SpawnCharacter(TSubclassOf<class AMech_RPGChara
 
 void ASpawnpoint::SetUpCharacter(AMech_RPGCharacter* character, UGroup* group, GroupEnums::Role role) {
 	FVector loc;
-	character->team = team;
+	character->SetTeam(team);
 	loc = character->GetActorLocation();
 	loc.Z += (character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 	character->SetActorLocation(loc);

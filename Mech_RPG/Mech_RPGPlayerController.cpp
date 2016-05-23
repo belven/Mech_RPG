@@ -6,6 +6,7 @@
 #include "Mech_RPGCharacter.h"
 #include "QuestDisplayUI.h"
 #include "Interactable.h"
+#include "ItemUI.h"
 #include "Weapons.h"
 
 #define mCanSee(location) UMiscLibrary::CanSee(GetOwner()->GetWorld(), GetOwner()->GetActorLocation(), location)
@@ -111,12 +112,6 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 			}
 			else {
 				CurrentMouseCursor = EMouseCursor::Hand;
-			}
-
-			// Check if we want to swap weapons
-			if (swapWeapons) {
-				GetOwner()->SwapWeapon();
-				swapWeapons = false;
 			}
 
 			// Are we trying to interact with an Interactable
@@ -583,9 +578,9 @@ void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 	}
 }
 
-FHitResult AMech_RPGPlayerController::GetHitFromCursor() {
+FHitResult AMech_RPGPlayerController::GetHitFromCursor(ECollisionChannel channel) {
 	static FHitResult Hit;
-	GetHitResultUnderCursor(ECollisionChannel::ECC_Pawn, true, Hit);
+	GetHitResultUnderCursor(channel, true, Hit);
 	return Hit;
 }
 
@@ -601,6 +596,12 @@ void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
 	owner->OnQuestAdded.AddUniqueDynamic(this, &AMech_RPGPlayerController::AddQuest);
 	owner->OnItemPickUpEvent.AddUniqueDynamic(this, &AMech_RPGPlayerController::PlayerItemPickup);
 	inventory->GenerateInventory();
+
+	for (UItemUI* item : inventory->GetSelectedItems()) {
+		item->DeselectItem();
+	}
+	inventory->GetSelectedItems().Empty();
+
 }
 
 void AMech_RPGPlayerController::CharacterFive() {
