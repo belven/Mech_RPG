@@ -123,6 +123,9 @@ private:
 	bool inCombat;
 	bool channeling;
 	bool isDead;
+	bool isPlayer;
+	bool isAlly;
+
 	static bool settingUpGroups;
 
 	int32 id;
@@ -181,7 +184,7 @@ private:
 		TArray<UAbility*> abilities;
 
 	UPROPERTY()
-		TArray<UArmour*> armour;
+		TArray<AArmour*> armour;
 
 	UPROPERTY()
 		TArray<UQuest*> quests;
@@ -349,12 +352,12 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		FORCEINLINE	TArray<UArmour*>& GetArmour() {
+		FORCEINLINE	TArray<AArmour*>& GetArmour() {
 		return armour;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		UArmour* GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
+		AArmour* GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
 
 	UFUNCTION(BlueprintCallable, Category = "CrowdControl")
 		void ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool positive);

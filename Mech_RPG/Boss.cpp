@@ -45,7 +45,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Light);
+		armourValue = AArmour::GetDeafultValue(ArmourGrades::Light);
 		break;
 	case GroupEnums::Tank:
 		params.healthChange = 1200;
@@ -58,7 +58,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
+		armourValue = AArmour::GetDeafultValue(ArmourGrades::Heavy);
 		break;
 	case GroupEnums::Sniper:
 		params.healthChange = 800;
@@ -73,7 +73,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Heavy);
+		armourValue = AArmour::GetDeafultValue(ArmourGrades::Heavy);
 		break;
 	case GroupEnums::Healer:
 		SetCurrentWeapon(AWeapon::CreatePresetWeapon(GetWorld(), this, WeaponEnums::Bio_Repair));
@@ -82,7 +82,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1.5 + statModifier);
 		SetMaxHealth(3000 * (1 + statModifier));
-		armourValue = UArmour::GetDeafultValue(ArmourGrades::Medium);
+		armourValue = AArmour::GetDeafultValue(ArmourGrades::Medium);
 		break;
 	default:
 		CreatePresetRole(GroupEnums::DPS);
@@ -91,6 +91,8 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 	SetHealth(GetMaxHealth());
 
 	for (int i = 0; i < ArmourEnums::End; i++) {
-		GetArmour().Add(UArmour::CreateArmour(armourValue, armourValue, armourValue, (ArmourEnums::ArmourPosition)i));
+		AArmour* newArmour = AArmour::CreateArmour(GetWorld(), "Test", armourValue, armourValue, armourValue, (ArmourEnums::ArmourPosition)i, this, grade, quaility);
+		GetArmour().Add(newArmour);
+		AddItem(newArmour);
 	}
 }

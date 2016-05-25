@@ -2,8 +2,9 @@
 
 #include "Mech_RPG.h"
 #include "Armour.h"
+#include "Mech_RPGCharacter.h"
 
-float UArmour::GetResistance(DamageEnums::DamageType damageType) {
+float AArmour::GetResistance(DamageEnums::DamageType damageType) {
 	switch (damageType) {
 	case DamageEnums::Physical:
 		return physicalResistance;
@@ -15,7 +16,7 @@ float UArmour::GetResistance(DamageEnums::DamageType damageType) {
 	return 0;
 }
 
-FString UArmour::GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
+FString AArmour::GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
 	switch (pos) {
 	case ArmourEnums::Chest:
 		return "Chest";
@@ -31,8 +32,8 @@ FString UArmour::GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
 	return "Not Found";
 }
 
-float UArmour::GetDeafultValue(ArmourGrades::ArmourGrade grade) {
-	switch (grade) {
+float AArmour::GetDeafultValue(ArmourGrades::ArmourGrade armourGrade) {
+	switch (armourGrade) {
 	case ArmourGrades::Light:
 		return 4.0F;
 	case ArmourGrades::MediumLight:
@@ -48,34 +49,62 @@ float UArmour::GetDeafultValue(ArmourGrades::ArmourGrade grade) {
 	}
 }
 
-float UArmour::GetPhysicalResistance() {
+AItem* AArmour::Copy()
+{
+	AArmour* armour = CreateArmour(GetWorld(), GetName(), physicalResistance, 
+		blastResistance, energyResistance, armourPosition, GetOwner(), GetGrade(), GetQuality());
+	armour->CloneItemSettings(this);
+	return armour;
+}
+
+float AArmour::GetPhysicalResistance() {
 	return physicalResistance;
 }
 
-float UArmour::GetBlastResistance() {
+float AArmour::GetBlastResistance() {
 	return blastResistance;
 }
 
-float UArmour::GetEnergyResistance() {
+float AArmour::GetEnergyResistance() {
 	return energyResistance;
 }
 
-TEnumAsByte<ArmourEnums::ArmourPosition> UArmour::GetArmourPosition() {
+TEnumAsByte<ArmourEnums::ArmourPosition> AArmour::GetArmourPosition() {
 	return armourPosition;
 }
 
-UArmour* UArmour::CreateArmour(float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition, int32 grade, int32 quality) {
-	UArmour* tempArmour = NewObject<UArmour>(StaticClass());
+AArmour* AArmour::CreateArmour(UWorld* world,
+	FString armourName,
+	float inPhysicalResistance,
+	float inBlastResistance,
+	float inEnergyResistance,
+	ArmourEnums::ArmourPosition inArmourPosition,
+	AMech_RPGCharacter* armourOwner,
+	int32 armourGrade,
+	int32 armourQuality)
+{
+	FActorSpawnParameters params;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AArmour* tempArmour = world->SpawnActor<AArmour>(StaticClass(), params);
 	tempArmour->armourPosition = inArmourPosition;
 	tempArmour->physicalResistance = inPhysicalResistance;
 	tempArmour->blastResistance = inBlastResistance;
 	tempArmour->energyResistance = inEnergyResistance;
-	//tempArmour->SetGrade(grade);
-	//tempArmour->SetQuality(grade);
+	tempArmour->SetGrade(armourGrade);
+	tempArmour->SetQuality(armourQuality);
+	tempArmour->SetOwner(armourOwner);
+	tempArmour->SetName(armourName);
 	return tempArmour;
 }
 
-UArmour* UArmour::CreateArmour(float inResistance, ArmourEnums::ArmourPosition inArmourPosition, int32 grade, int32 quality)
+AArmour* AArmour::CreateArmour(UWorld* world,
+	FString armourName,
+	float inResistance,
+	ArmourEnums::ArmourPosition inArmourPosition,
+	AMech_RPGCharacter* armourOwner,
+	int32 armourGrade,
+	int32 armourQuality)
 {
-	return CreateArmour(inResistance, inResistance, inResistance, inArmourPosition, grade, quality);
+	return CreateArmour(world, armourName, inResistance, inResistance, inResistance, inArmourPosition, armourOwner, armourGrade, armourQuality);
 }

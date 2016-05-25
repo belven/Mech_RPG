@@ -35,10 +35,11 @@ namespace DamageEnums {
 #pragma once
 
 #include "Object.h"
+#include "Item.h"
 #include "Armour.generated.h"
 
 UCLASS(BlueprintType)
-class MECH_RPG_API UArmour : public UObject {
+class MECH_RPG_API AArmour : public AItem {
 	GENERATED_BODY()
 private:
 	TEnumAsByte<ArmourEnums::ArmourPosition> armourPosition;
@@ -68,9 +69,13 @@ public:
 		float GetResistance(DamageEnums::DamageType damageType);
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		static float GetDeafultValue(ArmourGrades::ArmourGrade grade);
+		static float GetDeafultValue(ArmourGrades::ArmourGrade armourGrade);
 
-	static UArmour* CreateArmour(float inResistance, ArmourEnums::ArmourPosition inArmourPosition, int32 grade = 1, int32 quality = 1);
+	virtual AItem* Copy() override;
 
-	static UArmour* CreateArmour(float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition, int32 grade = 1, int32 quality = 1);
+	static AArmour* CreateArmour(UWorld* world,
+		FString armourName, float inResistance, ArmourEnums::ArmourPosition inArmourPosition, AMech_RPGCharacter* armourOwner = nullptr, int32 armourGrade = 1, int32 armourQuality = 1);
+
+	static AArmour* CreateArmour(UWorld* world,
+		FString armourName, float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition, AMech_RPGCharacter* armourOwner = nullptr, int32 armourGrade = 1, int32 armourQuality = 1);
 };
