@@ -17,7 +17,7 @@ AMechPart::AMechPart() : Super()
 	meshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MechAttachment_MeshComponent"));
 	//meshComponent->Owner = this;
 	SetRootComponent(meshComponent);
-	meshComponent->SetHiddenInGame(true);
+	SetActorHiddenInGame(true);
 }
 
 AMechPart::~AMechPart()
@@ -35,11 +35,8 @@ void AMechPart::SetOwner(AMech_RPGCharacter* inOwner)
 
 	if (mesh != nullptr) {
 		meshComponent->SetStaticMesh(mesh);
-		//meshComponent->SetMobility(EComponentMobility::Movable);
+		meshComponent->SetMobility(EComponentMobility::Movable);
 		meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		if (inOwner != nullptr && inOwner->GetMesh() != nullptr) {
-			AttachRootComponentTo(inOwner->GetMesh(), "RightHand");
-		}
 	}
 }
 
@@ -57,13 +54,5 @@ void AMechPart::SetActorHiddenInGame(bool bNewHidden)
 	GetRootComponent()->SetHiddenInGame(bNewHidden, true);
 	meshComponent->SetHiddenInGame(bNewHidden, true);
 	meshComponent->SetVisibility(!bNewHidden, true);
-
-	if (!bNewHidden && GetOwner() != nullptr && GetOwner()->GetMesh() != nullptr) {
-		AttachRootComponentTo(GetOwner()->GetMesh(), "RightHand");
-	}
-	else if (GetOwner() != nullptr && GetOwner()->GetMesh() != nullptr)
-	{
-		meshComponent->DetachFromParent();
-	}
 }
 

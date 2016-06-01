@@ -70,6 +70,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		static float GetDeafultValue(ArmourGrades::ArmourGrade armourGrade);
+	
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		virtual FString GetTooltipText() override;
 
 	virtual AItem* Copy() override;
 

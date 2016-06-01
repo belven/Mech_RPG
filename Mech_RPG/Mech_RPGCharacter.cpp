@@ -733,23 +733,22 @@ void AMech_RPGCharacter::SetDead(bool newVal) {
 
 void AMech_RPGCharacter::SetCurrentWeapon(AWeapon* newVal) {
 	if (newVal != nullptr && currentWeapon != newVal) {
-		if (GetCurrentWeapon() != nullptr) {
-			GetCurrentWeapon()->SetActorHiddenInGame(true);
-		}
-
-		newVal->SetOwner(this);
-
 		if (!GetInventory()->GetItems().Contains(newVal)) {
 			AddItem(newVal);
+		}
+
+		if (GetCurrentWeapon() != nullptr) {
+			GetCurrentWeapon()->Unequip();
 		}
 
 		if (OnSwappedWeapons.IsBound()) {
 			OnSwappedWeapons.Broadcast(currentWeapon, newVal);
 		}
+
+		newVal->Equip();
 	}
 
 	currentWeapon = newVal;
-	if (currentWeapon != nullptr) currentWeapon->SetActorHiddenInGame(false);
 }
 
 void AMech_RPGCharacter::SetGroup(UGroup* newVal) {

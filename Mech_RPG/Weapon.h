@@ -17,7 +17,7 @@ namespace WeaponEnums {
 
 #pragma once
 
-#include "MechPart.h"
+#include "Equipable.h"
 #include "Armour.h"
 #include "MiscLibrary.h"
 #include "Weapon.generated.h"
@@ -48,7 +48,7 @@ public:
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFired);
 
 UCLASS(Blueprintable)
-class MECH_RPG_API AWeapon : public AMechPart {
+class MECH_RPG_API AWeapon : public AEquipable {
 	GENERATED_BODY()
 protected:
 	FWeaponParams settings;
@@ -63,8 +63,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		virtual AItem* Copy();
-
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Particles)
 		UParticleSystemComponent* partclSystem;
 

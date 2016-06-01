@@ -49,6 +49,16 @@ float AArmour::GetDeafultValue(ArmourGrades::ArmourGrade armourGrade) {
 	}
 }
 
+FString AArmour::GetTooltipText()
+{
+	FString output = GetName() + UMiscLibrary::lnBreak;
+	output += FindObject<UEnum>(ANY_PACKAGE, TEXT("ArmourEnums"), true)->GetDisplayNameText(GetArmourPosition()).ToString() + UMiscLibrary::lnBreak;
+	output += "Physical Resistance: " + FString::SanitizeFloat(GetPhysicalResistance()) + UMiscLibrary::lnBreak;
+	output += "Blast Resistance: " + FString::SanitizeFloat(GetBlastResistance()) + UMiscLibrary::lnBreak;
+	output += "Energy Resistance: " + FString::SanitizeFloat(GetEnergyResistance());
+	return output;
+}
+
 AItem* AArmour::Copy()
 {
 	AArmour* armour = CreateArmour(GetWorld(), GetName(), physicalResistance, 
