@@ -41,22 +41,21 @@ void  AAOEHealthChange::Activate() {
 	if (currentLifetime <= settings.duration) {
 		currentLifetime += settings.rate;
 
-		FHealthChange healthChange;
 		FVector locationToUse = settings.usesTarget && settings.target != NULL ? settings.target->GetActorLocation() : settings.location;
 		DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, UMiscLibrary::GetRelativeColour(settings.owner), false, settings.rate, 0);
 
-	/*	if (!partclSystem->IsActive()) {
-			partclSystem->SetVectorParameter(FName(TEXT("Size")), FVector(settings.radius * 2));
-			partclSystem->Activate(true);
-		}*/
-
-		healthChange.damager = settings.owner;
+		/*	if (!partclSystem->IsActive()) {
+				partclSystem->SetVectorParameter(FName(TEXT("Size")), FVector(settings.radius * 2));
+				partclSystem->Activate(true);
+			}*/
 
 		for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(settings.radius, locationToUse)) {
 			bool canAffect = settings.affectedTeam == AOEEnums::Ally ? character->CompareGroup(settings.owner) : !character->CompareGroup(settings.owner);
 
 			if (canAffect) {
 				float tempDamage = settings.healthChange > 2 ? settings.healthChange : character->GetMaxHealth() * settings.healthChange;
+				FHealthChange healthChange;
+				healthChange.damager = settings.owner;
 				healthChange.healthChange = tempDamage;
 				healthChange.target = character;
 				healthChange.damageType = settings.damageType;

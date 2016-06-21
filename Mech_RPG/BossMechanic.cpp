@@ -30,7 +30,7 @@ void ABossMechanic::SetBoss(ABoss* newVal) {
 
 void ABossMechanic::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility)
 {
-	AMech_RPGCharacter::CreatePresetRole(inRole);
+	AMech_RPGCharacter::CreatePresetRole(inRole, grade, quaility);
 
 	SetMaxHealth(GetMaxHealth() * 1.7);
 	SetHealth(GetMaxHealth());

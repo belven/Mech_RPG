@@ -15,12 +15,20 @@ ASpawnpoint::ASpawnpoint() {
 AMech_RPGCharacter* ASpawnpoint::SpawnCharacter(TSubclassOf<class AMech_RPGCharacter> spawnClass, int spawnRadius) {
 	FNavLocation nav;
 	AMech_RPGCharacter* character = nullptr;
-	int count = 0;	
-	
-	while (character == nullptr && count < 10) {
-		GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), spawnRadius, nav);
-		character = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(GetWorld(), nav.Location, GetActorRotation(), spawnClass);
-		count++;
+	int count = 0;
+
+	while (count < 10
+		&& (character == nullptr || !UMiscLibrary::CanSee(GetWorld(), GetActorLocation(), character->GetActorLocation()))) {
+		if (character != nullptr) {
+			GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), spawnRadius, nav);
+			character->SetActorLocation(nav.Location);
+			count++;
+		}
+		else {
+			GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(GetActorLocation(), spawnRadius, nav);
+			character = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(GetWorld(), nav.Location, GetActorRotation(), spawnClass);
+			count++;
+		}
 	}
 	return character;
 }
@@ -42,7 +50,7 @@ void ASpawnpoint::BeginPlay() {
 
 	for (int i = 0; i < spawnAmount; i++) {
 		if (GetWorld() != nullptr) {
-			AMech_RPGCharacter* character = SpawnCharacter(classToSpawn, 400); 
+			AMech_RPGCharacter* character = SpawnCharacter(classToSpawn, 400);
 			GroupEnums::Role role = UGroup::GetRandomRole();
 
 			if (character != nullptr) {

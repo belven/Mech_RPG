@@ -21,11 +21,6 @@
 #include "Math/UnrealMathUtility.h"
 #include "Map.h"
 
-#define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)
-#define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
-#define mCreateChannelledAbility(ability, Duration, loc, trace) UChannelledAbility::CreateChannelledAbility(this, ability, Duration, loc, trace)
-#define mCreatePresetRole(role) AMech_RPGCharacter::CreatePresetRole(role)
-
 TArray<AMech_RPGCharacter*> AMech_RPGCharacter::characters;
 bool AMech_RPGCharacter::settingUpGroups = false;
 
@@ -89,13 +84,17 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 
 	if (newMesh.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(newMesh.Object);
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		GetMesh()->SetCollisionObjectType(mCharacterCollision);
 	}
 
 	AIControllerClass = ABaseAIController::StaticClass();
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	GetCapsuleComponent()->SetCollisionObjectType(mCharacterCollision);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(mItemCollision, ECollisionResponse::ECR_Ignore);
+	//GetCapsuleComponent()->SetCollisionResponseToChannel(mCharacterCollision, ECollisionResponse::ECR_Ignore);
 
 	characters.Add(this);
 }
@@ -625,7 +624,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, quaility));
-		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, false));
+		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, true));
 		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 200.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
@@ -664,7 +663,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 
 	case GroupEnums::Sniper:
 		SetCurrentWeapon(ALaserSniper::CreateLaserSniper(GetWorld(), this));
-		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Snipe, 2.5F, false, false));
+		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Snipe, 2.5F, false, true));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);

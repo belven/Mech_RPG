@@ -56,7 +56,7 @@ void UMiscLibrary::SetDifficulty(GameEnums::Difficulty newDifficulty)
 
 bool UMiscLibrary::CanSee(UWorld* world, FVector pointA, FVector pointB) {
 	TArray<FHitResult> results;
-	world->LineTraceMultiByObjectType(results, pointA, pointB, ECollisionChannel::ECC_WorldStatic);
+	world->LineTraceMultiByObjectType(results, pointA, pointB, mWorldCollision);
 	return results.Num() == 0;
 }
 

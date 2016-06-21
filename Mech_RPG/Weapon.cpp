@@ -214,6 +214,16 @@ AWeapon* AWeapon::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner,
 	case WeaponEnums::Sniper:
 		weapon = ASniper::CreateSniper(world, inOwner);
 		break;
+	case WeaponEnums::Sword:
+		FWeaponParams swordPrams;
+		swordPrams.fireRate = 1.25;
+		swordPrams.critChance = 70;
+		swordPrams.damageType = DamageEnums::Energy;
+		swordPrams.healthChange = 600;
+		swordPrams.range = 200;
+
+		weapon = CreateWeapon(world, inOwner, swordPrams);
+		break;
 	}
 
 	weapon->SetGrade(weaponGrade);

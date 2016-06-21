@@ -15,8 +15,8 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 	bShowMouseCursor = true;
 	bAttackTarget = false;
 	DefaultMouseCursor = EMouseCursor::Hand;
-	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-	objectCollision.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+	objectCollision.AddObjectTypesToQuery(mWorldCollision);
+	objectCollision.AddObjectTypesToQuery(mCharacterCollision);
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/CharacterUI/Character_Pane.Character_Pane_C"));
 
@@ -390,7 +390,7 @@ void AMech_RPGPlayerController::NotifyActorBeginCursorOver()
 void AMech_RPGPlayerController::MoveToMouseCursor() {
 	FHitResult Hit;
 
-	GetHitResultUnderCursor(ECollisionChannel::ECC_WorldStatic, false, Hit);
+	GetHitResultUnderCursor(mWorldCollision, false, Hit);
 
 	//if (Hit.bBlockingHit) {
 	SetNewMoveDestination(Hit.ImpactPoint);
@@ -519,7 +519,7 @@ AInteractable* AMech_RPGPlayerController::GetInteractableUnderCursor() {
 	FHitResult Hit;
 	Hit = GetHitFromCursor();
 
-	if (Hit.bBlockingHit) {
+	if (Hit.bBlockingHit || (Hit = GetHitFromCursor(mItemCollision)).bBlockingHit) {
 		AActor* targetFound = Hit.GetActor();
 
 		if (targetFound != nullptr && IsInteractable(targetFound)) {
@@ -768,7 +768,7 @@ void AMech_RPGPlayerController::AllyMove(int index) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 			static FHitResult Hit;
 
-			GetHitResultUnderCursor(ECollisionChannel::ECC_WorldStatic, false, Hit);
+			GetHitResultUnderCursor(mWorldCollision, false, Hit);
 
 			if (con != nullptr && Hit.bBlockingHit) {
 				con->SetPlayerControlledLocation(Hit.ImpactPoint);

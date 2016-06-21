@@ -2,6 +2,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "InventoryUI.h"
+#include "CollisionChannels.h"
 #include "CharacterStats.h"
 #include "Mech_RPGPlayerController.generated.h"
 
@@ -20,11 +21,11 @@ namespace PlayerControllerEnums {
 
 UENUM(BlueprintType)
 namespace TargetEnums {
-enum MouseOverTarget {
-	Character,
-	ItemPickup,
-	Interactable
-};
+	enum MouseOverTarget {
+		Character,
+		ItemPickup,
+		Interactable
+	};
 }
 
 UCLASS()
@@ -72,7 +73,7 @@ public:
 	AMech_RPGCharacter* GetTargetUnderCursor();
 	class AInteractable* GetInteractableUnderCursor();
 
-	FHitResult GetHitFromCursor(ECollisionChannel channel = ECollisionChannel::ECC_Pawn);
+	FHitResult GetHitFromCursor(ECollisionChannel channel = mCharacterCollision);
 
 	bool IsTargetValid(AMech_RPGCharacter* inTarget);
 

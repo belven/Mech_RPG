@@ -13,7 +13,7 @@ AItemPickup::AItemPickup() : Super()
 		GetStaticMeshComponent()->SetStaticMesh(mesh);
 	}
 	GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	GetStaticMeshComponent()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	GetStaticMeshComponent()->SetCollisionObjectType(mItemCollision);
 	SetMobility(EComponentMobility::Movable);
 }
 

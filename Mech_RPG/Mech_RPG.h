@@ -11,6 +11,7 @@
 
 #include "Cover.h"
 #include "MiscLibrary.h"
+#include "CollisionChannels.h"
 
 #include "Runtime/UMG/Public/UMG.h"
 #include "Runtime/UMG/Public/UMGStyle.h"
@@ -20,6 +21,7 @@
 #include "Runtime/UMG/Public/Components/WidgetComponent.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogMech_RPG, Log, All);
+
 
 
 

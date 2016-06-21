@@ -28,6 +28,11 @@ namespace EffectEnums {
 #include "FloatingStats_BP.h"
 #include "Mech_RPGCharacter.generated.h"
 
+#define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)
+#define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
+#define mCreateChannelledAbility(ability, Duration, loc, trace) UChannelledAbility::CreateChannelledAbility(this, ability, Duration, loc, trace)
+#define mCreatePresetRole(role) AMech_RPGCharacter::CreatePresetRole(role)
+
 USTRUCT(BlueprintType)
 struct FHealthChange {
 	GENERATED_USTRUCT_BODY()

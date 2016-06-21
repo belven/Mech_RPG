@@ -9,6 +9,7 @@ namespace WeaponEnums {
 		SMG,
 		Shotgun,
 		RPG,
+		Sword,
 		End
 	};
 }
