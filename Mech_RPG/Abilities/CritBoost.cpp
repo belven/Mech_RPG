@@ -1,9 +1,9 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Abilities/CritBoost.h"
-#include "Weapon.h"
+#include "Weapons/Weapon.h"
 
 bool UCritBoost::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 {

@@ -2,7 +2,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "FloatingStats_BP.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Abilities/ChannelledAbility.h"
 
 float UFloatingStats_BP::GetHealthBarPercent()

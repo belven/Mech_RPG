@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Object.h"
-#include "Boss.h"
+#include "Characters/Boss.h"
 #include "SpawnTrigger.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerSpawn);

@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "QuestDisplayUI.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 AMech_RPGCharacter* UQuestDisplayUI::GetCharacter()
 {

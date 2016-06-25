@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Abilities/TargetedHealthChange.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 bool UTargetedHealthChange::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (UMiscLibrary::IsCharacterAlive(target)) {

@@ -3,7 +3,7 @@
 #include "Mech_RPG.h"
 #include "Weapon.h"
 #include "Weapons.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 AWeapon::AWeapon() : Super() {
 	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WeaponParticle"));

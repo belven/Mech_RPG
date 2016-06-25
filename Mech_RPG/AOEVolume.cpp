@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "AOEVolume.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Components/BrushComponent.h"
 #include "Engine/Brush.h"
 

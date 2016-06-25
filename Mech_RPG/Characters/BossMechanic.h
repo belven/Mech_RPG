@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Boss.h"
 #include "BossMechanic.generated.h"
 

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Engine/TargetPoint.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Spawnpoint.generated.h"
 
 /**

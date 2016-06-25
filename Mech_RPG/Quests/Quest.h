@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Object.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Quest.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestCompleted, UQuest*, quest);

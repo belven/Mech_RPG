@@ -3,7 +3,7 @@
 #include "Mech_RPG.h"
 #include "Abilities/Ability.h"
 #include "Abilities.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 const FString UAbility::healTag = "Heal";
 const FString UAbility::damageTag = "Damage";

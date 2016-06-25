@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "ItemObjective.h"
-#include "Inventory.h"
+#include "Items/Inventory.h"
 #include "Quest.h"
 
 

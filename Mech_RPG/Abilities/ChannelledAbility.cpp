@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Abilities/ChannelledAbility.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "DrawDebugHelpers.h"
 
 UChannelledAbility::UChannelledAbility() : Super() {

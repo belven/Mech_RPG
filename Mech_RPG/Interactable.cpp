@@ -1,7 +1,7 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Interactable.h"
 
 

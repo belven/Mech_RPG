@@ -13,7 +13,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 	float blastResistance = 5;
 	float phsyicalResistance = 5;
 	float energyResistance = 5;
-	static float lowHealth = 8000;
+	static float lowHealth = 9000;
 	static float mediumHealth = lowHealth * 1.25;
 	static float highHealth = mediumHealth * 1.25;
 
@@ -38,7 +38,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		AddAbility(UDamageBoost::CreateAbility(7, this, 0.5));
 		//AddAbility(UChannelledAbility::CreateChannelledAbility(this, UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 400.0F), 2, true, true));
 		//AddAbility(UOrbitalStrike::CreateAbility(30, this, 350));
-		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UParticleBomb::CreateAbility(30.0F, this, 0.6F), 4.5F, false, true));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UParticleBomb::CreateAbility(12.0F, this, 0.7F), 2.5F, false, true));
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(lowHealth * (1 + statModifier));
@@ -59,7 +59,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		break;
 	case GroupEnums::Sniper:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Sniper, grade, quaility + 3));
-		AddAbility(USnipe::CreateAbility(7, this));
+		AddAbility(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(7, this), 2.5F, false, true));
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1 + statModifier);
 		SetMaxHealth(lowHealth * (1 + statModifier));
@@ -69,7 +69,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		break;
 	case GroupEnums::Healer:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Bio_Repair, grade, quaility + 3));
-		AddAbility(UHeal::CreateAbility(5, this, 800));
+		AddAbility(UHeal::CreateAbility(5, this, 1200));
 		AddAbility(UDisable::CreateDisable(10, this, 5));
 		SetDefenceModifier(0 + statModifier);
 		SetHealthChangeModifier(1.5 + statModifier);

@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "CharacterStats.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Mech_RPGPlayerController.h"
 
 #define mWBL UWidgetBlueprintLibrary

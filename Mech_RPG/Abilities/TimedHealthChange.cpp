@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Abilities/TimedHealthChange.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 bool UTimedHealthChange::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (target != NULL) {

@@ -20,12 +20,12 @@ namespace EffectEnums {
 #pragma once
 #include "GameFramework/Character.h"
 #include "Tag.h"
-#include "Weapon.h"
+#include "Weapons/Weapon.h"
 #include "Group.h"
 #include "Array.h"
 #include "Abilities/Ability.h"
-#include "Inventory.h"
-#include "FloatingStats_BP.h"
+#include "Items/Inventory.h"
+#include "UI/FloatingStats_BP.h"
 #include "Mech_RPGCharacter.generated.h"
 
 #define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)

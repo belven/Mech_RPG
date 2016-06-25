@@ -1,7 +1,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Abilities/Snipe.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 
 USnipe* USnipe::CreateAbility(float cooldown, AMech_RPGCharacter* owner) {

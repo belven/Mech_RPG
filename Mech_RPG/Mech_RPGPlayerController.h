@@ -1,9 +1,9 @@
 #pragma once
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
-#include "InventoryUI.h"
+#include "UI/InventoryUI.h"
 #include "CollisionChannels.h"
-#include "CharacterStats.h"
+#include "UI/CharacterStats.h"
 #include "Mech_RPGPlayerController.generated.h"
 
 class AMech_RPGCharacter;

@@ -13,7 +13,7 @@ namespace BossEnums {
 }
 
 #pragma once
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Boss.generated.h"
 
 

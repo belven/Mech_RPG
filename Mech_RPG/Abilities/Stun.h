@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Ability.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Stun.generated.h"
 
 /**

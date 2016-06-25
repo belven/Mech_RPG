@@ -3,10 +3,10 @@
 #include "Engine.h"
 #include "Mech_RPGPlayerController.h"
 #include "AllyAIController.h"
-#include "Mech_RPGCharacter.h"
-#include "QuestDisplayUI.h"
+#include "Characters/Mech_RPGCharacter.h"
+#include "UI/QuestDisplayUI.h"
 #include "Interactable.h"
-#include "ItemUI.h"
+#include "UI/ItemUI.h"
 #include "Weapons.h"
 
 #define mCanSee(location) UMiscLibrary::CanSee(GetOwner()->GetWorld(), GetOwner()->GetActorLocation(), location)

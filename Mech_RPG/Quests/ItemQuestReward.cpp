@@ -1,9 +1,9 @@
 // Copyright of Explosive Industries
 
 #include "Mech_RPG.h"
-#include "Item.h"
+#include "Items/Item.h"
 #include "ItemQuestReward.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 void UItemQuestReward::GiveReward(AMech_RPGCharacter* questOwner)
 {

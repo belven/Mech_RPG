@@ -6,9 +6,9 @@
 ///////////////////////////////////////////////////////////
 #include "Mech_RPG.h"
 #include "Item.h"
-#include "Weapon.h"
+#include "Weapons/Weapon.h"
 #include "Armour.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 int32 AItem::HighestItemLevel = 100;
 

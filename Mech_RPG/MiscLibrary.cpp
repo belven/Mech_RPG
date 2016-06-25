@@ -3,7 +3,7 @@
 #include "Mech_RPG.h"
 #include "MiscLibrary.h"
 #include "Mech_RPGPlayerController.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Group.h"
 #include "Abilities/Ability.h"
 #include "Abilities/ChannelledAbility.h"

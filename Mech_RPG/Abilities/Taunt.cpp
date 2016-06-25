@@ -2,7 +2,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Abilities/Taunt.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Mech_RPGPlayerController.h"
 #include "BaseAIController.h"
 

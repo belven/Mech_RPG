@@ -3,15 +3,15 @@
 #include "Abilities.h"
 #include "Weapons.h"
 
-#include "ItemPickup.h"
+#include "Items/ItemPickup.h"
 #include "Engine.h"
-#include "Armour.h"
+#include "Items/Armour.h"
 #include "BaseAIController.h"
 #include "AllyAIController.h"
 #include "Blueprint/UserWidget.h"
 #include "Mech_RPGPlayerController.h"
-#include "FloatingTextUI.h"
-#include "CharacterStats.h"
+#include "UI/FloatingTextUI.h"
+#include "UI/CharacterStats.h"
 #include "Group.h"
 #include "Abilities/Ability.h"
 #include "Abilities/ChannelledAbility.h"
@@ -24,10 +24,22 @@
 TArray<AMech_RPGCharacter*> AMech_RPGCharacter::characters;
 bool AMech_RPGCharacter::settingUpGroups = false;
 
-AMech_RPGCharacter::AMech_RPGCharacter() {
+
+AMech_RPGCharacter::AMech_RPGCharacter() :
+	healthChangeModifier(1),
+	inventory(NewObject<UInventory>(UInventory::StaticClass())),
+	defenceModifier(0),
+	movementModifier(1),
+	startingRole(GroupEnums::DPS),
+	health(2000),
+	maxHealth(2000),
+	channeling(false),
+	team(TeamEnums::Paladins)	
+{
 	static int32 ID = 0;
 	SetID(ID++);
 	SetActorTickEnabled(true);
+	AIControllerClass = ABaseAIController::StaticClass();
 
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -52,19 +64,9 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
-
-	StartingRole(GroupEnums::DPS);
-	healthChangeModifier = 1;
-	defenceModifier = 0;
-	movementModifier = 1.0;
-
-	SetMaxHealth(2000);
-	SetHealth(GetMaxHealth());
+	GetCharacterMovement()->bCanWalkOffLedges = false;
 
 	speed = GetCharacterMovement()->MaxWalkSpeed;
-	GetCharacterMovement()->bCanWalkOffLedges = false;
-	channeling = false;
-	SetTeam(TeamEnums::Paladins);
 
 	static ConstructorHelpers::FClassFinder<UFloatingStats_BP> statsWidget(TEXT("/Game/TopDown/Blueprints/UI/CharacterUI/FloatingStats"));
 
@@ -87,8 +89,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() {
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		GetMesh()->SetCollisionObjectType(mCharacterCollision);
 	}
-
-	AIControllerClass = ABaseAIController::StaticClass();
+	
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -148,9 +149,7 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 				GetCharacterStats()->UpdateHealthBar();
 			}
 		}
-
-		CLAMP(health, GetMaxHealth(), 0);
-
+		
 		if (stats->GetUserWidgetObject() != nullptr && stats->GetUserWidgetObject() != nullptr) {
 			if (mIsChildOf(GetController(), AMech_RPGPlayerController::StaticClass()) && GetTopDownCamera() != nullptr) {
 				UMiscLibrary::SetCameraRot(FRotator(-GetTopDownCamera()->GetComponentRotation().Pitch, UMiscLibrary::GetWidgetYaw(GetTopDownCamera()) + 90, 0));
@@ -161,6 +160,8 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 			}
 		}
 	}
+
+	CLAMP(health, GetMaxHealth(), 0);
 }
 
 void AMech_RPGCharacter::BeginPlay() {
@@ -168,11 +169,9 @@ void AMech_RPGCharacter::BeginPlay() {
 	if (IsPendingKill()) {
 		return;
 	}
-
-	inventory = NewObject<UInventory>(UInventory::StaticClass());
-
+	
 	if (!UseLoadout) {
-		CreatePresetRole(StartingRole());
+		//CreatePresetRole(StartingRole());
 	}
 	else {
 		SetupWithLoadout();
@@ -694,7 +693,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	SetHealth(GetMaxHealth());
 
 	for (int i = 0; i < ArmourEnums::End; i++) {
-		AArmour* newArmour = AArmour::CreateArmour(GetWorld(), "Test", phsyicalResistance, blastResistance, energyResistance, (ArmourEnums::ArmourPosition)i,  this, grade, quaility);
+		AArmour* newArmour = AArmour::CreateArmour(GetWorld(), "Test", phsyicalResistance, blastResistance, energyResistance, (ArmourEnums::ArmourPosition)i, this, grade, quaility);
 		GetArmour().Add(newArmour);
 		AddItem(newArmour);
 	}

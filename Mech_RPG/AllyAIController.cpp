@@ -1,7 +1,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "AllyAIController.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Group.h"
 #include "Weapons.h"
 #include "AI/Navigation/NavigationSystem.h"

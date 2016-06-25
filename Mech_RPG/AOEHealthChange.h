@@ -10,7 +10,7 @@ namespace AOEEnums {
 
 #pragma once
 #include "Engine/TargetPoint.h"
-#include "Armour.h"
+#include "Items/Armour.h"
 #include "AOEHealthChange.generated.h"
 
 class AMech_RPGCharacter;

@@ -3,7 +3,7 @@
 #include "Mech_RPG.h"
 #include "InteractObjective.h"
 #include "Interactable.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Quest.h"
 
 void UInteractObjective::SetUpListeners(UQuest* inQuest)

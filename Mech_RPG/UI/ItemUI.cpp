@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "ItemUI.h"
-#include "Item.h"
+#include "Items/Item.h"
 #include "InventoryUI.h"
 
 

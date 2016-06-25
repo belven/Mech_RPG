@@ -4,7 +4,7 @@
 #include "Quest.h"
 #include "QuestReward.h"
 #include "QuestObjective.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 /* Creates a new quest with the given parameters, the last two are optional */
 UQuest* UQuest::CreateQuest(AMech_RPGCharacter* character, TArray<UQuestObjective*> inObjectives, TArray<UQuestReward*> inRewards, FString qName) {

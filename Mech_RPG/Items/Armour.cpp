@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Armour.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 float AArmour::GetResistance(DamageEnums::DamageType damageType) {
 	switch (damageType) {

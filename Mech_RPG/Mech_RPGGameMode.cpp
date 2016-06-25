@@ -3,7 +3,7 @@
 #include "Mech_RPG.h"
 #include "Mech_RPGGameMode.h"
 #include "Mech_RPGPlayerController.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "GameFramework/HUD.h"
 
 AMech_RPGGameMode::AMech_RPGGameMode()

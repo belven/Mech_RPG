@@ -18,8 +18,8 @@ namespace WeaponEnums {
 
 #pragma once
 
-#include "Equipable.h"
-#include "Armour.h"
+#include "Items/Equipable.h"
+#include "Items/Armour.h"
 #include "MiscLibrary.h"
 #include "Weapon.generated.h"
 

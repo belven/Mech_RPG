@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Abilities/Stun.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 bool UStun::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (UMiscLibrary::IsCharacterAlive(target)) {

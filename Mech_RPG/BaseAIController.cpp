@@ -2,7 +2,7 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "BaseAIController.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Weapons.h"
 
 ABaseAIController::ABaseAIController() : Super() {

@@ -2,9 +2,9 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Group.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Mech_RPGPlayerController.h"
-#include "Item.h"
+#include "Items/Item.h"
 #include "Interactable.h"
 
 UGroup::UGroup() : Super() {

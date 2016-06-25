@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 #include "Drone.generated.h"
 
 /**

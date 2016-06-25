@@ -2,8 +2,8 @@
 
 #include "Mech_RPG.h"
 #include "BossSpawnpoint.h"
-#include "Boss.h"
-#include "DamageBoostMechanic.h"
+#include "Characters/Boss.h"
+#include "Characters/DamageBoostMechanic.h"
 
 #define loop(i, max) for(i = 0; i < max; i++)
 

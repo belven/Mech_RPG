@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Abilities/Heal.h"
-#include "Mech_RPGCharacter.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 UHeal* UHeal::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inHealAmount) {
 	UHeal* ability = NewObject<UHeal>(StaticClass());
