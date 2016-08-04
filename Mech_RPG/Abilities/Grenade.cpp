@@ -8,7 +8,7 @@ bool UGrenade::Activate(class AMech_RPGCharacter* target, FVector targetLocation
 	if (!targetLocation.IsZero()) {
 		FTempAOESettings settings;
 		settings.affectedTeam = AOEEnums::Enemy;
-		settings.healthChange = damage;
+		settings.healthChange = GetWeaponHealthChange() * damage;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 1;
@@ -37,7 +37,7 @@ UGrenade* UGrenade::CreateAbility(float cooldown, AMech_RPGCharacter* owner, flo
 FString UGrenade::GetTooltipText()
 {
 	FString lnBreak = " \n";
-	FString damageString = FString::SanitizeFloat(damage);
+	FString damageString = FString::SanitizeFloat(GetWeaponHealthChange() * damage);
 
 	return "Grenade" + lnBreak + "Damages all enemies in a " + FString::FromInt(450) + " radius, for " + damageString + " health." + lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
 }

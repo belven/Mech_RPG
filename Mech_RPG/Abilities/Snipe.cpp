@@ -7,8 +7,8 @@
 USnipe* USnipe::CreateAbility(float cooldown, AMech_RPGCharacter* owner) {
 	USnipe* ability = NewObject<USnipe>(StaticClass());
 	ability->SetCooldown(cooldown);
-	ability->changeAmount = 0.8F;
 	ability->owner = owner;
+	ability->changeAmount = 20.0F;
 	ability->affectedTeam = AOEEnums::Enemy;
 	ability->AddTag(damageTag, 0.8F);
 	return ability;
@@ -17,7 +17,6 @@ USnipe* USnipe::CreateAbility(float cooldown, AMech_RPGCharacter* owner) {
 FString USnipe::GetTooltipText()
 {
 	FString lnBreak = " \n";
-	FString damageString = FString::SanitizeFloat(changeAmount * 100);
-
+	FString damageString = FString::SanitizeFloat(GetWeaponHealthChange() * changeAmount);
 	return "Snipe" + lnBreak + "Damages target enemy for " + damageString + "% health." + lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
 }

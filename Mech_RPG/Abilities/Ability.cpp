@@ -89,9 +89,14 @@ bool UAbility::GetTagTrue(FString name)
 	return true;
 }
 
+float UAbility::GetWeaponHealthChange()
+{
+	return UMiscLibrary::IsCharacterAlive(owner) && owner->GetCurrentWeapon() != nullptr ? owner->GetCurrentWeapon()->GetDPS() : 100;
+}
+
 void UAbility::SetOnCooldown(UWorld* const World) {
 	onCooldown = true;
-	currentTime = GetCooldown() - 0.1;
+	currentTime = (GetCooldown() * owner->GetSpeedModifier()) - 0.1;
 	World->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UAbility::ResetOnCooldown, 0.1F);
 }
 
@@ -140,9 +145,9 @@ UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums:
 {
 	switch (abilityToCreate) {
 	case AbilityEnums::Heal:
-		return UHeal::CreateAbility(15.0F, owner, 500.0F);
+		return UHeal::CreateAbility(15.0F, owner, 15.0F);
 	case AbilityEnums::AoEHeal:
-		return UAoEHeal::CreateAbility(20.0F, owner, 0.1F);
+		return UAoEHeal::CreateAbility(20.0F, owner, 2.0F);
 	case AbilityEnums::Stun:
 		return UStun::CreateAbility(10.0F, owner, 4);
 	case AbilityEnums::Disable:
@@ -150,7 +155,7 @@ UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums:
 	case AbilityEnums::Taunt:
 		return UTaunt::CreateAbility(5.0F, owner);
 	case AbilityEnums::Grenade:
-		return UGrenade::CreateAbility(7.0F, owner, 800.0F);
+		return UGrenade::CreateAbility(7.0F, owner, 6.0F);
 	case AbilityEnums::CritBoost:
 		return UCritBoost::CreateCritBoost(6, owner, 55.0F);
 	case AbilityEnums::Snipe:
@@ -158,7 +163,7 @@ UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums:
 	case AbilityEnums::DefenceBoost:
 		return UDefenceBoost::CreateAbility(7.0F, owner, 0.25F);
 	case AbilityEnums::Shield:
-		return UShield::CreateShield(20, owner, 0.35F);
+		return UShield::CreateShield(20, owner, 10.0F);
 	}
 
 	return nullptr;

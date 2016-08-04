@@ -10,8 +10,8 @@ bool UTargetedHealthChange::Activate(class AMech_RPGCharacter* target, FVector t
 		float tempChangeAmount = 0.0F;
 		healthChange.heals = affectedTeam == AOEEnums::Ally;
 
-		tempChangeAmount = (changeAmount <= 2.0F) ? target->GetMaxHealth() * changeAmount : changeAmount;
-		
+		tempChangeAmount = GetWeaponHealthChange() * changeAmount;
+
 		healthChange.damager = owner;
 		healthChange.target = target;
 		healthChange.weaponUsed = nullptr;

@@ -241,25 +241,25 @@ void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
 	if (weapon != nullptr && distToTarget <= weapon->GetRange()) {
 		if (GetOwner()->CanAttack() && weapon->CanFire()) {
 
-			bool isCover = hit != nullptr ? IsCover(hit) : false;
+			//bool isCover = hit != nullptr ? IsCover(hit) : false;
 
 			// Have we hit cover
-			if (isCover) {
-				float distToCover = FVector::Dist(GetOwner()->GetActorLocation(), hit->GetActorLocation());
+			//if (isCover) {
+			//	float distToCover = FVector::Dist(GetOwner()->GetActorLocation(), hit->GetActorLocation());
 
-				// Are we too far from the cover to avoid shooting it
-				if (distToCover > 200) {
-					weapon->Fire(Cast<ACover>(hit));
-				}
-				// Otherwise we can attack the target
-				else {
-					weapon->Fire(target);
-				}
-			}
-			// Otherwise we've got a clear shot to the target
-			else {
-				weapon->Fire(target);
-			}
+			//	// Are we too far from the cover to avoid shooting it
+			//	if (distToCover > 200) {
+			//		weapon->Fire(Cast<ACover>(hit));
+			//	}
+			//	// Otherwise we can attack the target
+			//	else {
+			//		weapon->Fire(target);
+			//	}
+			//}
+			//// Otherwise we've got a clear shot to the target
+			//else {
+			weapon->Fire(target);
+			//}
 		}
 
 		owner->GetGroup()->GroupMemberHit(target, owner);

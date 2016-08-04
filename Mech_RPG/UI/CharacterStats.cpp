@@ -94,7 +94,7 @@ FString UCharacterStats::GetMovementSpeedText()
 	FString MovementText("");
 
 	if (owner != nullptr) {
-		float movement = round(owner->GetCharacterMovement()->MaxWalkSpeed * owner->GetMovementModifier());
+		float movement = round(owner->GetCharacterMovement()->MaxWalkSpeed * owner->GetSpeedModifier());
 		MovementText += FString::FromInt(movement);
 	}
 

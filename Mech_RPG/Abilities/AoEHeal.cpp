@@ -9,7 +9,7 @@ bool UAoEHeal::Activate(class AMech_RPGCharacter* target, FVector targetLocation
 	if (!targetLocation.IsZero()) {
 		FTempAOESettings settings;
 		settings.affectedTeam = GetAffectedTeam();
-		settings.healthChange = healAmount;
+		settings.healthChange = GetWeaponHealthChange() * healAmount;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 0.5F;
@@ -40,6 +40,6 @@ UAoEHeal* UAoEHeal::CreateAbility(float cooldown, AMech_RPGCharacter* owner, flo
 FString UAoEHeal::GetTooltipText()
 {
 	FString lnBreak = " \n";
-	FString healString = FString::SanitizeFloat(healAmount < 2 ? healAmount * 100 : healAmount);
+	FString healString = FString::SanitizeFloat(GetWeaponHealthChange() * healAmount);
 	return "AoE Heal" + lnBreak + "Heals all allies in a " + FString::FromInt(700) + " radius, for " + healString + " health." + lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
 }

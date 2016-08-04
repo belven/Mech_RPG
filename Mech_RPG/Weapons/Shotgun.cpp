@@ -5,7 +5,7 @@
 #include "Characters/Mech_RPGCharacter.h"
 
 AShotgun::AShotgun() : Super() {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> Shotgun(TEXT("/Game/TopDown/Meshes/Shotgun"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Shotgun(TEXT("/Game/TopDown/Meshes/Weapons/Shotgun"));
 	if (Shotgun.Succeeded()) {
 		mesh = Shotgun.Object;
 	}

@@ -4,7 +4,7 @@
 #include "SMG.h"
 
 ASMG::ASMG() : Super() {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> smg(TEXT("/Game/TopDown/Meshes/SMG"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> smg(TEXT("/Game/TopDown/Meshes/Weapons/SMG"));
 	if (smg.Succeeded()) {
 		mesh = smg.Object;
 	}

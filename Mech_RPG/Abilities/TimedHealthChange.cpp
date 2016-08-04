@@ -21,7 +21,7 @@ void UTimedHealthChange::TimeTick() {
 
 		FHealthChange healthChange;
 		healthChange.damager = owner;
-		healthChange.healthChange = changeAmount;
+		healthChange.healthChange = GetWeaponHealthChange() * changeAmount;
 		healthChange.target = target;
 		healthChange.heals = heals;
 

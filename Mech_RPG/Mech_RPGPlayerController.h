@@ -139,8 +139,7 @@ public:
 		TSubclassOf<UUserWidget> WidgetTemplate;
 	TSubclassOf<UUserWidget> inventoryTemplate;
 	TSubclassOf<UUserWidget> questListTemplate;
-
-
+	
 	UUserWidget* characterPane;
 	UInventoryUI* inventory;
 	UQuestDisplayUI* questList;

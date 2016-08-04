@@ -24,7 +24,7 @@ void AItemPickup::Interact_Implementation(class AMech_RPGCharacter* character)
 		Destroy();
 	}
 	// No Item so remove anyway
-	else {
+	else if(item == nullptr)  {
 		SetActorHiddenInGame(true);
 		Destroy();
 	}

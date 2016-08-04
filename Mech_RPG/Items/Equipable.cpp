@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Equipable.h"
+#include "Characters/Mech_RPGCharacter.h"
 
 void AEquipable::Equip()
 {

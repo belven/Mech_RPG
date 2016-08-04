@@ -7,7 +7,7 @@
 bool UShield::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 {
 	if (target != nullptr) {
-		shieldHealth = shieldAmount >= 2 ? shieldAmount : target->GetMaxHealth() * shieldAmount;
+		shieldHealth = GetWeaponHealthChange() * shieldAmount;
 		this->target = target;
 		SetOnCooldown(owner->GetWorld());
 		target->OnPreHealthChange.AddUniqueDynamic(this, &UShield::ChangeHealth);
@@ -28,8 +28,8 @@ UShield* UShield::CreateShield(float cooldown, AMech_RPGCharacter* owner, float 
 
 FString UShield::GetTooltipText() 
 {
-	FString shieldString = FString::SanitizeFloat(shieldAmount < 2 ? shieldAmount * 100 : shieldAmount);
-	return "Shield" + UMiscLibrary::lnBreak + "Places a shield on target ally that Absorbs " + shieldString + "% of thier max health as damage" + UMiscLibrary::lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
+	FString shieldString = FString::SanitizeFloat(GetWeaponHealthChange() *  shieldAmount);
+	return "Shield" + UMiscLibrary::lnBreak + "Places a shield on target ally that Absorbs " + shieldString + "% of their max health as damage" + UMiscLibrary::lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
 }
 
 void UShield::ChangeHealth(FHealthChange healthChange) {

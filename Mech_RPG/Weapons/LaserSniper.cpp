@@ -5,7 +5,7 @@
 
 ALaserSniper::ALaserSniper()
 {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> sniper(TEXT("/Game/TopDown/Meshes/Sniper"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> sniper(TEXT("/Game/TopDown/Meshes/Weapons/Sniper"));
 	if (sniper.Succeeded()) {
 		mesh = sniper.Object;
 	}

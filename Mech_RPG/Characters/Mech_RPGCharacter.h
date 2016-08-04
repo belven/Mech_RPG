@@ -171,7 +171,7 @@ private:
 		float speed;
 
 	UPROPERTY(EditAnywhere, Category = "Speed")
-		float movementModifier;
+		float speedModifier;
 
 	UPROPERTY()
 		AWeapon* currentWeapon = nullptr;
@@ -365,7 +365,7 @@ public:
 		AArmour* GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
 
 	UFUNCTION(BlueprintCallable, Category = "CrowdControl")
-		void ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool positive);
+		void ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool remove);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
 		FORCEINLINE TEnumAsByte<GroupEnums::Role> GetRole()
@@ -541,12 +541,12 @@ public:
 		canBeDamaged = newVal;
 	}
 
-	FORCEINLINE float GetMovementModifier() {
-		return movementModifier;
+	FORCEINLINE float GetSpeedModifier() {
+		return speedModifier;
 	}
 
-	FORCEINLINE void SetMovementModifier(float newVal) {
-		movementModifier = newVal;
+	FORCEINLINE void SetSpeedModifier(float newVal) {
+		speedModifier = newVal;
 	}
 
 	FORCEINLINE float GetSpeed() {

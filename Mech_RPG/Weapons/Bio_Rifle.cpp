@@ -4,7 +4,7 @@
 #include "Bio_Rifle.h"
 
 ABio_Rifle::ABio_Rifle() : Super() {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> sniper(TEXT("/Game/TopDown/Meshes/Bio_Rifle"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> sniper(TEXT("/Game/TopDown/Meshes/Weapons/Bio_Rifle"));
 	if (sniper.Succeeded()) {
 		mesh = sniper.Object;
 	}
@@ -28,7 +28,7 @@ ABio_Rifle* ABio_Rifle::CreateBioRifle(UWorld* world, AMech_RPGCharacter* inOwne
 	if (world != nullptr) {
 		FOverheatWeaponParams overheatSettings;
 		overheatSettings.healthChange = 40;
-		overheatSettings.range = 600;
+		overheatSettings.range = 1000;
 		overheatSettings.fireRate = 0.3;
 		overheatSettings.heals = true;
 		overheatSettings.heatLosePerTick = 0.05;

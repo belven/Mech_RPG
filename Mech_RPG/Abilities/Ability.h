@@ -60,6 +60,8 @@ public:
 	virtual float GetTagValue(FString name);
 	virtual bool GetTagTrue(FString name);
 
+	float GetWeaponHealthChange();
+
 	void SetOnCooldown(UWorld* const World);
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")

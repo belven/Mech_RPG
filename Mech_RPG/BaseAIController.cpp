@@ -18,10 +18,12 @@ void ABaseAIController::Tick(float DeltaTime) {
 		if (!GetOwner()->IsDead() && !GetOwner()->Channelling()) {
 			bool abilityUsed = false;
 
-			for (UAbility* ability : GetOwner()->GetAbilities()) {
-				if (!ability->OnCooldown() && PerformAbility(ability)) {
-					abilityUsed = true;
-					break;
+			if (GetOwner()->CanCast()) {
+				for (UAbility* ability : GetOwner()->GetAbilities()) {
+					if (!ability->OnCooldown() && PerformAbility(ability)) {
+						abilityUsed = true;
+						break;
+					}
 				}
 			}
 

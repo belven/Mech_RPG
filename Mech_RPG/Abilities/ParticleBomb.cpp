@@ -9,7 +9,7 @@ bool UParticleBomb::Activate(class AMech_RPGCharacter* target, FVector targetLoc
 	if (!targetLocation.IsZero()) {
 		FTempAOESettings settings;
 		settings.affectedTeam = AOEEnums::Enemy;
-		settings.healthChange = damage;
+		settings.healthChange = GetWeaponHealthChange() *  damage;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 1;

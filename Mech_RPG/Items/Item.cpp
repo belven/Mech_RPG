@@ -123,8 +123,6 @@ AItem* AItem::Copy() {
 	return CreateItem(GetWorld(), GetOwner(), GetName(), GetAmount(), GetGrade(), GetQuality(), GetStackSize());
 }
 
-
-
 FString AItem::GetTooltipText()
 {
 	return "";

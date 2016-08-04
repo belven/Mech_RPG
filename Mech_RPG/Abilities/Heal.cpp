@@ -17,7 +17,7 @@ UHeal* UHeal::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inH
 FString UHeal::GetTooltipText()
 {
 	FString lnBreak = " \n";
-	FString healString = FString::FromInt(changeAmount);
+	FString healString = FString::FromInt(GetWeaponHealthChange() * changeAmount);
 
 	return "Heal" + lnBreak + "Heals target ally for " + healString + " health." + lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
 }

@@ -61,6 +61,7 @@ public:
 	AWeapon();
 	float GetChangeAmount();
 	float GetRange(); 
+	float GetDPS();
 	
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		virtual AItem* Copy();

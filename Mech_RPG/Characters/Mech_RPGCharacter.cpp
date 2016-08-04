@@ -29,7 +29,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 	healthChangeModifier(1),
 	inventory(NewObject<UInventory>(UInventory::StaticClass())),
 	defenceModifier(0),
-	movementModifier(1),
+	speedModifier(1),
 	startingRole(GroupEnums::DPS),
 	health(2000),
 	maxHealth(2000),
@@ -65,6 +65,10 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 	GetCharacterMovement()->bCanWalkOffLedges = false;
+	GetCharacterMovement()->SetWalkableFloorAngle(90);
+	GetCharacterMovement()->SetAvoidanceGroup(0);
+	GetCharacterMovement()->SetGroupsToAvoid(0);
+	//GetCharacterMovement()->SetGroupsToIgnore(0);
 
 	speed = GetCharacterMovement()->MaxWalkSpeed;
 
@@ -82,7 +86,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 		floatingTextClass = floatingTextWidget.Class;
 	}
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> newMesh(TEXT("/Game/TopDown/Meshes/Mecha_2.Mecha_2"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> newMesh(TEXT("/Game/TopDown/Meshes/Mech/Mech.Mech"));
 
 	if (newMesh.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(newMesh.Object);
@@ -91,7 +95,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 	}
 	
 	// Set size for player capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	GetCapsuleComponent()->InitCapsuleSize(60.0f, 140.0f);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GetCapsuleComponent()->SetCollisionObjectType(mCharacterCollision);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(mItemCollision, ECollisionResponse::ECR_Ignore);
@@ -137,7 +141,7 @@ void AMech_RPGCharacter::PossessedBy(AController* NewController) {
 void AMech_RPGCharacter::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 	if (!isDead) {
-		GetCharacterMovement()->MaxWalkSpeed = speed * movementModifier;
+		GetCharacterMovement()->MaxWalkSpeed = speed * speedModifier;
 
 		if (GetHealth() < GetMaxHealth()) {
 			float regen = !inCombat ? GetMaxHealth() * 0.15 : healthRegen;
@@ -166,6 +170,7 @@ void AMech_RPGCharacter::Tick(float DeltaTime) {
 
 void AMech_RPGCharacter::BeginPlay() {
 	Super::BeginPlay();
+	GetCharacterMovement()->SetAvoidanceEnabled(true);
 	if (IsPendingKill()) {
 		return;
 	}
@@ -181,10 +186,9 @@ void AMech_RPGCharacter::BeginPlay() {
 		SetCurrentAbility(abilities[0]);
 	}
 
-	SetUpGroup();
-
+	//SetUpGroup();
 	SetUpWidgets();
-
+	
 	if (OnPostBeginPlay.IsBound()) {
 		OnPostBeginPlay.Broadcast(this);
 	}
@@ -254,14 +258,7 @@ void AMech_RPGCharacter::SetUpGroup() {
 
 	if (group == nullptr) {
 		SetGroup(UGroup::CreateGroup(GetTeam()));
-	}
-
-	ABaseAIController* con = Cast<ABaseAIController>(Controller);
-	if (con) {
-		group->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
-	}
-
-	group->OnMemberDamageEvent.AddUniqueDynamic(this, &AMech_RPGCharacter::SetInCombat);
+	}	
 }
 
 void AMech_RPGCharacter::ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool remove) {
@@ -624,7 +621,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	case GroupEnums::DPS:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, quaility));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, true));
-		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 200.0F));
+		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 2.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
 		blastResistance = AArmour::GetDeafultValue(ArmourGrades::Light);
@@ -637,10 +634,10 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Bio_Repair, grade, quaility));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Heal));
 		AddAbility(mCreatePresetAbility(AbilityEnums::AoEHeal));
-		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 200.0F));
+		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 2.0F));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
-		SetMovementModifier(1.0F + statModifier);
+		SetSpeedModifier(1.0F + statModifier);
 		blastResistance = AArmour::GetDeafultValue(ArmourGrades::Light);
 		phsyicalResistance = AArmour::GetDeafultValue(ArmourGrades::MediumLight);
 		energyResistance = AArmour::GetDeafultValue(ArmourGrades::Light);
@@ -653,7 +650,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		AddAbility(mCreatePresetAbility(AbilityEnums::Stun));
 		SetDefenceModifier(0.0F + statModifier);
 		SetHealthChangeModifier(1.0F + statModifier);
-		SetMovementModifier(1.0F + statModifier);
+		SetSpeedModifier(1.0F + statModifier);
 		blastResistance = AArmour::GetDeafultValue(ArmourGrades::MediumHeavy);
 		phsyicalResistance = AArmour::GetDeafultValue(ArmourGrades::Heavy);
 		energyResistance = AArmour::GetDeafultValue(ArmourGrades::Medium);
@@ -721,7 +718,7 @@ void AMech_RPGCharacter::SetupWithLoadout() {
 	SetCanBeDamaged(startingLoadout.canBeDamaged);
 	SetHealthRegen(startingLoadout.healthRegen);
 	SetTeam(startingLoadout.team);
-	SetMovementModifier(startingLoadout.movementModifier);
+	SetSpeedModifier(startingLoadout.movementModifier);
 	SetSpeed(startingLoadout.speed);
 }
 
@@ -751,8 +748,14 @@ void AMech_RPGCharacter::SetCurrentWeapon(AWeapon* newVal) {
 
 void AMech_RPGCharacter::SetGroup(UGroup* newVal) {
 	if (newVal != nullptr) {
+		ABaseAIController* con = Cast<ABaseAIController>(Controller);
 		if (group != nullptr) {
 			group->RemoveMember(this);
+			group->OnMemberDamageEvent.RemoveAll(this);
+
+			if (con != nullptr) {
+				group->OnMemberDamageEvent.RemoveAll(con);
+			}
 
 			if (!group->HasMemebers()) {
 				group->ConditionalBeginDestroy();
@@ -761,6 +764,14 @@ void AMech_RPGCharacter::SetGroup(UGroup* newVal) {
 
 		group = newVal;
 		group->AddMemeber(this);
+
+		if (group != nullptr) {
+			group->OnMemberDamageEvent.AddUniqueDynamic(this, &AMech_RPGCharacter::SetInCombat);
+
+			if (con != nullptr) {
+				group->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
+			}
+		}
 	}
 }
 

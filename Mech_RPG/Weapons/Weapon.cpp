@@ -22,11 +22,16 @@ AWeapon::AWeapon() : Super() {
 float AWeapon::GetChangeAmount() {
 	float tempDamage = settings.healthChange * (1 + (GetGrade() * 0.25));
 	tempDamage *= (1 + (GetQuality() * 0.07));
-	return tempDamage;
+	return tempDamage * GetOwner()->GetHealthChangeModifier();
 }
 
 float AWeapon::GetRange() {
 	return settings.range;
+}
+
+float AWeapon::GetDPS()
+{
+	return GetChangeAmount() * (1 / GetFireRate());
 }
 
 AItem* AWeapon::Copy()
@@ -89,7 +94,7 @@ FString AWeapon::GetTooltipText()
 
 void AWeapon::Fire(AMech_RPGCharacter* target) {
 	FHealthChange healthChange;
-	float changeAmount = GetChangeAmount() * GetOwner()->GetHealthChangeModifier();
+	float changeAmount = GetChangeAmount() ;
 	bool isCrit = rand() % 100 <= settings.critChance;
 
 	if (isCrit) {

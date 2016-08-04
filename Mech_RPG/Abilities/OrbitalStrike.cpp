@@ -3,20 +3,21 @@
 #include "Mech_RPG.h"
 #include "AOEHealthChange.h"
 #include "Characters/Mech_RPGCharacter.h"
+#include "OrbitalStrike.h"
 
 
 bool UOrbitalStrike::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (target != NULL) {
 		FTempAOESettings settings;
 		settings.affectedTeam = AOEEnums::Enemy;
-		settings.healthChange = damage;
 		settings.owner = owner;
+		settings.healthChange = GetWeaponHealthChange() *  damage;
 		settings.world = owner->GetWorld();
-		settings.rate = 1.75;
+		settings.rate = 1.5;
 		settings.radius = 500;
 		settings.target = target;
 		settings.duration = settings.rate * 5;
-		settings.usesTarget = true;
+		settings.usesTarget = false;
 		AAOEHealthChange::CreateAOEHealthChange(settings);
 		SetOnCooldown(owner->GetWorld());
 		return true;
