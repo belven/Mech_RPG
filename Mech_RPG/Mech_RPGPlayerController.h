@@ -47,9 +47,10 @@ private:
 
 	FCollisionQueryParams collision;
 	FCollisionObjectQueryParams objectCollision;
-	FHitResult hit;
 
 	class AInteractable* lastTargetInteractable;
+
+	// The last character we targeted with an ability or weapon, used so we can move to it if we can't see it
 	class AMech_RPGCharacter* lastCharacterTarget;
 	UAbility* lastUsedAbility;
 	AItem* selectedItem;
@@ -62,9 +63,11 @@ public:
 	AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(BlueprintCallable, Category = "Owner")
-		AMech_RPGCharacter* GetOwner();
+		AMech_RPGCharacter* GetPlayerControllerOwner();
 
-	void SetOwner(AMech_RPGCharacter* newVal);
+	void SetPlayerControllerOwner(AMech_RPGCharacter* newVal);
+
+	void Possess(APawn* InPawn) override;
 
 	bool IsMechCharacter(AActor* character);
 	bool IsInteractable(AActor * character);
@@ -89,6 +92,12 @@ public:
 
 	void SwapWeapons();
 	void ActivateAbility();
+
+	FVector GetCharacterLocation(AMech_RPGCharacter* tempCharacter);
+
+	// Attempts to use an ability and returns the result
+	bool usedAbility(UAbility* ability, FVector location, AMech_RPGCharacter* tempCharacter);
+
 	void PlayerDied();
 	void SwapCharacter();
 	bool IsOwnerValid();
@@ -113,7 +122,7 @@ public:
 	void SetTarget(AMech_RPGCharacter* newVal);
 
 
-	void MoveToActor(AActor* target);
+	void MoveToActor(AActor* targetActor);
 	void MoveToLocation(FVector location);
 
 	void ZoomIn();
@@ -173,6 +182,13 @@ protected:
 	 * Begin PlayerController interface
 	 */
 	virtual void PlayerTick(float DeltaTime) override;
+	
+	void SetCursorType();
+
+	void CalculateActions(float DeltaTime);
+
+	void PerformPanning();
+
 	virtual void SetupInputComponent() override;
 
 	/**

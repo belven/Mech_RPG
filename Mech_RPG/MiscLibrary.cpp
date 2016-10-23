@@ -15,6 +15,9 @@ TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::difficulty = GameEnums::Hard;
 FRotator UMiscLibrary::cameraRot = FRotator(90, 90, 0);
 const FString UMiscLibrary::lnBreak = "\n";
 
+// If a health change value is at this or below, then it should do % change and not the actual value
+const float UMiscLibrary::MAX_HEALTH_CHANGE = 2;
+
 float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
 	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;
 }
@@ -22,6 +25,10 @@ float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
 TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::GetDifficulty()
 {
 	return difficulty;
+}
+
+bool UMiscLibrary::IsCrit(float critChance) {
+	return rand() % 100 <= critChance;
 }
 
 AMech_RPGPlayerController* UMiscLibrary::GetPlayerController() {
@@ -77,7 +84,7 @@ float UMiscLibrary::GetAbilityChannelPercent(UChannelledAbility* ability) {
 }
 
 bool UMiscLibrary::IsCharacterAlive(AMech_RPGCharacter* character) {
-	return character != nullptr && &character != nullptr && !character->IsDead();
+	return character != nullptr && !character->IsDead();
 }
 
 void UMiscLibrary::OpenCharacterPane(UWorld* world) {
@@ -104,18 +111,18 @@ UGroup* UMiscLibrary::GetPlayerGroup() {
 
 AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
 	if (GetPlayerController() != nullptr) {
-	/*	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
-			if (IsCharacterAlive(character)
-				&& IsValid(character)
-				&& character->IsValidLowLevel()
-				&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
-				playerController = Cast<AMech_RPGPlayerController>(character->GetController());
-				return character;
+		/*	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
+				if (IsCharacterAlive(character)
+					&& IsValid(character)
+					&& character->IsValidLowLevel()
+					&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
+					playerController = Cast<AMech_RPGPlayerController>(character->GetController());
+					return character;
+				}
 			}
 		}
-	}
-	else {*/
-		return GetPlayerController()->GetOwner();
+		else {*/
+		return GetPlayerController()->GetPlayerControllerOwner();
 	}
 	return nullptr;
 }

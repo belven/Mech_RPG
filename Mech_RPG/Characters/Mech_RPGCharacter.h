@@ -128,7 +128,6 @@ private:
 	bool inCombat;
 	bool channeling;
 	bool isDead;
-	bool isPlayer;
 	bool isAlly;
 
 	static bool settingUpGroups;
@@ -212,6 +211,7 @@ protected:
 	virtual ~AMech_RPGCharacter();
 public:
 	AMech_RPGCharacter();
+	bool isPlayer;
 
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 
@@ -354,8 +354,6 @@ public:
 
 	void SetUpWidgets();
 
-	virtual void PossessedBy(AController* NewController) override;
-
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		FORCEINLINE	TArray<AArmour*>& GetArmour() {
 		return armour;
@@ -422,9 +420,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetGroup(UGroup* newVal);
-
+	
+	// Compares the characters group with another, true if allies, false if enemies
 	bool CompareGroup(UGroup* inGroup);
 
+	// Compares the characters group with another, true if allies, false if enemies
 	bool CompareGroup(AMech_RPGCharacter* inCharacter);
 
 	virtual void Tick(float DeltaTime) override;

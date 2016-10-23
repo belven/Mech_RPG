@@ -23,7 +23,7 @@ ASMG* ASMG::CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner) {
 
 		ASMG* weapon = world->SpawnActor<ASMG>(ASMG::StaticClass());
 		weapon->SetSettings(magSettings);
-		weapon->SetOwner(inOwner);
+		weapon->SetItemOwner(inOwner);
 		weapon->SetName("SMG");
 		weapon->magazineSize = magSettings.magazineSize;
 		weapon->reloadAmount = magSettings.reloadAmount;

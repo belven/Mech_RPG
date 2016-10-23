@@ -22,7 +22,7 @@ AWeapon::AWeapon() : Super() {
 float AWeapon::GetChangeAmount() {
 	float tempDamage = settings.healthChange * (1 + (GetGrade() * 0.25));
 	tempDamage *= (1 + (GetQuality() * 0.07));
-	return tempDamage * GetOwner()->GetHealthChangeModifier();
+	return tempDamage * GetItemOwner()->GetHealthChangeModifier();
 }
 
 float AWeapon::GetRange() {
@@ -36,7 +36,7 @@ float AWeapon::GetDPS()
 
 AItem* AWeapon::Copy()
 {
-	return CreateWeapon(GetWorld(), GetOwner(), settings);
+	return CreateWeapon(GetWorld(), GetItemOwner(), settings);
 }
 
 void AWeapon::SetChangeAmount(float newVal) {
@@ -59,19 +59,19 @@ AWeapon* AWeapon::CreateWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FWeap
 	if (world != nullptr) {
 		AWeapon* weapon = world->SpawnActor<AWeapon>(AWeapon::StaticClass());
 		weapon->SetSettings(inSettings);
-		weapon->SetOwner(inOwner);
+		weapon->SetItemOwner(inOwner);
 		return weapon;
 	}
 	return nullptr;
 }
 
-void AWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
-	Super::SetOwner(inOwner);
+void AWeapon::SetItemOwner(AMech_RPGCharacter* inOwner) {
+	Super::SetItemOwner(inOwner);
 
 	if (inOwner != nullptr) {
 		if (partclSystem != nullptr) {
 			// TODO Attach to end of weapon
-			partclSystem->AttachTo(inOwner->GetRootComponent());
+			partclSystem->AttachToComponent(inOwner->GetRootComponent(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 			partclSystem->SetActorParameter(FName(TEXT("BeamSource")), this);
 		}
 
@@ -94,10 +94,9 @@ FString AWeapon::GetTooltipText()
 
 void AWeapon::Fire(AMech_RPGCharacter* target) {
 	FHealthChange healthChange;
-	float changeAmount = GetChangeAmount() ;
-	bool isCrit = rand() % 100 <= settings.critChance;
+	float changeAmount = GetChangeAmount();
 
-	if (isCrit) {
+	if (UMiscLibrary::IsCrit(settings.critChance)) {
 		changeAmount = changeAmount * 2;
 		healthChange.crit = true;
 	}
@@ -114,7 +113,7 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 		audioComp->Play(0);
 	}
 
-	healthChange.damager = GetOwner();
+	healthChange.damager = GetItemOwner();
 	healthChange.target = target;
 	healthChange.weaponUsed = this;
 	healthChange.damageType = settings.damageType;
@@ -131,9 +130,9 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 
 void AWeapon::Fire(ACover* target) {
 	FHealthChange healthChange;
-	float changeAmount = GetChangeAmount()  * GetOwner()->GetHealthChangeModifier();
+	float changeAmount = GetChangeAmount()  * GetItemOwner()->GetHealthChangeModifier();
 
-	healthChange.damager = GetOwner();
+	healthChange.damager = GetItemOwner();
 	//healthChange.target = target;
 	healthChange.weaponUsed = this;
 

@@ -14,12 +14,12 @@ ABaseAIController::ABaseAIController() : Super() {
 void ABaseAIController::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	if (GetOwner() && GetOwner()->GetDemandedController() == nullptr) {
-		if (!GetOwner()->IsDead() && !GetOwner()->Channelling()) {
+	if (GetAIOwner() != nullptr && GetAIOwner()->GetDemandedController() == nullptr) {
+		if (!GetAIOwner()->IsDead() && !GetAIOwner()->Channelling()) {
 			bool abilityUsed = false;
 
-			if (GetOwner()->CanCast()) {
-				for (UAbility* ability : GetOwner()->GetAbilities()) {
+			if (GetAIOwner()->CanCast()) {
+				for (UAbility* ability : GetAIOwner()->GetAbilities()) {
 					if (!ability->OnCooldown() && PerformAbility(ability)) {
 						abilityUsed = true;
 						break;
@@ -28,59 +28,67 @@ void ABaseAIController::Tick(float DeltaTime) {
 			}
 
 			if (!abilityUsed) {
-				if (GetOwner()->GetCurrentWeapon()->Heals()) {
-					FindTarget(true);
+				if (GetAIOwner()->GetCurrentWeapon()->Heals()) {
+					FindTarget(AOEEnums::Ally);
 
-					if (IsTargetValid(target, true) && UMiscLibrary::GetMissingHealth(target) > 0) {
+					if (IsTargetValid(targetCharacter, AOEEnums::Ally) && UMiscLibrary::GetMissingHealth(targetCharacter) > 0) {
 						AttackTarget(DeltaTime);
 					}
 				}
 				else {
-					FindTarget(false);
+					FindTarget();
 
-					if (IsTargetValid(target, false)) {
+					if (IsTargetValid(targetCharacter)) {
 						AttackTarget(DeltaTime);
 					}
 				}
 			}
 
 			if (!UMiscLibrary::IsCharacterAlive(GetTarget())) {
-				GetOwner()->OnStopFiring.Broadcast();
+				GetAIOwner()->OnStopFiring.Broadcast();
 			}
 		}
 	}
 }
 
+void ABaseAIController::Possess(APawn* InPawn)
+{
+	Super::Possess(InPawn);
+	if (UMiscLibrary::IsMechCharacter(InPawn)) {
+		SetAIOwner(Cast<AMech_RPGCharacter>(InPawn));
+	}
+}
+
 void ABaseAIController::OwnerPostBeginPlay(AMech_RPGCharacter* mech)
 {
-	GetOwner()->GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(this, &ABaseAIController::GroupMemberDamaged);
+	GetAIOwner()->GetGroup()->OnMemberDamageEvent.AddUniqueDynamic(this, &ABaseAIController::GroupMemberDamaged);
 
 }
 
 void ABaseAIController::AttackTarget(float DeltaTime) {
 	// Are we targeting ourselves
-	if (target == GetOwner()) {
+	if (targetCharacter == GetAIOwner()) {
 		//PerformAbility();
 		FireWeapon(nullptr);
-		GetOwner()->LookAt(target);
+		GetAIOwner()->LookAt(targetCharacter);
 	}
 	// Have we traced to another character or cover
-	else if (UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), target->GetActorLocation())) {
+	else if (UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), targetCharacter->GetActorLocation())) {
 		//PerformAbility();
-		FireWeapon(target);
-		GetOwner()->LookAt(target);
+		FireWeapon(targetCharacter);
+		GetAIOwner()->LookAt(targetCharacter);
 	}
 	// We've hit some scenery so move towards the target
 	else if (GetWorld()->GetNavigationSystem()) {
-		MoveToLocation(target->GetActorLocation());
+		MoveToLocation(targetCharacter->GetActorLocation());
 	}
 }
 
 UAbility* ABaseAIController::GetOwnerAbilityByTag(FString tag)
 {
-	if (!GetOwner()->Channelling()
-		&& GetOwner()->CanCast()) {
-		for (UAbility* ability : GetOwner()->GetAbilities()) {
+	if (!GetAIOwner()->Channelling()
+		&& GetAIOwner()->CanCast()) {
+		for (UAbility* ability : GetAIOwner()->GetAbilities()) {
 			if (!ability->OnCooldown() && ability->HasTag(tag)) return ability;
 		}
 	}
@@ -88,54 +96,35 @@ UAbility* ABaseAIController::GetOwnerAbilityByTag(FString tag)
 }
 
 void ABaseAIController::FireWeapon(AActor* hit) {
-	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
-	float distToTarget = GetOwner()->GetDistanceTo(target);
+	AWeapon* weapon = GetAIOwner()->GetCurrentWeapon();
+	float distToTarget = GetAIOwner()->GetDistanceTo(targetCharacter);
 
 	// Are we in weapons range
 	if (weapon != nullptr && distToTarget <= weapon->GetRange()) {
-		if (GetOwner()->CanAttack() && weapon->CanFire()) {
+		if (GetAIOwner()->CanAttack() && weapon->CanFire()) {
 
-			bool isCover = hit != nullptr ? UMiscLibrary::IsCover(hit) : false;
+			weapon->Fire(targetCharacter);
 
-			// Have we hit cover
-			if (isCover) {
-				float distToCover = GetOwner()->GetDistanceTo(hit);
-
-				// Are we too far from the cover to avoid shooting it
-				if (distToCover > 200) {
-					weapon->Fire(Cast<ACover>(hit));
-				}
-				// Otherwise we can attack the target
-				else {
-					weapon->Fire(target);
-				}
-			}
-			// Otherwise we've got a clear shot to the target
-			else {
-				weapon->Fire(target);
-
-				if (!weapon->Heals()) {
-					GetOwner()->GetGroup()->GroupMemberHit(GetOwner(), target);
-				}
+			if (!weapon->Heals()) {
+				GetAIOwner()->GetGroup()->GroupMemberHit(GetAIOwner(), targetCharacter);
 			}
 		}
 
-		SetFocus(target);
+		SetFocus(targetCharacter);
 		StopMovement();
 	}
 	// We're out of range so move closer
 	else if (GetWorld()->GetNavigationSystem()) {
-		MoveToLocation(target->GetActorLocation());
+		MoveToLocation(targetCharacter->GetActorLocation());
 	}
 }
 
 bool ABaseAIController::PerformAbility(UAbility* ability) {
-	bool affectsAllies = ability->GetAffectedTeam() == AOEEnums::Ally;
+	FindTarget(ability->GetAffectedTeam());
 
-	FindTarget(affectsAllies);
-
-	if (IsTargetValid(target, affectsAllies) && ShouldHeal(ability) && ability->Activate(target, target->GetActorLocation())) {
-		GetOwner()->SetCurrentAbility(ability);
+	if (UMiscLibrary::IsCharacterAlive(targetCharacter) 
+		&& ability->Activate(targetCharacter, targetCharacter->GetActorLocation())) {
+		GetAIOwner()->SetCurrentAbility(ability);
 		StopMovement();
 		return true;
 	}
@@ -144,63 +133,61 @@ bool ABaseAIController::PerformAbility(UAbility* ability) {
 }
 
 bool ABaseAIController::ShouldHeal(UAbility* ability) {
-	return !ability->HasTag(UAbility::healTag) || ability->GetTagValue(UAbility::healTag) <= UMiscLibrary::GetMissingHealth(target);
+	return !ability->HasTag(UAbility::healTag) || ability->GetTagValue(UAbility::healTag) <= UMiscLibrary::GetMissingHealth(targetCharacter);
 }
 
 void ABaseAIController::MoveToActor(AActor* target) {
-	if (GetOwner()->CanMove()) {
-		GetOwner()->OnStopFiring.Broadcast();
+	if (GetAIOwner()->CanMove()) {
+		GetAIOwner()->OnStopFiring.Broadcast();
 		GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, target);
 	}
 }
 
 void ABaseAIController::MoveToLocation(FVector location) {
-	if (GetOwner()->CanMove()) {
-		GetOwner()->OnStopFiring.Broadcast();
+	if (GetAIOwner()->CanMove()) {
+		GetAIOwner()->OnStopFiring.Broadcast();
 		GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, location);
 	}
 }
 
-void ABaseAIController::FindTarget(bool ally) {
-	float range = GetOwner()->GetCurrentWeapon()->GetRange();
+void ABaseAIController::FindTarget(AOEEnums::AffectedTeam affectedTeam) {
+	float range = GetAIOwner()->GetCurrentWeapon()->GetRange();
 
-	if (IsTargetValid(target, ally) && (!ally || UMiscLibrary::GetMissingHealth(target) > 0)) {
+	// Is the target
+	if (IsTargetValid(targetCharacter, affectedTeam)
+		// If they're an enemy then we can carry on, or only affect allies that have lost health
+		&& (affectedTeam == AOEEnums::Enemy || UMiscLibrary::GetMissingHealth(targetCharacter) > 0)) {
 		return;
 	}
+	// Otherwise remove the target character and find a new one
 	else {
-		target = nullptr;
+		targetCharacter = nullptr;
 	}
 
-	if (!ally) {
-		if (target != nullptr && IsTargetValid(target = target->GetGroup()->GetRandomMember(), ally)) {
-			SetTarget(target);
-		}
-		else {
-			for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
-				if (IsTargetValid(character, ally) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
-					if (character->GetGroup() != nullptr && character->GetGroup()->HasMemebers()) {
-						SetTarget(character->GetGroup()->GetRandomMember());
-					}
-					else {
-						SetTarget(character);
-					}
-					break;
-				}
+	if (affectedTeam == AOEEnums::Enemy) {
+		for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
+			if (IsTargetValid(character, affectedTeam)
+				&& UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), character->GetActorLocation())) {
+				SetTarget(character);
+				break;
 			}
 		}
 	}
 	else {
-		bool targetFound = false;
+		// Will only return a member if health lost is 1 or more
+		AMech_RPGCharacter* lowHealthCharacter = GetAIOwner()->GetGroup()->GetLowHealthMember();
 
-		AMech_RPGCharacter* character = GetOwner()->GetGroup()->GetLowHealthMember();
-		if (IsTargetValid(character, ally)) {
-			targetFound = true;
-			SetTarget(character);
+		// Did we find a group member to heal
+		if (lowHealthCharacter != nullptr) {
+			SetTarget(lowHealthCharacter);
 		}
-
-		if (!targetFound) {
+		else
+		{
+			// Search for allies outside of the group within range
 			for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
-				if (IsTargetValid(character, ally) && UMiscLibrary::CanSee(GetWorld(), GetOwner()->GetActorLocation(), character->GetActorLocation())) {
+				// Is the target valid
+				if (IsTargetValid(character, affectedTeam) && UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), character->GetActorLocation())) {
+					// Have they lost health
 					if (UMiscLibrary::GetMissingHealth(character) > 0) {
 						SetTarget(character->GetGroup()->GetRandomMember());
 						break;
@@ -212,24 +199,28 @@ void ABaseAIController::FindTarget(bool ally) {
 }
 
 TArray<AMech_RPGCharacter*> ABaseAIController::GetCharactersInRange(float range) {
-	return UMiscLibrary::GetCharactersInRange(range, GetOwner());
+	return UMiscLibrary::GetCharactersInRange(range, GetAIOwner());
 }
 
-AMech_RPGCharacter* ABaseAIController::GetOwner() {
+AMech_RPGCharacter* ABaseAIController::GetAIOwner() {
 	return characterOwner;
 }
 
 AMech_RPGCharacter* ABaseAIController::GetTarget() {
-	return target;
+	return targetCharacter;
 }
 
-bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget, bool ally) {
-	bool valid = UMiscLibrary::IsCharacterAlive(inTarget) && ally == GetOwner()->CompareGroup(inTarget);
-	
-	return valid;
+bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam) {
+	if (UMiscLibrary::IsCharacterAlive(inTarget)) {
+		if (affectedTeam == AOEEnums::Ally) {
+			return GetAIOwner()->CompareGroup(inTarget);
+		}
+		return !GetAIOwner()->CompareGroup(inTarget);
+	}
+	return false;
 }
 
-void ABaseAIController::SetOwner(AMech_RPGCharacter* newVal) {
+void ABaseAIController::SetAIOwner(AMech_RPGCharacter* newVal) {
 	if (characterOwner != nullptr && characterOwner->GetGroup() != nullptr) {
 		characterOwner->GetGroup()->OnMemberDamageEvent.RemoveDynamic(this, &ABaseAIController::GroupMemberDamaged);
 	}
@@ -246,7 +237,7 @@ void ABaseAIController::SetOwner(AMech_RPGCharacter* newVal) {
 }
 
 void ABaseAIController::SetTarget(AMech_RPGCharacter* newVal) {
-	target = newVal;
+	targetCharacter = newVal;
 }
 
 void ABaseAIController::GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {

@@ -14,7 +14,7 @@ class MECH_RPG_API UShield : public UAbility
 	GENERATED_BODY()
 private:
 	float shieldAmount;
-	class AMech_RPGCharacter* target;
+	class AMech_RPGCharacter* shieldTarget;
 	int count;
 	float shieldHealth;
 public:

@@ -29,7 +29,7 @@ ASniper* ASniper::CreateSniper(UWorld* world, AMech_RPGCharacter* inOwner) {
 
 		ASniper* weapon = world->SpawnActor<ASniper>(ASniper::StaticClass());
 		weapon->SetSettings(magSettings);
-		weapon->SetOwner(inOwner);
+		weapon->SetItemOwner(inOwner);
 		weapon->SetName("Sniper");
 		weapon->magazineSize = magSettings.magazineSize;
 		weapon->reloadAmount = magSettings.reloadAmount;

@@ -13,7 +13,7 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 	float blastResistance = 5;
 	float phsyicalResistance = 5;
 	float energyResistance = 5;
-	static float Health = 100000;
+	static float Health = 50000;
 
 	StartingRole(inRole);
 
@@ -31,7 +31,7 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 	params.healthChange = 1500;
 
 	SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
-	AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(7, this, 6.0F), 6, true, false));
+	AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 2.0F), 6, true, false));
 	SetDefenceModifier(0.0F + statModifier);
 	SetHealthChangeModifier(1.0F + statModifier);
 	blastResistance = AArmour::GetDeafultValue(ArmourGrades::Medium);
@@ -54,12 +54,15 @@ void ATestBoss::SetPhase(int32 val)
 
 	if (phase == 1) {
 		ApplyCrowdControl(EffectEnums::Cast, true); // Set can cast
+		ApplyCrowdControl(EffectEnums::Attack, false);
 	}
 	else if (phase == 2) {
 		ApplyCrowdControl(EffectEnums::Cast, false);
+		ApplyCrowdControl(EffectEnums::Attack, true);
 	}
 	else if (phase == 3) {
 		ApplyCrowdControl(EffectEnums::Cast, true);
+		ApplyCrowdControl(EffectEnums::Attack, false);
 	}
 }
 

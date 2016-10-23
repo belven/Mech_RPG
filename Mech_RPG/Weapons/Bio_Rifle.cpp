@@ -38,7 +38,7 @@ ABio_Rifle* ABio_Rifle::CreateBioRifle(UWorld* world, AMech_RPGCharacter* inOwne
 		weapon->SetSettings(overheatSettings);
 		weapon->heatLosePerTick = overheatSettings.heatLosePerTick;
 		weapon->heatGenerated = overheatSettings.heatGenerated;
-		weapon->SetOwner(inOwner);
+		weapon->SetItemOwner(inOwner);
 		weapon->SetName("Bio Rifle");
 		return weapon;
 	}

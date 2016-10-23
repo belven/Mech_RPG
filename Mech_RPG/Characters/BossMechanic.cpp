@@ -12,8 +12,7 @@ void ABossMechanic::BeginPlay() {
 
 	for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(1200, this)) {
 		if (character != nullptr && character->GetClass()->IsChildOf(ABoss::StaticClass()) && character->CompareGroup(this)) {
-			ABoss* boss = Cast<ABoss>(character);
-			SetBoss(boss);
+			SetBoss(Cast<ABoss>(character));
 			SetGroup(GetBoss()->GetGroup());
 			break;
 		}

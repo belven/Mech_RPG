@@ -2,15 +2,19 @@
 
 #include "Mech_RPG.h"
 #include "Abilities/Stun.h"
+#include "EffectTimer.h"
 #include "Characters/Mech_RPGCharacter.h"
 
 bool UStun::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (UMiscLibrary::IsCharacterAlive(target)) {
 		targetCharacter = target;
-		targetCharacter->ApplyCrowdControl(EffectEnums::Cast, false);
-		targetCharacter->ApplyCrowdControl(EffectEnums::Attack, false);
-		targetCharacter->ApplyCrowdControl(EffectEnums::Move, false);
-		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_StunEnd, this, &UStun::StunEnd, duration);
+		TArray<EffectEnums::CrowdControl> effects;
+		effects.Add(EffectEnums::Cast);
+		effects.Add(EffectEnums::Attack);
+		effects.Add(EffectEnums::Move);
+		UEffectTimer::CreateEffectTimer(target, duration, effects);
+
+		//owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_StunEnd, this, &UStun::StunEnd, duration);
 		SetOnCooldown(owner->GetWorld());
 		return true;
 	}

@@ -32,7 +32,7 @@ void AItemPickup::Interact_Implementation(class AMech_RPGCharacter* character)
 
 AItemPickup* AItemPickup::CreateItemPickup(AItem* item)
 {
-	AItemPickup* newItem = item->GetOwner()->GetWorld()->SpawnActor<AItemPickup>(AItemPickup::StaticClass());
+	AItemPickup* newItem = item->GetItemOwner()->GetWorld()->SpawnActor<AItemPickup>(AItemPickup::StaticClass());
 	newItem->item = item;
 
 	if (item->GetClass()->IsChildOf(AMechPart::StaticClass())) {

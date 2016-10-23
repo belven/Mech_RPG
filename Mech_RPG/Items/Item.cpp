@@ -18,7 +18,7 @@ void AItem::CloneItemSettings(AItem* cloneFromItem)
 	SetGrade(cloneFromItem->GetGrade());
 	SetQuality(cloneFromItem->GetQuality());
 	SetType(cloneFromItem->GetType());
-	SetOwner(cloneFromItem->GetOwner());
+	SetItemOwner(cloneFromItem->GetItemOwner());
 }
 
 AItem::AItem() : Super() {
@@ -77,7 +77,7 @@ void AItem::SetGrade(int32 newVal) {
 	grade = newVal;
 }
 
-AMech_RPGCharacter* AItem::GetOwner() {
+AMech_RPGCharacter* AItem::GetItemOwner() {
 	return itemOwner;
 }
 
@@ -91,7 +91,7 @@ void AItem::SetQuality(int32 newQuality)
 	quality = newQuality;
 }
 
-void AItem::SetOwner(AMech_RPGCharacter* newVal) {
+void AItem::SetItemOwner(AMech_RPGCharacter* newVal) {
 	itemOwner = newVal;
 }
 
@@ -120,7 +120,7 @@ void AItem::SetStackSize(int32 newVal) {
 }
 
 AItem* AItem::Copy() {
-	return CreateItem(GetWorld(), GetOwner(), GetName(), GetAmount(), GetGrade(), GetQuality(), GetStackSize());
+	return CreateItem(GetWorld(), GetItemOwner(), GetName(), GetAmount(), GetGrade(), GetQuality(), GetStackSize());
 }
 
 FString AItem::GetTooltipText()
@@ -139,7 +139,7 @@ AItem * AItem::CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString in
 	newItem->SetStackSize(inStackSize);
 	//SetType(GetType());
 	newItem->SetGrade(inGrade);
-	newItem->SetOwner(inOwner);
+	newItem->SetItemOwner(inOwner);
 	newItem->SetQuality(inQuality);
 	return  newItem;
 }

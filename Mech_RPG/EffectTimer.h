@@ -18,8 +18,9 @@ private:
 	bool remove = false;
 	float duration = 1;
 	class AMech_RPGCharacter* target;
+	FTimerHandle TimerHandle_EffectEnds;
 public:
 	static UEffectTimer* CreateEffectTimer(AMech_RPGCharacter* inTarget, float inDuration, TArray<EffectEnums::CrowdControl> inEffects, bool inRemove = false);
-
-
+	void Activate();
+	void Complete();
 };

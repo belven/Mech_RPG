@@ -5,8 +5,8 @@
 #include "Characters/Mech_RPGCharacter.h"
 
 bool UTimedHealthChange::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
-	if (target != NULL) {
-		this->target = target;
+	if (target != nullptr) {
+		targetCharacter = target;
 		timeLeft = duration;
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_TimeTick, this, &UTimedHealthChange::TimeTick, rate);
 		SetOnCooldown(owner->GetWorld());
@@ -16,16 +16,23 @@ bool UTimedHealthChange::Activate(class AMech_RPGCharacter* target, FVector targ
 }
 
 void UTimedHealthChange::TimeTick() {
-	if (UMiscLibrary::IsCharacterAlive(owner) && UMiscLibrary::IsCharacterAlive(target) && timeLeft > 0) {
+	if (UMiscLibrary::IsCharacterAlive(owner) 
+		&& UMiscLibrary::IsCharacterAlive(targetCharacter) 
+		&& timeLeft > 0) {
 		timeLeft -= rate;
 
 		FHealthChange healthChange;
 		healthChange.damager = owner;
+		healthChange.crit = UMiscLibrary::IsCrit(25);
 		healthChange.healthChange = GetWeaponHealthChange() * changeAmount;
-		healthChange.target = target;
+		healthChange.target = targetCharacter;
 		healthChange.heals = heals;
 
-		target->ChangeHealth(healthChange);
+		if (healthChange.crit) {
+			healthChange.healthChange *= 2;
+		}
+
+		targetCharacter->ChangeHealth(healthChange);
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_TimeTick, this, &UTimedHealthChange::TimeTick, rate);
 	}
 }
@@ -39,12 +46,6 @@ UTimedHealthChange* UTimedHealthChange::CreateTimedHealthChange(AMech_RPGCharact
 	ability->affectedTeam = inHeals ? AOEEnums::Ally : AOEEnums::Enemy;
 	ability->changeAmount = inChangeAmount;
 	ability->SetCooldown(cooldown);
-
-	if (inHeals) {
-		ability->AddTag(healTag, inChangeAmount);
-	}
-	else {
-		ability->AddTag(damageTag, inChangeAmount);
-	}
+	ability->AddTag(inHeals ? healTag : damageTag, inChangeAmount);
 	return ability;
 }

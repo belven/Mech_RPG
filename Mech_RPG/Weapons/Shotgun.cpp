@@ -23,7 +23,7 @@ AShotgun* AShotgun::CreateShotgun(UWorld* world, AMech_RPGCharacter* inOwner) {
 
 		AShotgun* weapon = world->SpawnActor<AShotgun>(AShotgun::StaticClass());
 		weapon->SetSettings(magSettings);
-		weapon->SetOwner(inOwner);
+		weapon->SetItemOwner(inOwner);
 		weapon->SetName("Shotgun");
 		weapon->magazineSize = magSettings.magazineSize;
 		weapon->reloadAmount = magSettings.reloadAmount;

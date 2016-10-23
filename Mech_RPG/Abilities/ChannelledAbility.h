@@ -37,7 +37,7 @@ public:
 	UChannelledAbility();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
+		bool Activate(class AMech_RPGCharacter* target, FVector inTargetLocation = FVector::ZeroVector) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		float GetCooldown() override;

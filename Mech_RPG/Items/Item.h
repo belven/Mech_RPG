@@ -71,10 +71,10 @@ public:
 		void SetGrade(int32 newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		AMech_RPGCharacter* GetOwner();
+		AMech_RPGCharacter* GetItemOwner();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		virtual void SetOwner(AMech_RPGCharacter* newVal);
+		virtual void SetItemOwner(AMech_RPGCharacter* newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		bool HasSpace();

@@ -16,6 +16,9 @@ protected:
 public:
 	AAllyAIController();
 	virtual void Tick(float DeltaTime) override;
+
+	bool ShouldMoveToPlayer(AMech_RPGCharacter* player);
+
 	virtual	void BeginPlay() override;
 	FVector GetPlayerControlledLocation();
 	void SetPlayerControlledLocation(FVector newVal);

@@ -96,12 +96,13 @@ float UAbility::GetWeaponHealthChange()
 
 void UAbility::SetOnCooldown(UWorld* const World) {
 	onCooldown = true;
-	currentTime = (GetCooldown() * owner->GetSpeedModifier()) - 0.1;
+	currentTime = GetCooldown() - 0.1;
 	World->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UAbility::ResetOnCooldown, 0.1F);
 }
 
 float UAbility::GetCooldown() {
-	return cooldown;
+	float percentChange = 1 - (owner->GetSpeedModifier() - 1);
+	return cooldown  * percentChange;
 }
 
 float UAbility::GetCurrentTimeRemaining() {
@@ -155,7 +156,7 @@ UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums:
 	case AbilityEnums::Taunt:
 		return UTaunt::CreateAbility(5.0F, owner);
 	case AbilityEnums::Grenade:
-		return UGrenade::CreateAbility(7.0F, owner, 6.0F);
+		return UGrenade::CreateAbility(15.0F, owner, 6.0F);
 	case AbilityEnums::CritBoost:
 		return UCritBoost::CreateCritBoost(6, owner, 55.0F);
 	case AbilityEnums::Snipe:

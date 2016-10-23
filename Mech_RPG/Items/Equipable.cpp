@@ -6,8 +6,8 @@
 
 void AEquipable::Equip()
 {
-	if (GetOwner() != nullptr && GetOwner()->GetMesh() != nullptr) {
-		AttachRootComponentTo(GetOwner()->GetMesh(), "RightHand");
+	if (GetItemOwner() != nullptr && GetItemOwner()->GetMesh() != nullptr) {
+		AttachToComponent(GetItemOwner()->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), "RightHand");
 	}
 
 	SetActorHiddenInGame(false);
@@ -17,7 +17,7 @@ void AEquipable::Equip()
 
 void AEquipable::Unequip()
 {
-	meshComponent->DetachFromParent();	
+	meshComponent->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepRelative, true));
 	SetActorHiddenInGame(true);
 	SetEquipped(false);
 }

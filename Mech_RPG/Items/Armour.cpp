@@ -62,7 +62,7 @@ FString AArmour::GetTooltipText()
 AItem* AArmour::Copy()
 {
 	AArmour* armour = CreateArmour(GetWorld(), GetName(), physicalResistance, 
-		blastResistance, energyResistance, armourPosition, GetOwner(), GetGrade(), GetQuality());
+		blastResistance, energyResistance, armourPosition, GetItemOwner(), GetGrade(), GetQuality());
 	armour->CloneItemSettings(this);
 	return armour;
 }
@@ -103,7 +103,7 @@ AArmour* AArmour::CreateArmour(UWorld* world,
 	tempArmour->energyResistance = inEnergyResistance;
 	tempArmour->SetGrade(armourGrade);
 	tempArmour->SetQuality(armourQuality);
-	tempArmour->SetOwner(armourOwner);
+	tempArmour->SetItemOwner(armourOwner);
 	tempArmour->SetName(armourName);
 	return tempArmour;
 }

@@ -9,7 +9,7 @@
 #include "UI/ItemUI.h"
 #include "Weapons.h"
 
-#define mCanSee(location) UMiscLibrary::CanSee(GetOwner()->GetWorld(), GetOwner()->GetActorLocation(), location)
+#define mCanSee(location) UMiscLibrary::CanSee(GetPlayerControllerOwner()->GetWorld(), GetPlayerControllerOwner()->GetActorLocation(), location)
 
 AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	bShowMouseCursor = true;
@@ -65,103 +65,51 @@ void AMech_RPGPlayerController::BeginPlay() {
 	}
 }
 
+void  AMech_RPGPlayerController::PerformPanning()
+{
+	if (panLeft || panRight) {
+		FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
+		rot.Yaw += panLeft ? -1 : 1;
+		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
+	}
+
+	if (panUp || panDown) {
+		FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
+		rot.Pitch += panUp ? -1 : 1;
+
+		if (rot.Pitch < -85) {
+			rot.Pitch = -85;
+		}
+		else if (rot.Pitch > 0) {
+			rot.Pitch = 0;
+		}
+
+		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
+	}
+}
+
 /**
  * Begin PlayerController interface
  */
 void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 	Super::PlayerTick(DeltaTime);
-	//UE_LOG(LogTemp, Log, TEXT("PlayerTick"));
 
 	//Do we have an owner
-	if (GetOwner()) {
+	if (GetPlayerControllerOwner()) {
 
 		// Is our owner demanding a character change
-		if (GetOwner()->GetDemandedController() != nullptr) {
+		if (GetPlayerControllerOwner()->GetDemandedController() != nullptr) {
 			SwapCharacter();
 		}
 
-		if (panLeft || panRight) {
-			FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
-			rot.Yaw += panLeft ? -1 : 1;
-			GetOwner()->CameraBoom->SetRelativeRotation(rot);
-		}
-
-		if (panUp || panDown) {
-			FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
-			rot.Pitch += panUp ? -1 : 1;
-
-			if (rot.Pitch < -85) {
-				rot.Pitch = -85;
-			}
-			else if (rot.Pitch > 0) {
-				rot.Pitch = 0;
-			}
-
-			GetOwner()->CameraBoom->SetRelativeRotation(rot);
-		}
-
+		PerformPanning();
+		
 		// Is our owner is still alive
-		if (!GetOwner()->IsDead()) {
+		if (!GetPlayerControllerOwner()->IsDead()) {
 			cursorTarget = GetTargetUnderCursor();
 
-			if (cursorTarget != nullptr && !cursorTarget->IsDead()) {
-				CurrentMouseCursor = EMouseCursor::Crosshairs;
-			}
-			else if (GetInteractableUnderCursor() != nullptr) {
-				CurrentMouseCursor = EMouseCursor::GrabHand;
-			}
-			else {
-				CurrentMouseCursor = EMouseCursor::Hand;
-			}
-
-			// Are we trying to interact with an Interactable
-			if (lastAction == PlayerControllerEnums::Interactable) {
-				if (mCanSee(lastTargetInteractable->GetActorLocation())
-					&& GetOwner()->GetDistanceTo(lastTargetInteractable) <= interactionRange) {
-					lastAction = PlayerControllerEnums::None;
-					GetOwner()->Interact(lastTargetInteractable);
-					inventory->GenerateInventory();
-				}
-				else {
-					MoveToActor(lastTargetInteractable);
-				}
-			}
-			// Are we trying to use an ability
-			else if (lastAction == PlayerControllerEnums::Ability && lastCharacterTarget != nullptr) {
-				if (mCanSee(lastCharacterTarget->GetActorLocation())) {
-					ActivateAbility();
-				}
-				else {
-					MoveToActor(lastCharacterTarget);
-				}
-			}
-			// Are we trying to interact with a character
-			else if (lastAction == PlayerControllerEnums::NPCInteract) {
-				// Are we requesting a new target to attack			
-				if (bAttackTarget && IsTargetValid(cursorTarget)) {
-					target = cursorTarget;
-					AttackTarget(DeltaTime);
-				}
-				// Is our current target valid
-				else if (IsTargetValid(target)) {
-					AttackTarget(DeltaTime);
-				}
-				// No valid target so stop firing
-				else {
-					GetOwner()->OnStopFiring.Broadcast();
-				}
-
-				//if (UMiscLibrary::IsCharacterAlive(cursorTarget) && cursorTarget->CompareGroup(GetOwner())) {
-				//	if (mCanSee(cursorTarget->GetActorLocation())
-				//		&& GetOwner()->GetDistanceTo(cursorTarget) <= interactionRange) {
-				//		lastAction = PlayerControllerEnums::None;
-				//		GetOwner()->NPCInteract(cursorTarget);
-				//	}
-				//	else {
-				//		MoveToActor(cursorTarget);
-				//	}
-				//}
-			}
+			SetCursorType();
+			CalculateActions(DeltaTime);
 		}
 		else {
 			PlayerDied();
@@ -169,30 +117,90 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 	}
 }
 
-void AMech_RPGPlayerController::MoveToActor(AActor* target) {
-	if (GetOwner()->CanMove()) {
-		GetOwner()->OnStopFiring.Broadcast();
-		GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, target);
+void AMech_RPGPlayerController::SetCursorType()
+{
+	if (cursorTarget != nullptr && !cursorTarget->IsDead()) {
+		CurrentMouseCursor = EMouseCursor::Crosshairs;
+	}
+	else if (GetInteractableUnderCursor() != nullptr) {
+		CurrentMouseCursor = EMouseCursor::GrabHand;
+	}
+	else {
+		CurrentMouseCursor = EMouseCursor::Hand;
+	}
+}
+
+void AMech_RPGPlayerController::CalculateActions(float DeltaTime)
+{
+	// Are we trying to interact with an Interactable
+	if (lastAction == PlayerControllerEnums::Interactable) {
+		if (mCanSee(lastTargetInteractable->GetActorLocation())
+			&& GetPlayerControllerOwner()->GetDistanceTo(lastTargetInteractable) <= interactionRange) {
+			lastAction = PlayerControllerEnums::None;
+			GetPlayerControllerOwner()->Interact(lastTargetInteractable);
+			inventory->GenerateInventory();
+		}
+		else {
+			MoveToActor(lastTargetInteractable);
+		}
+	}
+	// Are we trying to use an ability
+	else if (lastAction == PlayerControllerEnums::Ability && lastUsedAbility != nullptr) {
+		ActivateAbility();
+	}
+	// Are we trying to interact with a character
+	else if (lastAction == PlayerControllerEnums::NPCInteract) {
+		// Are we requesting a new target to attack			
+		if (bAttackTarget && IsTargetValid(cursorTarget)) {
+			target = cursorTarget;
+			AttackTarget(DeltaTime);
+		}
+		// Is our current target valid
+		else if (IsTargetValid(target)) {
+			AttackTarget(DeltaTime);
+		}
+		// No valid target so stop firing
+		else {
+			GetPlayerControllerOwner()->OnStopFiring.Broadcast();
+		}
+
+		//if (UMiscLibrary::IsCharacterAlive(cursorTarget) && cursorTarget->CompareGroup(GetOwner())) {
+		//	if (mCanSee(cursorTarget->GetActorLocation())
+		//		&& GetOwner()->GetDistanceTo(cursorTarget) <= interactionRange) {
+		//		lastAction = PlayerControllerEnums::None;
+		//		GetOwner()->NPCInteract(cursorTarget);
+		//	}
+		//	else {
+		//		MoveToActor(cursorTarget);
+		//	}
+		//}
+	}
+}
+
+void AMech_RPGPlayerController::MoveToActor(AActor* targetActor) {
+	if (GetPlayerControllerOwner()->CanMove()) {
+		GetPlayerControllerOwner()->OnStopFiring.Broadcast();
+		GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, targetActor);
 	}
 }
 
 void AMech_RPGPlayerController::MoveToLocation(FVector location) {
-	if (GetOwner()->CanMove()) {
-		GetOwner()->OnStopFiring.Broadcast();
+	if (GetPlayerControllerOwner()->CanMove()) {
+		GetPlayerControllerOwner()->OnStopFiring.Broadcast();
 		GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, location);
 	}
 }
 
 void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 	// Are we targeting ourselves
-	if (target == GetOwner()) {
+	if (target == GetPlayerControllerOwner()) {
 		FireWeapon(nullptr);
-		GetOwner()->LookAt(target);
+		GetPlayerControllerOwner()->LookAt(target);
 	}
 	// Have we traced to another character or cover
 	else if (mCanSee(target->GetActorLocation())) {
 		FireWeapon(target);
-		GetOwner()->LookAt(target);
+		GetPlayerControllerOwner()->LookAt(target);
 	}
 	// We've hit some scenery so move towards the target
 	else if (GetWorld()->GetNavigationSystem()) {
@@ -230,36 +238,17 @@ void AMech_RPGPlayerController::PlayerSwappedWeapons(AWeapon* oldWeapon, AWeapon
 }
 
 TArray<AMech_RPGCharacter*> AMech_RPGPlayerController::GetCharactersInRange(float range) {
-	return UMiscLibrary::GetCharactersInRange(range, GetOwner());
+	return UMiscLibrary::GetCharactersInRange(range, GetPlayerControllerOwner());
 }
 
 void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
-	AWeapon* weapon = GetOwner()->GetCurrentWeapon();
-	float distToTarget = FVector::Dist(GetOwner()->GetActorLocation(), target->GetActorLocation());
+	AWeapon* weapon = GetPlayerControllerOwner()->GetCurrentWeapon();
+	float distToTarget = FVector::Dist(GetPlayerControllerOwner()->GetActorLocation(), target->GetActorLocation());
 
 	// Are we in weapons range
 	if (weapon != nullptr && distToTarget <= weapon->GetRange()) {
-		if (GetOwner()->CanAttack() && weapon->CanFire()) {
-
-			//bool isCover = hit != nullptr ? IsCover(hit) : false;
-
-			// Have we hit cover
-			//if (isCover) {
-			//	float distToCover = FVector::Dist(GetOwner()->GetActorLocation(), hit->GetActorLocation());
-
-			//	// Are we too far from the cover to avoid shooting it
-			//	if (distToCover > 200) {
-			//		weapon->Fire(Cast<ACover>(hit));
-			//	}
-			//	// Otherwise we can attack the target
-			//	else {
-			//		weapon->Fire(target);
-			//	}
-			//}
-			//// Otherwise we've got a clear shot to the target
-			//else {
+		if (GetPlayerControllerOwner()->CanAttack() && weapon->CanFire()) {
 			weapon->Fire(target);
-			//}
 		}
 
 		owner->GetGroup()->GroupMemberHit(target, owner);
@@ -403,7 +392,7 @@ void AMech_RPGPlayerController::MoveToMouseCursor() {
 void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation) {
 	UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
 
-	if (UMiscLibrary::IsCharacterAlive(GetOwner()) && NavSys != nullptr) {
+	if (UMiscLibrary::IsCharacterAlive(GetPlayerControllerOwner()) && NavSys != nullptr) {
 		MoveToLocation(DestLocation);
 	}
 }
@@ -428,27 +417,27 @@ void AMech_RPGPlayerController::OnSetDestinationReleased() {
 }
 
 void AMech_RPGPlayerController::ZoomIn() {
-	GetOwner()->CameraBoom->TargetArmLength += 100;
+	GetPlayerControllerOwner()->CameraBoom->TargetArmLength += 100;
 }
 
 void AMech_RPGPlayerController::ZoomOut() {
-	GetOwner()->CameraBoom->TargetArmLength -= 100;
+	GetPlayerControllerOwner()->CameraBoom->TargetArmLength -= 100;
 }
 
 void AMech_RPGPlayerController::ResetZoom() {
-	GetOwner()->CameraBoom->TargetArmLength = 1700;
-	FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
-	rot.Yaw = GetOwner()->GetViewRotation().Yaw;
+	GetPlayerControllerOwner()->CameraBoom->TargetArmLength = 1700;
+	FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
+	rot.Yaw = GetPlayerControllerOwner()->GetViewRotation().Yaw;
 	rot.Pitch = -75.f;
-	GetOwner()->CameraBoom->SetRelativeRotation(rot);
+	GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
 }
 
 void AMech_RPGPlayerController::PanLeft()
 {
 	panLeft = true;
-	FRotator rot = GetOwner()->CameraBoom->RelativeRotation;
+	FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
 	rot.Yaw -= 18;
-	GetOwner()->CameraBoom->SetRelativeRotation(rot);
+	GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
 }
 
 void AMech_RPGPlayerController::PanLeftReleased()
@@ -543,8 +532,8 @@ bool AMech_RPGPlayerController::IsCover(AActor* character) {
 
 bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 	if (inTarget != nullptr && !inTarget->IsDead()) {
-		if (GetOwner()->GetCurrentWeapon()) {
-			if (GetOwner()->GetCurrentWeapon()->Heals()) {
+		if (GetPlayerControllerOwner()->GetCurrentWeapon()) {
+			if (GetPlayerControllerOwner()->GetCurrentWeapon()->Heals()) {
 				return inTarget->CompareGroup(owner);
 			}
 			else {
@@ -557,8 +546,8 @@ bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 
 void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 	// Do we have an owner
-	if (GetOwner() != nullptr) {
-		UGroup* group = GetOwner()->GetGroup();
+	if (GetPlayerControllerOwner() != nullptr) {
+		UGroup* group = GetPlayerControllerOwner()->GetGroup();
 
 		// Does the owner have a group and is there more than 1 other person
 		if (group != nullptr && group->GetMembers().Num() > 1) {
@@ -568,10 +557,10 @@ void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 				AMech_RPGCharacter* character = group->GetMembers()[index - 1];
 
 				// Are we swapping to ourselves
-				if (character != nullptr && GetOwner() != character && !character->IsDead()) {
+				if (character != nullptr && GetPlayerControllerOwner() != character && !character->IsDead()) {
 					character->SetDemandedController(this);
 
-					GetOwner()->SetDemandedController(character->GetController());
+					GetPlayerControllerOwner()->SetDemandedController(character->GetController());
 				}
 			}
 		}
@@ -584,11 +573,11 @@ FHitResult AMech_RPGPlayerController::GetHitFromCursor(ECollisionChannel channel
 	return Hit;
 }
 
-AMech_RPGCharacter* AMech_RPGPlayerController::GetOwner() {
+AMech_RPGCharacter* AMech_RPGPlayerController::GetPlayerControllerOwner() {
 	return owner;
 }
 
-void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
+void AMech_RPGPlayerController::SetPlayerControllerOwner(AMech_RPGCharacter* newVal) {
 	owner = newVal;
 	inventory->SetOwner(owner);
 	questList->SetCharacter(owner);
@@ -602,6 +591,15 @@ void AMech_RPGPlayerController::SetOwner(AMech_RPGCharacter* newVal) {
 	}
 	inventory->GetSelectedItems().Empty();
 
+}
+
+void AMech_RPGPlayerController::Possess(APawn* InPawn)
+{
+	Super::Possess(InPawn);
+	if (IsMechCharacter(InPawn)) {
+		SetPlayerControllerOwner(Cast<AMech_RPGCharacter>(InPawn));
+		UMiscLibrary::SetPlayerController(this);
+	}
 }
 
 void AMech_RPGPlayerController::CharacterFive() {
@@ -645,55 +643,77 @@ void AMech_RPGPlayerController::SwapWeapons() {
 	}
 }
 
-void AMech_RPGPlayerController::ActivateAbility() {
-	FHitResult hit;
+FVector AMech_RPGPlayerController::GetCharacterLocation(AMech_RPGCharacter* tempCharacter)
+{
 	FVector location;
-	AMech_RPGCharacter* tempCharacter = cursorTarget != nullptr ? cursorTarget : lastCharacterTarget;
+
+	if (!UMiscLibrary::IsCharacterAlive(tempCharacter)) {
+		location = GetHitFromCursor().ImpactPoint;
+	}
+	else if (UMiscLibrary::IsCharacterAlive(tempCharacter)) {
+		location = tempCharacter->GetActorLocation();
+	}
+	return location;
+}
+
+void AMech_RPGPlayerController::ActivateAbility() {
+	AMech_RPGCharacter* tempCharacter = cursorTarget;
 
 	if (IsOwnerValid()
-		&& GetOwner()->HasAbilities()
-		&& !GetOwner()->Channelling()
-		&& GetOwner()->CanCast()) {
+		&& GetPlayerControllerOwner()->HasAbilities()
+		&& !GetPlayerControllerOwner()->Channelling()
+		&& GetPlayerControllerOwner()->CanCast()) {
 
-		SetupCollision();
+		//SetupCollision();
 
-		//We're targeting the ground so get selected location
-		if (!UMiscLibrary::IsCharacterAlive(tempCharacter)) {
-			hit = GetHitFromCursor();
-			location = hit.ImpactPoint;
-		}
-		else if (UMiscLibrary::IsCharacterAlive(tempCharacter)) {
-			location = tempCharacter->GetActorLocation();
-			lastCharacterTarget = tempCharacter;
-		}
-
-		for (UAbility* ability : GetOwner()->GetAbilities()) {
-			if (ability != nullptr && !ability->OnCooldown()) {
-
-				if (ability->GetTagTrue(ability->needsTargetTag)) {
-					//Only use an ability if we have LoS to our target/location
-					if (!mCanSee(location)) {
-						MoveToLocation(location);
-						lastUsedAbility = ability;
-						lastAction = PlayerControllerEnums::Ability;
-						break;
-					}
-				}
-
-				if (ability->Activate(tempCharacter, location)) {
-					GetOwner()->SetCurrentAbility(ability);
-					StopMovement();
-					lastAction = PlayerControllerEnums::None;
+		// Check if we've already tried to use an ability and we can use it, or try to use another one
+		if (lastUsedAbility == nullptr) {
+			for (UAbility* ability : GetPlayerControllerOwner()->GetAbilities()) {
+				if (usedAbility(ability, GetCharacterLocation(tempCharacter), tempCharacter)) {
 					break;
 				}
 			}
 		}
+		else {
+			usedAbility(lastUsedAbility, GetCharacterLocation(lastCharacterTarget), lastCharacterTarget);
+		}
 	}
 }
 
+
+bool AMech_RPGPlayerController::usedAbility(UAbility* ability, FVector location, AMech_RPGCharacter* tempCharacter)
+{
+	// Check if the ability is valid.
+	if (ability != nullptr && !ability->OnCooldown()) {
+		//if (ability->GetTagTrue(ability->needsTargetTag)) {
+			//Only use an ability if we have LoS to our target/location
+		if (!mCanSee(location)) {
+			MoveToLocation(location);
+			lastUsedAbility = ability;
+			lastCharacterTarget = tempCharacter;
+			lastAction = PlayerControllerEnums::Ability;
+			return false;
+		}
+		//}
+
+		// If the ability doesn't need a target or we can see the location, try to use it 
+		if (ability->Activate(tempCharacter, location)) {
+			GetPlayerControllerOwner()->SetCurrentAbility(ability);
+			StopMovement();
+			lastAction = PlayerControllerEnums::None;
+
+			// Clear last used and target
+			lastCharacterTarget = nullptr;
+			lastUsedAbility = nullptr;
+			return true;
+		}
+	}
+	return false;
+}
+
 void AMech_RPGPlayerController::PlayerDied() {
-	for (int i = 0; i < GetOwner()->GetGroup()->GetMembers().Num(); i++) {
-		AMech_RPGCharacter* character = GetOwner()->GetGroup()->GetMembers()[i];
+	for (int i = 0; i < GetPlayerControllerOwner()->GetGroup()->GetMembers().Num(); i++) {
+		AMech_RPGCharacter* character = GetPlayerControllerOwner()->GetGroup()->GetMembers()[i];
 
 		if (UMiscLibrary::IsCharacterAlive(character)) {
 			DemandSwapCharacter(i + 1);
@@ -703,24 +723,24 @@ void AMech_RPGPlayerController::PlayerDied() {
 }
 
 void AMech_RPGPlayerController::SwapCharacter() {
-	AAllyAIController* aiCon = Cast<AAllyAIController>(GetOwner()->GetDemandedController());
-	AMech_RPGCharacter* aiOwner = aiCon->GetOwner();
+	AAllyAIController* aiCon = Cast<AAllyAIController>(GetPlayerControllerOwner()->GetDemandedController());
+	AMech_RPGCharacter* aiOwner = aiCon->GetAIOwner();
 	AMech_RPGCharacter* aiTarget = aiCon->GetTarget();
 
-	GetOwner()->SetDemandedController(nullptr);
+	GetPlayerControllerOwner()->SetDemandedController(nullptr);
 	aiOwner->SetDemandedController(nullptr);
 
 	if (aiCon != nullptr) {
 		aiCon->SetTarget(GetTarget());
 		aiCon->SetPlayerControlledLocation(FVector::ZeroVector);
-		aiCon->Possess(GetOwner());
-		aiOwner->MirrorCamera(GetOwner());
+		aiCon->Possess(GetPlayerControllerOwner());
+		aiOwner->MirrorCamera(GetPlayerControllerOwner());
 		Possess(aiOwner);
 	}
 }
 
 bool AMech_RPGPlayerController::IsOwnerValid() {
-	return GetOwner() != nullptr && !GetOwner()->IsDead();
+	return GetPlayerControllerOwner() != nullptr && !GetPlayerControllerOwner()->IsDead();
 }
 
 void AMech_RPGPlayerController::AllyAbility(int index) {
@@ -728,11 +748,11 @@ void AMech_RPGPlayerController::AllyAbility(int index) {
 }
 
 void AMech_RPGPlayerController::AllyAttack(int index) {
-	UGroup* group = GetOwner()->GetGroup();
+	UGroup* group = GetPlayerControllerOwner()->GetGroup();
 
 	if (group != nullptr) {
 		AMech_RPGCharacter* character = group->GetMember(index);
-		if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
+		if (UMiscLibrary::IsCharacterAlive(character) && character != GetPlayerControllerOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 
 			if (con->IsTargetValid(cursorTarget)) {
@@ -744,11 +764,11 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 }
 
 void AMech_RPGPlayerController::GroupAttack() {
-	UGroup* group = GetOwner()->GetGroup();
+	UGroup* group = GetPlayerControllerOwner()->GetGroup();
 
 	if (group != nullptr) {
 		for (AMech_RPGCharacter* character : group->GetMembers()) {
-			if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
+			if (UMiscLibrary::IsCharacterAlive(character) && character != GetPlayerControllerOwner()) {
 				AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 
 				if (con->IsTargetValid(cursorTarget)) {
@@ -761,10 +781,10 @@ void AMech_RPGPlayerController::GroupAttack() {
 }
 
 void AMech_RPGPlayerController::AllyMove(int index) {
-	UGroup* group = GetOwner()->GetGroup();
+	UGroup* group = GetPlayerControllerOwner()->GetGroup();
 	if (group != nullptr) {
 		AMech_RPGCharacter* character = group->GetMember(index);
-		if (UMiscLibrary::IsCharacterAlive(character) && character != GetOwner()) {
+		if (UMiscLibrary::IsCharacterAlive(character) && character != GetPlayerControllerOwner()) {
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 			static FHitResult Hit;
 

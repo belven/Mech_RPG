@@ -15,7 +15,7 @@ UChannelledAbility::UChannelledAbility() : Super() {
 	}
 }
 
-bool UChannelledAbility::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
+bool UChannelledAbility::Activate(class AMech_RPGCharacter* target, FVector inTargetLocation) {
 	if (!channelling) {
 		channelling = true;
 		owner->SetChannelling(true);
@@ -23,7 +23,7 @@ bool UChannelledAbility::Activate(class AMech_RPGCharacter* target, FVector targ
 		owner->ApplyCrowdControl(EffectEnums::Move, false);
 		owner->ApplyCrowdControl(EffectEnums::Attack, false);
 		targetCharacter = target;
-		this->targetLocation = targetLocation;
+		targetLocation = inTargetLocation;
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UChannelledAbility::ActiveChannelAbility, 0.1F);
 		return true;
 	}
@@ -39,7 +39,8 @@ float UChannelledAbility::GetCooldown() {
 }
 
 float UChannelledAbility::GetChannelDuration() {
-	return channelDuration;
+	float percentChange = 1 - (owner->GetSpeedModifier() - 1);
+	return channelDuration * percentChange;
 }
 
 float UChannelledAbility::GetCurrentChannelTime() {

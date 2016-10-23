@@ -19,11 +19,11 @@ USTRUCT(BlueprintType)
 struct FTempAOESettings {
 	GENERATED_USTRUCT_BODY()
 public:
-	AMech_RPGCharacter* owner = NULL;
-	AMech_RPGCharacter* target = NULL;
+	AMech_RPGCharacter* owner = nullptr;
+	AMech_RPGCharacter* target = nullptr;
 
 	FVector location = FVector::ZeroVector;
-	UWorld* world = NULL;
+	UWorld* world = nullptr;
 
 	float radius = 100;
 	float healthChange = 100;
@@ -54,4 +54,11 @@ public:
 
 	static AAOEHealthChange* CreateAOEHealthChange(FTempAOESettings inSettings);
 	void Activate();
+
+	void PerformHealthChange(AMech_RPGCharacter* character);
+
+	static FVector GetLocationToUse(FTempAOESettings inSettings);
+	bool CanAffect(AMech_RPGCharacter* character);
+	float GetHealthChange(AMech_RPGCharacter* character);
+	void CreateDebugSphere(FVector locationToUse);
 };

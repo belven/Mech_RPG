@@ -25,9 +25,9 @@ AMechPart::~AMechPart()
 	//meshComponent->DestroyComponent(true);
 }
 
-void AMechPart::SetOwner(AMech_RPGCharacter* inOwner)
+void AMechPart::SetItemOwner(AMech_RPGCharacter* inOwner)
 {
-	Super::SetOwner(inOwner);
+	Super::SetItemOwner(inOwner);
 
 	if (mesh == nullptr && meshClass != nullptr) {
 		mesh = GetWorld()->SpawnActor<UStaticMesh>(meshClass);

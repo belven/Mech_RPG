@@ -38,8 +38,8 @@ float AOverHeatWeapon::GetProgressBarPercent() {
 	return heatLevel;
 }
 
-void AOverHeatWeapon::SetOwner(AMech_RPGCharacter* inOwner) {
-	Super::SetOwner(inOwner);
+void AOverHeatWeapon::SetItemOwner(AMech_RPGCharacter* inOwner) {
+	Super::SetItemOwner(inOwner);
 	if (inOwner != nullptr) {
 		inOwner->OnOutOfCombat.AddUniqueDynamic(this, &AOverHeatWeapon::Cooldown);
 	}
@@ -77,7 +77,7 @@ AOverHeatWeapon* AOverHeatWeapon::CreateOverHeatWeapon(UWorld* world, AMech_RPGC
 		weapon->SetSettings(inSettings);
 		weapon->heatLosePerTick = inSettings.heatLosePerTick;
 		weapon->heatGenerated = inSettings.heatGenerated;
-		weapon->SetOwner(inOwner);
+		weapon->SetItemOwner(inOwner);
 		return weapon;
 	}
 	return NULL;

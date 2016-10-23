@@ -36,7 +36,11 @@ public:
 
 	static const FString lnBreak;
 
+	static const float MAX_HEALTH_CHANGE;
+
 	template<class T> static void InitialiseArray(TArray<T>& emptyArray, T* items);
+
+	static bool IsCrit(float critChance);
 
 	static FColor GetRelativeColour(AMech_RPGCharacter * character);
 

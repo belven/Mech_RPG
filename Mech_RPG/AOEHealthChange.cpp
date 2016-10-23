@@ -5,7 +5,9 @@
 #include "Characters/Mech_RPGCharacter.h"
 #include "DrawDebugHelpers.h"
 
-AAOEHealthChange::AAOEHealthChange() : Super() {
+AAOEHealthChange::AAOEHealthChange()
+	: currentLifetime(0),
+	Super() {
 	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("AoEParticleSystem"));
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/AoE"));
@@ -21,28 +23,53 @@ AAOEHealthChange::AAOEHealthChange() : Super() {
 }
 
 AAOEHealthChange* AAOEHealthChange::CreateAOEHealthChange(FTempAOESettings inSettings) {
+	AAOEHealthChange* tempAOE = inSettings.world->SpawnActor<AAOEHealthChange>(StaticClass(), GetLocationToUse(inSettings), FRotator(0, 0, 0));
+	tempAOE->settings = inSettings;
+	tempAOE->Activate();
+	return tempAOE;
+}
+
+FVector AAOEHealthChange::GetLocationToUse(FTempAOESettings inSettings)
+{
 	FVector locationToUse;
 
-	if (inSettings.usesTarget && inSettings.target != NULL) {
+	if (inSettings.usesTarget && inSettings.target != nullptr) {
 		locationToUse = inSettings.target->GetActorLocation();
 		locationToUse.Z -= inSettings.target->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	}
 	else {
 		locationToUse = inSettings.location;
 	}
-
-	AAOEHealthChange* tempAOE = inSettings.world->SpawnActor<AAOEHealthChange>(StaticClass(), locationToUse, FRotator(0, 0, 0));
-	tempAOE->settings = inSettings;
-	tempAOE->Activate();
-	return tempAOE;
+	return locationToUse;
 }
+
+bool AAOEHealthChange::CanAffect(AMech_RPGCharacter* character)
+{
+	if (settings.affectedTeam == AOEEnums::Ally) {
+		return character->CompareGroup(settings.owner);
+	}
+	return !character->CompareGroup(settings.owner);
+}
+
+float AAOEHealthChange::GetHealthChange(AMech_RPGCharacter* character) {
+	if (settings.healthChange < UMiscLibrary::MAX_HEALTH_CHANGE
+		&& UMiscLibrary::IsCharacterAlive(character)) {
+		return character->GetMaxHealth() * settings.healthChange;
+	}
+	return settings.healthChange;
+}
+
+void AAOEHealthChange::CreateDebugSphere(FVector locationToUse) {
+	DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, UMiscLibrary::GetRelativeColour(settings.owner), false, settings.rate, 0);
+}
+
 
 void  AAOEHealthChange::Activate() {
 	if (currentLifetime <= settings.duration) {
 		currentLifetime += settings.rate;
 
-		FVector locationToUse = settings.usesTarget && settings.target != NULL ? settings.target->GetActorLocation() : settings.location;
-		DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, UMiscLibrary::GetRelativeColour(settings.owner), false, settings.rate, 0);
+		FVector locationToUse = GetLocationToUse(settings);
+		CreateDebugSphere(locationToUse);
 
 		/*	if (!partclSystem->IsActive()) {
 				partclSystem->SetVectorParameter(FName(TEXT("Size")), FVector(settings.radius * 2));
@@ -50,17 +77,8 @@ void  AAOEHealthChange::Activate() {
 			}*/
 
 		for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(settings.radius, locationToUse)) {
-			bool canAffect = settings.affectedTeam == AOEEnums::Ally ? character->CompareGroup(settings.owner) : !character->CompareGroup(settings.owner);
-
-			if (canAffect) {
-				float tempDamage = settings.healthChange > 2 ? settings.healthChange : character->GetMaxHealth() * settings.healthChange;
-				FHealthChange healthChange;
-				healthChange.damager = settings.owner;
-				healthChange.healthChange = tempDamage;
-				healthChange.target = character;
-				healthChange.damageType = settings.damageType;
-				healthChange.heals = settings.heals;
-				character->ChangeHealth(healthChange);
+			if (CanAffect(character)) {
+				PerformHealthChange(character);
 			}
 		}
 
@@ -70,4 +88,16 @@ void  AAOEHealthChange::Activate() {
 		partclSystem->Deactivate();
 		Destroy();
 	}
+}
+
+void AAOEHealthChange::PerformHealthChange(AMech_RPGCharacter* character)
+{
+	float tempDamage = GetHealthChange(character);
+	FHealthChange healthChange;
+	healthChange.damager = settings.owner;
+	healthChange.healthChange = tempDamage;
+	healthChange.target = character;
+	healthChange.damageType = settings.damageType;
+	healthChange.heals = settings.heals;
+	character->ChangeHealth(healthChange);
 }

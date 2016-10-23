@@ -47,7 +47,7 @@ bool UGroup::Compare(UGroup* inGroup) {
 }
 
 AMech_RPGCharacter* UGroup::GetMember(int32 index) {
-	return members.IsValidIndex(index - 1) ? members[index - 1] : NULL;
+	return members.IsValidIndex(index - 1) ? members[index - 1] : nullptr;
 }
 
 AMech_RPGCharacter* UGroup::GetRandomMember()
@@ -61,7 +61,7 @@ AMech_RPGCharacter* UGroup::GetRandomMember()
 	}
 
 	if (aliveMembers.Num() == 0) {
-		return NULL;
+		return nullptr;
 	}
 	else if (aliveMembers.Num() == 1) {
 		return aliveMembers[0];
@@ -90,20 +90,20 @@ AMech_RPGCharacter* UGroup::GetLowHealthMember()
 AMech_RPGCharacter* UGroup::GetPlayer() {
 	if (HasMemebers()) {
 		for (AMech_RPGCharacter* character : members) {
-			if (character != NULL
-				&& character->GetController() != NULL
-				&& character->GetController()->GetClass()->IsChildOf(AMech_RPGPlayerController::StaticClass())) {
+			if (character != nullptr
+				&& character->GetController() != nullptr
+				&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
 				return character;
 			}
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
 void UGroup::GroupMemberHit(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
-	if (OnMemberDamageEvent.IsBound() && attacker != NULL && !attacker->IsDead()) {
+	if (OnMemberDamageEvent.IsBound() && attacker != nullptr && !attacker->IsDead()) {
 		OnMemberDamageEvent.Broadcast(attacker, damagedMember);
 	}
 }

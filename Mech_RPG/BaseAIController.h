@@ -3,6 +3,7 @@
 #pragma once
 
 #include "AIController.h"
+#include "AOEHealthChange.h"
 #include "BaseAIController.generated.h"
 
 class AMech_RPGCharacter;
@@ -13,17 +14,18 @@ class MECH_RPG_API ABaseAIController : public AAIController {
 
 protected:
 	AMech_RPGCharacter* characterOwner;
-	AMech_RPGCharacter* target;
-	FHitResult hit;
+	AMech_RPGCharacter* targetCharacter;
 public:
 	ABaseAIController();
 	void AttackTarget(float DeltaTime);
 
 	virtual void Tick(float DeltaTime) override;
 
+	void Possess(APawn* InPawn) override;
+
 	UFUNCTION(BlueprintCallable, Category = "Group")
 	virtual void OwnerPostBeginPlay(AMech_RPGCharacter* mech);
-	void FindTarget(bool ally = false);
+	void FindTarget(AOEEnums::AffectedTeam affectedTeam = AOEEnums::Enemy);
 
 
 	bool PerformAbility(UAbility* ability);
@@ -32,12 +34,12 @@ public:
 
 	UAbility* GetOwnerAbilityByTag(FString tag);
 	
-	AMech_RPGCharacter* GetOwner();
+	AMech_RPGCharacter* GetAIOwner();
 	AMech_RPGCharacter* GetTarget();
 
-	bool IsTargetValid(AMech_RPGCharacter* inTarget, bool ally = false);
+	bool IsTargetValid(AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam = AOEEnums::Enemy);
 
-	void SetOwner(AMech_RPGCharacter* newVal);
+	void SetAIOwner(AMech_RPGCharacter* newVal);
 	void SetTarget(AMech_RPGCharacter* newVal);
 
 	void MoveToActor(AActor* target);

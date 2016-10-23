@@ -3,11 +3,15 @@
 #include "Mech_RPG.h"
 #include "Abilities/DamageBoost.h"
 #include "Characters/Mech_RPGCharacter.h"
+#include "ModifierTimer.h"
 
 bool UDamageBoost::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	SetOnCooldown(owner->GetWorld());
-	owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_DamageBoostEnded, this, &UDamageBoost::ResetDamageBoost, GetCooldown() * 0.5);
-	owner->SetHealthChangeModifier(owner->GetHealthChangeModifier() + damageMultiplier);
+	//owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_DamageBoostEnded, this, &UDamageBoost::ResetDamageBoost, GetCooldown() * 0.5);
+	//owner->SetHealthChangeModifier(owner->GetHealthChangeModifier() + damageMultiplier);
+	TMap<ModifierEnums::ModifierType, float> modifiers;
+	modifiers.Add(ModifierEnums::HealthChange, damageMultiplier);
+	UModifierTimer::CreateEffectTimer(owner, GetCooldown() * 0.5, modifiers);
 	return true;
 }
 

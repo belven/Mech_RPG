@@ -16,7 +16,7 @@ public:
 	AMechPart();
 	~AMechPart();
 
-	virtual	void SetOwner(AMech_RPGCharacter* inOwner);
+	virtual	void SetItemOwner(AMech_RPGCharacter* inOwner);
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;

@@ -19,7 +19,7 @@ public:
 		void TimeTick();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		static UTimedHealthChange* CreateTimedHealthChange(AMech_RPGCharacter* inOwner, float cooldown, float inChangeAmount = 100, float inRate = 0.2F, float inDuration = 1.0F, bool inHeals = false);
+		static UTimedHealthChange* CreateTimedHealthChange(AMech_RPGCharacter* inOwner, float cooldown = 1.0F, float inChangeAmount = 1.0F, float inRate = 0.2F, float inDuration = 1.0F, bool inHeals = false);
 
 private:
 	float changeAmount = 100;
@@ -28,7 +28,7 @@ private:
 	float timeLeft = 1.0F;
 	bool heals;
 
-	class AMech_RPGCharacter* target;
+	class AMech_RPGCharacter* targetCharacter;
 
 	FTimerHandle TimerHandle_TimeTick;
 };

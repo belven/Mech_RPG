@@ -14,9 +14,9 @@ AAllyAIController::AAllyAIController() : Super() {
 
 void AAllyAIController::Tick(float DeltaTime) {
 	//UE_LOG(LogTemp, Log, TEXT("AAllyAIController Tick"));
-	if (GetOwner() && !GetOwner()->IsDead() && GetOwner()->GetDemandedController() == NULL) {
+	if (GetAIOwner() && !GetAIOwner()->IsDead() && GetAIOwner()->GetDemandedController() == NULL) {
 		if (GetPlayerControlledLocation() != FVector::ZeroVector) {
-			float dist = FVector::Dist(GetPlayerControlledLocation(), GetOwner()->GetActorLocation());
+			float dist = FVector::Dist(GetPlayerControlledLocation(), GetAIOwner()->GetActorLocation());
 			if (dist > 1800.0F) {
 				SetPlayerControlledLocation(FVector::ZeroVector);
 			}
@@ -30,9 +30,9 @@ void AAllyAIController::Tick(float DeltaTime) {
 		else {
 			Super::Tick(DeltaTime);
 
-			if (!IsTargetValid(GetTarget(), false) && !IsTargetValid(GetTarget(), true)) {
-				AMech_RPGCharacter* player = GetOwner()->GetGroup()->GetPlayer();
-				if (player != NULL && player->GetDistanceTo(GetOwner()) > (300.0F + (GetOwner()->GetGroup()->GetMembers().IndexOfByKey(GetOwner()) * 40))) {
+			if (!IsTargetValid(GetTarget(), AOEEnums::Enemy) && !IsTargetValid(GetTarget(), AOEEnums::Ally)) {
+				AMech_RPGCharacter* player = GetAIOwner()->GetGroup()->GetPlayer();
+				if (ShouldMoveToPlayer(player)) {
 					MoveToActor(player);
 				}
 				else {
@@ -41,6 +41,19 @@ void AAllyAIController::Tick(float DeltaTime) {
 			}
 		}
 	}
+}
+
+bool AAllyAIController::ShouldMoveToPlayer(AMech_RPGCharacter* player)
+{
+	if (player != nullptr) {
+		int32 indexOfByKey = GetAIOwner()->GetGroup()->GetMembers().IndexOfByKey(GetAIOwner());
+
+		// This will try and spread the bots out a bit based on how many there are
+		float distance = player->GetInCombat() ? GetAIOwner()->GetCurrentWeapon()->GetRange() : 300.0F + (indexOfByKey * 60);
+
+		return player->GetDistanceTo(GetAIOwner()) > distance;
+	}
+	return false;
 }
 
 void AAllyAIController::BeginPlay() {

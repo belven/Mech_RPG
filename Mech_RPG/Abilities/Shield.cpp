@@ -8,9 +8,9 @@ bool UShield::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 {
 	if (target != nullptr) {
 		shieldHealth = GetWeaponHealthChange() * shieldAmount;
-		this->target = target;
+		shieldTarget = target;
 		SetOnCooldown(owner->GetWorld());
-		target->OnPreHealthChange.AddUniqueDynamic(this, &UShield::ChangeHealth);
+		shieldTarget->OnPreHealthChange.AddUniqueDynamic(this, &UShield::ChangeHealth);
 		return true;
 	}
 	return false;
@@ -43,6 +43,6 @@ void UShield::ChangeHealth(FHealthChange healthChange) {
 	}
 	else {
 		healthChange.healthChange -= shieldHealth;
-		target->OnPreHealthChange.RemoveDynamic(this, &UShield::ChangeHealth);
+		shieldTarget->OnPreHealthChange.RemoveDynamic(this, &UShield::ChangeHealth);
 	}
 }

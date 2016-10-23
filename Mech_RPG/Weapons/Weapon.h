@@ -76,7 +76,7 @@ public:
 	virtual void Fire(class AMech_RPGCharacter* targetr);
 	virtual void Fire(class ACover* target);
 
-	virtual	void SetOwner(AMech_RPGCharacter* inOwner) override;
+	virtual	void SetItemOwner(AMech_RPGCharacter* inOwner) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual void StopFire();

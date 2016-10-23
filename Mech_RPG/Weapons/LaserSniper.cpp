@@ -34,7 +34,7 @@ ALaserSniper * ALaserSniper::CreateLaserSniper(UWorld * world, AMech_RPGCharacte
 		weapon->SetSettings(overheatSettings);
 		weapon->heatLosePerTick = overheatSettings.heatLosePerTick;
 		weapon->heatGenerated = overheatSettings.heatGenerated;
-		weapon->SetOwner(inOwner);
+		weapon->SetItemOwner(inOwner);
 		weapon->SetName("Laser Sniper");
 		return weapon;
 	}
@@ -45,7 +45,7 @@ AItem* ALaserSniper::Copy()
 {
 	ALaserSniper* weapon = GetWorld()->SpawnActor<ALaserSniper>(ALaserSniper::StaticClass());
 	weapon->SetSettings(settings);
-	weapon->SetOwner(GetOwner());
+	weapon->SetItemOwner(GetItemOwner());
 	weapon->heatLosePerTick = heatLosePerTick;
 	weapon->heatGenerated = heatGenerated;
 	weapon->SetName(GetName());
