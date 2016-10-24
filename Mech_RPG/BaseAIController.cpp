@@ -31,14 +31,14 @@ void ABaseAIController::Tick(float DeltaTime) {
 				if (GetAIOwner()->GetCurrentWeapon()->Heals()) {
 					FindTarget(AOEEnums::Ally);
 
-					if (IsTargetValid(targetCharacter, AOEEnums::Ally) && UMiscLibrary::GetMissingHealth(targetCharacter) > 0) {
+					if (targetCharacter != nullptr) {
 						AttackTarget(DeltaTime);
 					}
 				}
 				else {
-					FindTarget();
+					FindTarget(AOEEnums::Enemy);
 
-					if (IsTargetValid(targetCharacter)) {
+					if (targetCharacter != nullptr) {
 						AttackTarget(DeltaTime);
 					}
 				}
@@ -166,8 +166,7 @@ void ABaseAIController::FindTarget(AOEEnums::AffectedTeam affectedTeam) {
 
 	if (affectedTeam == AOEEnums::Enemy) {
 		for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
-			if (IsTargetValid(character, affectedTeam)
-				&& UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), character->GetActorLocation())) {
+			if (IsTargetValid(character, affectedTeam)) {
 				SetTarget(character);
 				break;
 			}
@@ -186,10 +185,11 @@ void ABaseAIController::FindTarget(AOEEnums::AffectedTeam affectedTeam) {
 			// Search for allies outside of the group within range
 			for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
 				// Is the target valid
-				if (IsTargetValid(character, affectedTeam) && UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), character->GetActorLocation())) {
+				if (IsTargetValid(character, affectedTeam) 
+				    && UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), character->GetActorLocation())) {
 					// Have they lost health
 					if (UMiscLibrary::GetMissingHealth(character) > 0) {
-						SetTarget(character->GetGroup()->GetRandomMember());
+						SetTarget(character);
 						break;
 					}
 				}
