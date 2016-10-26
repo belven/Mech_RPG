@@ -150,7 +150,7 @@ UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums:
 	case AbilityEnums::AoEHeal:
 		return UAoEHeal::CreateAbility(20.0F, owner, 2.0F);
 	case AbilityEnums::Stun:
-		return UStun::CreateAbility(10.0F, owner, 4);
+		return UStun::CreateAbility(15.0F, owner, 4);
 	case AbilityEnums::Disable:
 		return UDisable::CreateDisable(10.0F, owner, 4.0F);
 	case AbilityEnums::Taunt:

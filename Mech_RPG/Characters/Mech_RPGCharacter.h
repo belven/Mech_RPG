@@ -26,12 +26,15 @@ namespace EffectEnums {
 #include "Abilities/Ability.h"
 #include "Items/Inventory.h"
 #include "UI/FloatingStats_BP.h"
+#include "Delegates/DelegateCombinations.h"
 #include "Mech_RPGCharacter.generated.h"
 
 #define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)
 #define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
 #define mCreateChannelledAbility(ability, Duration, loc, trace) UChannelledAbility::CreateChannelledAbility(this, ability, Duration, loc, trace)
 #define mCreatePresetRole(role) AMech_RPGCharacter::CreatePresetRole(role)
+
+#define ArmourMap TPair<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*>
 
 USTRUCT(BlueprintType)
 struct FHealthChange {
@@ -186,9 +189,9 @@ private:
 
 	UPROPERTY()
 		TArray<UAbility*> abilities;
-
+	
 	UPROPERTY()
-		TArray<AArmour*> armour;
+	TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*> armour;
 
 	UPROPERTY()
 		TArray<UQuest*> quests;
@@ -203,7 +206,7 @@ private:
 		class UFloatingStats_BP* floatingStats = nullptr;
 
 	UPROPERTY()
-	class UCharacterStats* characterStats = nullptr;
+		class UCharacterStats* characterStats = nullptr;
 
 	TSubclassOf<class UFloatingStats_BP> widgetClass = nullptr;
 	TSubclassOf<class UFloatingTextUI> floatingTextClass = nullptr;
@@ -231,6 +234,9 @@ public:
 	}
 
 	float GetTotalResistance(DamageEnums::DamageType damageType);
+
+	UFUNCTION(BlueprintCallable, Category = "Armour")
+		void CreateArmour(float phsyicalResistance, float blastResistance, float energyResistance, int32 grade, int32 quaility);
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 		void AddQuest(UQuest* newQuest);
@@ -297,7 +303,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void NPCInteract(AMech_RPGCharacter * character);
-	
+
 	virtual void NotifyActorBeginCursorOver() override;
 
 	virtual void OutOfCombat();
@@ -355,13 +361,20 @@ public:
 	void SetUpWidgets();
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		FORCEINLINE	TArray<AArmour*>& GetArmour() {
+		FORCEINLINE	TArray<AArmour*> GetArmourList() {
+		TArray<AArmour*> armourList;
+		armour.GenerateValueArray(armourList);
+		return armourList;
+	}
+
+	FORCEINLINE	TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*>& GetArmour() {
 		return armour;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		AArmour* GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
 
+	// if remove is false then it will apply the effect, if it's true it will remove it
 	UFUNCTION(BlueprintCallable, Category = "CrowdControl")
 		void ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool remove);
 
@@ -392,7 +405,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		void ChangeHealth(FHealthChange healthChange);
+		virtual void ChangeHealth(FHealthChange healthChange);
 
 	UFUNCTION(BlueprintCallable, Category = "Items")
 		AItem* CalucluateItemDrop(UGroup * inGroup, ItemEnumns::ItemType type = ItemEnumns::Weapon);
@@ -420,7 +433,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetGroup(UGroup* newVal);
-	
+
 	// Compares the characters group with another, true if allies, false if enemies
 	bool CompareGroup(UGroup* inGroup);
 

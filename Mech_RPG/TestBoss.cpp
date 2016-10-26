@@ -6,6 +6,11 @@
 #include "Abilities/ChannelledAbility.h"
 #include "MiscLibrary.h"
 #include "TestBoss.h"
+#include "Abilities/Immobilise.h"
+#include "HealthChangePhaseTrigger.h"
+
+#define mCreateHealthChangePhaseTrigger(health, phase) UHealthChangePhaseTrigger::CreateHealthChangePhaseTrigger(this, health, phase)
+#define mGetMeleeRange UMiscLibrary::GetMeleeRange(this)
 
 void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility)
 {
@@ -13,13 +18,13 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 	float blastResistance = 5;
 	float phsyicalResistance = 5;
 	float energyResistance = 5;
-	static float Health = 50000;
+	static float Health = 20000;
 
 	StartingRole(inRole);
 
 	Reset();
 	ApplyCrowdControl(EffectEnums::Cast, false); //Default to not casting
-	
+
 	FWeaponParams params;
 	params.critChance = 0;
 	params.damageType = DamageEnums::Blast;
@@ -31,7 +36,7 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 	params.healthChange = 1500;
 
 	SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
-	AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 2.0F), 6, true, false));
+	AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 2.5F), 6, true, false));
 	SetDefenceModifier(0.0F + statModifier);
 	SetHealthChangeModifier(1.0F + statModifier);
 	blastResistance = AArmour::GetDeafultValue(ArmourGrades::Medium);
@@ -41,41 +46,45 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 
 	SetHealth(GetMaxHealth());
 
-	for (int i = 0; i < ArmourEnums::End; i++) {
-		AArmour* newArmour = AArmour::CreateArmour(GetWorld(), "Test", phsyicalResistance, blastResistance, energyResistance, (ArmourEnums::ArmourPosition)i, this, grade, quaility);
-		GetArmour().Add(newArmour);
-		AddItem(newArmour);
-	}
+	CreateArmour(phsyicalResistance, blastResistance, energyResistance, grade, quaility);
+
+	triggers.Add(mCreateHealthChangePhaseTrigger(0.15, 1));
+	triggers.Add(mCreateHealthChangePhaseTrigger(0.15, 2));
+	triggers.Add(mCreateHealthChangePhaseTrigger(0.15, 3));
 }
 
 void ATestBoss::SetPhase(int32 val)
-{ 
-	phase = val;
+{
+	Super::SetPhase(val);
 
-	if (phase == 1) {
+	if (GetPhase() == 1) {
 		ApplyCrowdControl(EffectEnums::Cast, true); // Set can cast
 		ApplyCrowdControl(EffectEnums::Attack, false);
+		SetHealth(GetMaxHealth());
 	}
-	else if (phase == 2) {
+	else if (GetPhase() == 2) {
 		ApplyCrowdControl(EffectEnums::Cast, false);
 		ApplyCrowdControl(EffectEnums::Attack, true);
+		SetHealth(GetMaxHealth());
 	}
-	else if (phase == 3) {
-		ApplyCrowdControl(EffectEnums::Cast, true);
-		ApplyCrowdControl(EffectEnums::Attack, false);
-	}
-}
+	else if (GetPhase() == 3) {
+		FWeaponParams params;
+		params.critChance = 40;
+		params.damageType = DamageEnums::Physical;
+		params.fireRate = 1;
+		params.grade = GetCurrentWeapon()->GetGrade();
+		params.quality = (QualityEnums::Quality)GetCurrentWeapon()->GetQuality();
+		params.range = mGetMeleeRange;
+		params.healthChange = 1750;
 
-void ATestBoss::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	if (phase == 0 && UMiscLibrary::GetHealthPercent(this) <= 0.75) {
-		SetPhase(1);
-	}
-	else if (phase == 1 && UMiscLibrary::GetMissingHealthPercent(this) <= 0.50) {
-		SetPhase(2);
-	}
-	else if (phase == 2 && UMiscLibrary::GetMissingHealthPercent(this) <= 0.25) {
-		SetPhase(3);
+		SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
+
+		GetAbilities().Empty();
+		AddAbility(mCreateChannelledAbility(UImmobilise::CreateAbility(10, this, 5), 3, false, true));
+
+		ApplyCrowdControl(EffectEnums::Cast, true);
+		SetHealth(GetMaxHealth());
+		SetSpeedModifier(0.8);
+		SetDefenceModifier(1.3);
 	}
 }

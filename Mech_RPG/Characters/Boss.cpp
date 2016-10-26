@@ -3,9 +3,15 @@
 #include "Boss.h"
 #include "Weapons.h"
 #include "Abilities.h"
+#include "PhaseTrigger.h"
 
 TEnumAsByte<GroupEnums::Role> ABoss::GetRandomRole() {
 	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
+}
+
+void ABoss::SetPhase(int32 val)
+{
+	phase = val;
 }
 
 void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility) {
@@ -84,9 +90,8 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 	}
 	SetHealth(GetMaxHealth());
 
-	for (int i = 0; i < ArmourEnums::End; i++) {
-		AArmour* newArmour = AArmour::CreateArmour(GetWorld(), "Test", phsyicalResistance, blastResistance, energyResistance, (ArmourEnums::ArmourPosition)i, this, grade, quaility);
-		GetArmour().Add(newArmour);
-		AddItem(newArmour);
-	}
+	CreateArmour(phsyicalResistance, blastResistance, energyResistance, grade, quaility);
+
 }
+
+

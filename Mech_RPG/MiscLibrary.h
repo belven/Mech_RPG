@@ -107,4 +107,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static void SetCameraRot(FRotator val) { cameraRot = val; }
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static float GetMeleeRange(AMech_RPGCharacter* character);
 };

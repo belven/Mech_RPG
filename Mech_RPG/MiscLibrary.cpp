@@ -7,6 +7,7 @@
 #include "Group.h"
 #include "Abilities/Ability.h"
 #include "Abilities/ChannelledAbility.h"
+#include "Components/CapsuleComponent.h"
 
 
 UGroup* UMiscLibrary::playerGroup = nullptr;
@@ -37,6 +38,11 @@ AMech_RPGPlayerController* UMiscLibrary::GetPlayerController() {
 
 void UMiscLibrary::SetPlayerController(AMech_RPGPlayerController* newController) {
 	playerController = newController;
+}
+
+float UMiscLibrary::GetMeleeRange(AMech_RPGCharacter* character)
+{
+	return (character->GetCapsuleComponent()->GetUnscaledCapsuleRadius() * 2) * 1.2;
 }
 
 template<class T>

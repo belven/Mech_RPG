@@ -21,6 +21,8 @@
 #include "Math/UnrealMathUtility.h"
 #include "Map.h"
 
+
+
 TArray<AMech_RPGCharacter*> AMech_RPGCharacter::characters;
 bool AMech_RPGCharacter::settingUpGroups = false;
 
@@ -108,7 +110,7 @@ AMech_RPGCharacter::~AMech_RPGCharacter() {
 	characters.Remove(this);
 	abilities.Empty();
 	//weapons.Empty();
-	armour.Empty();
+	armour. Empty();
 
 	if (GetCurrentWeapon() != nullptr) {
 		GetCurrentWeapon()->Destroy();
@@ -220,10 +222,7 @@ void AMech_RPGCharacter::SetCharacterStats(class UCharacterStats* val) {
 }
 
 AArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
-	for (AArmour* armourFound : GetArmour()) {
-		if (armourFound != nullptr && armourFound->GetArmourPosition() == pos) return armourFound;
-	}
-	return nullptr;
+	return *GetArmour().Find(pos);
 }
 
 void AMech_RPGCharacter::SetUpGroup() {
@@ -264,8 +263,8 @@ void AMech_RPGCharacter::ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl
 
 float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType) {
 	float totalResistance = 0;
-	for (AArmour* armourFound : armour) {
-		if (armourFound != nullptr) totalResistance += armourFound->GetResistance(damageType);
+	for (ArmourMap armourFound : GetArmour()) {
+		if (armourFound.Value != nullptr) totalResistance += armourFound.Value->GetResistance(damageType);
 	}
 
 	return MAX(totalResistance, 1);
@@ -674,9 +673,15 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 
 	SetHealth(GetMaxHealth());
 
+	CreateArmour(phsyicalResistance, blastResistance, energyResistance, grade, quaility);
+}
+
+void AMech_RPGCharacter::CreateArmour(float phsyicalResistance, float blastResistance, float energyResistance, int32 grade, int32 quaility)
+{
 	for (int i = 0; i < ArmourEnums::End; i++) {
-		AArmour* newArmour = AArmour::CreateArmour(GetWorld(), "Test", phsyicalResistance, blastResistance, energyResistance, (ArmourEnums::ArmourPosition)i, this, grade, quaility);
-		GetArmour().Add(newArmour);
+		ArmourEnums::ArmourPosition pos = (ArmourEnums::ArmourPosition)i;
+		AArmour* newArmour = AArmour::CreateArmour(GetWorld(), "Test", phsyicalResistance, blastResistance, energyResistance, pos, this, grade, quaility);
+		GetArmour().Add(pos, newArmour);
 		AddItem(newArmour);
 	}
 }
