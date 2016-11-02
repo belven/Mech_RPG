@@ -10,9 +10,10 @@ namespace ItemEnumns
 {
 	enum ItemType
 	{
-		Resource,
 		Armour,
-		Weapon
+		Weapon,
+		Resource,
+		End
 	};
 }
 
@@ -43,7 +44,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		static AItem* CreateItemByType(ItemEnumns::ItemType type, UWorld* world, int32 grade, int32 quality);
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		ItemEnumns::ItemType GetType();
 

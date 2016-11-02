@@ -3,7 +3,7 @@
 #pragma once
 
 #include "BossMechanic.h"
-#include "SpawnTrigger.h"
+#include "Delayed Events/SpawnTrigger.h"
 #include "AddSpawningMechanic.generated.h"
 
 /**

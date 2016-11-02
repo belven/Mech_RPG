@@ -94,7 +94,7 @@ void AAOEHealthChange::PerformHealthChange(AMech_RPGCharacter* character)
 {
 	float tempDamage = GetHealthChange(character);
 	FHealthChange healthChange;
-	healthChange.damager = settings.owner;
+	healthChange.manipulator = settings.owner;
 	healthChange.healthChange = tempDamage;
 	healthChange.target = character;
 	healthChange.damageType = settings.damageType;

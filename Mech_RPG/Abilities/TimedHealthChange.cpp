@@ -22,7 +22,7 @@ void UTimedHealthChange::TimeTick() {
 		timeLeft -= rate;
 
 		FHealthChange healthChange;
-		healthChange.damager = owner;
+		healthChange.manipulator = owner;
 		healthChange.crit = UMiscLibrary::IsCrit(25);
 		healthChange.healthChange = GetWeaponHealthChange() * changeAmount;
 		healthChange.target = targetCharacter;

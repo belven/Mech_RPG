@@ -7,7 +7,7 @@
 
 UFloatingTextUI * UFloatingTextUI::CreateFloatingText(TSubclassOf<class UFloatingTextUI> floatingTextClass, FHealthChange inHealthChange)
 {
-	UFloatingTextUI* widget = CreateWidget<UFloatingTextUI>(inHealthChange.damager->GetWorld(), floatingTextClass);
+	UFloatingTextUI* widget = CreateWidget<UFloatingTextUI>(inHealthChange.manipulator->GetWorld(), floatingTextClass);
 	widget->healthChange = inHealthChange;
 	widget->AddToViewport();
 	widget->PlayAnimation(widget->textAnimation);

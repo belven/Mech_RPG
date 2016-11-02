@@ -20,6 +20,8 @@
 #include "Mech_RPGPlayerController.h"
 #include "Math/UnrealMathUtility.h"
 #include "Map.h"
+#include "Spawnpoints/Spawnpoint.h"
+#include "Spawnpoints/PlayerSpawnpoint.h"
 
 
 
@@ -109,8 +111,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 AMech_RPGCharacter::~AMech_RPGCharacter() {
 	characters.Remove(this);
 	abilities.Empty();
-	//weapons.Empty();
-	armour. Empty();
+	armour.Empty();
 
 	if (GetCurrentWeapon() != nullptr) {
 		GetCurrentWeapon()->Destroy();
@@ -261,6 +262,16 @@ void AMech_RPGCharacter::ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl
 	}
 }
 
+bool AMech_RPGCharacter::IsAlly(AMech_RPGCharacter * other)
+{
+	return other->CompareGroup(GetGroup());
+}
+
+bool AMech_RPGCharacter::IsEnemy(AMech_RPGCharacter* other)
+{
+	return !other->CompareGroup(GetGroup());
+}
+
 float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType) {
 	float totalResistance = 0;
 	for (ArmourMap armourFound : GetArmour()) {
@@ -290,8 +301,8 @@ void AMech_RPGCharacter::AbandonQuest(UQuest* quest)
 }
 
 void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
-	if (GetGroup() != nullptr && !CompareGroup(healthChange.damager)) {
-		GetGroup()->GroupMemberHit(healthChange.damager, this);
+	if (GetGroup() != nullptr && !CompareGroup(healthChange.manipulator)) {
+		GetGroup()->GroupMemberHit(healthChange.manipulator, this);
 	}
 
 	if (OnPreHealthChange.IsBound()) {
@@ -328,10 +339,12 @@ void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 		SetActorHiddenInGame(true);
 		if (GetCurrentWeapon() != nullptr) GetCurrentWeapon()->SetActorHiddenInGame(true);
 		OnStopFiring.Broadcast();
-		healthChange.damager->EnemyKilled(this);
+		healthChange.manipulator->EnemyKilled(this);
 
 		if (GetGroup()->GetPlayer() == nullptr) {
-			AItemPickup::CreateItemPickup(CalucluateItemDrop(healthChange.damager->GetGroup(), GetCurrentWeapon()->GetType()))->SetActorLocation(GetActorLocation());
+			ItemEnumns::ItemType type = UMiscLibrary::GetRandomEnum(ItemEnumns::Resource);
+			AItem* newItem = CalucluateItemDrop(healthChange.manipulator->GetGroup(), type);
+			AItemPickup::CreateItemPickup(newItem)->SetActorLocation(GetActorLocation());
 		}
 	}
 
@@ -440,10 +453,11 @@ void AMech_RPGCharacter::SetActorHiddenInGame(bool bNewHidden)
 	}
 }
 
-void AMech_RPGCharacter::SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
+void AMech_RPGCharacter::SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember)
+{
 	inCombat = true;
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_OutOfCombat);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 3.0F);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 8.0F);
 
 	//if (!isPlayer && !isAlly) {
 	stats->SetVisibility(true, true);
@@ -532,6 +546,15 @@ void AMech_RPGCharacter::NotifyActorBeginCursorOver()
 }
 
 void AMech_RPGCharacter::OutOfCombat() {
+	TArray<AMech_RPGCharacter*> characters = UMiscLibrary::GetCharactersInRange(1500, this->GetActorLocation());
+
+	for (AMech_RPGCharacter* character : characters) {
+		if (character->IsEnemy(this) && character->inCombat) {
+			SetInCombat();
+			return;
+		}
+	}
+
 	inCombat = false;
 	OnStopFiring.Broadcast();
 
@@ -542,17 +565,66 @@ void AMech_RPGCharacter::OutOfCombat() {
 	//}
 
 	if (IsDead() && GetGroup()->GetPlayer() != nullptr) {
-		SetDead(false);
-		SetActorHiddenInGame(false);
-		SetActorEnableCollision(true);
+		Resurrect();
 
-		SetHealth(GetMaxHealth() * 0.2);
-		ApplyCrowdControl(EffectEnums::Damage, false);
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::ResetInvunrelbility, 3.0F);
 	}
 	else if (IsDead()) {
 		Reset();
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::RemoveFromPlay, 6.0F);
+	}
+}
+
+void AMech_RPGCharacter::Resurrect()
+{
+	FindSpawnpoint();
+
+
+	SetDead(false);
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+
+	FHealthChange change;
+	change.heals = true;
+	change.healthChange = GetMaxHealth();
+	change.manipulator = this;
+	change.target = this;
+	ChangeHealth(change);
+
+	ApplyCrowdControl(EffectEnums::Damage, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::ResetInvunrelbility, 3.0F);
+}
+
+void AMech_RPGCharacter::FindSpawnpoint()
+{
+	float distanceTo = std::numeric_limits<float>::max();
+	bool locationFound = false;
+
+	APlayerSpawnpoint* spawn = nullptr;
+	TArray<ASpawnpoint*>* spawnpoints = ASpawnpoint::GetSpawnpoints(APlayerSpawnpoint::StaticClass());
+
+	if (spawnpoints != nullptr) {
+		for (ASpawnpoint* spawnpoint : *spawnpoints) {
+			if (spawnpoint != nullptr) {
+				APlayerSpawnpoint* spawnFound = Cast<APlayerSpawnpoint>(spawnpoint);
+
+				if (spawnFound != nullptr
+					&& (spawn == nullptr || GetDistanceTo(spawnFound) < distanceTo)) {
+					distanceTo = GetDistanceTo(spawnFound);
+					spawn = spawnFound;
+				}
+			}
+		}
+
+		if (spawn != nullptr) {
+			FNavLocation nav;
+
+			while (!locationFound) {
+				locationFound = GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(spawn->GetActorLocation(), ASpawnpoint::defaultSpawnRadius, nav);
+			}
+
+			SetActorLocation(nav.Location);
+			ASpawnpoint::AdjustCharacterLocationByCapsule(this);
+		}
 	}
 }
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Object.h"
+#include "Delayed Events/AOEHealthChange.h"
 #include "MiscLibrary.generated.h"
 
 
@@ -83,12 +84,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static bool IsChildOf(UObject* object, UClass* inClass);
 
-	static int GetRandomEnum(int end);
+	template<class T> static T GetRandomEnum(T end);
 
 	template<class T> static T* SpawnCharacter(UWorld* world, FVector location, FRotator rotation, TSubclassOf<AMech_RPGCharacter> classToSpawn);
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static void OpenCharacterPane(UWorld* world);
+
+	static	bool IsTargetValid(AMech_RPGCharacter* character, AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam);
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static float GetWidgetYaw(UCameraComponent* camera);

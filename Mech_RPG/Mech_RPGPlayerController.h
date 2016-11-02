@@ -177,6 +177,7 @@ protected:
 
 	AMech_RPGCharacter* target;
 	AMech_RPGCharacter* cursorTarget;
+	FVector lastTargetLocation;
 
 	/**
 	 * Begin PlayerController interface

@@ -44,7 +44,7 @@ public:
 		AMech_RPGCharacter* target = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		AMech_RPGCharacter* damager = nullptr;
+		AMech_RPGCharacter* manipulator = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		AWeapon* weaponUsed = nullptr;
@@ -233,6 +233,9 @@ public:
 		CameraBoom->SetRelativeRotation(other->CameraBoom->RelativeRotation);
 	}
 
+	bool IsAlly(AMech_RPGCharacter* other);
+	bool IsEnemy(AMech_RPGCharacter* other);
+
 	float GetTotalResistance(DamageEnums::DamageType damageType);
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
@@ -245,7 +248,7 @@ public:
 		void AbandonQuest(UQuest* quest);
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-		void SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
+		void SetInCombat(AMech_RPGCharacter* attacker = nullptr, AMech_RPGCharacter* damagedMember = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void Reset();
@@ -307,6 +310,10 @@ public:
 	virtual void NotifyActorBeginCursorOver() override;
 
 	virtual void OutOfCombat();
+
+	void Resurrect();
+
+	void FindSpawnpoint();
 
 	FORCEINLINE bool GetInCombat()
 	{

@@ -24,18 +24,18 @@ void AItem::CloneItemSettings(AItem* cloneFromItem)
 AItem::AItem() : Super() {
 	SetActorEnableCollision(false);
 	SetGrade(1);
-
 }
 
 AItem* AItem::CreateItemByType(ItemEnumns::ItemType type, UWorld* world, int32 grade, int32 quality) {
 	switch (type) {
 	case ItemEnumns::Weapon:
-		return AWeapon::CreatePresetWeapon(world, nullptr, (WeaponEnums::WeaponType)UMiscLibrary::GetRandomEnum(WeaponEnums::End), grade, quality);
-	//case ItemEnumns::Armour:
-		//return UArmour::CreateArmour(UArmour::GetDeafultValue((ArmourGrades::ArmourGrade)UMiscLibrary::GetRandomEnum(ArmourGrades::End)), (ArmourEnums::ArmourPosition) UMiscLibrary::GetRandomEnum(ArmourEnums::End),  grade, quality);
+		return AWeapon::CreatePresetWeapon(world, nullptr, UMiscLibrary::GetRandomEnum(WeaponEnums::End), grade, quality);
+	case ItemEnumns::Armour:
+		return AArmour::CreateArmour(world, "Test", AArmour::GetDeafultValue(UMiscLibrary::GetRandomEnum(ArmourGrades::End)), UMiscLibrary::GetRandomEnum(ArmourEnums::End), nullptr, grade, quality);
 	}
 	return nullptr;
 }
+
 
 ItemEnumns::ItemType AItem::GetType() {
 	return type;

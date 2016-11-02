@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
 #include "Mech_RPG.h"
-#include "AOEHealthChange.h"
+#include "Delayed Events/AOEHealthChange.h"
 #include "Characters/Mech_RPGCharacter.h"
 #include "OrbitalStrike.h"
 

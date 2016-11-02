@@ -2,7 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "AddSpawningMechanic.h"
-#include "DamageSpawnTrigger.h"
+#include "Delayed Events/DamageSpawnTrigger.h"
 
 
 AAddSpawningMechanic::AAddSpawningMechanic() : Super() {

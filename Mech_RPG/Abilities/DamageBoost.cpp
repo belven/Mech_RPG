@@ -3,12 +3,10 @@
 #include "Mech_RPG.h"
 #include "Abilities/DamageBoost.h"
 #include "Characters/Mech_RPGCharacter.h"
-#include "ModifierTimer.h"
+#include "Delayed Events/ModifierTimer.h"
 
 bool UDamageBoost::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	SetOnCooldown(owner->GetWorld());
-	//owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_DamageBoostEnded, this, &UDamageBoost::ResetDamageBoost, GetCooldown() * 0.5);
-	//owner->SetHealthChangeModifier(owner->GetHealthChangeModifier() + damageMultiplier);
 	TMap<ModifierEnums::ModifierType, float> modifiers;
 	modifiers.Add(ModifierEnums::HealthChange, damageMultiplier);
 	UModifierTimer::CreateEffectTimer(owner, GetCooldown() * 0.5, modifiers);
@@ -29,8 +27,4 @@ FString UDamageBoost::GetTooltipText()
 {
 	FString damageString = FString::SanitizeFloat(damageMultiplier < 2 ? damageMultiplier * 100 : damageMultiplier);
 	return "Damage Boost" + UMiscLibrary::lnBreak + "Increases damage by " + damageString + UMiscLibrary::lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
-}
-
-void  UDamageBoost::ResetDamageBoost() {
-	owner->SetHealthChangeModifier(owner->GetHealthChangeModifier() - damageMultiplier);
 }

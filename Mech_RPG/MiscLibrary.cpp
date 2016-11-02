@@ -204,12 +204,23 @@ T* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotati
 	else return nullptr;
 }
 
+bool UMiscLibrary::IsTargetValid(AMech_RPGCharacter* character, AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam) {
+	if (UMiscLibrary::IsCharacterAlive(inTarget) && UMiscLibrary::IsCharacterAlive(character)) {
+		if (affectedTeam == AOEEnums::Ally) {
+			return character->IsAlly(inTarget);
+		}
+		return character->IsEnemy(inTarget);
+	}
+	return false;
+}
+
 
 bool UMiscLibrary::IsChildOf(UObject* object, UClass* inClass)
 {
 	return object != nullptr ? object->GetClass()->IsChildOf(inClass) : false;
 }
 
-int UMiscLibrary::GetRandomEnum(int end) {
-	return rand() % (end - 1);
+template<class T>
+T UMiscLibrary::GetRandomEnum(T end) {
+	return static_cast<T>(rand() % (end - 1));
 }

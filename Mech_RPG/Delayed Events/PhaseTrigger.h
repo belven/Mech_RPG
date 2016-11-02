@@ -41,6 +41,4 @@ public:
 		FORCEINLINE int32 GetPhase() {
 		return phaseToTrigger;
 	}
-
-
 };

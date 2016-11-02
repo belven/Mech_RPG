@@ -12,10 +12,18 @@
 UCLASS()
 class MECH_RPG_API ASpawnpoint : public ATargetPoint {
 	GENERATED_BODY()
+private:
+	static TMap<UClass*, TArray<ASpawnpoint*>> spawnPoints;
 public:
 	ASpawnpoint();
+
+	static float defaultSpawnRadius;
+
 	AMech_RPGCharacter* SpawnCharacter(TSubclassOf<class AMech_RPGCharacter> spawnClass, int spawnRadius);
 	void SetUpCharacter(AMech_RPGCharacter * character, UGroup * group, GroupEnums::Role role);
+
+	static void AdjustCharacterLocationByCapsule(AMech_RPGCharacter* character);
+
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
@@ -26,4 +34,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 		TSubclassOf<class AMech_RPGCharacter> classToSpawn;
+
+	static TArray<ASpawnpoint*>* GetSpawnpoints(UClass* classToFind);
 };

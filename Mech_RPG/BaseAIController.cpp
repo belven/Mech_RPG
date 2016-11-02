@@ -211,14 +211,8 @@ AMech_RPGCharacter* ABaseAIController::GetTarget() {
 	return targetCharacter;
 }
 
-bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam) {
-	if (UMiscLibrary::IsCharacterAlive(inTarget)) {
-		if (affectedTeam == AOEEnums::Ally) {
-			return GetAIOwner()->CompareGroup(inTarget);
-		}
-		return !GetAIOwner()->CompareGroup(inTarget);
-	}
-	return false;
+bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam) {	
+	return UMiscLibrary::IsTargetValid(GetAIOwner(), inTarget, affectedTeam);
 }
 
 void ABaseAIController::SetAIOwner(AMech_RPGCharacter* newVal) {

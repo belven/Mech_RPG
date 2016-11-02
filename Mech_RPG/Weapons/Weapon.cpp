@@ -113,7 +113,7 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 		audioComp->Play(0);
 	}
 
-	healthChange.damager = GetItemOwner();
+	healthChange.manipulator = GetItemOwner();
 	healthChange.target = target;
 	healthChange.weaponUsed = this;
 	healthChange.damageType = settings.damageType;
@@ -132,7 +132,7 @@ void AWeapon::Fire(ACover* target) {
 	FHealthChange healthChange;
 	float changeAmount = GetChangeAmount()  * GetItemOwner()->GetHealthChangeModifier();
 
-	healthChange.damager = GetItemOwner();
+	healthChange.manipulator = GetItemOwner();
 	//healthChange.target = target;
 	healthChange.weaponUsed = this;
 

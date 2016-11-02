@@ -12,7 +12,7 @@ bool UTargetedHealthChange::Activate(class AMech_RPGCharacter* target, FVector t
 
 		tempChangeAmount = GetWeaponHealthChange() * changeAmount;
 
-		healthChange.damager = owner;
+		healthChange.manipulator = owner;
 		healthChange.target = target;
 		healthChange.weaponUsed = nullptr;
 		healthChange.healthChange = tempChangeAmount;

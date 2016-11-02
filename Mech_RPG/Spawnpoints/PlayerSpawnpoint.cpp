@@ -4,8 +4,14 @@
 #include "PlayerSpawnpoint.h"
 #include "Characters/Mech_RPGCharacter.h"
 
+APlayerSpawnpoint::APlayerSpawnpoint() :
+	defaultSpawnpoint(false), Super()
+{
+
+}
+
 void APlayerSpawnpoint::BeginPlay() {
-	if (GetWorld() != nullptr) {
+	if (GetWorld() != nullptr && defaultSpawnpoint) {
 		UGroup* group = UGroup::CreateGroup(team);
 		AMech_RPGCharacter* character = nullptr;
 		bool healerSpawned = false;

@@ -7,18 +7,15 @@
 #include "MiscLibrary.h"
 #include "TestBoss.h"
 #include "Abilities/Immobilise.h"
-#include "HealthChangePhaseTrigger.h"
+#include "Delayed Events/HealthChangePhaseTrigger.h"
 
 #define mCreateHealthChangePhaseTrigger(health, phase) UHealthChangePhaseTrigger::CreateHealthChangePhaseTrigger(this, health, phase)
 #define mGetMeleeRange UMiscLibrary::GetMeleeRange(this)
 
 void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility)
 {
-	float statModifier = 0;
-	float blastResistance = 5;
-	float phsyicalResistance = 5;
-	float energyResistance = 5;
-	static float Health = 20000;
+	float statModifier = GetModifierForDifficulty(UMiscLibrary::GetDifficulty());
+	static float newHealth = 20000;
 
 	StartingRole(inRole);
 
@@ -37,16 +34,17 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 
 	SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
 	AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 2.5F), 6, true, false));
-	SetDefenceModifier(0.0F + statModifier);
 	SetHealthChangeModifier(1.0F + statModifier);
-	blastResistance = AArmour::GetDeafultValue(ArmourGrades::Medium);
-	phsyicalResistance = AArmour::GetDeafultValue(ArmourGrades::MediumHeavy);
-	energyResistance = AArmour::GetDeafultValue(ArmourGrades::Medium);
-	SetMaxHealth(Health * (1 + statModifier));
+	SetMaxHealth(newHealth * (1 - statModifier));
+	SetDefenceModifier(0.0F);
 
 	SetHealth(GetMaxHealth());
 
-	CreateArmour(phsyicalResistance, blastResistance, energyResistance, grade, quaility);
+	CreateArmour(AArmour::GetDeafultValue(ArmourGrades::MediumHeavy),
+		AArmour::GetDeafultValue(ArmourGrades::Medium),
+		AArmour::GetDeafultValue(ArmourGrades::Medium),
+		grade,
+		quaility);
 
 	triggers.Add(mCreateHealthChangePhaseTrigger(0.15, 1));
 	triggers.Add(mCreateHealthChangePhaseTrigger(0.15, 2));
@@ -61,11 +59,13 @@ void ATestBoss::SetPhase(int32 val)
 		ApplyCrowdControl(EffectEnums::Cast, true); // Set can cast
 		ApplyCrowdControl(EffectEnums::Attack, false);
 		SetHealth(GetMaxHealth());
+		SetDefenceModifier(0.1);
 	}
 	else if (GetPhase() == 2) {
 		ApplyCrowdControl(EffectEnums::Cast, false);
 		ApplyCrowdControl(EffectEnums::Attack, true);
 		SetHealth(GetMaxHealth());
+		SetDefenceModifier(0.2);
 	}
 	else if (GetPhase() == 3) {
 		FWeaponParams params;
@@ -85,6 +85,6 @@ void ATestBoss::SetPhase(int32 val)
 		ApplyCrowdControl(EffectEnums::Cast, true);
 		SetHealth(GetMaxHealth());
 		SetSpeedModifier(0.8);
-		SetDefenceModifier(1.3);
+		SetDefenceModifier(0.4);
 	}
 }

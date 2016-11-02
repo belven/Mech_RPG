@@ -3,7 +3,7 @@
 #include "Boss.h"
 #include "Weapons.h"
 #include "Abilities.h"
-#include "PhaseTrigger.h"
+#include "Delayed Events/PhaseTrigger.h"
 
 TEnumAsByte<GroupEnums::Role> ABoss::GetRandomRole() {
 	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));

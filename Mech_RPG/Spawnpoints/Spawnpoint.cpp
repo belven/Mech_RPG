@@ -4,11 +4,24 @@
 #include "Spawnpoint.h"
 #include "Characters/Mech_RPGCharacter.h"
 
+TMap<UClass*, TArray<ASpawnpoint*>> ASpawnpoint::spawnPoints;
+float ASpawnpoint::defaultSpawnRadius = 400;
 
 ASpawnpoint::ASpawnpoint() {
 	static ConstructorHelpers::FClassFinder<AMech_RPGCharacter> AIClass(TEXT("/Game/TopDown/Blueprints/AI/AI"));
 	if (AIClass.Succeeded()) {
 		classToSpawn = AIClass.Class;
+	}
+
+	TArray<ASpawnpoint*>* spawnPointsFound = spawnPoints.Find(GetClass());
+
+	if (spawnPointsFound != nullptr) {
+		spawnPointsFound->Add(this);
+	}
+	else {
+		spawnPointsFound = new TArray<ASpawnpoint *>();
+		spawnPointsFound->Add(this);
+		spawnPoints.Add(GetClass(), *spawnPointsFound);	
 	}
 }
 
@@ -34,13 +47,18 @@ AMech_RPGCharacter* ASpawnpoint::SpawnCharacter(TSubclassOf<class AMech_RPGChara
 }
 
 void ASpawnpoint::SetUpCharacter(AMech_RPGCharacter* character, UGroup* group, GroupEnums::Role role) {
-	FVector loc;
 	character->SetTeam(team);
+	AdjustCharacterLocationByCapsule(character);
+	character->SetGroup(group);
+	character->CreatePresetRole(role);
+}
+
+void ASpawnpoint::AdjustCharacterLocationByCapsule(AMech_RPGCharacter* character)
+{
+	FVector loc;
 	loc = character->GetActorLocation();
 	loc.Z += (character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 	character->SetActorLocation(loc);
-	character->SetGroup(group);
-	character->CreatePresetRole(role);
 }
 
 void ASpawnpoint::BeginPlay() {
@@ -50,7 +68,7 @@ void ASpawnpoint::BeginPlay() {
 
 	for (int i = 0; i < spawnAmount; i++) {
 		if (GetWorld() != nullptr) {
-			AMech_RPGCharacter* character = SpawnCharacter(classToSpawn, 400);
+			AMech_RPGCharacter* character = SpawnCharacter(classToSpawn, ASpawnpoint::defaultSpawnRadius);
 			GroupEnums::Role role = UGroup::GetRandomRole();
 
 			if (character != nullptr) {
@@ -69,4 +87,9 @@ void ASpawnpoint::BeginPlay() {
 			}
 		}
 	}
+}
+
+TArray<ASpawnpoint*>* ASpawnpoint::GetSpawnpoints(UClass* classToFind)
+{
+	return spawnPoints.Find(classToFind);
 }

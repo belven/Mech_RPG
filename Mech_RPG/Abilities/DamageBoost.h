@@ -25,8 +25,4 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		virtual FString GetTooltipText() override;
-
-	void ResetDamageBoost();
-
-	FTimerHandle TimerHandle_DamageBoostEnded;
 };

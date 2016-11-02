@@ -103,7 +103,7 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 		}
 
 		PerformPanning();
-		
+
 		// Is our owner is still alive
 		if (!GetPlayerControllerOwner()->IsDead()) {
 			cursorTarget = GetTargetUnderCursor();
@@ -675,26 +675,28 @@ void AMech_RPGPlayerController::ActivateAbility() {
 			}
 		}
 		else {
-			usedAbility(lastUsedAbility, GetCharacterLocation(lastCharacterTarget), lastCharacterTarget);
+			usedAbility(lastUsedAbility, lastTargetLocation, lastCharacterTarget);
 		}
 	}
 }
 
-
 bool AMech_RPGPlayerController::usedAbility(UAbility* ability, FVector location, AMech_RPGCharacter* tempCharacter)
 {
+	//Only use an ability if we have LoS to our target/location
+	if (!mCanSee(location)) {
+		MoveToLocation(location);
+		lastUsedAbility = ability;
+		lastCharacterTarget = tempCharacter;
+		lastTargetLocation = location;
+		lastAction = PlayerControllerEnums::Ability;
+		return true;
+	}
+
 	// Check if the ability is valid.
-	if (ability != nullptr && !ability->OnCooldown()) {
-		//if (ability->GetTagTrue(ability->needsTargetTag)) {
-			//Only use an ability if we have LoS to our target/location
-		if (!mCanSee(location)) {
-			MoveToLocation(location);
-			lastUsedAbility = ability;
-			lastCharacterTarget = tempCharacter;
-			lastAction = PlayerControllerEnums::Ability;
-			return false;
-		}
-		//}
+	if (ability != nullptr
+		&& !ability->OnCooldown()
+		// Check if there is a target, is it valid for the attack?
+		&& (tempCharacter == nullptr || UMiscLibrary::IsTargetValid(GetPlayerControllerOwner(), tempCharacter, ability->GetAffectedTeam()))) {
 
 		// If the ability doesn't need a target or we can see the location, try to use it 
 		if (ability->Activate(tempCharacter, location)) {
@@ -705,6 +707,7 @@ bool AMech_RPGPlayerController::usedAbility(UAbility* ability, FVector location,
 			// Clear last used and target
 			lastCharacterTarget = nullptr;
 			lastUsedAbility = nullptr;
+			lastTargetLocation = FVector::ZeroVector;
 			return true;
 		}
 	}

@@ -21,7 +21,7 @@ namespace AbilityEnums {
 
 #pragma once
 #include "MiscLibrary.h"
-#include "AOEHealthChange.h"
+#include "Delayed Events/AOEHealthChange.h"
 #include "Tag.h"
 #include "Ability.generated.h"
 

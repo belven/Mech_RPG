@@ -3,7 +3,7 @@
 #pragma once
 
 #include "AIController.h"
-#include "AOEHealthChange.h"
+#include "Delayed Events/AOEHealthChange.h"
 #include "BaseAIController.generated.h"
 
 class AMech_RPGCharacter;
