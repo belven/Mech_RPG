@@ -34,7 +34,6 @@ void UGroup::SetMembers(TArray<AMech_RPGCharacter*> newVal) {
 }
 
 void UGroup::AddMemeber(AMech_RPGCharacter* memberToAdd) {
-	//members.AddUnique(memberToAdd);
 	members.Add(memberToAdd);
 }
 
@@ -117,11 +116,14 @@ void UGroup::GroupEnemyKilled(AMech_RPGCharacter* character)
 	if (OnGroupEnemyKilled.IsBound()) OnGroupEnemyKilled.Broadcast(character);
 }
 
+void UGroup::GroupMemberKilled(AMech_RPGCharacter* character)
+{
+	if (OnGroupMemberKilled.IsBound()) OnGroupMemberKilled.Broadcast(character);
+}
+
 TEnumAsByte<GroupEnums::Role> UGroup::GetRandomRole() {
 	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
 }
-
-
 
 void UGroup::Interact(AInteractable * interactable)
 {

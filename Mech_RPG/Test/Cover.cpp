@@ -1,6 +1,7 @@
 // Copyright of Explosive Industries
 #pragma once
 #include "Mech_RPG.h"
+#include "Test/Cover.h"
 
 
 // Sets default values

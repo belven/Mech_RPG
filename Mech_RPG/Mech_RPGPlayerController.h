@@ -71,7 +71,6 @@ public:
 
 	bool IsMechCharacter(AActor* character);
 	bool IsInteractable(AActor * character);
-	bool IsCover(AActor* character);
 
 	AMech_RPGCharacter* GetTargetUnderCursor();
 	class AInteractable* GetInteractableUnderCursor();

@@ -8,6 +8,7 @@
 #include "Abilities/Ability.h"
 #include "Abilities/ChannelledAbility.h"
 #include "Components/CapsuleComponent.h"
+#include "Weapons.h"
 
 
 UGroup* UMiscLibrary::playerGroup = nullptr;
@@ -22,6 +23,53 @@ const float UMiscLibrary::MAX_HEALTH_CHANGE = 2;
 float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
 	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;
 }
+
+AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality) {
+	FMagazineWeaponParams magSettings;
+	AWeapon* weapon = nullptr;
+
+	switch (weaponType) {
+	case WeaponEnums::SMG:
+		weapon = ASMG::CreateSMG(world, inOwner);
+		break;
+	case WeaponEnums::Bio_Repair:
+		weapon = ABio_Rifle::CreateBioRifle(world, inOwner);
+		break;
+	case WeaponEnums::RPG:
+		magSettings.healthChange = 500;
+		magSettings.range = 1300;
+		magSettings.fireRate = 2.5;
+		magSettings.heals = false;
+		weapon = AWeapon::CreateWeapon(world, inOwner, magSettings);
+		break;
+	case WeaponEnums::Shotgun:
+		weapon = AShotgun::CreateShotgun(world, inOwner);
+		break;
+	case WeaponEnums::Sniper:
+		weapon = ASniper::CreateSniper(world, inOwner);
+		break;
+	case WeaponEnums::Sword:
+		FWeaponParams swordPrams;
+		swordPrams.fireRate = 1.25;
+		swordPrams.critChance = 70;
+		swordPrams.damageType = DamageEnums::Energy;
+		swordPrams.healthChange = 600;
+		swordPrams.range = 200;
+
+		weapon = AWeapon::CreateWeapon(world, inOwner, swordPrams);
+		break;
+	}
+
+	weapon->SetGrade(weaponGrade);
+	weapon->SetQuality(weaponQuality);
+
+	if (weapon->GetName().IsEmpty()) {
+		weapon->SetName("Test Weapon");
+	}
+
+	return weapon;
+}
+
 
 TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::GetDifficulty()
 {
@@ -145,6 +193,23 @@ UWorld* UMiscLibrary::GetActorWorld(AActor* actor) {
 	return actor != nullptr ? actor->GetWorld() : nullptr;
 }
 
+//TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AMech_RPGCharacter* origin) {
+//	AMech_RPGCharacter* character;
+//	TArray<AMech_RPGCharacter*> characters;
+//	TArray<AActor*> actorsFound;
+//
+//	origin->GetRadiusDection()->SetSphereRadius(range);
+//	origin->GetRadiusDection()->GetOverlappingActors(actorsFound, AMech_RPGCharacter::StaticClass());
+//
+//	for (AActor* actor : actorsFound) {
+//		character = Cast<AMech_RPGCharacter>(actor);
+//		if (IsCharacterAlive(character)) {
+//			characters.Add(character);
+//		}
+//	}
+//	return characters;
+//}
+
 TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AActor* origin) {
 	TArray<AMech_RPGCharacter*> characters;
 	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
@@ -173,10 +238,6 @@ TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, FVec
 		}
 	}
 	return characters;
-}
-
-bool UMiscLibrary::IsCover(AActor* character) {
-	return mIsChildOf(character, ACover::StaticClass());
 }
 
 bool UMiscLibrary::IsMechCharacter(AActor* character) {

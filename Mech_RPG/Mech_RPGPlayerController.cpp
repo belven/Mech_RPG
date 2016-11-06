@@ -417,27 +417,31 @@ void AMech_RPGPlayerController::OnSetDestinationReleased() {
 }
 
 void AMech_RPGPlayerController::ZoomIn() {
-	GetPlayerControllerOwner()->CameraBoom->TargetArmLength += 100;
+	if (GetPlayerControllerOwner() != nullptr) GetPlayerControllerOwner()->CameraBoom->TargetArmLength += 100;
 }
 
 void AMech_RPGPlayerController::ZoomOut() {
-	GetPlayerControllerOwner()->CameraBoom->TargetArmLength -= 100;
+	if (GetPlayerControllerOwner() != nullptr) GetPlayerControllerOwner()->CameraBoom->TargetArmLength -= 100;
 }
 
 void AMech_RPGPlayerController::ResetZoom() {
-	GetPlayerControllerOwner()->CameraBoom->TargetArmLength = 1700;
-	FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
-	rot.Yaw = GetPlayerControllerOwner()->GetViewRotation().Yaw;
-	rot.Pitch = -75.f;
-	GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
+	if (GetPlayerControllerOwner() != nullptr) {
+		GetPlayerControllerOwner()->CameraBoom->TargetArmLength = 1700;
+		FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
+		rot.Yaw = GetPlayerControllerOwner()->GetViewRotation().Yaw;
+		rot.Pitch = -75.f;
+		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
+	}
 }
 
 void AMech_RPGPlayerController::PanLeft()
 {
-	panLeft = true;
-	FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
-	rot.Yaw -= 18;
-	GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
+	if (GetPlayerControllerOwner() != nullptr) {
+		panLeft = true;
+		FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
+		rot.Yaw -= 18;
+		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
+	}
 }
 
 void AMech_RPGPlayerController::PanLeftReleased()
@@ -524,10 +528,6 @@ bool AMech_RPGPlayerController::IsMechCharacter(AActor* character) {
 
 bool AMech_RPGPlayerController::IsInteractable(AActor* character) {
 	return character->GetClass()->IsChildOf(AInteractable::StaticClass());
-}
-
-bool AMech_RPGPlayerController::IsCover(AActor* character) {
-	return character->GetClass()->IsChildOf(ACover::StaticClass());
 }
 
 bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {

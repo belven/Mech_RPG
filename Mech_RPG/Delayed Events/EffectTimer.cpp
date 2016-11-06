@@ -4,7 +4,7 @@
 #include "Characters/Mech_RPGCharacter.h"
 #include "EffectTimer.h"
 
-UEffectTimer* UEffectTimer::CreateEffectTimer(AMech_RPGCharacter* inTarget, float inDuration, TArray<EffectEnums::CrowdControl> inEffects, bool inRemove)
+UEffectTimer* UEffectTimer::CreateEffectTimer(AMech_RPGCharacter* inTarget, float inDuration, TArray<TEnumAsByte<EffectEnums::CrowdControl>> inEffects, bool inRemove)
 {
 	UEffectTimer* timer = NewObject<UEffectTimer>(StaticClass());
 	timer->effects = inEffects;

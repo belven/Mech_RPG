@@ -2,7 +2,6 @@
 #pragma once
 #include "Mech_RPG.h"
 #include "Weapon.h"
-#include "Weapons.h"
 #include "Characters/Mech_RPGCharacter.h"
 
 AWeapon::AWeapon() : Super() {
@@ -17,7 +16,6 @@ AWeapon::AWeapon() : Super() {
 		partclSystem->SetActorParameter(FName(TEXT("BeamSource")), this);
 	}
 }
-
 
 float AWeapon::GetChangeAmount() {
 	float tempDamage = settings.healthChange * (1 + (GetGrade() * 0.25));
@@ -128,19 +126,19 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 	}
 }
 
-void AWeapon::Fire(ACover* target) {
-	FHealthChange healthChange;
-	float changeAmount = GetChangeAmount()  * GetItemOwner()->GetHealthChangeModifier();
-
-	healthChange.manipulator = GetItemOwner();
-	//healthChange.target = target;
-	healthChange.weaponUsed = this;
-
-	healthChange.healthChange = settings.heals ? -changeAmount : changeAmount;
-
-	target->ChangeHealth(healthChange);
-	canFire = false;
-}
+//void AWeapon::Fire(ACover* target) {
+//	FHealthChange healthChange;
+//	float changeAmount = GetChangeAmount()  * GetItemOwner()->GetHealthChangeModifier();
+//
+//	healthChange.manipulator = GetItemOwner();
+//	//healthChange.target = target;
+//	healthChange.weaponUsed = this;
+//
+//	healthChange.healthChange = settings.heals ? -changeAmount : changeAmount;
+//
+//	target->ChangeHealth(healthChange);
+//	canFire = false;
+//}
 
 void AWeapon::StopFire()
 {
@@ -194,49 +192,8 @@ void AWeapon::SetSettings(FWeaponParams newSettings)
 	settings = newSettings;
 }
 
-AWeapon* AWeapon::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality) {
-	FMagazineWeaponParams magSettings;
-	AWeapon* weapon = nullptr;
-
-	switch (weaponType) {
-	case WeaponEnums::SMG:
-		weapon = ASMG::CreateSMG(world, inOwner);
-		break;
-	case WeaponEnums::Bio_Repair:
-		weapon = ABio_Rifle::CreateBioRifle(world, inOwner);
-		break;
-	case WeaponEnums::RPG:
-		magSettings.healthChange = 500;
-		magSettings.range = 1300;
-		magSettings.fireRate = 2.5;
-		magSettings.heals = false;
-		weapon = CreateWeapon(world, inOwner, magSettings);
-		break;
-	case WeaponEnums::Shotgun:
-		weapon = AShotgun::CreateShotgun(world, inOwner);
-		break;
-	case WeaponEnums::Sniper:
-		weapon = ASniper::CreateSniper(world, inOwner);
-		break;
-	case WeaponEnums::Sword:
-		FWeaponParams swordPrams;
-		swordPrams.fireRate = 1.25;
-		swordPrams.critChance = 70;
-		swordPrams.damageType = DamageEnums::Energy;
-		swordPrams.healthChange = 600;
-		swordPrams.range = 200;
-
-		weapon = CreateWeapon(world, inOwner, swordPrams);
-		break;
-	}
-
-	weapon->SetGrade(weaponGrade);
-	weapon->SetQuality(weaponQuality);
-
-	if (weapon->GetName().IsEmpty()) {
-		weapon->SetName("Test Weapon");
-	}
-
-	return weapon;
+AWeapon* AWeapon::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, 
+	TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality) {
+	return UMiscLibrary::CreatePresetWeapon(world, inOwner, weaponType, weaponGrade, weaponQuality);
 }
 

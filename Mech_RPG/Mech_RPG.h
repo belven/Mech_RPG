@@ -9,7 +9,6 @@
 #define MIN(a,b) (a < b) ? (a) : (b)
 #define MAX(a,b) (a > b) ? (a) : (b)
 
-#include "Cover.h"
 #include "MiscLibrary.h"
 #include "CollisionChannels.h"
 
@@ -20,9 +19,5 @@
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Runtime/UMG/Public/Components/WidgetComponent.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogMech_RPG, Log, All);
-
-
-
-
+//DECLARE_LOG_CATEGORY_EXTERN(LogMech_RPG, Log, All);
 #endif

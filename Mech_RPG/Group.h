@@ -24,6 +24,7 @@ class AInteractable;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMemberDamageEvent, AMech_RPGCharacter*, attacker, AMech_RPGCharacter*, damagedMember);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupEnemyKilled, AMech_RPGCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupMemberKilled, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupNPCInteractEvent, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupItemPickUpEvent, AItem*, item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupInteractEvent, AInteractable*, interactable);
@@ -83,6 +84,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void GroupEnemyKilled(AMech_RPGCharacter* character);
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FGroupMemberKilled OnGroupMemberKilled;
+
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void GroupMemberKilled(AMech_RPGCharacter* character);
 	
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FMemberDamageEvent OnMemberDamageEvent;

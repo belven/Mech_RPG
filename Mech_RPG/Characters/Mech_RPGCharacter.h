@@ -210,6 +210,8 @@ private:
 
 	TSubclassOf<class UFloatingStats_BP> widgetClass = nullptr;
 	TSubclassOf<class UFloatingTextUI> floatingTextClass = nullptr;
+
+	USphereComponent* radiusDection;
 protected:
 	virtual ~AMech_RPGCharacter();
 public:
@@ -217,6 +219,10 @@ public:
 	bool isPlayer;
 
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+
+	FORCEINLINE USphereComponent* GetRadiusDection() {
+		return radiusDection;
+	}
 
 	FORCEINLINE class UWidgetComponent* GetStats()
 	{

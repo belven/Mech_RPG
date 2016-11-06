@@ -6,3 +6,4 @@
 #include "Weapons/Sniper.h"
 #include "Weapons/Bio_Rifle.h"
 #include "Weapons/LaserSniper.h"
+#include "Weapons/Weapon.h"

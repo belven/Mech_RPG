@@ -46,18 +46,20 @@ void ABossSpawnpoint::BeginPlay() {
 	loop(i, amountOfMechanics) {
 		ABossMechanic* bossMechanic = dynamic_cast<ABossMechanic*>(SpawnCharacter(mechanicClass, 400)) ;
 
-		if (role == GroupEnums::Healer) {
-			if (!healerSpawned) {
-				healerSpawned = true;
-			}
-			else {
-				while (role == GroupEnums::Healer) {
-					role = UGroup::GetRandomRole();
+		if (bossMechanic != nullptr) {
+			if (role == GroupEnums::Healer) {
+				if (!healerSpawned) {
+					healerSpawned = true;
+				}
+				else {
+					while (role == GroupEnums::Healer) {
+						role = UGroup::GetRandomRole();
+					}
 				}
 			}
-		}
 
-		SetUpCharacter(Cast<AMech_RPGCharacter>(bossMechanic), group, role);
+			SetUpCharacter(Cast<AMech_RPGCharacter>(bossMechanic), group, role);
+		}
 	}
 
 	if (spawnAdds) {

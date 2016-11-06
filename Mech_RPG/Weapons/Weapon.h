@@ -1,26 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-UENUM(BlueprintType)
-namespace WeaponEnums {
-	enum WeaponType {
-		Sniper,
-		Bio_Repair,
-		SMG,
-		Shotgun,
-		RPG,
-		Sword,
-		End
-	};
-}
+
 
 
 
 #pragma once
 
-#include "Items/Equipable.h"
-#include "Items/Armour.h"
 #include "MiscLibrary.h"
+#include "Items/Equipable.h"
 #include "Weapon.generated.h"
 
 
@@ -74,7 +62,7 @@ public:
 
 	virtual bool CanFire();
 	virtual void Fire(class AMech_RPGCharacter* targetr);
-	virtual void Fire(class ACover* target);
+	//virtual void Fire(class ACover* target);
 
 	virtual	void SetItemOwner(AMech_RPGCharacter* inOwner) override;
 

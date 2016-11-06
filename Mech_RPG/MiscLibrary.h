@@ -19,6 +19,19 @@ namespace GameEnums {
 	};
 }
 
+UENUM(BlueprintType)
+namespace WeaponEnums {
+	enum WeaponType {
+		Sniper,
+		Bio_Repair,
+		SMG,
+		Shotgun,
+		RPG,
+		Sword,
+		End
+	};
+}
+
 UCLASS()
 class MECH_RPG_API UMiscLibrary : public UObject {
 	GENERATED_BODY()
@@ -32,6 +45,8 @@ private:
 public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static float GetMissingHealth(AMech_RPGCharacter* character);
+
+	static class AWeapon* CreatePresetWeapon(class UWorld* world, class AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality);
 
 	static TEnumAsByte<GameEnums::Difficulty> GetDifficulty();
 
@@ -75,11 +90,10 @@ public:
 
 	static TArray<AMech_RPGCharacter*> GetCharactersInRange(float range, FVector location);
 
-	UFUNCTION(BlueprintCallable, Category = "Character")
-		static bool IsCover(AActor* character);
+	//static TArray<AMech_RPGCharacter*> GetCharactersInRange(float range, AMech_RPGCharacter* origin);
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
-		static bool IsMechCharacter(AActor* character);
+	static bool IsMechCharacter(AActor* character);
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static bool IsChildOf(UObject* object, UClass* inClass);

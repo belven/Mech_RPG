@@ -4,10 +4,8 @@
 #include "Weapons.h"
 
 #include "Items/ItemPickup.h"
-#include "Engine.h"
 #include "Items/Armour.h"
 #include "BaseAIController.h"
-#include "AllyAIController.h"
 #include "Blueprint/UserWidget.h"
 #include "Mech_RPGPlayerController.h"
 #include "UI/FloatingTextUI.h"
@@ -17,17 +15,13 @@
 #include "Abilities/ChannelledAbility.h"
 #include "Interactable.h"
 #include "Quests/Quest.h"
-#include "Mech_RPGPlayerController.h"
 #include "Math/UnrealMathUtility.h"
-#include "Map.h"
 #include "Spawnpoints/Spawnpoint.h"
 #include "Spawnpoints/PlayerSpawnpoint.h"
-
-
+#include <limits>
 
 TArray<AMech_RPGCharacter*> AMech_RPGCharacter::characters;
 bool AMech_RPGCharacter::settingUpGroups = false;
-
 
 AMech_RPGCharacter::AMech_RPGCharacter() :
 	healthChangeModifier(1),
@@ -105,6 +99,11 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 	GetCapsuleComponent()->SetCollisionResponseToChannel(mItemCollision, ECollisionResponse::ECR_Ignore);
 	//GetCapsuleComponent()->SetCollisionResponseToChannel(mCharacterCollision, ECollisionResponse::ECR_Ignore);
 
+	//radiusDection = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
+	//radiusDection->InitSphereRadius(1500.0f);
+	//radiusDection->SetCollisionProfileName(TEXT("Pawn"));
+	//radiusDection->AttachTo(this->RootComponent);
+	//radiusDection->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	characters.Add(this);
 }
 
@@ -546,10 +545,10 @@ void AMech_RPGCharacter::NotifyActorBeginCursorOver()
 }
 
 void AMech_RPGCharacter::OutOfCombat() {
-	TArray<AMech_RPGCharacter*> characters = UMiscLibrary::GetCharactersInRange(1500, this->GetActorLocation());
+	TArray<AMech_RPGCharacter*> charactersFound = UMiscLibrary::GetCharactersInRange(1500, this->GetActorLocation());
 
-	for (AMech_RPGCharacter* character : characters) {
-		if (character->IsEnemy(this) && character->inCombat) {
+	for (AMech_RPGCharacter* character : charactersFound) {
+		if (!character->IsDead() && character->IsEnemy(this) && character->inCombat) {
 			SetInCombat();
 			return;
 		}
@@ -666,11 +665,11 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	StartingRole(inRole);
 
 	isPlayer = mIsChildOf(GetController(), AMech_RPGPlayerController::StaticClass());
-	isAlly = mIsChildOf(GetController(), AAllyAIController::StaticClass());
+	//isAlly = mIsChildOf(GetController(), AAllyAIController::StaticClass());
 
-	if (isAlly || isPlayer) {
-		statModifier = GetModifierForDifficulty(UMiscLibrary::GetDifficulty());
-	}
+	//if (isAlly || isPlayer) {
+	//	statModifier = GetModifierForDifficulty(UMiscLibrary::GetDifficulty());
+	//}
 
 	switch (inRole) {
 	case GroupEnums::DPS:

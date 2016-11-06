@@ -8,7 +8,7 @@
 bool UStun::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (UMiscLibrary::IsCharacterAlive(target)) {
 		targetCharacter = target;
-		TArray<EffectEnums::CrowdControl> effects;
+		TArray<TEnumAsByte<EffectEnums::CrowdControl>> effects;
 		effects.Add(EffectEnums::Cast);
 		effects.Add(EffectEnums::Attack);
 		effects.Add(EffectEnums::Move);
