@@ -1,4 +1,9 @@
 // Copyright of Explosive Industries
+#pragma once
+
+#include "Object.h"
+#include "Item.h"
+#include "Armour.generated.h"
 
 UENUM(BlueprintType)
 namespace ArmourEnums {
@@ -25,18 +30,11 @@ namespace ArmourGrades {
 }
 
 UENUM(BlueprintType)
-namespace DamageEnums {
-	enum DamageType {
-		Physical,
-		Blast,
-		Energy
-	};
-}
-#pragma once
-
-#include "Object.h"
-#include "Item.h"
-#include "Armour.generated.h"
+enum class EDamageType : uint8 {
+	Physical,
+	Blast,
+	Energy
+};
 
 UCLASS(BlueprintType)
 class MECH_RPG_API AArmour : public AItem {
@@ -66,11 +64,11 @@ public:
 		static FString GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		float GetResistance(DamageEnums::DamageType damageType);
+		float GetResistance(EDamageType damageType);
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		static float GetDeafultValue(ArmourGrades::ArmourGrade armourGrade);
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		virtual FString GetTooltipText() override;
 

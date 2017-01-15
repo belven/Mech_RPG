@@ -7,7 +7,7 @@
 
 bool UOrbitalStrike::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	FTempAOESettings settings;
-	settings.affectedTeam = AOEEnums::Enemy;
+	settings.affectedTeam = EAffectedTeam::Enemy;
 	settings.owner = owner;
 	settings.healthChange = GetWeaponHealthChange() *  damage;
 	settings.world = owner->GetWorld();
@@ -19,6 +19,13 @@ bool UOrbitalStrike::Activate(class AMech_RPGCharacter* target, FVector targetLo
 	settings.location = targetLocation;
 	AAOEHealthChange::CreateAOEHealthChange(settings);
 	SetOnCooldown(owner->GetWorld());
+
+	if (target != nullptr) {
+		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %d"), owner->GetID(), *GetClass()->GetName(), target->GetID());
+	}
+	else {
+		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %s"), owner->GetID(), *GetClass()->GetName(), *targetLocation.ToString());
+	}
 	return true;
 }
 

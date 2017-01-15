@@ -49,7 +49,7 @@ bool AWeapon::CanFire() {
 	return canFire;
 }
 
-DamageEnums::DamageType AWeapon::GetChangeAmountType() {
+EDamageType AWeapon::GetChangeAmountType() {
 	return settings.damageType;
 }
 
@@ -83,11 +83,13 @@ float AWeapon::GetProgressBarPercent() {
 
 FString AWeapon::GetTooltipText()
 {
-	FString lnBreak = " \n";
 	FString dpsString = FString::FromInt(round(GetChangeAmount() * (1 / settings.fireRate)));
-	FString damageType = FindObject<UEnum>(ANY_PACKAGE, TEXT("DamageEnums"), true)->GetDisplayNameText(settings.damageType).ToString();
 
-	return GetName() + lnBreak + "DPS: " + dpsString + lnBreak + "Damage Type: " + damageType;
+	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);
+
+	FString damageType = !EnumPtr ? "Invalid" : EnumPtr->GetEnumName((int32)settings.damageType);
+
+	return GetName() + UMiscLibrary::lnBreak + "DPS: " + dpsString + UMiscLibrary::lnBreak + "Damage Type: " + damageType;
 }
 
 void AWeapon::Fire(AMech_RPGCharacter* target) {

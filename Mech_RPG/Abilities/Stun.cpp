@@ -13,9 +13,9 @@ bool UStun::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 		effects.Add(EffectEnums::Attack);
 		effects.Add(EffectEnums::Move);
 		UEffectTimer::CreateEffectTimer(target, duration, effects);
-
-		//owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_StunEnd, this, &UStun::StunEnd, duration);
 		SetOnCooldown(owner->GetWorld());
+
+		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %d"), owner->GetID(), *GetClass()->GetName(), target->GetID());
 		return true;
 	}
 	return false;

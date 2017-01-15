@@ -29,14 +29,14 @@ void ABaseAIController::Tick(float DeltaTime) {
 
 			if (!abilityUsed) {
 				if (GetAIOwner()->GetCurrentWeapon()->Heals()) {
-					FindTarget(AOEEnums::Ally);
+					FindTarget(EAffectedTeam::Ally);
 
 					if (targetCharacter != nullptr) {
 						AttackTarget(DeltaTime);
 					}
 				}
 				else {
-					FindTarget(AOEEnums::Enemy);
+					FindTarget(EAffectedTeam::Enemy);
 
 					if (targetCharacter != nullptr) {
 						AttackTarget(DeltaTime);
@@ -150,13 +150,13 @@ void ABaseAIController::MoveToLocation(FVector location) {
 	}
 }
 
-void ABaseAIController::FindTarget(AOEEnums::AffectedTeam affectedTeam) {
+void ABaseAIController::FindTarget(EAffectedTeam affectedTeam) {
 	float range = GetAIOwner()->GetCurrentWeapon()->GetRange();
 
 	// Is the target
 	if (IsTargetValid(targetCharacter, affectedTeam)
 		// If they're an enemy then we can carry on, or only affect allies that have lost health
-		&& (affectedTeam == AOEEnums::Enemy || UMiscLibrary::GetMissingHealth(targetCharacter) > 0)) {
+		&& (affectedTeam == EAffectedTeam::Enemy || UMiscLibrary::GetMissingHealth(targetCharacter) > 0)) {
 		return;
 	}
 	// Otherwise remove the target character and find a new one
@@ -164,7 +164,7 @@ void ABaseAIController::FindTarget(AOEEnums::AffectedTeam affectedTeam) {
 		targetCharacter = nullptr;
 	}
 
-	if (affectedTeam == AOEEnums::Enemy) {
+	if (affectedTeam == EAffectedTeam::Enemy) {
 		for (AMech_RPGCharacter* character : GetCharactersInRange(range)) {
 			if (IsTargetValid(character, affectedTeam) 
 				&& UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), character->GetActorLocation())) {
@@ -211,7 +211,7 @@ AMech_RPGCharacter* ABaseAIController::GetTarget() {
 	return targetCharacter;
 }
 
-bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam) {	
+bool ABaseAIController::IsTargetValid(AMech_RPGCharacter* inTarget, EAffectedTeam affectedTeam) {	
 	return UMiscLibrary::IsTargetValid(GetAIOwner(), inTarget, affectedTeam);
 }
 

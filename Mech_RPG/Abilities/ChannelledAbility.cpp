@@ -146,13 +146,10 @@ bool UChannelledAbility::PerformLineTrace() {
 	owner->GetWorld()->LineTraceSingleByObjectType(hit, owner->GetActorLocation(), targetLocation, objectCollision, collision);
 
 	bool targetTraced = hit.bBlockingHit && hit.GetActor() != nullptr;
-	bool affectsAllies = abilityToActivate->GetAffectedTeam() == AOEEnums::Ally;
 
 	if (targetTraced && UMiscLibrary::IsMechCharacter(hit.GetActor())) {
-		targetCharacter = Cast<AMech_RPGCharacter>(hit.GetActor());
-		bool affectedAlly = affectsAllies && targetCharacter->CompareGroup(owner);
-		bool affectedEnemy = !affectsAllies && !targetCharacter->CompareGroup(owner);
-		return affectedAlly || affectedEnemy;
+		targetCharacter = Cast<AMech_RPGCharacter>(hit.GetActor());		
+		return UMiscLibrary::IsTargetValid(owner, targetCharacter, abilityToActivate->GetAffectedTeam());
 	}
 
 	return false;

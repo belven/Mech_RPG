@@ -1,12 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 UENUM(BlueprintType)
-namespace AOEEnums {
-	enum AffectedTeam {
-		Ally,
-		Enemy
-	};
-}
+enum class EAffectedTeam : uint8 {
+	Ally,
+	Enemy
+};
 
 #pragma once
 #include "Engine/TargetPoint.h"
@@ -30,8 +28,8 @@ public:
 	float duration = 5;
 	float rate = 1;
 
-	TEnumAsByte<AOEEnums::AffectedTeam>  affectedTeam = AOEEnums::Enemy;
-	TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
+	EAffectedTeam  affectedTeam = EAffectedTeam::Enemy;
+	EDamageType damageType = EDamageType::Physical;
 
 	bool usesTarget = false;
 	bool heals = false;

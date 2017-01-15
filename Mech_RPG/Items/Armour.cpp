@@ -4,13 +4,13 @@
 #include "Armour.h"
 #include "Characters/Mech_RPGCharacter.h"
 
-float AArmour::GetResistance(DamageEnums::DamageType damageType) {
+float AArmour::GetResistance(EDamageType damageType) {
 	switch (damageType) {
-	case DamageEnums::Physical:
+	case EDamageType::Physical:
 		return physicalResistance;
-	case DamageEnums::Energy:
+	case EDamageType::Energy:
 		return energyResistance;
-	case DamageEnums::Blast:
+	case EDamageType::Blast:
 		return blastResistance;
 	}
 	return 0;

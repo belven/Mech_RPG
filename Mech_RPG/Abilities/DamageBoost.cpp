@@ -10,6 +10,8 @@ bool UDamageBoost::Activate(class AMech_RPGCharacter* target, FVector targetLoca
 	TMap<ModifierEnums::ModifierType, float> modifiers;
 	modifiers.Add(ModifierEnums::HealthChange, damageMultiplier);
 	UModifierTimer::CreateEffectTimer(owner, GetCooldown() * 0.5, modifiers);
+
+	UE_LOG(AbilitiesLog, Log, TEXT("%d used %s"), owner->GetID(), *GetClass()->GetName());
 	return true;
 }
 

@@ -25,7 +25,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
 	virtual void OwnerPostBeginPlay(AMech_RPGCharacter* mech);
-	void FindTarget(AOEEnums::AffectedTeam affectedTeam = AOEEnums::Enemy);
+	void FindTarget(EAffectedTeam affectedTeam = EAffectedTeam::Enemy);
 
 
 	bool PerformAbility(UAbility* ability);
@@ -37,7 +37,7 @@ public:
 	AMech_RPGCharacter* GetAIOwner();
 	AMech_RPGCharacter* GetTarget();
 
-	bool IsTargetValid(AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam = AOEEnums::Enemy);
+	bool IsTargetValid(AMech_RPGCharacter* inTarget, EAffectedTeam affectedTeam = EAffectedTeam::Enemy);
 
 	void SetAIOwner(AMech_RPGCharacter* newVal);
 	void SetTarget(AMech_RPGCharacter* newVal);

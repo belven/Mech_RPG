@@ -24,7 +24,7 @@ public:
 		FString GetHealthText();
 
 	UFUNCTION(BlueprintCallable, Category = "Stats")
-		FString GetArmourText(DamageEnums::DamageType damageType);
+		FString GetArmourText(EDamageType damageType);
 
 	UFUNCTION(BlueprintCallable, Category = "Stats")
 		FString GetDPSText();

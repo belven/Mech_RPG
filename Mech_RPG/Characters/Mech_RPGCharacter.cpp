@@ -19,6 +19,7 @@
 #include "Spawnpoints/Spawnpoint.h"
 #include "Spawnpoints/PlayerSpawnpoint.h"
 #include <limits>
+#include "Delayed Events/EffectTimer.h"
 
 TArray<AMech_RPGCharacter*> AMech_RPGCharacter::characters;
 bool AMech_RPGCharacter::settingUpGroups = false;
@@ -271,7 +272,7 @@ bool AMech_RPGCharacter::IsEnemy(AMech_RPGCharacter* other)
 	return !other->CompareGroup(GetGroup());
 }
 
-float AMech_RPGCharacter::GetTotalResistance(DamageEnums::DamageType damageType) {
+float AMech_RPGCharacter::GetTotalResistance(EDamageType damageType) {
 	float totalResistance = 0;
 	for (ArmourMap armourFound : GetArmour()) {
 		if (armourFound.Value != nullptr) totalResistance += armourFound.Value->GetResistance(damageType);
@@ -575,9 +576,6 @@ void AMech_RPGCharacter::OutOfCombat() {
 
 void AMech_RPGCharacter::Resurrect()
 {
-	FindSpawnpoint();
-
-
 	SetDead(false);
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
@@ -589,7 +587,13 @@ void AMech_RPGCharacter::Resurrect()
 	change.target = this;
 	ChangeHealth(change);
 
+	TArray<TEnumAsByte<EffectEnums::CrowdControl>> effects;
+	effects.Add(EffectEnums::Damage);
+
+	UEffectTimer::CreateEffectTimer(this, 3.0F, effects);
 	ApplyCrowdControl(EffectEnums::Damage, false);
+	//FindSpawnpoint();
+
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::ResetInvunrelbility, 3.0F);
 }
 
@@ -615,13 +619,7 @@ void AMech_RPGCharacter::FindSpawnpoint()
 		}
 
 		if (spawn != nullptr) {
-			FNavLocation nav;
-
-			while (!locationFound) {
-				locationFound = GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(spawn->GetActorLocation(), ASpawnpoint::defaultSpawnRadius, nav);
-			}
-
-			SetActorLocation(nav.Location);
+			SetActorLocation(UMiscLibrary::FindNavLocation(this, ASpawnpoint::defaultSpawnRadius));
 			ASpawnpoint::AdjustCharacterLocationByCapsule(this);
 		}
 	}

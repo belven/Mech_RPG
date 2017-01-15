@@ -8,6 +8,8 @@ bool UDefenceBoost::Activate(class AMech_RPGCharacter* target, FVector targetLoc
 	SetOnCooldown(owner->GetWorld());
 	owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_DefenceBoostEnded, this, &UDefenceBoost::ResetDefenceBoost, GetCooldown() * 0.5);
 	owner->SetDefenceModifier(owner->GetDefenceModifier() + DefenceModifier);
+
+	UE_LOG(AbilitiesLog, Log, TEXT("%d used %s"), owner->GetID(), *GetClass()->GetName());
 	return true;
 }
 
@@ -16,7 +18,7 @@ UDefenceBoost* UDefenceBoost::CreateAbility(float cooldown, AMech_RPGCharacter* 
 	ability->SetCooldown(cooldown);
 	ability->DefenceModifier = inDefenceMultiplier;
 	ability->owner = owner;
-	ability->affectedTeam = AOEEnums::Ally;
+	ability->affectedTeam = EAffectedTeam::Ally;
 	ability->AddTag(buffTag, inDefenceMultiplier);
 	ability->AddTag(needsTargetTag, 0);
 	return ability;

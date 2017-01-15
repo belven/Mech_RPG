@@ -45,10 +45,7 @@ FVector AAOEHealthChange::GetLocationToUse(FTempAOESettings inSettings)
 
 bool AAOEHealthChange::CanAffect(AMech_RPGCharacter* character)
 {
-	if (settings.affectedTeam == AOEEnums::Ally) {
-		return character->CompareGroup(settings.owner);
-	}
-	return !character->CompareGroup(settings.owner);
+	return UMiscLibrary::IsTargetValid(settings.owner, character, settings.affectedTeam);
 }
 
 float AAOEHealthChange::GetHealthChange(AMech_RPGCharacter* character) {

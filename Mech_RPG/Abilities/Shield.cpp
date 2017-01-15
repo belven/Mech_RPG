@@ -11,6 +11,7 @@ bool UShield::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 		shieldTarget = target;
 		SetOnCooldown(owner->GetWorld());
 		shieldTarget->OnPreHealthChange.AddUniqueDynamic(this, &UShield::ChangeHealth);
+		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %d"), owner->GetID(), *GetClass()->GetName(), target->GetID());
 		return true;
 	}
 	return false;

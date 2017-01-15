@@ -37,7 +37,7 @@ private:
 	bool onCooldown = false;
 	float currentTime = 0.0F;
 protected:
-	TEnumAsByte<AOEEnums::AffectedTeam> affectedTeam = AOEEnums::Enemy;
+	EAffectedTeam affectedTeam = EAffectedTeam::Enemy;
 	TArray<FTag> tags;
 	static TArray<TEnumAsByte<AbilityEnums::Ability>> supportAbilities;
 	static TArray<TEnumAsByte<AbilityEnums::Ability>> offensiveAbilities;
@@ -83,9 +83,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		virtual bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) { check(0 && "You must override this") return false; };
 
+
 	FTimerHandle TimerHandle_AbilityOffCooldown;
 
-	TEnumAsByte<AOEEnums::AffectedTeam> GetAffectedTeam();
+	EAffectedTeam GetAffectedTeam();
 
 	static UAbility* CreateChannelledPresetAbility(AMech_RPGCharacter* owner, AbilityEnums::Ability abilityToCreate, float inChannelDuration, bool inUsesLocation = false, bool inUsesTrace = false);
 

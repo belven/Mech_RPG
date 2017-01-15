@@ -14,11 +14,17 @@ class MECH_RPG_API UEffectTimer : public UObject
 {
 	GENERATED_BODY()
 private:
+	UEffectTimer();
+	~UEffectTimer();
+	
 	UPROPERTY()
 		TArray<TEnumAsByte<EffectEnums::CrowdControl>> effects;
 
 	UPROPERTY()
 		bool remove = false;
+
+	UPROPERTY()
+		bool isComplete = false;
 
 	UPROPERTY()
 		float duration = 1;

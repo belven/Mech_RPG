@@ -8,18 +8,26 @@
 bool UParticleBomb::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
 	if (!targetLocation.IsZero()) {
 		FTempAOESettings settings;
-		settings.affectedTeam = AOEEnums::Enemy;
+		settings.affectedTeam = EAffectedTeam::Enemy;
 		settings.healthChange = GetWeaponHealthChange() *  damage;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
 		settings.rate = 1;
 		settings.radius = 300;
 		settings.location = targetLocation;
-		settings.damageType = DamageEnums::Blast;
+		settings.damageType = EDamageType::Blast;
 		settings.duration = 1;
 		settings.usesTarget = false;
 		AAOEHealthChange::CreateAOEHealthChange(settings);
 		SetOnCooldown(owner->GetWorld());
+
+		if (target != nullptr) {
+			UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %d"), owner->GetID(), *GetClass()->GetName(), target->GetID());
+		}
+		else {
+			UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %s"), owner->GetID(), *GetClass()->GetName(), *targetLocation.ToString());
+		}
+
 		return true;
 	}
 	return false;

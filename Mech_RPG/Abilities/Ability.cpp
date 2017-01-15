@@ -133,7 +133,7 @@ void UAbility::ResetOnCooldown() {
 	}
 }
 
-TEnumAsByte<AOEEnums::AffectedTeam> UAbility::GetAffectedTeam() {
+EAffectedTeam UAbility::GetAffectedTeam() {
 	return affectedTeam;
 }
 

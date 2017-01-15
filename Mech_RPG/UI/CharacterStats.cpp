@@ -43,7 +43,7 @@ FString UCharacterStats::GetHealthText()
 	return healthtext;
 }
 
-FString UCharacterStats::GetArmourText(DamageEnums::DamageType damageType)
+FString UCharacterStats::GetArmourText(EDamageType damageType)
 {
 	FString ArmourText("");
 

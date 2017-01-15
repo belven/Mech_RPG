@@ -12,8 +12,7 @@ UCLASS()
 class MECH_RPG_API UCritBoost : public UAbility
 {
 	GENERATED_BODY()
-
-
+		
 private:
 	float critMultiplier;
 	class AWeapon* weaponAffected;

@@ -23,6 +23,8 @@ bool UTaunt::Activate(class AMech_RPGCharacter* target, FVector targetLocation) 
 
 	if (targetFound) {
 		SetOnCooldown(owner->GetWorld());
+
+		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %d"), owner->GetID(), *GetClass()->GetName(), target->GetID());
 		return true;
 	}
 	return false;
@@ -32,6 +34,6 @@ UTaunt* UTaunt::CreateAbility(float cooldown, AMech_RPGCharacter* owner) {
 	UTaunt* ability = NewObject<UTaunt>(StaticClass());
 	ability->SetCooldown(cooldown);
 	ability->owner = owner;
-	ability->affectedTeam = AOEEnums::Enemy;
+	ability->affectedTeam = EAffectedTeam::Enemy;
 	return ability;
 }

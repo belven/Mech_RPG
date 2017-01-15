@@ -28,7 +28,7 @@ ALaserSniper * ALaserSniper::CreateLaserSniper(UWorld * world, AMech_RPGCharacte
 		overheatSettings.heatLosePerTick = 0.05;
 		overheatSettings.heatGenerated = 0.15;
 		overheatSettings.critChance = 45;
-		overheatSettings.damageType = DamageEnums::Energy;
+		overheatSettings.damageType = EDamageType::Energy;
 
 		ALaserSniper* weapon = world->SpawnActor<ALaserSniper>(ALaserSniper::StaticClass());
 		weapon->SetSettings(overheatSettings);

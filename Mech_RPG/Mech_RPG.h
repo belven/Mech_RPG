@@ -19,5 +19,5 @@
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Runtime/UMG/Public/Components/WidgetComponent.h"
 
-//DECLARE_LOG_CATEGORY_EXTERN(LogMech_RPG, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(AbilitiesLog, Log, All);
 #endif

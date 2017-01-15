@@ -52,7 +52,7 @@ AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inO
 		FWeaponParams swordPrams;
 		swordPrams.fireRate = 1.25;
 		swordPrams.critChance = 70;
-		swordPrams.damageType = DamageEnums::Energy;
+		swordPrams.damageType = EDamageType::Energy;
 		swordPrams.healthChange = 600;
 		swordPrams.range = 200;
 
@@ -91,6 +91,21 @@ void UMiscLibrary::SetPlayerController(AMech_RPGPlayerController* newController)
 float UMiscLibrary::GetMeleeRange(AMech_RPGCharacter* character)
 {
 	return (character->GetCapsuleComponent()->GetUnscaledCapsuleRadius() * 2) * 1.2;
+}
+
+FVector UMiscLibrary::FindNavLocation(AActor* actor, float radius) {
+	FNavLocation nav;
+	int32 count = 0;
+	bool locationFound = false;
+
+	while (count < 120 
+		&& (!locationFound || !CanSee(actor->GetWorld(), actor->GetActorLocation(), nav.Location))) {
+		radius *= 1.01;
+		locationFound = actor->GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(actor->GetActorLocation(), radius, nav);
+		count++;
+	}
+
+	return nav.Location;
 }
 
 template<class T>
@@ -265,9 +280,9 @@ T* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotati
 	else return nullptr;
 }
 
-bool UMiscLibrary::IsTargetValid(AMech_RPGCharacter* character, AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam) {
+bool UMiscLibrary::IsTargetValid(AMech_RPGCharacter* character, AMech_RPGCharacter* inTarget, EAffectedTeam affectedTeam) {
 	if (UMiscLibrary::IsCharacterAlive(inTarget) && UMiscLibrary::IsCharacterAlive(character)) {
-		if (affectedTeam == AOEEnums::Ally) {
+		if (affectedTeam == EAffectedTeam::Ally) {
 			return character->IsAlly(inTarget);
 		}
 		return character->IsEnemy(inTarget);

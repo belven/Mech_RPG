@@ -9,7 +9,7 @@ UHeal* UHeal::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inH
 	ability->SetCooldown(cooldown);
 	ability->changeAmount = inHealAmount;
 	ability->owner = owner;
-	ability->affectedTeam = AOEEnums::Ally;
+	ability->affectedTeam = EAffectedTeam::Ally;
 	ability->AddTag(healTag, inHealAmount);
 	return ability;
 }

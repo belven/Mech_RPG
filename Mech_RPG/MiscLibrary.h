@@ -105,7 +105,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static void OpenCharacterPane(UWorld* world);
 
-	static	bool IsTargetValid(AMech_RPGCharacter* character, AMech_RPGCharacter* inTarget, AOEEnums::AffectedTeam affectedTeam);
+	static	bool IsTargetValid(AMech_RPGCharacter* character, AMech_RPGCharacter* inTarget, EAffectedTeam affectedTeam);
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static float GetWidgetYaw(UCameraComponent* camera);
@@ -127,4 +127,5 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static float GetMeleeRange(AMech_RPGCharacter* character);
+	static FVector FindNavLocation(AActor* actor, float radius);
 };

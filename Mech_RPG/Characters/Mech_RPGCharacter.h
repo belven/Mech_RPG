@@ -53,7 +53,7 @@ public:
 		float healthChange = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
+		TEnumAsByte<EDamageType> damageType = EDamageType::Physical;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		bool heals = false;
@@ -242,7 +242,7 @@ public:
 	bool IsAlly(AMech_RPGCharacter* other);
 	bool IsEnemy(AMech_RPGCharacter* other);
 
-	float GetTotalResistance(DamageEnums::DamageType damageType);
+	float GetTotalResistance(EDamageType damageType);
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		void CreateArmour(float phsyicalResistance, float blastResistance, float energyResistance, int32 grade, int32 quaility);

@@ -27,7 +27,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 		bool heals = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		TEnumAsByte<DamageEnums::DamageType> damageType = DamageEnums::Physical;
+		EDamageType damageType = EDamageType::Physical;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 		TEnumAsByte<QualityEnums::Quality> quality = QualityEnums::Base;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
@@ -87,7 +87,7 @@ public:
 
 	void SetSettings(FWeaponParams newSettings);
 
-	DamageEnums::DamageType GetChangeAmountType();
+	EDamageType GetChangeAmountType();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent();

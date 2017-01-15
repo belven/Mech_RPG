@@ -5,6 +5,7 @@
 #include "Abilities/CritBoost.h"
 #include "Weapons/Weapon.h"
 
+
 bool UCritBoost::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 {
 	if (owner->GetCurrentWeapon() != nullptr && count <= 0) {
@@ -13,6 +14,9 @@ bool UCritBoost::Activate(class AMech_RPGCharacter* target, FVector targetLocati
 		weaponAffected->SetCritChance(weaponAffected->GetCritChance() + critMultiplier);
 		weaponAffected->OnFire.AddDynamic(this, &UCritBoost::OwnerFired);
 		count = 10;
+
+		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s"), owner->GetID(), *GetClass()->GetName());
+
 		return true;
 	}
 	return false;

@@ -4,6 +4,16 @@
 #include "Characters/Mech_RPGCharacter.h"
 #include "EffectTimer.h"
 
+UEffectTimer::UEffectTimer()
+{
+	SetFlags(EObjectFlags::RF_MarkAsRootSet);
+}
+
+UEffectTimer::~UEffectTimer()
+{
+	Complete();
+}
+
 UEffectTimer* UEffectTimer::CreateEffectTimer(AMech_RPGCharacter* inTarget, float inDuration, TArray<TEnumAsByte<EffectEnums::CrowdControl>> inEffects, bool inRemove)
 {
 	UEffectTimer* timer = NewObject<UEffectTimer>(StaticClass());
@@ -27,8 +37,15 @@ void UEffectTimer::Activate() {
 
 void UEffectTimer::Complete()
 {
-	target->GetWorld()->GetTimerManager().ClearTimer(TimerHandle_EffectEnds);
-	for (EffectEnums::CrowdControl effect : effects) {
-		target->ApplyCrowdControl(effect, !remove);
+	if (!isComplete) {
+		isComplete = true;
+		
+		target->GetWorld()->GetTimerManager().ClearTimer(TimerHandle_EffectEnds);
+		for (EffectEnums::CrowdControl effect : effects) {
+			target->ApplyCrowdControl(effect, !remove);
+		}
+
+		ClearFlags(EObjectFlags::RF_MarkAsRootSet);
+		SetFlags(EObjectFlags::RF_Transient);
 	}
 }

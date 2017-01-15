@@ -30,7 +30,7 @@ void AAllyAIController::Tick(float DeltaTime) {
 		else {
 			Super::Tick(DeltaTime);
 
-			if (!IsTargetValid(GetTarget(), AOEEnums::Enemy) && !IsTargetValid(GetTarget(), AOEEnums::Ally)) {
+			if (!IsTargetValid(GetTarget(), EAffectedTeam::Enemy) && !IsTargetValid(GetTarget(), EAffectedTeam::Ally)) {
 				AMech_RPGCharacter* player = GetAIOwner()->GetGroup()->GetPlayer();
 				if (ShouldMoveToPlayer(player)) {
 					MoveToActor(player);

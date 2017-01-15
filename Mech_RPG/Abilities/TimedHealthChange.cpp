@@ -10,6 +10,8 @@ bool UTimedHealthChange::Activate(class AMech_RPGCharacter* target, FVector targ
 		timeLeft = duration;
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_TimeTick, this, &UTimedHealthChange::TimeTick, rate);
 		SetOnCooldown(owner->GetWorld());
+
+		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %d"), owner->GetID(), *GetClass()->GetName(), target->GetID());
 		return true;
 	}
 	return false;
@@ -43,7 +45,7 @@ UTimedHealthChange* UTimedHealthChange::CreateTimedHealthChange(AMech_RPGCharact
 	ability->rate = inRate;
 	ability->duration = inDuration;
 	ability->heals = inHeals;
-	ability->affectedTeam = inHeals ? AOEEnums::Ally : AOEEnums::Enemy;
+	ability->affectedTeam = inHeals ? EAffectedTeam::Ally : EAffectedTeam::Enemy;
 	ability->changeAmount = inChangeAmount;
 	ability->SetCooldown(cooldown);
 	ability->AddTag(inHeals ? healTag : damageTag, inChangeAmount);

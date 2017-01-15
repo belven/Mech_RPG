@@ -24,7 +24,7 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 
 	FWeaponParams params;
 	params.critChance = 0;
-	params.damageType = DamageEnums::Blast;
+	params.damageType = EDamageType::Blast;
 	params.fireRate = 5;
 	params.heals = false;
 	params.grade = grade;
@@ -70,7 +70,7 @@ void ATestBoss::SetPhase(int32 val)
 	else if (GetPhase() == 3) {
 		FWeaponParams params;
 		params.critChance = 40;
-		params.damageType = DamageEnums::Physical;
+		params.damageType = EDamageType::Physical;
 		params.fireRate = 1;
 		params.grade = GetCurrentWeapon()->GetGrade();
 		params.quality = (QualityEnums::Quality)GetCurrentWeapon()->GetQuality();

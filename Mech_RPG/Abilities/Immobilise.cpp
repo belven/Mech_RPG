@@ -6,12 +6,13 @@
 
 
 bool UImmobilise::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
-	if (target != NULL && !target->IsDead() && target->GetController()) {
+	if (UMiscLibrary::IsCharacterAlive(target) && target->GetController()) {
 		SetOnCooldown(owner->GetWorld());
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_ImmobiliseEnded, this, &UImmobilise::ResetImmobilise, duration);
 		target->GetCanMove()++;
 		target->GetController()->StopMovement();
 		lastTarget = target;
+		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %d"), owner->GetID(), *GetClass()->GetName(), target->GetID());
 		return true;
 	}
 	return false;

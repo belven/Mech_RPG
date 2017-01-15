@@ -19,7 +19,7 @@ void ADrone::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade,
 	Super::CreatePresetRole(inRole, grade, quaility);
 	SetMaxHealth(GetMaxHealth() * 0.25F);
 	GetAbilities().Empty();
-	AddAbility(UTargetedHealthChange::CreateAbility(7, this, 0.25F, AOEEnums::Enemy));
+	AddAbility(UTargetedHealthChange::CreateAbility(7, this, 0.25F, EAffectedTeam::Enemy));
 	SetHealth(GetMaxHealth());
 }
 

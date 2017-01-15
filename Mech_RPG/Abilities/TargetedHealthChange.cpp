@@ -8,7 +8,7 @@ bool UTargetedHealthChange::Activate(class AMech_RPGCharacter* target, FVector t
 	if (UMiscLibrary::IsCharacterAlive(target)) {
 		FHealthChange healthChange;
 		float tempChangeAmount = 0.0F;
-		healthChange.heals = affectedTeam == AOEEnums::Ally;
+		healthChange.heals = affectedTeam == EAffectedTeam::Ally;
 
 		tempChangeAmount = GetWeaponHealthChange() * changeAmount;
 
@@ -19,19 +19,21 @@ bool UTargetedHealthChange::Activate(class AMech_RPGCharacter* target, FVector t
 
 		target->ChangeHealth(healthChange);
 		SetOnCooldown(owner->GetWorld());
+
+		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %d"), owner->GetID(), *GetClass()->GetName(), target->GetID());
 		return true;
 	}
 	return false;
 }
 
-UTargetedHealthChange* UTargetedHealthChange::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inChangeAmount, AOEEnums::AffectedTeam team) {
+UTargetedHealthChange* UTargetedHealthChange::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inChangeAmount, EAffectedTeam team) {
 	UTargetedHealthChange* ability = NewObject<UTargetedHealthChange>(StaticClass());
 	ability->SetCooldown(cooldown);
 	ability->changeAmount = inChangeAmount;
 	ability->owner = owner;
 	ability->affectedTeam = team;
 
-	if (team == AOEEnums::Ally) {
+	if (team == EAffectedTeam::Ally) {
 		ability->AddTag(healTag, inChangeAmount);
 	}
 	else {
