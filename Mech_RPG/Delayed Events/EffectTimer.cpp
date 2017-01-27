@@ -37,7 +37,7 @@ void UEffectTimer::Activate() {
 
 void UEffectTimer::Complete()
 {
-	if (!isComplete) {
+	if (!isComplete && target->IsValidLowLevel()) {
 		isComplete = true;
 		
 		target->GetWorld()->GetTimerManager().ClearTimer(TimerHandle_EffectEnds);

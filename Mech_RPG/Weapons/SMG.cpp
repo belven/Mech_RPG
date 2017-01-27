@@ -14,12 +14,12 @@ ASMG::ASMG() : Super() {
 ASMG* ASMG::CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner) {
 	if (world != nullptr) {
 		FMagazineWeaponParams magSettings;
-		magSettings.healthChange = 42;
+		magSettings.healthChange = 40;
 		magSettings.range = 1000;
-		magSettings.fireRate = 0.3;
+		magSettings.fireRate = 0.1F;
 		magSettings.heals = false;
-		magSettings.magazineSize = 20;
-		magSettings.reloadAmount = 4;
+		magSettings.magazineSize = 60;
+		magSettings.reloadAmount = 15;
 
 		ASMG* weapon = world->SpawnActor<ASMG>(ASMG::StaticClass());
 		weapon->SetSettings(magSettings);
@@ -30,7 +30,7 @@ ASMG* ASMG::CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner) {
 		weapon->ammo = magSettings.magazineSize;
 		return weapon;
 	}
-	return NULL;
+	return nullptr;
 }
 
 AItem* ASMG::Copy()
@@ -43,4 +43,3 @@ AItem* ASMG::Copy()
 	weapon->CloneItemSettings(this);
 	return weapon;
 }
-

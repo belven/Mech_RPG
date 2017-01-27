@@ -16,7 +16,7 @@ UFloatingTextUI * UFloatingTextUI::CreateFloatingText(TSubclassOf<class UFloatin
 
 float UFloatingTextUI::GetText()
 {
-	return healthChange.healthChange;
+	return healthChange.changeAmount;
 }
 
 FSlateColor UFloatingTextUI::GetTextColour()

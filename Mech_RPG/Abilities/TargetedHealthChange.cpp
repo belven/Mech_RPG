@@ -15,7 +15,7 @@ bool UTargetedHealthChange::Activate(class AMech_RPGCharacter* target, FVector t
 		healthChange.manipulator = owner;
 		healthChange.target = target;
 		healthChange.weaponUsed = nullptr;
-		healthChange.healthChange = tempChangeAmount;
+		healthChange.changeAmount = tempChangeAmount;
 
 		target->ChangeHealth(healthChange);
 		SetOnCooldown(owner->GetWorld());

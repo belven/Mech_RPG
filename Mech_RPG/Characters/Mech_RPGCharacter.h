@@ -33,6 +33,7 @@ namespace EffectEnums {
 #define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
 #define mCreateChannelledAbility(ability, Duration, loc, trace) UChannelledAbility::CreateChannelledAbility(this, ability, Duration, loc, trace)
 #define mCreatePresetRole(role) AMech_RPGCharacter::CreatePresetRole(role)
+#define mGetDefaultArmourValue(grade) AArmour::GetDeafultValue(grade)
 
 #define ArmourMap TPair<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*>
 
@@ -50,7 +51,7 @@ public:
 		AWeapon* weaponUsed = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		float healthChange = 0;
+		float changeAmount = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		TEnumAsByte<EDamageType> damageType = EDamageType::Physical;
@@ -60,6 +61,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		bool crit = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		bool ignoresArmour = false;
 };
 
 USTRUCT(BlueprintType)

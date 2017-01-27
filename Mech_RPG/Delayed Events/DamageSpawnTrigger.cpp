@@ -21,7 +21,7 @@ void UDamageSpawnTrigger::SetBoss(ABoss* inBoss) {
 void UDamageSpawnTrigger::BossHealthChange(FHealthChange damage) {
 	if (GetBoss() != NULL && GetAmount() > 0 && !damage.heals) {
 		// Convert damage taken to a percent of the bosses maxHealth
-		float healthPercent = damage.healthChange / GetBoss()->GetMaxHealth();
+		float healthPercent = damage.changeAmount / GetBoss()->GetMaxHealth();
 		percentDamageTaken += healthPercent;
 
 		while (percentDamageTaken >= percent && GetAmount() > 0) {

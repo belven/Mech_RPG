@@ -15,6 +15,8 @@ class MECH_RPG_API UAoEHeal : public UAbility
 
 private:
 	float healAmount;
+
+	static const int radius;
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")

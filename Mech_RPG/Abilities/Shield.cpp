@@ -24,6 +24,7 @@ UShield* UShield::CreateShield(float cooldown, AMech_RPGCharacter* owner, float 
 	ability->shieldAmount = inShieldAmount;
 	ability->owner = owner;
 	ability->AddTag(healTag, inShieldAmount);
+	ability->affectedTeam = EAffectedTeam::Ally;
 	return ability;
 }
 
@@ -38,12 +39,12 @@ void UShield::ChangeHealth(FHealthChange healthChange) {
 		return;
 	}
 
-	if (healthChange.healthChange < shieldHealth) {
-		shieldHealth -= healthChange.healthChange;
-		healthChange.healthChange = 0;
+	if (healthChange.changeAmount < shieldHealth) {
+		shieldHealth -= healthChange.changeAmount;
+		healthChange.changeAmount = 0;
 	}
 	else {
-		healthChange.healthChange -= shieldHealth;
+		healthChange.changeAmount -= shieldHealth;
 		shieldTarget->OnPreHealthChange.RemoveDynamic(this, &UShield::ChangeHealth);
 	}
 }

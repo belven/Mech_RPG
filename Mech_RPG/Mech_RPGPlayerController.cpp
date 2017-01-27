@@ -702,7 +702,13 @@ bool AMech_RPGPlayerController::usedAbility(UAbility* ability, FVector location,
 		if (ability->Activate(tempCharacter, location)) {
 			GetPlayerControllerOwner()->SetCurrentAbility(ability);
 			StopMovement();
-			lastAction = PlayerControllerEnums::None;
+
+			if (IsTargetValid(target)) {
+				lastAction = PlayerControllerEnums::NPCInteract;
+			}
+			else {
+				lastAction = PlayerControllerEnums::None;
+			}
 
 			// Clear last used and target
 			lastCharacterTarget = nullptr;

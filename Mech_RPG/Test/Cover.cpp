@@ -27,7 +27,7 @@ void ACover::Tick( float DeltaTime )
 }
 
 void ACover::ChangeHealth(FHealthChange damage) {
-	currentHealth -= damage.healthChange;
+	currentHealth -= damage.changeAmount;
 
 	if (currentHealth <= 0) {
 		SetActorHiddenInGame(true);

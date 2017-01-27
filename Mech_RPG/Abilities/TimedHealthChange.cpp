@@ -26,12 +26,12 @@ void UTimedHealthChange::TimeTick() {
 		FHealthChange healthChange;
 		healthChange.manipulator = owner;
 		healthChange.crit = UMiscLibrary::IsCrit(25);
-		healthChange.healthChange = GetWeaponHealthChange() * changeAmount;
+		healthChange.changeAmount = GetWeaponHealthChange() * changeAmount;
 		healthChange.target = targetCharacter;
 		healthChange.heals = heals;
 
 		if (healthChange.crit) {
-			healthChange.healthChange *= 2;
+			healthChange.changeAmount *= 2;
 		}
 
 		targetCharacter->ChangeHealth(healthChange);
@@ -47,7 +47,7 @@ UTimedHealthChange* UTimedHealthChange::CreateTimedHealthChange(AMech_RPGCharact
 	ability->heals = inHeals;
 	ability->affectedTeam = inHeals ? EAffectedTeam::Ally : EAffectedTeam::Enemy;
 	ability->changeAmount = inChangeAmount;
-	ability->SetCooldown(cooldown);
+	ability->SetCooldown(MAX(cooldown, inDuration));
 	ability->AddTag(inHeals ? healTag : damageTag, inChangeAmount);
 	return ability;
 }

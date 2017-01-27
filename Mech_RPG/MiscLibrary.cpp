@@ -53,8 +53,8 @@ AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inO
 		swordPrams.fireRate = 1.25;
 		swordPrams.critChance = 70;
 		swordPrams.damageType = EDamageType::Energy;
-		swordPrams.healthChange = 600;
-		swordPrams.range = 200;
+		swordPrams.healthChange = 100;
+		swordPrams.range = UMiscLibrary::GetMeleeRange(inOwner);
 
 		weapon = AWeapon::CreateWeapon(world, inOwner, swordPrams);
 		break;

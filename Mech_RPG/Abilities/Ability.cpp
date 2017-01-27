@@ -156,7 +156,7 @@ UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums:
 	case AbilityEnums::Taunt:
 		return UTaunt::CreateAbility(5.0F, owner);
 	case AbilityEnums::Grenade:
-		return UGrenade::CreateAbility(15.0F, owner, 6.0F);
+		return UGrenade::CreateAbility(15.0F, owner, 3.0F);
 	case AbilityEnums::CritBoost:
 		return UCritBoost::CreateCritBoost(6, owner, 55.0F);
 	case AbilityEnums::Snipe:
@@ -164,7 +164,7 @@ UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums:
 	case AbilityEnums::DefenceBoost:
 		return UDefenceBoost::CreateAbility(7.0F, owner, 0.25F);
 	case AbilityEnums::Shield:
-		return UShield::CreateShield(20, owner, 10.0F);
+		return UShield::CreateShield(20, owner, 40.0F);
 	}
 
 	return nullptr;

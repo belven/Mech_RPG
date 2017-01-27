@@ -117,7 +117,7 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 	healthChange.target = target;
 	healthChange.weaponUsed = this;
 	healthChange.damageType = settings.damageType;
-	healthChange.healthChange = changeAmount;
+	healthChange.changeAmount = changeAmount;
 	healthChange.heals = settings.heals;
 
 	target->ChangeHealth(healthChange);

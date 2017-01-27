@@ -14,7 +14,6 @@
 
 void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility)
 {
-	float statModifier = GetModifierForDifficulty(UMiscLibrary::GetDifficulty());
 	static float newHealth = 20000;
 
 	StartingRole(inRole);
@@ -30,19 +29,19 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 	params.grade = grade;
 	params.quality = (QualityEnums::Quality)quaility;
 	params.range = 5000;
-	params.healthChange = 1500;
+	params.healthChange = 400;
 
 	SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
 	AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 2.5F), 6, true, false));
-	SetHealthChangeModifier(1.0F + statModifier);
-	SetMaxHealth(newHealth * (1 - statModifier));
+	SetHealthChangeModifier(1.0F);
+	SetMaxHealth(newHealth );
 	SetDefenceModifier(0.0F);
 
 	SetHealth(GetMaxHealth());
 
-	CreateArmour(AArmour::GetDeafultValue(ArmourGrades::MediumHeavy),
-		AArmour::GetDeafultValue(ArmourGrades::Medium),
-		AArmour::GetDeafultValue(ArmourGrades::Medium),
+	CreateArmour(mGetDefaultArmourValue(ArmourGrades::Light),
+		mGetDefaultArmourValue(ArmourGrades::Light),
+		mGetDefaultArmourValue(ArmourGrades::Light),
 		grade,
 		quaility);
 
@@ -75,7 +74,7 @@ void ATestBoss::SetPhase(int32 val)
 		params.grade = GetCurrentWeapon()->GetGrade();
 		params.quality = (QualityEnums::Quality)GetCurrentWeapon()->GetQuality();
 		params.range = mGetMeleeRange;
-		params.healthChange = 1750;
+		params.healthChange = 600;
 
 		SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
 
@@ -85,6 +84,6 @@ void ATestBoss::SetPhase(int32 val)
 		ApplyCrowdControl(EffectEnums::Cast, true);
 		SetHealth(GetMaxHealth());
 		SetSpeedModifier(0.8);
-		SetDefenceModifier(0.4);
+		SetDefenceModifier(0.3);
 	}
 }

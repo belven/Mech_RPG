@@ -310,14 +310,19 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 	}
 
 	if (healthChange.heals) {
-		health += healthChange.healthChange;
+		health += healthChange.changeAmount;
 	}
 	else if (canBeDamaged == 0) {
-		float resistance = (GetTotalResistance(healthChange.damageType) / 100);
+		if (!healthChange.ignoresArmour) {
+			float resistance = (GetTotalResistance(healthChange.damageType) / 100);
 
-		resistance *= (1 + GetDefenceModifier());
-		resistance = MIN(0.99F, resistance);
-		health -= (healthChange.healthChange *= (1 - resistance));
+			resistance *= (1 + GetDefenceModifier());
+			resistance = MIN(0.99F, resistance);
+			health -= (healthChange.changeAmount *= (1 - resistance));
+		}
+		else {
+			health -= healthChange.changeAmount;
+		}
 	}
 
 	PostHealthChange(healthChange);
@@ -582,7 +587,7 @@ void AMech_RPGCharacter::Resurrect()
 
 	FHealthChange change;
 	change.heals = true;
-	change.healthChange = GetMaxHealth();
+	change.changeAmount = GetMaxHealth();
 	change.manipulator = this;
 	change.target = this;
 	ChangeHealth(change);
@@ -653,7 +658,6 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	float blastResistance = 5;
 	float phsyicalResistance = 5;
 	float energyResistance = 5;
-	float statModifier = 0;
 	static float lowHealth = 2000;
 	static float mediumHealth = lowHealth * 1.25;
 	static float highHealth = mediumHealth * 1.25;
@@ -673,53 +677,53 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	case GroupEnums::DPS:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, quaility));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, true));
-		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 2.0F));
-		SetDefenceModifier(0.0F + statModifier);
-		SetHealthChangeModifier(1.0F + statModifier);
-		SetSpeedModifier(1.0F + statModifier);
-		blastResistance = AArmour::GetDeafultValue(ArmourGrades::Light);
-		phsyicalResistance = AArmour::GetDeafultValue(ArmourGrades::MediumLight);
-		energyResistance = AArmour::GetDeafultValue(ArmourGrades::Light);
-		SetMaxHealth(lowHealth * (1 + statModifier));
+		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
+		SetDefenceModifier(0.0F);
+		SetHealthChangeModifier(1.0F);
+		SetSpeedModifier(1.0F);
+		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		SetMaxHealth(lowHealth);
 		break;
 
 	case GroupEnums::Healer:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Bio_Repair, grade, quaility));
-		AddAbility(mCreatePresetAbility(AbilityEnums::Heal));
+		//AddAbility(mCreatePresetAbility(AbilityEnums::Heal));
 		AddAbility(mCreatePresetAbility(AbilityEnums::AoEHeal));
-		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 2.0F));
-		SetDefenceModifier(0.0F + statModifier);
-		SetHealthChangeModifier(1.0F + statModifier);
-		SetSpeedModifier(1.0F + statModifier);
-		blastResistance = AArmour::GetDeafultValue(ArmourGrades::Light);
-		phsyicalResistance = AArmour::GetDeafultValue(ArmourGrades::MediumLight);
-		energyResistance = AArmour::GetDeafultValue(ArmourGrades::Light);
-		SetMaxHealth(lowHealth * (1 + statModifier));
+		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 1.0F, 2.0F, 16.0F, true));
+		SetDefenceModifier(0.0F);
+		SetHealthChangeModifier(1.0F);
+		SetSpeedModifier(1.0F);
+		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		SetMaxHealth(lowHealth);
 		break;
 
 	case GroupEnums::Tank:
-		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
+		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Sword, grade, quaility));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Taunt));
-		AddAbility(mCreatePresetAbility(AbilityEnums::Stun));
-		SetDefenceModifier(0.0F + statModifier);
-		SetHealthChangeModifier(1.0F + statModifier);
-		SetSpeedModifier(1.0F + statModifier);
-		blastResistance = AArmour::GetDeafultValue(ArmourGrades::MediumHeavy);
-		phsyicalResistance = AArmour::GetDeafultValue(ArmourGrades::Heavy);
-		energyResistance = AArmour::GetDeafultValue(ArmourGrades::Medium);
-		SetMaxHealth(highHealth * (1 + statModifier));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Shield));
+		SetDefenceModifier(0.0F);
+		SetHealthChangeModifier(1.0F);
+		SetSpeedModifier(1.0F);
+		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		SetMaxHealth(lowHealth);
 		break;
 
 	case GroupEnums::Sniper:
 		SetCurrentWeapon(ALaserSniper::CreateLaserSniper(GetWorld(), this));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Snipe, 2.5F, false, true));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
-		SetDefenceModifier(0.0F + statModifier);
-		SetHealthChangeModifier(1.0F + statModifier);
-		blastResistance = AArmour::GetDeafultValue(ArmourGrades::Light);
-		phsyicalResistance = AArmour::GetDeafultValue(ArmourGrades::MediumLight);
-		energyResistance = AArmour::GetDeafultValue(ArmourGrades::Light);
-		SetMaxHealth(lowHealth * (1 + statModifier));
+		SetDefenceModifier(0.0F);
+		SetHealthChangeModifier(1.0F);
+		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		SetMaxHealth(lowHealth);
 		break;
 
 	case GroupEnums::Support:
@@ -727,12 +731,12 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		AddAbility(USummonDamageDrone::CreateAbility(20, this));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Shield));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Disable));
-		SetDefenceModifier(0.0F + statModifier);
-		SetHealthChangeModifier(1.0F + statModifier);
-		blastResistance = AArmour::GetDeafultValue(ArmourGrades::MediumLight);
-		phsyicalResistance = AArmour::GetDeafultValue(ArmourGrades::Medium);
-		energyResistance = AArmour::GetDeafultValue(ArmourGrades::MediumLight);
-		SetMaxHealth(mediumHealth * (1 + statModifier));
+		SetDefenceModifier(0.0F);
+		SetHealthChangeModifier(1.0F);
+		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		SetMaxHealth(lowHealth);
 		break;
 
 	default:

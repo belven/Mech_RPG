@@ -8,7 +8,7 @@ USnipe* USnipe::CreateAbility(float cooldown, AMech_RPGCharacter* owner) {
 	USnipe* ability = NewObject<USnipe>(StaticClass());
 	ability->SetCooldown(cooldown);
 	ability->owner = owner;
-	ability->changeAmount = 20.0F;
+	ability->changeAmount = 5.0F;
 	ability->affectedTeam = EAffectedTeam::Enemy;
 	ability->AddTag(damageTag, 0.8F);
 	return ability;
