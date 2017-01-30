@@ -6,6 +6,9 @@
 #include "Delayed Events/AOEHealthChange.h"
 #include "BaseAIController.generated.h"
 
+#define mCanSee(actorB) UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), actorB->GetActorLocation())
+#define mLostHealth(character) UMiscLibrary::GetMissingHealth(character) > 0
+
 class AMech_RPGCharacter;
 
 UCLASS()

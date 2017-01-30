@@ -70,14 +70,22 @@ AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inO
 	return weapon;
 }
 
-
 TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::GetDifficulty()
 {
 	return difficulty;
 }
 
 bool UMiscLibrary::IsCrit(float critChance) {
-	return rand() % 100 <= critChance;
+	return IsSuccess(critChance);
+}
+
+bool UMiscLibrary::IsSuccess(float chance)
+{
+	return GetRandomPercent() <= chance;
+}
+
+float UMiscLibrary::GetRandomPercent() {
+	return rand() % 100;
 }
 
 AMech_RPGPlayerController* UMiscLibrary::GetPlayerController() {
@@ -180,17 +188,6 @@ UGroup* UMiscLibrary::GetPlayerGroup() {
 
 AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
 	if (GetPlayerController() != nullptr) {
-		/*	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
-				if (IsCharacterAlive(character)
-					&& IsValid(character)
-					&& character->IsValidLowLevel()
-					&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
-					playerController = Cast<AMech_RPGPlayerController>(character->GetController());
-					return character;
-				}
-			}
-		}
-		else {*/
 		return GetPlayerController()->GetPlayerControllerOwner();
 	}
 	return nullptr;

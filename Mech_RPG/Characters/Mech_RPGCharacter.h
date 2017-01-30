@@ -125,10 +125,15 @@ class AInteractable;
 UCLASS(Blueprintable)
 class AMech_RPGCharacter : public ACharacter {
 	GENERATED_BODY()
+protected:
+	static const float lowHealth;
+	static const float mediumHealth;
+	static const float highHealth;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* TopDownCameraComponent;
-
+	
 	float energy;
 	float health;
 	float healthRegen;
@@ -193,9 +198,9 @@ private:
 
 	UPROPERTY()
 		TArray<UAbility*> abilities;
-	
+
 	UPROPERTY()
-	TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*> armour;
+		TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*> armour;
 
 	UPROPERTY()
 		TArray<UQuest*> quests;

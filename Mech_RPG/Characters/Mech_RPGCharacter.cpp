@@ -23,6 +23,9 @@
 
 TArray<AMech_RPGCharacter*> AMech_RPGCharacter::characters;
 bool AMech_RPGCharacter::settingUpGroups = false;
+const float AMech_RPGCharacter::lowHealth = 2000;
+const float AMech_RPGCharacter::mediumHealth = AMech_RPGCharacter::lowHealth * 1.25;
+const float AMech_RPGCharacter::highHealth = AMech_RPGCharacter::mediumHealth * 1.25;
 
 AMech_RPGCharacter::AMech_RPGCharacter() :
 	healthChangeModifier(1),
@@ -313,16 +316,15 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange) {
 		health += healthChange.changeAmount;
 	}
 	else if (canBeDamaged == 0) {
-		if (!healthChange.ignoresArmour) {
-			float resistance = (GetTotalResistance(healthChange.damageType) / 100);
+		float resistance = GetDefenceModifier();
 
-			resistance *= (1 + GetDefenceModifier());
-			resistance = MIN(0.99F, resistance);
-			health -= (healthChange.changeAmount *= (1 - resistance));
+		if (!healthChange.ignoresArmour) {
+			resistance += (GetTotalResistance(healthChange.damageType) / 100);
 		}
-		else {
-			health -= healthChange.changeAmount;
-		}
+
+		resistance = MIN(0.99F, resistance);
+
+		health -= (healthChange.changeAmount *= (1 - resistance));
 	}
 
 	PostHealthChange(healthChange);
@@ -364,10 +366,12 @@ void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 
 AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemType type) {
 	TMultiMap<int32, int32> gradeMap;
-	int32 outputGrade;
-	int32 outputQuality;
-	bool upgradeGrade = FMath::RandHelper(100) <= 70;// upgradeGradeChance;
-	bool upgradeQuality = FMath::RandHelper(100) <= 70; //upgradeQualityChance;
+
+	int32 outputGrade = 0;
+	int32 outputQuality = 0;
+
+	bool upgradeGrade = UMiscLibrary::IsSuccess(70);// upgradeGradeChance;
+	bool upgradeQuality = UMiscLibrary::IsSuccess(70); //upgradeQualityChance;
 
 	float totalItems = 0;
 	float lowestGrade = AItem::HighestItemLevel;
@@ -413,7 +417,7 @@ AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemT
 	heighestValue.Key = 1;
 	heighestValue.Value = 0;
 
-	for (auto& map : gradeMap) {
+	for (TPair<int32, int32>& map : gradeMap) {
 		// Found a higher quantity
 		if (map.Value > heighestValue.Value) {
 			heighestValue = map;
@@ -424,10 +428,11 @@ AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemT
 		}
 	}
 
-	//if (upgradeGrade) 
-	meanGrade++;
-	//if (upgradeQuality)
-	meanQuality++;
+	if (upgradeGrade)
+		meanGrade++;
+
+	if (upgradeQuality)
+		meanQuality++;
 
 	outputGrade = FMath::RoundHalfToEven(MAX(meanGrade, heighestValue.Key));
 	outputQuality = FMath::RoundHalfToEven(meanQuality);
@@ -460,13 +465,11 @@ void AMech_RPGCharacter::SetActorHiddenInGame(bool bNewHidden)
 
 void AMech_RPGCharacter::SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember)
 {
-	inCombat = true;
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_OutOfCombat);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 8.0F);
-
-	//if (!isPlayer && !isAlly) {
-	stats->SetVisibility(true, true);
-	//}
+	if (!inCombat) {
+		inCombat = true;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 1.0F, true);
+		stats->SetVisibility(true, true);
+	}
 }
 
 void AMech_RPGCharacter::Reset()
@@ -551,27 +554,23 @@ void AMech_RPGCharacter::NotifyActorBeginCursorOver()
 }
 
 void AMech_RPGCharacter::OutOfCombat() {
-	TArray<AMech_RPGCharacter*> charactersFound = UMiscLibrary::GetCharactersInRange(1500, this->GetActorLocation());
-
-	for (AMech_RPGCharacter* character : charactersFound) {
+	for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(3000, this->GetActorLocation())) {
 		if (!character->IsDead() && character->IsEnemy(this) && character->inCombat) {
-			SetInCombat();
 			return;
 		}
 	}
+
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_OutOfCombat);
 
 	inCombat = false;
 	OnStopFiring.Broadcast();
 
 	if (OnOutOfCombat.IsBound()) OnOutOfCombat.Broadcast();
 
-	//if (!isPlayer && !isAlly) {
 	stats->SetVisibility(false, true);
-	//}
 
 	if (IsDead() && GetGroup()->GetPlayer() != nullptr) {
 		Resurrect();
-
 	}
 	else if (IsDead()) {
 		Reset();
@@ -658,29 +657,18 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	float blastResistance = 5;
 	float phsyicalResistance = 5;
 	float energyResistance = 5;
-	static float lowHealth = 2000;
-	static float mediumHealth = lowHealth * 1.25;
-	static float highHealth = mediumHealth * 1.25;
 
 	Reset();
 
 	StartingRole(inRole);
 
 	isPlayer = mIsChildOf(GetController(), AMech_RPGPlayerController::StaticClass());
-	//isAlly = mIsChildOf(GetController(), AAllyAIController::StaticClass());
-
-	//if (isAlly || isPlayer) {
-	//	statModifier = GetModifierForDifficulty(UMiscLibrary::GetDifficulty());
-	//}
 
 	switch (inRole) {
 	case GroupEnums::DPS:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, quaility));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, true));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
-		SetDefenceModifier(0.0F);
-		SetHealthChangeModifier(1.0F);
-		SetSpeedModifier(1.0F);
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
@@ -692,9 +680,6 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		//AddAbility(mCreatePresetAbility(AbilityEnums::Heal));
 		AddAbility(mCreatePresetAbility(AbilityEnums::AoEHeal));
 		AddAbility(UTimedHealthChange::CreateTimedHealthChange(this, 10.0F, 1.0F, 2.0F, 16.0F, true));
-		SetDefenceModifier(0.0F);
-		SetHealthChangeModifier(1.0F);
-		SetSpeedModifier(1.0F);
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
@@ -705,9 +690,6 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Sword, grade, quaility));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Taunt));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Shield));
-		SetDefenceModifier(0.0F);
-		SetHealthChangeModifier(1.0F);
-		SetSpeedModifier(1.0F);
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
@@ -718,8 +700,6 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetCurrentWeapon(ALaserSniper::CreateLaserSniper(GetWorld(), this));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Snipe, 2.5F, false, true));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
-		SetDefenceModifier(0.0F);
-		SetHealthChangeModifier(1.0F);
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
@@ -731,8 +711,6 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		AddAbility(USummonDamageDrone::CreateAbility(20, this));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Shield));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Disable));
-		SetDefenceModifier(0.0F);
-		SetHealthChangeModifier(1.0F);
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);

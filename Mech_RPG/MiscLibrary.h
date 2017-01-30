@@ -58,6 +58,10 @@ public:
 
 	static bool IsCrit(float critChance);
 
+	static bool IsSuccess(float chance);
+
+	static	float GetRandomPercent();
+
 	static FColor GetRelativeColour(AMech_RPGCharacter * character);
 
 	static void SetDifficulty(GameEnums::Difficulty newDifficulty);
@@ -93,7 +97,7 @@ public:
 	//static TArray<AMech_RPGCharacter*> GetCharactersInRange(float range, AMech_RPGCharacter* origin);
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
-	static bool IsMechCharacter(AActor* character);
+		static bool IsMechCharacter(AActor* character);
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static bool IsChildOf(UObject* object, UClass* inClass);

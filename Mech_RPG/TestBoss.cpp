@@ -32,7 +32,7 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 	params.healthChange = 400;
 
 	SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
-	AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 2.5F), 6, true, false));
+	AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 4.5F), 6, true, false));
 	SetHealthChangeModifier(1.0F);
 	SetMaxHealth(newHealth );
 	SetDefenceModifier(0.0F);

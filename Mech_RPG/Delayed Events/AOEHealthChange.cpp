@@ -96,5 +96,6 @@ void AAOEHealthChange::PerformHealthChange(AMech_RPGCharacter* character)
 	healthChange.target = character;
 	healthChange.damageType = settings.damageType;
 	healthChange.heals = settings.heals;
+	healthChange.ignoresArmour = settings.ignoresArmour;
 	character->ChangeHealth(healthChange);
 }
