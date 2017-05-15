@@ -54,7 +54,7 @@ public:
 		float changeAmount = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		TEnumAsByte<EDamageType> damageType = EDamageType::Physical;
+		EDamageType damageType = EDamageType::Physical;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		bool heals = false;
@@ -228,6 +228,7 @@ public:
 	bool isPlayer;
 
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	FORCEINLINE USphereComponent* GetRadiusDection() {
 		return radiusDection;
@@ -260,13 +261,15 @@ public:
 		void AddQuest(UQuest* newQuest);
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
-		void AbandonQuest(UQuest* quest);
+		void RemoveQuest(UQuest* quest);
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 		void SetInCombat(AMech_RPGCharacter* attacker = nullptr, AMech_RPGCharacter* damagedMember = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void Reset();
+
+	void MaximiseHealth();
 
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void ResetInvunrelbility();
@@ -276,6 +279,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void PostHealthChange(FHealthChange healthChange);
+
+	void UpdateStats();
+
+	void SpawnItem(AMech_RPGCharacter* character);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		AItem* AddItem(AItem* itemToAdd);
@@ -325,6 +332,8 @@ public:
 	virtual void NotifyActorBeginCursorOver() override;
 
 	virtual void OutOfCombat();
+
+	void SetInvunrebleTimer();
 
 	void Resurrect();
 

@@ -15,6 +15,7 @@
 #include "Abilities/ChannelledAbility.h"
 #include "Interactable.h"
 #include "Quests/Quest.h"
+#include "Quests/QuestManager.h"
 #include "Math/UnrealMathUtility.h"
 #include "Spawnpoints/Spawnpoint.h"
 #include "Spawnpoints/PlayerSpawnpoint.h"
@@ -42,6 +43,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 	SetID(ID++);
 	SetActorTickEnabled(true);
 	AIControllerClass = ABaseAIController::StaticClass();
+	inventory = NewObject<UInventory>(UInventory::StaticClass());
 
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -120,10 +122,11 @@ AMech_RPGCharacter::~AMech_RPGCharacter() {
 		GetCurrentWeapon()->Destroy();
 		SetCurrentWeapon(nullptr);
 	}
-
-	if (mIsChildOf(GetController(), AMech_RPGPlayerController::StaticClass())) {
-		UMiscLibrary::SetPlayerController(nullptr);
+	
+	if (GetGroup() != nullptr) {
+		GetGroup()->RemoveMember(this);
 	}
+
 }
 
 void AMech_RPGCharacter::Tick(float DeltaTime) {
@@ -298,7 +301,7 @@ void AMech_RPGCharacter::AddQuest(UQuest * newQuest)
 	OnQuestAdded.Broadcast(newQuest);
 }
 
-void AMech_RPGCharacter::AbandonQuest(UQuest* quest)
+void AMech_RPGCharacter::RemoveQuest(UQuest* quest)
 {
 	quests.Remove(quest);
 }
@@ -344,23 +347,35 @@ void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 		health = 0;
 		SetDead(true);
 		SetActorHiddenInGame(true);
+
 		if (GetCurrentWeapon() != nullptr) GetCurrentWeapon()->SetActorHiddenInGame(true);
 		OnStopFiring.Broadcast();
 		healthChange.manipulator->EnemyKilled(this);
-
-		if (GetGroup()->GetPlayer() == nullptr) {
-			ItemEnumns::ItemType type = UMiscLibrary::GetRandomEnum(ItemEnumns::Resource);
-			AItem* newItem = CalucluateItemDrop(healthChange.manipulator->GetGroup(), type);
-			AItemPickup::CreateItemPickup(newItem)->SetActorLocation(GetActorLocation());
-		}
+		
+		UQuestManager::EntityKilled(healthChange);
+		SpawnItem(healthChange.manipulator);
 	}
 
+	UpdateStats();
+}
+
+void AMech_RPGCharacter::UpdateStats()
+{
 	if (GetFloatingStats() != nullptr) {
 		GetFloatingStats()->UpdateHealthBar();
 	}
 
 	if (GetCharacterStats() != nullptr) {
 		GetCharacterStats()->UpdateHealthBar();
+	}
+}
+
+void AMech_RPGCharacter::SpawnItem(AMech_RPGCharacter* character)
+{
+	if (GetGroup()->GetPlayer() == nullptr) {
+		ItemEnumns::ItemType type = UMiscLibrary::GetRandomEnum(ItemEnumns::Resource);
+		AItem* newItem = CalucluateItemDrop(character->GetGroup(), type);
+		AItemPickup::CreateItemPickup(newItem)->SetActorLocation(GetActorLocation());
 	}
 }
 
@@ -451,6 +466,7 @@ void AMech_RPGCharacter::EnemyKilled(AMech_RPGCharacter* character)
 {
 	if (OnEnemyKilled.IsBound()) OnEnemyKilled.Broadcast(character);
 	GetGroup()->GroupEnemyKilled(character);
+
 }
 
 void AMech_RPGCharacter::SetActorHiddenInGame(bool bNewHidden)
@@ -460,6 +476,13 @@ void AMech_RPGCharacter::SetActorHiddenInGame(bool bNewHidden)
 
 	if (GetCurrentWeapon() != nullptr) {
 		GetCurrentWeapon()->SetActorHiddenInGame(bNewHidden);
+	}
+}
+
+void AMech_RPGCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	if (isPlayer) {
+		//UQuestManager::GetQuests().Empty();
 	}
 }
 
@@ -485,17 +508,23 @@ void AMech_RPGCharacter::Reset()
 	if (GetInventory() != nullptr) {
 		GetInventory()->GetItems().Empty();
 	}
+	else {
+		inventory = NewObject<UInventory>(UInventory::StaticClass());
+	}
 
-	inventory = NewObject<UInventory>(UInventory::StaticClass());
-
-	SetHealth(GetMaxHealth());
-
+	MaximiseHealth();
+	
 	channeling = false;
 	inCombat = false;
 
 	canAttack = 0;
 	canMove = 0;
 	canBeDamaged = 0;
+}
+
+void AMech_RPGCharacter::MaximiseHealth()
+{
+	SetHealth(GetMaxHealth());
 }
 
 void AMech_RPGCharacter::ResetInvunrelbility()
@@ -574,8 +603,14 @@ void AMech_RPGCharacter::OutOfCombat() {
 	}
 	else if (IsDead()) {
 		Reset();
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::RemoveFromPlay, 6.0F);
+		SetInvunrebleTimer();
+
 	}
+}
+
+void AMech_RPGCharacter::SetInvunrebleTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::RemoveFromPlay, 6.0F);
 }
 
 void AMech_RPGCharacter::Resurrect()
@@ -722,7 +757,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		break;
 	}
 
-	SetHealth(GetMaxHealth());
+	MaximiseHealth();
 
 	CreateArmour(phsyicalResistance, blastResistance, energyResistance, grade, quaility);
 }
@@ -751,7 +786,7 @@ float AMech_RPGCharacter::GetModifierForDifficulty(TEnumAsByte<GameEnums::Diffic
 
 void AMech_RPGCharacter::SetupWithLoadout() {
 	SetMaxHealth(startingLoadout.maxHealth);
-	SetHealth(GetMaxHealth());
+	MaximiseHealth();
 	SetDefenceModifier(startingLoadout.defenceModifier);
 	SetHealthChangeModifier(startingLoadout.damageModifier);
 	SetCanMove(startingLoadout.canMove);
@@ -821,8 +856,7 @@ bool AMech_RPGCharacter::CompareGroup(UGroup* inGroup) {
 }
 
 bool AMech_RPGCharacter::CompareGroup(AMech_RPGCharacter* inCharacter) {
-	if (this != nullptr
-		&& inCharacter != nullptr
+	if (UMiscLibrary::IsCharacterAlive(inCharacter)
 		&& inCharacter->GetGroup() != nullptr) {
 		return CompareGroup(inCharacter->GetGroup());
 	}

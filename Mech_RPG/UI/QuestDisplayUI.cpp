@@ -3,6 +3,7 @@
 #include "Mech_RPG.h"
 #include "QuestDisplayUI.h"
 #include "Characters/Mech_RPGCharacter.h"
+#include "Quests/QuestManager.h"
 
 AMech_RPGCharacter* UQuestDisplayUI::GetCharacter()
 {
@@ -16,5 +17,5 @@ void UQuestDisplayUI::SetCharacter(AMech_RPGCharacter* inCharacter)
 
 TArray<UQuest*>& UQuestDisplayUI::GetQuests()
 {
-	return character->GetQuests();
+	return UQuestManager::GetQuests();
 }

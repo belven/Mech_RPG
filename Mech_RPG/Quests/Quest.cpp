@@ -119,5 +119,5 @@ UQuestObjective* UQuest::GetFirstObjective()
 }
 
 void UQuest::AbandonQuest() {
-	GetOwner()->AbandonQuest(this);
+	GetOwner()->RemoveQuest(this);
 }

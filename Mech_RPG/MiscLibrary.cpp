@@ -88,14 +88,6 @@ float UMiscLibrary::GetRandomPercent() {
 	return rand() % 100;
 }
 
-AMech_RPGPlayerController* UMiscLibrary::GetPlayerController() {
-	return playerController;
-}
-
-void UMiscLibrary::SetPlayerController(AMech_RPGPlayerController* newController) {
-	playerController = newController;
-}
-
 float UMiscLibrary::GetMeleeRange(AMech_RPGCharacter* character)
 {
 	return (character->GetCapsuleComponent()->GetUnscaledCapsuleRadius() * 2) * 1.2;
@@ -164,6 +156,14 @@ bool UMiscLibrary::IsCharacterAlive(AMech_RPGCharacter* character) {
 	return character != nullptr && !character->IsDead();
 }
 
+AMech_RPGPlayerController* UMiscLibrary::GetPlayerController() {
+	return playerController;
+}
+
+void UMiscLibrary::SetPlayerController(AMech_RPGPlayerController* newController) {
+	playerController = newController;
+}
+
 void UMiscLibrary::OpenCharacterPane(UWorld* world) {
 	AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(UGameplayStatics::GetPlayerCharacter(world, 0));
 
@@ -173,17 +173,18 @@ void UMiscLibrary::OpenCharacterPane(UWorld* world) {
 }
 
 UGroup* UMiscLibrary::GetPlayerGroup() {
-	//if (playerGroup == nullptr || playerGroup->GetPlayer() == nullptr) {
-	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
-		if (IsCharacterAlive(character)
-			&& IsValid(character)
-			&& character->IsValidLowLevel()
-			&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
-			return character->GetGroup();
-		}
+	/*if (GetPlayerController() != nullptr && GetPlayerController()->GetPlayerControllerOwner() != nullptr) {
+		return GetPlayerController()->GetPlayerControllerOwner()->GetGroup();
+	}*/
+	if (playerGroup == nullptr) {
+		UMiscLibrary::SetPlayerGroup(NewObject<UGroup>(UGroup::StaticClass()));
 	}
-	//}
-	return nullptr;
+	return playerGroup;
+}
+
+void UMiscLibrary::SetPlayerGroup(UGroup* group)
+{
+	playerGroup = group;
 }
 
 AMech_RPGCharacter* UMiscLibrary::GetPlayer() {

@@ -24,10 +24,5 @@ public :
 	bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		virtual FString GetTooltipText() override;
-	
-	void StunEnd();
-
-	FTimerHandle TimerHandle_StunEnd;
-	
+		virtual FString GetTooltipText() override;		
 };

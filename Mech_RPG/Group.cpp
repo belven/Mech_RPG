@@ -145,3 +145,40 @@ void UGroup::NPCInteract(AMech_RPGCharacter * character)
 		OnNPCInteractEvent.Broadcast(character);
 	}
 }
+
+void UGroup::AddQuest(UQuest* newQuest) {
+	quests.Add(newQuest);
+}
+
+void UGroup::RemoveQuest(UQuest* questToRemove) {
+	quests.Remove(questToRemove);
+}
+
+TArray<UQuest*>& UGroup::GetQuests()
+{
+	return quests;
+}
+
+TArray<UQuest*> UGroup::GetCompletedQuests() {
+	TArray<UQuest*> completedQuests;
+
+	for (UQuest* quest : quests) {
+		if (quest->IsComplete()) {
+			completedQuests.Add(quest);
+		}
+	}
+
+	return completedQuests;
+}
+
+TArray<UQuest*> UGroup::GetActiveQuests() {
+	TArray<UQuest*> activeQuests;
+
+	for (UQuest* quest : quests) {
+		if (!quest->IsComplete()) {
+			activeQuests.Add(quest);
+		}
+	}
+
+	return activeQuests;
+}

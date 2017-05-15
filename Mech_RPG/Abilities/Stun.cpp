@@ -27,12 +27,6 @@ FString UStun::GetTooltipText()
 	return "Stun" + UMiscLibrary::lnBreak + "Stops target from moving and attacking for " + durationString + UMiscLibrary::lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
 }
 
-void UStun::StunEnd() {
-	targetCharacter->ApplyCrowdControl(EffectEnums::Cast, true);
-	targetCharacter->ApplyCrowdControl(EffectEnums::Attack, true);
-	targetCharacter->ApplyCrowdControl(EffectEnums::Move, true);
-}
-
 UStun* UStun::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float duration) {
 	UStun* ability = NewObject<UStun>(StaticClass());
 	ability->SetCooldown(cooldown);

@@ -4,6 +4,7 @@
 #include "BaseAIController.h"
 #include "Characters/Mech_RPGCharacter.h"
 #include "Weapons.h"
+#include "Quests/QuestManager.h"
 
 ABaseAIController::ABaseAIController() : Super() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -23,6 +24,7 @@ void ABaseAIController::Tick(float DeltaTime) {
 			for (UAbility* ability : GetAIOwner()->GetAbilities()) {
 				if (!ability->OnCooldown() && PerformAbility(ability)) {
 					abilityUsed = true;
+					UQuestManager::AbilityUsed(ability);
 					break;
 				}
 			}

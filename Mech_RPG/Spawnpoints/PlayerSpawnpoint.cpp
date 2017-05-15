@@ -12,7 +12,9 @@ APlayerSpawnpoint::APlayerSpawnpoint() :
 
 void APlayerSpawnpoint::BeginPlay() {
 	if (GetWorld() != nullptr && defaultSpawnpoint) {
-		UGroup* group = UGroup::CreateGroup(team);
+		UGroup* group = UMiscLibrary::GetPlayerGroup();
+		group->SetID(team);
+
 		AMech_RPGCharacter* character = nullptr;
 		bool healerSpawned = false;
 		FVector loc;

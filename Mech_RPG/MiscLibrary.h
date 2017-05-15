@@ -72,6 +72,9 @@ public:
 		static UGroup* GetPlayerGroup();
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
+		static void SetPlayerGroup(UGroup* group);
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
 		static AMech_RPGCharacter* GetPlayer();
 
 	UFUNCTION(BlueprintCallable, Category = "Character")

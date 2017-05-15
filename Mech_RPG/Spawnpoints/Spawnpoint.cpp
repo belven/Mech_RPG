@@ -39,8 +39,11 @@ AMech_RPGCharacter* ASpawnpoint::SpawnCharacter(TSubclassOf<class AMech_RPGChara
 		count++;
 	}
 
-	if (!UMiscLibrary::CanSee(GetWorld(), GetActorLocation(), character->GetActorLocation())) {
+	count = 0;
+
+	while(count < 10 && !UMiscLibrary::CanSee(GetWorld(), GetActorLocation(), character->GetActorLocation())) {
 		character->SetActorLocation(mFindNavLocation(spawnRadius));
+		count++;
 	}
 
 	return character;

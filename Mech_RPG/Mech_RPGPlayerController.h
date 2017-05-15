@@ -59,6 +59,8 @@ private:
 
 	float interactionRange = 200;
 
+	~AMech_RPGPlayerController();
+
 public:
 	AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer);
 

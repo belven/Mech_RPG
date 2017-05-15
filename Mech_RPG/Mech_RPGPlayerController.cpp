@@ -11,6 +11,11 @@
 
 #define mCanSee(location) UMiscLibrary::CanSee(GetPlayerControllerOwner()->GetWorld(), GetPlayerControllerOwner()->GetActorLocation(), location)
 
+AMech_RPGPlayerController::~AMech_RPGPlayerController()
+{
+	UMiscLibrary::SetPlayerGroup(nullptr);
+}
+
 AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	bShowMouseCursor = true;
 	bAttackTarget = false;
@@ -701,6 +706,7 @@ bool AMech_RPGPlayerController::usedAbility(UAbility* ability, FVector location,
 		// If the ability doesn't need a target or we can see the location, try to use it 
 		if (ability->Activate(tempCharacter, location)) {
 			GetPlayerControllerOwner()->SetCurrentAbility(ability);
+			UQuestManager::AbilityUsed(ability);
 			StopMovement();
 
 			if (IsTargetValid(target)) {

@@ -37,6 +37,8 @@ private:
 
 	UPROPERTY()
 		TArray<AMech_RPGCharacter*> members;
+
+	TArray<UQuest*> quests;
 public:
 	UGroup();
 	UFUNCTION(BlueprintCallable, Category = "Group")
@@ -114,4 +116,19 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void ItemPickup(AItem* item);
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		void AddQuest(UQuest* newQuest);
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		void RemoveQuest(UQuest* questToRemove);
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		TArray<UQuest*>& GetQuests();
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		TArray<UQuest*> GetCompletedQuests();
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+		TArray<UQuest*> GetActiveQuests();
 };
