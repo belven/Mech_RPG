@@ -26,7 +26,7 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/CharacterUI/Character_Pane.Character_Pane_C"));
 
 	if (characterPaneClass.Class != nullptr) {
-		WidgetTemplate = characterPaneClass.Class;
+		characterPaneTemplate = characterPaneClass.Class;
 	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryClass(TEXT("/Game/TopDown/Blueprints/UI/ItemsUI/Inventory.Inventory_C"));
@@ -49,8 +49,8 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 
 void AMech_RPGPlayerController::BeginPlay() {
 	Super::BeginPlay();
-	if (WidgetTemplate != nullptr) {
-		characterPane = CreateWidget<UUserWidget>(this, WidgetTemplate);
+	if (characterPaneTemplate != nullptr) {
+		characterPane = CreateWidget<UUserWidget>(this, characterPaneTemplate);
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
 	}

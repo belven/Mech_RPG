@@ -146,7 +146,7 @@ public:
 	TArray<AMech_RPGCharacter*> GetCharactersInRange(float range);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = UI)
-		TSubclassOf<UUserWidget> WidgetTemplate;
+		TSubclassOf<UUserWidget> characterPaneTemplate;
 	TSubclassOf<UUserWidget> inventoryTemplate;
 	TSubclassOf<UUserWidget> questListTemplate;
 	

@@ -8,7 +8,7 @@
 #include "Characters/Mech_RPGCharacter.h"
 #include "QuestManager.h"
 
-//UQuestManager* UQuestManager::INSTANCE = nullptr;
+UQuestManager* UQuestManager::INSTANCE = nullptr;
 //
 //UQuestManager* UQuestManager::GetInstance() {
 //	if (INSTANCE == nullptr) {
@@ -17,11 +17,11 @@
 //	return INSTANCE;
 //}
 
-void UQuestManager::EntityKilled(FHealthChange healthChange) {
-	//if (OnEntityKilled.IsBound()) {
-	//	OnEntityKilled.Broadcast(healthChange);
-	//}
-}
+//void UQuestManager::EntityKilled(FHealthChange healthChange) {
+//	/*if (OnEntityKilled.IsBound()) {
+//		OnEntityKilled.Broadcast(healthChange);
+//	}*/
+//}
 
 void UQuestManager::ItemAquired(AItem* item) {
 	/*if (OnItemPickUpEvent.IsBound()) {

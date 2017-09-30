@@ -99,9 +99,9 @@ FVector UMiscLibrary::FindNavLocation(AActor* actor, float radius) {
 	bool locationFound = false;
 
 	while (count < 120 
-		&& (!locationFound || !CanSee(actor->GetWorld(), actor->GetActorLocation(), nav.Location))) {
+		&& (!locationFound )) {//|| !CanSee(actor->GetWorld(), actor->GetActorLocation(), nav.Location))) {
 		radius *= 1.01;
-		locationFound = actor->GetWorld()->GetNavigationSystem()->GetRandomPointInNavigableRadius(actor->GetActorLocation(), radius, nav);
+		locationFound = actor->GetWorld()->GetNavigationSystem()->GetRandomReachablePointInRadius(actor->GetActorLocation(), radius, nav);
 		count++;
 	}
 

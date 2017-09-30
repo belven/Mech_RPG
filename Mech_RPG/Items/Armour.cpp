@@ -52,7 +52,7 @@ float AArmour::GetDeafultValue(ArmourGrades::ArmourGrade armourGrade) {
 FString AArmour::GetTooltipText()
 {
 	FString output = GetName() + UMiscLibrary::lnBreak;
-	output += FindObject<UEnum>(ANY_PACKAGE, TEXT("ArmourEnums"), true)->GetDisplayNameText(GetArmourPosition()).ToString() + UMiscLibrary::lnBreak;
+	output += FindObject<UEnum>(ANY_PACKAGE, TEXT("ArmourEnums"), true)->GetDisplayNameTextByValue(GetArmourPosition()).ToString() + UMiscLibrary::lnBreak;
 	output += "Physical Resistance: " + FString::SanitizeFloat(GetPhysicalResistance()) + UMiscLibrary::lnBreak;
 	output += "Blast Resistance: " + FString::SanitizeFloat(GetBlastResistance()) + UMiscLibrary::lnBreak;
 	output += "Energy Resistance: " + FString::SanitizeFloat(GetEnergyResistance());
@@ -105,6 +105,11 @@ AArmour* AArmour::CreateArmour(UWorld* world,
 	tempArmour->SetQuality(armourQuality);
 	tempArmour->SetItemOwner(armourOwner);
 	tempArmour->SetName(armourName);
+	
+	if (armourOwner != nullptr) {
+		tempArmour->AttachToComponent(armourOwner->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+	}
+
 	return tempArmour;
 }
 

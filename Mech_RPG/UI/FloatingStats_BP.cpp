@@ -12,7 +12,7 @@ float UFloatingStats_BP::GetHealthBarPercent()
 
 FText UFloatingStats_BP::GetRoleText()
 {
-	return owner != nullptr ? FindObject<UEnum>(ANY_PACKAGE, TEXT("GroupEnums"), true)->GetDisplayNameText(owner->GetRole()) : FText();
+	return owner != nullptr ? FindObject<UEnum>(ANY_PACKAGE, TEXT("GroupEnums"), true)->GetDisplayNameTextByIndex(owner->GetRole()) : FText();
 }
 
 float UFloatingStats_BP::GetCastBarPercent()

@@ -87,7 +87,7 @@ FString AWeapon::GetTooltipText()
 
 	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDamageType"), true);
 
-	FString damageType = !EnumPtr ? "Invalid" : EnumPtr->GetEnumName((int32)settings.damageType);
+	FString damageType = !EnumPtr ? "Invalid" : EnumPtr->GetNameStringByIndex((int32)settings.damageType);
 
 	return GetName() + UMiscLibrary::lnBreak + "DPS: " + dpsString + UMiscLibrary::lnBreak + "Damage Type: " + damageType;
 }

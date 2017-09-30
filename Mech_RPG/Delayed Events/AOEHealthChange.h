@@ -33,7 +33,7 @@ public:
 
 	bool usesTarget = false;
 	bool heals = false;
-	bool ignoresArmour;
+	bool ignoresArmour = false;
 };
 
 UCLASS()

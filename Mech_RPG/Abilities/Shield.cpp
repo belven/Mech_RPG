@@ -10,7 +10,7 @@ bool UShield::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 		shieldHealth = GetWeaponHealthChange() * shieldAmount;
 		shieldTarget = target;
 		SetOnCooldown(owner->GetWorld());
-		shieldTarget->OnPreHealthChange.AddUniqueDynamic(this, &UShield::ChangeHealth);
+		//shieldTarget->OnPreHealthChange.AddUniqueDynamic(this, &UShield::ChangeHealth);
 		UE_LOG(AbilitiesLog, Log, TEXT("%d used %s on %d"), owner->GetID(), *GetClass()->GetName(), target->GetID());
 		return true;
 	}
@@ -34,17 +34,17 @@ FString UShield::GetTooltipText()
 	return "Shield" + UMiscLibrary::lnBreak + "Places a shield on target ally that Absorbs " + shieldString + "% of their max health as damage" + UMiscLibrary::lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
 }
 
-void UShield::ChangeHealth(FHealthChange healthChange) {
-	if (healthChange.heals) {
-		return;
-	}
-
-	if (healthChange.changeAmount < shieldHealth) {
-		shieldHealth -= healthChange.changeAmount;
-		healthChange.changeAmount = 0;
-	}
-	else {
-		healthChange.changeAmount -= shieldHealth;
-		shieldTarget->OnPreHealthChange.RemoveDynamic(this, &UShield::ChangeHealth);
-	}
-}
+//void UShield::ChangeHealth(FHealthChange healthChange) {
+//	if (healthChange.heals) {
+//		return;
+//	}
+//
+//	if (healthChange.changeAmount < shieldHealth) {
+//		shieldHealth -= healthChange.changeAmount;
+//		healthChange.changeAmount = 0;
+//	}
+//	else {
+//		healthChange.changeAmount -= shieldHealth;
+//		shieldTarget->OnPreHealthChange.RemoveDynamic(this, &UShield::ChangeHealth);
+//	}
+//}

@@ -4,8 +4,8 @@ using UnrealBuildTool;
 
 public class Mech_RPG : ModuleRules
 {
-	public Mech_RPG(TargetInfo Target)
-	{
+	public Mech_RPG(ReadOnlyTargetRules Target) : base(Target)
+    {
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "Slate", "SlateCore" });
 	}
 }

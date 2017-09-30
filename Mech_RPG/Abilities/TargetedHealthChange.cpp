@@ -26,7 +26,7 @@ bool UTargetedHealthChange::Activate(class AMech_RPGCharacter* target, FVector t
 	return false;
 }
 
-UTargetedHealthChange* UTargetedHealthChange::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float inChangeAmount, EAffectedTeam team) {
+UTargetedHealthChange* UTargetedHealthChange::CreateTargetedHealthChange(float cooldown, AMech_RPGCharacter* owner, float inChangeAmount, EAffectedTeam team) {
 	UTargetedHealthChange* ability = NewObject<UTargetedHealthChange>(StaticClass());
 	ability->SetCooldown(cooldown);
 	ability->changeAmount = inChangeAmount;

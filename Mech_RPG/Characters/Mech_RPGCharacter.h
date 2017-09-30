@@ -29,6 +29,8 @@ namespace EffectEnums {
 #include "Delegates/DelegateCombinations.h"
 #include "Mech_RPGCharacter.generated.h"
 
+#define MIN(a,b) (a < b) ? (a) : (b)
+#define MAX(a,b) (a > b) ? (a) : (b)
 #define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)
 #define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
 #define mCreateChannelledAbility(ability, Duration, loc, trace) UChannelledAbility::CreateChannelledAbility(this, ability, Duration, loc, trace)

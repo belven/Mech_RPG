@@ -14,7 +14,7 @@ float UCharacterStats::GetHealthBarPercent()
 
 FText UCharacterStats::GetRoleText()
 {
-	return owner != nullptr ? FindObject<UEnum>(ANY_PACKAGE, TEXT("GroupEnums"), true)->GetDisplayNameText(owner->GetRole()) : FText();
+	return owner != nullptr ? FindObject<UEnum>(ANY_PACKAGE, TEXT("GroupEnums"), true)->GetDisplayNameTextByValue(owner->GetRole()) : FText();
 }
 
 FString UCharacterStats::GetHealthText()
@@ -85,7 +85,6 @@ FReply UCharacterStats::NativeOnMouseButtonUp(const FGeometry& InGeometry, const
 
 FReply UCharacterStats::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-
 	return FReply::Handled();
 }
 

@@ -6,6 +6,8 @@
 #include "Delayed Events/AOEHealthChange.h"
 #include "MiscLibrary.generated.h"
 
+#define MIN(a,b) (a < b) ? (a) : (b)
+#define MAX(a,b) (a > b) ? (a) : (b)
 
 #define mIsChildOf(inUObject, checkClass) UMiscLibrary::IsChildOf(inUObject, checkClass)
 #define CLAMP(value, max, min) (value = (MAX(MIN(value, max), min)))

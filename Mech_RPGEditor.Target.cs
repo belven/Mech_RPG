@@ -5,21 +5,9 @@ using System.Collections.Generic;
 
 public class Mech_RPGEditorTarget : TargetRules
 {
-	public Mech_RPGEditorTarget(TargetInfo Target)
-	{
+	public Mech_RPGEditorTarget(TargetInfo Target) : base(Target)
+    {
 		Type = TargetType.Editor;
-	}
-
-	//
-	// TargetRules interface.
-	//
-
-	public override void SetupBinaries(
-		TargetInfo Target,
-		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-		ref List<string> OutExtraModuleNames
-		)
-	{
-		OutExtraModuleNames.Add("Mech_RPG");
-	}
+        ExtraModuleNames.Add("Mech_RPG");
+    }    
 }

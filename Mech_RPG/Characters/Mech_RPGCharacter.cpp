@@ -43,7 +43,6 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 	SetID(ID++);
 	SetActorTickEnabled(true);
 	AIControllerClass = ABaseAIController::StaticClass();
-	inventory = NewObject<UInventory>(UInventory::StaticClass());
 
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -124,7 +123,7 @@ AMech_RPGCharacter::~AMech_RPGCharacter() {
 	}
 	
 	if (GetGroup() != nullptr) {
-		GetGroup()->RemoveMember(this);
+		//GetGroup()->RemoveMember(this);
 	}
 
 }
@@ -352,7 +351,7 @@ void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 		OnStopFiring.Broadcast();
 		healthChange.manipulator->EnemyKilled(this);
 		
-		UQuestManager::EntityKilled(healthChange);
+		//UQuestManager::EntityKilled(healthChange);
 		SpawnItem(healthChange.manipulator);
 	}
 

@@ -28,8 +28,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		virtual FString GetTooltipText() override;
 
-	UFUNCTION(BlueprintCallable, Category = "Shield")
-		void ChangeHealth(FHealthChange healthChange);
+	//UFUNCTION(BlueprintCallable, Category = "Shield")
+		//void ChangeHealth(FHealthChange healthChange);
 
 
 };
