@@ -20,7 +20,7 @@ void UHealthChangePhaseTrigger::Trigger()
 	GetBoss()->OnPostHealthChange.RemoveDynamic(this, &UHealthChangePhaseTrigger::HealthChanged);
 }
 
-void UHealthChangePhaseTrigger::HealthChanged(FHealthChange healthChange)
+void UHealthChangePhaseTrigger::HealthChanged(FHealthChange& healthChange)
 {
 	int32 bossPhase = GetBoss()->GetPhase();
 	int32 trigerPhase = GetPhase() - 1;

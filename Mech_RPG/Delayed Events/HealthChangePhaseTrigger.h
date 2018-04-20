@@ -3,6 +3,7 @@
 #pragma once
 
 #include "PhaseTrigger.h"
+#include "EventManager.h"
 #include "HealthChangePhaseTrigger.generated.h"
 
 class ABoss;
@@ -21,6 +22,6 @@ public:
 		virtual void Trigger() override;
 
 	UFUNCTION(BlueprintCallable, Category = "PhaseTrigger")
-		void HealthChanged(FHealthChange healthChange);
+		void HealthChanged(FHealthChange& healthChange);
 
 };

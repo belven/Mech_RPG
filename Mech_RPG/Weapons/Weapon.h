@@ -1,19 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
-
-
-
-
 #pragma once
-
 #include "MiscLibrary.h"
 #include "Items/Equipable.h"
+#include "Items/Armour.h"
 #include "Weapon.generated.h"
 
-
 USTRUCT(BlueprintType)
-struct FWeaponParams {
+struct FWeaponParams
+{
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
@@ -37,7 +31,8 @@ public:
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFired);
 
 UCLASS(Blueprintable)
-class MECH_RPG_API AWeapon : public AEquipable {
+class MECH_RPG_API AWeapon : public AEquipable
+{
 	GENERATED_BODY()
 protected:
 	FWeaponParams settings;
@@ -47,13 +42,14 @@ protected:
 
 public:
 	AWeapon();
-	float GetChangeAmount();
-	float GetRange(); 
+	virtual float GetChangeAmount();
+
+	float GetRange();
 	float GetDPS();
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		virtual AItem* Copy();
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Particles)
 		UParticleSystemComponent* partclSystem;
 
@@ -61,7 +57,7 @@ public:
 	void SetRange(float newVal);
 
 	virtual bool CanFire();
-	virtual void Fire(class AMech_RPGCharacter* targetr);
+	virtual void UseWeapon(class AMech_RPGCharacter* targetr);
 	//virtual void Fire(class ACover* target);
 
 	virtual	void SetItemOwner(AMech_RPGCharacter* inOwner) override;
@@ -91,6 +87,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		virtual FLinearColor GetProgressBarColour();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual FString GetTooltipText() override;

@@ -6,6 +6,7 @@
 #include "Mech_RPGPlayerController.h"
 #include "Items/Item.h"
 #include "Interactable.h"
+#include "Quests/Quest.h"
 
 UGroup::UGroup() : Super() {
 

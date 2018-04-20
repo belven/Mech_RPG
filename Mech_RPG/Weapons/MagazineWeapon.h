@@ -6,7 +6,8 @@
 #include "MagazineWeapon.generated.h"
 
 USTRUCT(BlueprintType)
-struct FMagazineWeaponParams : public FWeaponParams {
+struct FMagazineWeaponParams : public FWeaponParams
+{
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
@@ -16,7 +17,8 @@ public:
 };
 
 UCLASS()
-class MECH_RPG_API AMagazineWeapon : public AWeapon {
+class MECH_RPG_API AMagazineWeapon : public AWeapon
+{
 	GENERATED_BODY()
 
 protected:
@@ -27,10 +29,14 @@ protected:
 	float lastTime = 0;
 
 public:
-	virtual void Fire(class AMech_RPGCharacter* target) override;
+	virtual void UseWeapon(class AMech_RPGCharacter* target) override;
 	virtual void Tick(float DeltaTime) override;
+
 	virtual bool CanFire() override;
 	virtual	void SetItemOwner(AMech_RPGCharacter* inOwner) override;
+
+	UFUNCTION(BlueprintCallable, Category = "MagazineWeapon")
+		void Reload();
 
 	UFUNCTION(BlueprintCallable, Category = "MagazineWeapon")
 		void FullReload();
@@ -45,4 +51,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		virtual FLinearColor GetProgressBarColour() override;
 };

@@ -73,7 +73,7 @@ void  AAOEHealthChange::Activate() {
 				partclSystem->Activate(true);
 			}*/
 
-		for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(settings.radius, locationToUse)) {
+		for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(settings.owner->GetWorld(), settings.radius, locationToUse)) {
 			if (CanAffect(character)) {
 				PerformHealthChange(character);
 			}

@@ -1,9 +1,8 @@
 // Copyright of Explosive Industries
 
 #pragma once
-
 #include "Object.h"
-#include "Delayed Events/AOEHealthChange.h"
+#include "Enums.h"
 #include "MiscLibrary.generated.h"
 
 #define MIN(a,b) (a < b) ? (a) : (b)
@@ -12,30 +11,10 @@
 #define mIsChildOf(inUObject, checkClass) UMiscLibrary::IsChildOf(inUObject, checkClass)
 #define CLAMP(value, max, min) (value = (MAX(MIN(value, max), min)))
 
-UENUM(BlueprintType)
-namespace GameEnums {
-	enum Difficulty {
-		Easy,
-		Medium,
-		Hard
-	};
-}
-
-UENUM(BlueprintType)
-namespace WeaponEnums {
-	enum WeaponType {
-		Sniper,
-		Bio_Repair,
-		SMG,
-		Shotgun,
-		RPG,
-		Sword,
-		End
-	};
-}
 
 UCLASS()
-class MECH_RPG_API UMiscLibrary : public UObject {
+class MECH_RPG_API UMiscLibrary : public UObject
+{
 	GENERATED_BODY()
 
 private:
@@ -97,9 +76,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static TArray<AMech_RPGCharacter*> GetCharactersInRange(float range, AActor* origin);
 
-	static TArray<AMech_RPGCharacter*> GetCharactersInRange(float range, FVector location);
-
-	//static TArray<AMech_RPGCharacter*> GetCharactersInRange(float range, AMech_RPGCharacter* origin);
+	static TArray<AMech_RPGCharacter*> GetCharactersInRange(UWorld* world, float range, FVector location);
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static bool IsMechCharacter(AActor* character);

@@ -8,6 +8,7 @@
 #include "Interactable.h"
 #include "UI/ItemUI.h"
 #include "Weapons.h"
+#include "Quests/QuestManager.h"
 
 #define mCanSee(location) UMiscLibrary::CanSee(GetPlayerControllerOwner()->GetWorld(), GetPlayerControllerOwner()->GetActorLocation(), location)
 
@@ -76,6 +77,7 @@ void  AMech_RPGPlayerController::PerformPanning()
 		FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
 		rot.Yaw += panLeft ? -1 : 1;
 		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
+		GetPlayerControllerOwner()->UpdateHealthBarRot();
 	}
 
 	if (panUp || panDown) {
@@ -89,7 +91,8 @@ void  AMech_RPGPlayerController::PerformPanning()
 			rot.Pitch = 0;
 		}
 
-		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
+		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot); 
+		GetPlayerControllerOwner()->UpdateHealthBarRot();
 	}
 }
 
@@ -253,7 +256,7 @@ void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
 	// Are we in weapons range
 	if (weapon != nullptr && distToTarget <= weapon->GetRange()) {
 		if (GetPlayerControllerOwner()->CanAttack() && weapon->CanFire()) {
-			weapon->Fire(target);
+			weapon->UseWeapon(target);
 		}
 
 		owner->GetGroup()->GroupMemberHit(target, owner);
@@ -311,7 +314,23 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("ResetZoom", IE_Pressed, this, &AMech_RPGPlayerController::ResetZoom);
 	InputComponent->BindAction("CharacterPane", IE_Pressed, this, &AMech_RPGPlayerController::OpenCharacterPane);
 	InputComponent->BindAction("Inventory", IE_Pressed, this, &AMech_RPGPlayerController::OpenInventory);
-	//	InputComponent->BindAction("UpdateRotation", IE_Pressed, this, &AMech_RPGPlayerController::UpdateRotation);
+
+	InputComponent->BindAction("Reload", IE_Pressed, this, &AMech_RPGPlayerController::Reload);
+}
+
+void AMech_RPGPlayerController::Reload()
+{
+	if (UMiscLibrary::IsCharacterAlive(GetPlayerControllerOwner()) 
+		&& GetPlayerControllerOwner()->GetCurrentWeapon() != nullptr)
+	{
+		AWeapon* weapon = GetPlayerControllerOwner()->GetCurrentWeapon();
+
+		if (mIsChildOf(weapon, AMagazineWeapon::StaticClass()))
+		{
+			AMagazineWeapon* mWeapon = Cast<AMagazineWeapon>(weapon);
+			mWeapon->Reload();
+		}
+	}
 }
 
 void AMech_RPGPlayerController::OpenCharacterPane() {

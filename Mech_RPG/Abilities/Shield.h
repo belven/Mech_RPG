@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Abilities/Ability.h"
+#include "EventManager.h"
 #include "Shield.generated.h"
 
 /**
@@ -28,8 +29,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		virtual FString GetTooltipText() override;
 
-	//UFUNCTION(BlueprintCallable, Category = "Shield")
-		//void ChangeHealth(FHealthChange healthChange);
+	UFUNCTION(BlueprintCallable, Category = "Shield")
+		void ChangeHealth(FHealthChange& healthChange);
 
 
 };

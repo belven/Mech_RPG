@@ -193,6 +193,8 @@ protected:
 
 	virtual void SetupInputComponent() override;
 
+	void Reload();
+
 	/**
 	 * Navigate player to the current mouse cursor location.
 	 */

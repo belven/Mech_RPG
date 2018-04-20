@@ -20,7 +20,7 @@ protected:
 	AMech_RPGCharacter* targetCharacter;
 public:
 	ABaseAIController();
-	void AttackTarget(float DeltaTime);
+	void UseWeaponOnTarget(float DeltaTime);
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -32,7 +32,7 @@ public:
 
 
 	bool PerformAbility(UAbility* ability);
-	void FireWeapon(AActor* hit);
+	void UseWeapon(AActor* hit);
 	bool ShouldHeal(UAbility* ability);
 
 	UAbility* GetOwnerAbilityByTag(FString tag);

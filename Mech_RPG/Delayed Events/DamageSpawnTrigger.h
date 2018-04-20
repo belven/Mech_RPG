@@ -23,7 +23,7 @@ public:
 		static UDamageSpawnTrigger* CreateDamageSpawnTrigger(ABoss* inBoss, int32 inAmount, float inPercent);
 
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
-		void BossHealthChange(FHealthChange damage);
+		void BossHealthChange(FHealthChange& damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
 		void SetBoss(ABoss* inBoss) override;

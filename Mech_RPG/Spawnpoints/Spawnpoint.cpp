@@ -53,7 +53,7 @@ void ASpawnpoint::SetUpCharacter(AMech_RPGCharacter* character, UGroup* group, G
 	character->SetTeam(team);
 	AdjustCharacterLocationByCapsule(character);
 	character->SetGroup(group);
-	character->CreatePresetRole(role);
+	character->CreatePresetRole(role, 1 + bonusGrade, bonusQuality);
 }
 
 void ASpawnpoint::AdjustCharacterLocationByCapsule(AMech_RPGCharacter* character)

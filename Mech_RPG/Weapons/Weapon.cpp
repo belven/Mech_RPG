@@ -4,26 +4,30 @@
 #include "Weapon.h"
 #include "Characters/Mech_RPGCharacter.h"
 
-AWeapon::AWeapon() : Super() {
+AWeapon::AWeapon() : Super()
+{
 	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WeaponParticle"));
 	audioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("WeaponAudio"));
 	SetType(ItemEnumns::Weapon);
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/Gun_Flash"));
-	if (ParticleSystemClass.Succeeded()) {
+	if (ParticleSystemClass.Succeeded())
+	{
 		partclSystem->Template = ParticleSystemClass.Object;
 		partclSystem->bAutoActivate = false;
 		partclSystem->SetActorParameter(FName(TEXT("BeamSource")), this);
 	}
 }
 
-float AWeapon::GetChangeAmount() {
+float AWeapon::GetChangeAmount()
+{
 	float tempDamage = settings.healthChange * (1 + (GetGrade() * 0.25));
 	tempDamage *= (1 + (GetQuality() * 0.07));
 	return tempDamage * GetItemOwner()->GetHealthChangeModifier();
 }
 
-float AWeapon::GetRange() {
+float AWeapon::GetRange()
+{
 	return settings.range;
 }
 
@@ -37,24 +41,30 @@ AItem* AWeapon::Copy()
 	return CreateWeapon(GetWorld(), GetItemOwner(), settings);
 }
 
-void AWeapon::SetChangeAmount(float newVal) {
+void AWeapon::SetChangeAmount(float newVal)
+{
 	settings.healthChange = newVal;
 }
 
-void AWeapon::SetRange(float newVal) {
+void AWeapon::SetRange(float newVal)
+{
 	settings.range = newVal;
 }
 
-bool AWeapon::CanFire() {
+bool AWeapon::CanFire()
+{
 	return canFire;
 }
 
-EDamageType AWeapon::GetChangeAmountType() {
+EDamageType AWeapon::GetChangeAmountType()
+{
 	return settings.damageType;
 }
 
-AWeapon* AWeapon::CreateWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FWeaponParams inSettings) {
-	if (world != nullptr) {
+AWeapon* AWeapon::CreateWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FWeaponParams inSettings)
+{
+	if (world != nullptr)
+	{
 		AWeapon* weapon = world->SpawnActor<AWeapon>(AWeapon::StaticClass());
 		weapon->SetSettings(inSettings);
 		weapon->SetItemOwner(inOwner);
@@ -63,11 +73,14 @@ AWeapon* AWeapon::CreateWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FWeap
 	return nullptr;
 }
 
-void AWeapon::SetItemOwner(AMech_RPGCharacter* inOwner) {
+void AWeapon::SetItemOwner(AMech_RPGCharacter* inOwner)
+{
 	Super::SetItemOwner(inOwner);
 
-	if (inOwner != nullptr) {
-		if (partclSystem != nullptr) {
+	if (inOwner != nullptr)
+	{
+		if (partclSystem != nullptr)
+		{
 			// TODO Attach to end of weapon
 			partclSystem->AttachToComponent(inOwner->GetRootComponent(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 			partclSystem->SetActorParameter(FName(TEXT("BeamSource")), this);
@@ -77,8 +90,14 @@ void AWeapon::SetItemOwner(AMech_RPGCharacter* inOwner) {
 	}
 }
 
-float AWeapon::GetProgressBarPercent() {
+float AWeapon::GetProgressBarPercent()
+{
 	return -1;
+}
+
+FLinearColor AWeapon::GetProgressBarColour()
+{
+	return FLinearColor::Blue;
 }
 
 FString AWeapon::GetTooltipText()
@@ -92,24 +111,29 @@ FString AWeapon::GetTooltipText()
 	return GetName() + UMiscLibrary::lnBreak + "DPS: " + dpsString + UMiscLibrary::lnBreak + "Damage Type: " + damageType;
 }
 
-void AWeapon::Fire(AMech_RPGCharacter* target) {
+void AWeapon::UseWeapon(AMech_RPGCharacter* target)
+{
 	FHealthChange healthChange;
 	float changeAmount = GetChangeAmount();
 
-	if (UMiscLibrary::IsCrit(settings.critChance)) {
+	if (UMiscLibrary::IsCrit(settings.critChance))
+	{
 		changeAmount = changeAmount * 2;
 		healthChange.crit = true;
 	}
 
-	if (partclSystem != nullptr) {
-		if (!partclSystem->IsActive()) {
+	if (partclSystem != nullptr)
+	{
+		if (!partclSystem->IsActive())
+		{
 			partclSystem->Activate(true);
 			partclSystem->ActivateSystem(true);
 		}
 		partclSystem->SetActorParameter(FName(TEXT("BeamTarget")), target);
 	}
 
-	if (audioComp != nullptr && !audioComp->IsPlaying()) {
+	if (audioComp != nullptr && !audioComp->IsPlaying())
+	{
 		audioComp->Play(0);
 	}
 
@@ -123,69 +147,67 @@ void AWeapon::Fire(AMech_RPGCharacter* target) {
 	target->ChangeHealth(healthChange);
 	canFire = false;
 
-	if (OnFire.IsBound()) {
+	if (OnFire.IsBound())
+	{
 		OnFire.Broadcast();
 	}
 }
 
-//void AWeapon::Fire(ACover* target) {
-//	FHealthChange healthChange;
-//	float changeAmount = GetChangeAmount()  * GetItemOwner()->GetHealthChangeModifier();
-//
-//	healthChange.manipulator = GetItemOwner();
-//	//healthChange.target = target;
-//	healthChange.weaponUsed = this;
-//
-//	healthChange.healthChange = settings.heals ? -changeAmount : changeAmount;
-//
-//	target->ChangeHealth(healthChange);
-//	canFire = false;
-//}
-
 void AWeapon::StopFire()
 {
-	if (partclSystem != nullptr) {
+	if (partclSystem != nullptr)
+	{
 		partclSystem->Deactivate();
 	}
 
-	if (audioComp != nullptr) {
+	if (audioComp != nullptr)
+	{
 		audioComp->Stop();
 	}
 }
 
-float AWeapon::GetFireRate() {
+float AWeapon::GetFireRate()
+{
 	return settings.fireRate;
 }
 
-void AWeapon::SetFireRate(float newVal) {
+void AWeapon::SetFireRate(float newVal)
+{
 	settings.fireRate = newVal;
 }
 
-float AWeapon::GetCritChance() {
+float AWeapon::GetCritChance()
+{
 	return settings.critChance;
 }
 
-void AWeapon::SetCritChance(float newVal) {
+void AWeapon::SetCritChance(float newVal)
+{
 	settings.critChance = newVal;
 }
 
-void AWeapon::Tick(float DeltaTime) {
+void AWeapon::Tick(float DeltaTime)
+{
 	Super::Tick(DeltaTime);
-	if (!canFire) {
+	if (!canFire)
+	{
 		lastTime += DeltaTime;
 
-		if (lastTime >= settings.fireRate) {
+		if (lastTime >= settings.fireRate)
+		{
 			lastTime = 0;
 			canFire = true;
 		}
 	}
 }
 
-bool AWeapon::Heals() {
+bool AWeapon::Heals()
+{
 	return settings.heals;
 }
 
-void AWeapon::SetHeals(bool newVal) {
+void AWeapon::SetHeals(bool newVal)
+{
 	settings.heals = newVal;
 }
 
@@ -194,8 +216,9 @@ void AWeapon::SetSettings(FWeaponParams newSettings)
 	settings = newSettings;
 }
 
-AWeapon* AWeapon::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, 
-	TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality) {
+AWeapon* AWeapon::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner,
+	TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality)
+{
 	return UMiscLibrary::CreatePresetWeapon(world, inOwner, weaponType, weaponGrade, weaponQuality);
 }
 

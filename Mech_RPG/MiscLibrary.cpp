@@ -1,5 +1,6 @@
 // Copyright of Explosive Industries
 
+#pragma once
 #include "Mech_RPG.h"
 #include "MiscLibrary.h"
 #include "Mech_RPGPlayerController.h"
@@ -9,6 +10,7 @@
 #include "Abilities/ChannelledAbility.h"
 #include "Components/CapsuleComponent.h"
 #include "Weapons.h"
+#include "EngineUtils.h"
 
 
 UGroup* UMiscLibrary::playerGroup = nullptr;
@@ -20,15 +22,18 @@ const FString UMiscLibrary::lnBreak = "\n";
 // If a health change value is at this or below, then it should do % change and not the actual value
 const float UMiscLibrary::MAX_HEALTH_CHANGE = 2;
 
-float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character) {
+float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character)
+{
 	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;
 }
 
-AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality) {
+AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality)
+{
 	FMagazineWeaponParams magSettings;
 	AWeapon* weapon = nullptr;
 
-	switch (weaponType) {
+	switch (weaponType)
+	{
 	case WeaponEnums::SMG:
 		weapon = ASMG::CreateSMG(world, inOwner);
 		break;
@@ -63,7 +68,8 @@ AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inO
 	weapon->SetGrade(weaponGrade);
 	weapon->SetQuality(weaponQuality);
 
-	if (weapon->GetName().IsEmpty()) {
+	if (weapon->GetName().IsEmpty())
+	{
 		weapon->SetName("Test Weapon");
 	}
 
@@ -75,7 +81,8 @@ TEnumAsByte<GameEnums::Difficulty> UMiscLibrary::GetDifficulty()
 	return difficulty;
 }
 
-bool UMiscLibrary::IsCrit(float critChance) {
+bool UMiscLibrary::IsCrit(float critChance)
+{
 	return IsSuccess(critChance);
 }
 
@@ -84,22 +91,25 @@ bool UMiscLibrary::IsSuccess(float chance)
 	return GetRandomPercent() <= chance;
 }
 
-float UMiscLibrary::GetRandomPercent() {
+float UMiscLibrary::GetRandomPercent()
+{
 	return rand() % 100;
 }
 
 float UMiscLibrary::GetMeleeRange(AMech_RPGCharacter* character)
 {
-	return (character->GetCapsuleComponent()->GetUnscaledCapsuleRadius() * 2) * 1.2;
+	return (character->GetCapsuleComponent()->GetUnscaledCapsuleRadius() * 2) * 1.35;
 }
 
-FVector UMiscLibrary::FindNavLocation(AActor* actor, float radius) {
+FVector UMiscLibrary::FindNavLocation(AActor* actor, float radius)
+{
 	FNavLocation nav;
 	int32 count = 0;
 	bool locationFound = false;
 
-	while (count < 120 
-		&& (!locationFound )) {//|| !CanSee(actor->GetWorld(), actor->GetActorLocation(), nav.Location))) {
+	while (count < 120
+		&& (!locationFound))
+	{//|| !CanSee(actor->GetWorld(), actor->GetActorLocation(), nav.Location))) {
 		radius *= 1.01;
 		locationFound = actor->GetWorld()->GetNavigationSystem()->GetRandomReachablePointInRadius(actor->GetActorLocation(), radius, nav);
 		count++;
@@ -109,16 +119,21 @@ FVector UMiscLibrary::FindNavLocation(AActor* actor, float radius) {
 }
 
 template<class T>
-void UMiscLibrary::InitialiseArray(TArray<T>& emptyArray, T* items) {
+void UMiscLibrary::InitialiseArray(TArray<T>& emptyArray, T* items)
+{
 	emptyArray.Append(items, ARRAY_COUNT(items));
 }
 
-FColor UMiscLibrary::GetRelativeColour(AMech_RPGCharacter* character) {
-	if (GetPlayer() != nullptr && character != nullptr) {
-		if (character->CompareGroup(GetPlayer())) {
+FColor UMiscLibrary::GetRelativeColour(AMech_RPGCharacter* character)
+{
+	if (GetPlayer() != nullptr && character != nullptr)
+	{
+		if (character->CompareGroup(GetPlayer()))
+		{
 			return FColor::Green;
 		}
-		else {
+		else
+		{
 			return FColor::Red;
 		}
 	}
@@ -130,53 +145,65 @@ void UMiscLibrary::SetDifficulty(GameEnums::Difficulty newDifficulty)
 	difficulty = newDifficulty;
 }
 
-bool UMiscLibrary::CanSee(UWorld* world, FVector pointA, FVector pointB) {
+bool UMiscLibrary::CanSee(UWorld* world, FVector pointA, FVector pointB)
+{
 	TArray<FHitResult> results;
 	world->LineTraceMultiByObjectType(results, pointA, pointB, mWorldCollision);
 	return results.Num() == 0;
 }
 
-float UMiscLibrary::GetHealthPercent(AMech_RPGCharacter* character) {
+float UMiscLibrary::GetHealthPercent(AMech_RPGCharacter* character)
+{
 	return character != nullptr ? character->GetHealth() / character->GetMaxHealth() : 0.0;
 }
 
-float UMiscLibrary::GetMissingHealthPercent(AMech_RPGCharacter* character) {
+float UMiscLibrary::GetMissingHealthPercent(AMech_RPGCharacter* character)
+{
 	return character != nullptr ? character->GetMaxHealth() / GetMissingHealth(character) : 0.0;
 }
 
-float UMiscLibrary::GetAbilityCooldownPercent(UAbility* ability) {
+float UMiscLibrary::GetAbilityCooldownPercent(UAbility* ability)
+{
 	return ability != nullptr ? 1 - (ability->GetCurrentTimeRemaining() / ability->GetCooldown()) : 0.0;
 }
 
-float UMiscLibrary::GetAbilityChannelPercent(UChannelledAbility* ability) {
+float UMiscLibrary::GetAbilityChannelPercent(UChannelledAbility* ability)
+{
 	return ability != nullptr ? 1 - (ability->GetCurrentChannelTime() / ability->GetChannelDuration()) : 0.0;
 }
 
-bool UMiscLibrary::IsCharacterAlive(AMech_RPGCharacter* character) {
+bool UMiscLibrary::IsCharacterAlive(AMech_RPGCharacter* character)
+{
 	return character != nullptr && !character->IsDead();
 }
 
-AMech_RPGPlayerController* UMiscLibrary::GetPlayerController() {
+AMech_RPGPlayerController* UMiscLibrary::GetPlayerController()
+{
 	return playerController;
 }
 
-void UMiscLibrary::SetPlayerController(AMech_RPGPlayerController* newController) {
+void UMiscLibrary::SetPlayerController(AMech_RPGPlayerController* newController)
+{
 	playerController = newController;
 }
 
-void UMiscLibrary::OpenCharacterPane(UWorld* world) {
+void UMiscLibrary::OpenCharacterPane(UWorld* world)
+{
 	AMech_RPGCharacter* character = Cast<AMech_RPGCharacter>(UGameplayStatics::GetPlayerCharacter(world, 0));
 
-	if (character != nullptr && character->GetController() != nullptr) {
+	if (character != nullptr && character->GetController() != nullptr)
+	{
 		Cast<AMech_RPGPlayerController>(character->GetController())->OpenCharacterPane();
 	}
 }
 
-UGroup* UMiscLibrary::GetPlayerGroup() {
+UGroup* UMiscLibrary::GetPlayerGroup()
+{
 	/*if (GetPlayerController() != nullptr && GetPlayerController()->GetPlayerControllerOwner() != nullptr) {
 		return GetPlayerController()->GetPlayerControllerOwner()->GetGroup();
 	}*/
-	if (playerGroup == nullptr) {
+	if (playerGroup == nullptr)
+	{
 		UMiscLibrary::SetPlayerGroup(NewObject<UGroup>(UGroup::StaticClass()));
 	}
 	return playerGroup;
@@ -187,83 +214,63 @@ void UMiscLibrary::SetPlayerGroup(UGroup* group)
 	playerGroup = group;
 }
 
-AMech_RPGCharacter* UMiscLibrary::GetPlayer() {
-	if (GetPlayerController() != nullptr) {
+AMech_RPGCharacter* UMiscLibrary::GetPlayer()
+{
+	if (GetPlayerController() != nullptr)
+	{
 		return GetPlayerController()->GetPlayerControllerOwner();
 	}
 	return nullptr;
 }
 
-float UMiscLibrary::GetWidgetYaw(UCameraComponent* camera) {
+float UMiscLibrary::GetWidgetYaw(UCameraComponent* camera)
+{
 
-	if (camera != nullptr) {
+	if (camera != nullptr)
+	{
 		return camera->GetComponentRotation().Yaw + 90;
 	}
 	return 0;
 }
 
-UWorld* UMiscLibrary::GetActorWorld(AActor* actor) {
+UWorld* UMiscLibrary::GetActorWorld(AActor* actor)
+{
 	return actor != nullptr ? actor->GetWorld() : nullptr;
 }
 
-//TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AMech_RPGCharacter* origin) {
-//	AMech_RPGCharacter* character;
-//	TArray<AMech_RPGCharacter*> characters;
-//	TArray<AActor*> actorsFound;
-//
-//	origin->GetRadiusDection()->SetSphereRadius(range);
-//	origin->GetRadiusDection()->GetOverlappingActors(actorsFound, AMech_RPGCharacter::StaticClass());
-//
-//	for (AActor* actor : actorsFound) {
-//		character = Cast<AMech_RPGCharacter>(actor);
-//		if (IsCharacterAlive(character)) {
-//			characters.Add(character);
-//		}
-//	}
-//	return characters;
-//}
+TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AActor* origin)
+{
+	return UMiscLibrary::GetCharactersInRange(origin->GetWorld(), range, origin->GetActorLocation());
+}
 
-TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, AActor* origin) {
+TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(UWorld* world, float range, FVector location)
+{
 	TArray<AMech_RPGCharacter*> characters;
-	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
-		if (IsCharacterAlive(character)
-			&& IsValid(origin)
-			&& origin->IsValidLowLevel()
-			&& IsValid(character)
-			&& character->IsValidLowLevel()) {
-
-			if (character->GetDistanceTo(origin) <= range)
-				characters.Add(character);
+	for (TActorIterator<AMech_RPGCharacter> actor(world); actor; ++actor)
+	{
+		if ((actor->GetActorLocation() - location).Size() <= range)
+		{
+			characters.Add(*actor);
 		}
 	}
+
 	return characters;
 }
 
-TArray<AMech_RPGCharacter*> UMiscLibrary::GetCharactersInRange(float range, FVector location) {
-	TArray<AMech_RPGCharacter*> characters;
-	for (AMech_RPGCharacter* character : AMech_RPGCharacter::GetCharacters()) {
-		if (IsCharacterAlive(character)
-			&& IsValid(character)
-			&& character->IsValidLowLevel()) {
-
-			if ((character->GetActorLocation() - location).Size() <= range)
-				characters.Add(character);
-		}
-	}
-	return characters;
-}
-
-bool UMiscLibrary::IsMechCharacter(AActor* character) {
+bool UMiscLibrary::IsMechCharacter(AActor* character)
+{
 	return mIsChildOf(character, AMech_RPGCharacter::StaticClass());
 }
 
 template<class T>
-T* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotation, TSubclassOf<class AMech_RPGCharacter> classToSpawn) {
+T* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotation, TSubclassOf<class AMech_RPGCharacter> classToSpawn)
+{
 	int count = 0;
 	FNavLocation nav;
 	AMech_RPGCharacter* character = nullptr;
 
-	while (character == nullptr && count < 10) {
+	while (character == nullptr && count < 10)
+	{
 		FActorSpawnParameters params;
 		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 		world->GetNavigationSystem()->GetRandomPointInNavigableRadius(location, 100, nav);
@@ -271,16 +278,20 @@ T* UMiscLibrary::SpawnCharacter(UWorld* world, FVector location, FRotator rotati
 		count++;
 	}
 
-	if (character != nullptr) {
+	if (character != nullptr)
+	{
 		character->SpawnDefaultController();
 		return dynamic_cast<T*>(character);
 	}
 	else return nullptr;
 }
 
-bool UMiscLibrary::IsTargetValid(AMech_RPGCharacter* character, AMech_RPGCharacter* inTarget, EAffectedTeam affectedTeam) {
-	if (UMiscLibrary::IsCharacterAlive(inTarget) && UMiscLibrary::IsCharacterAlive(character)) {
-		if (affectedTeam == EAffectedTeam::Ally) {
+bool UMiscLibrary::IsTargetValid(AMech_RPGCharacter* character, AMech_RPGCharacter* inTarget, EAffectedTeam affectedTeam)
+{
+	if (UMiscLibrary::IsCharacterAlive(inTarget) && UMiscLibrary::IsCharacterAlive(character))
+	{
+		if (affectedTeam == EAffectedTeam::Ally)
+		{
 			return character->IsAlly(inTarget);
 		}
 		return character->IsEnemy(inTarget);
@@ -295,6 +306,7 @@ bool UMiscLibrary::IsChildOf(UObject* object, UClass* inClass)
 }
 
 template<class T>
-T UMiscLibrary::GetRandomEnum(T end) {
+T UMiscLibrary::GetRandomEnum(T end)
+{
 	return static_cast<T>(rand() % (end - 1));
 }

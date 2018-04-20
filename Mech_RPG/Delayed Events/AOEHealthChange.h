@@ -1,20 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-UENUM(BlueprintType)
-enum class EAffectedTeam : uint8 {
-	Ally,
-	Enemy
-};
-
 #pragma once
 #include "Engine/TargetPoint.h"
-#include "Items/Armour.h"
+#include "Enums.h"
 #include "AOEHealthChange.generated.h"
 
 class AMech_RPGCharacter;
 
 USTRUCT(BlueprintType)
-struct FTempAOESettings {
+struct FTempAOESettings
+{
 	GENERATED_USTRUCT_BODY()
 public:
 	AMech_RPGCharacter* owner = nullptr;
@@ -28,7 +23,7 @@ public:
 	float duration = 5;
 	float rate = 1;
 
-	EAffectedTeam  affectedTeam = EAffectedTeam::Enemy;
+	EAffectedTeam affectedTeam = EAffectedTeam::Enemy;
 	EDamageType damageType = EDamageType::Physical;
 
 	bool usesTarget = false;
@@ -40,7 +35,7 @@ UCLASS()
 class MECH_RPG_API AAOEHealthChange : public ATargetPoint
 {
 	GENERATED_BODY()
-	
+
 private:
 	FTempAOESettings settings;
 	float currentLifetime;

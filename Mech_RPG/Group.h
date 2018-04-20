@@ -21,6 +21,7 @@ namespace GroupEnums {
 class AMech_RPGCharacter;
 class AItem;
 class AInteractable;
+class UQuest;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMemberDamageEvent, AMech_RPGCharacter*, attacker, AMech_RPGCharacter*, damagedMember);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupEnemyKilled, AMech_RPGCharacter*, character);

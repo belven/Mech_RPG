@@ -7,8 +7,7 @@
 void AMagazineWeapon::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 	if (ammo <= 0) {
-		reloading = true;
-		StopFire();
+		Reload();
 	}
 
 	if (reloading) {
@@ -25,6 +24,12 @@ void AMagazineWeapon::Tick(float DeltaTime) {
 			}
 		}
 	}
+}
+
+void AMagazineWeapon::Reload()
+{
+	reloading = true;
+	StopFire();
 }
 
 void AMagazineWeapon::SetItemOwner(AMech_RPGCharacter* inOwner) {
@@ -49,12 +54,24 @@ float AMagazineWeapon::GetProgressBarPercent() {
 	return ammo / magazineSize;
 }
 
+FLinearColor AMagazineWeapon::GetProgressBarColour()
+{
+	if (reloading)
+	{
+		return FLinearColor::Red;
+	}
+	else
+	{
+		return FLinearColor::Green;
+	}
+}
+
 float AMagazineWeapon::GetAmmo() {
 	return ammo;
 }
 
-void AMagazineWeapon::Fire(AMech_RPGCharacter* target) {
-	Super::Fire(target);
+void AMagazineWeapon::UseWeapon(AMech_RPGCharacter* target) {
+	Super::UseWeapon(target);
 	ammo--;
 }
 

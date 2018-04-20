@@ -7,6 +7,7 @@
 #include "MiscLibrary.h"
 #include "TestBoss.h"
 #include "Abilities/Immobilise.h"
+#include "Abilities/TimedHealthChange.h"
 #include "Delayed Events/HealthChangePhaseTrigger.h"
 
 #define mCreateHealthChangePhaseTrigger(health, phase) UHealthChangePhaseTrigger::CreateHealthChangePhaseTrigger(this, health, phase)
@@ -61,8 +62,11 @@ void ATestBoss::SetPhase(int32 val)
 		SetDefenceModifier(0.1);
 	}
 	else if (GetPhase() == 2) {
-		ApplyCrowdControl(EffectEnums::Cast, false);
+		//ApplyCrowdControl(EffectEnums::Cast, false);
 		ApplyCrowdControl(EffectEnums::Attack, true);
+		RemoveAbility(GetAbilities()[0]);
+		AddAbility(mCreateTimedHealthChange(10.0F, 1.0F, 2.0F, 16.0F, false));
+
 		SetHealth(GetMaxHealth());
 		SetDefenceModifier(0.2);
 	}

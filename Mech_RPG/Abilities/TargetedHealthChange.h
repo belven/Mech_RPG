@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Ability.h"
+#include "Enums.h"
 #include "TargetedHealthChange.generated.h"
 
 /**

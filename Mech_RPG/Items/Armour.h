@@ -3,38 +3,8 @@
 
 #include "Object.h"
 #include "Item.h"
+#include "Enums.h"
 #include "Armour.generated.h"
-
-UENUM(BlueprintType)
-namespace ArmourEnums {
-	enum ArmourPosition {
-		Left_Leg,
-		Right_Leg,
-		Chest,
-		Left_Arm,
-		Right_Arm,
-		End
-	};
-}
-
-UENUM(BlueprintType)
-namespace ArmourGrades {
-	enum ArmourGrade {
-		Light,
-		MediumLight,
-		Medium,
-		MediumHeavy,
-		Heavy,
-		End
-	};
-}
-
-UENUM(BlueprintType)
-enum class EDamageType : uint8 {
-	Physical,
-	Blast,
-	Energy
-};
 
 UCLASS(BlueprintType)
 class MECH_RPG_API AArmour : public AItem {

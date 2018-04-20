@@ -1,14 +1,18 @@
 UENUM(BlueprintType)
-namespace TeamEnums {
-	enum Team {
+namespace TeamEnums
+{
+	enum Team
+	{
 		Paladins,
 		Mercenaries
 	};
 }
 
 UENUM(BlueprintType)
-namespace EffectEnums {
-	enum CrowdControl {
+namespace EffectEnums
+{
+	enum CrowdControl
+	{
 		Attack,
 		Move,
 		Damage,
@@ -27,6 +31,7 @@ namespace EffectEnums {
 #include "Items/Inventory.h"
 #include "UI/FloatingStats_BP.h"
 #include "Delegates/DelegateCombinations.h"
+#include "EventManager.h"
 #include "Mech_RPGCharacter.generated.h"
 
 #define MIN(a,b) (a < b) ? (a) : (b)
@@ -36,40 +41,13 @@ namespace EffectEnums {
 #define mCreateChannelledAbility(ability, Duration, loc, trace) UChannelledAbility::CreateChannelledAbility(this, ability, Duration, loc, trace)
 #define mCreatePresetRole(role) AMech_RPGCharacter::CreatePresetRole(role)
 #define mGetDefaultArmourValue(grade) AArmour::GetDeafultValue(grade)
+#define mCreateTimedHealthChange(changeAmount, cooldown, duration, rate, heals) UTimedHealthChange::CreateTimedHealthChange(this, cooldown, changeAmount, rate, duration, heals)
 
 #define ArmourMap TPair<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*>
 
 USTRUCT(BlueprintType)
-struct FHealthChange {
-	GENERATED_USTRUCT_BODY()
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		AMech_RPGCharacter* target = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		AMech_RPGCharacter* manipulator = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		AWeapon* weaponUsed = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		float changeAmount = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		EDamageType damageType = EDamageType::Physical;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		bool heals = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		bool crit = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		bool ignoresArmour = false;
-};
-
-USTRUCT(BlueprintType)
-struct FLoadout {
+struct FLoadout
+{
 	GENERATED_USTRUCT_BODY()
 public:
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
@@ -109,8 +87,6 @@ public:
 		float movementModifier = 1;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPreHealthChangeEvent, FHealthChange, healthChange);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostHealthChangeEvent, FHealthChange, healthChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostBeginPlay, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNPCInteractEvent, AMech_RPGCharacter*, character);
@@ -125,7 +101,8 @@ class UQuest;
 class AInteractable;
 
 UCLASS(Blueprintable)
-class AMech_RPGCharacter : public ACharacter {
+class AMech_RPGCharacter : public ACharacter
+{
 	GENERATED_BODY()
 protected:
 	static const float lowHealth;
@@ -135,7 +112,7 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* TopDownCameraComponent;
-	
+
 	float energy;
 	float health;
 	float healthRegen;
@@ -150,8 +127,6 @@ private:
 	int32 canAttack;
 	int32 canMove;
 	int32 canBeDamaged;
-
-	static TArray<AMech_RPGCharacter*> characters;
 
 	FTimerHandle TimerHandle_OutOfCombat;
 	FTimerHandle TimerHandle_Invunrelbility;
@@ -232,7 +207,8 @@ public:
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	FORCEINLINE USphereComponent* GetRadiusDection() {
+	FORCEINLINE USphereComponent* GetRadiusDection()
+	{
 		return radiusDection;
 	}
 
@@ -241,7 +217,8 @@ public:
 		return stats;
 	}
 
-	class UFloatingStats_BP* GetFloatingStats() {
+	class UFloatingStats_BP* GetFloatingStats()
+	{
 		return floatingStats;
 	}
 
@@ -289,8 +266,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		AItem* AddItem(AItem* itemToAdd);
 
-	UPROPERTY(BlueprintAssignable, Category = "Events")
+	UPROPERTY()
 		FPreHealthChangeEvent OnPreHealthChange;
+
+	UPROPERTY()
+		FPostHealthChangeEvent OnPostHealthChange;
+
+	UPROPERTY()
+		FEnemyKilled OnEnemyKilled;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FNPCInteractEvent OnNPCInteractEvent;
@@ -300,9 +283,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FInteractEvent OnInteractEvent;
-
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-		FPostHealthChangeEvent OnPostHealthChange;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FPostBeginPlay OnPostBeginPlay;
@@ -315,9 +295,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FSwappedWeapons OnSwappedWeapons;
-
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-		FEnemyKilled OnEnemyKilled;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FQuestAdded OnQuestAdded;
@@ -346,13 +323,10 @@ public:
 		return inCombat;
 	}
 
-	static const TArray<AMech_RPGCharacter*>& GetCharacters() {
-		return characters;
-	}
-
 	class UCameraComponent* GetTopDownCamera() { return TopDownCameraComponent; };
 
-	void SetTopDownCamera(class UCameraComponent* newCamera) {
+	void SetTopDownCamera(class UCameraComponent* newCamera)
+	{
 		TopDownCameraComponent = newCamera;
 	};
 
@@ -363,24 +337,28 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		FORCEINLINE	UInventory * GetInventory() {
+		FORCEINLINE	UInventory * GetInventory()
+	{
 		return inventory;
 	}
 
 	void LookAt(AMech_RPGCharacter* other);
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		FORCEINLINE	bool Channelling() {
+		FORCEINLINE	bool Channelling()
+	{
 		return channeling;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		void SetChannelling(bool inChallenning) {
+		void SetChannelling(bool inChallenning)
+	{
 		channeling = inChallenning;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		FORCEINLINE	bool HasAbilities() {
+		FORCEINLINE	bool HasAbilities()
+	{
 		return GetAbilities().Num() > 0;
 	}
 
@@ -394,13 +372,15 @@ public:
 	void SetUpWidgets();
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		FORCEINLINE	TArray<AArmour*> GetArmourList() {
+		FORCEINLINE	TArray<AArmour*> GetArmourList()
+	{
 		TArray<AArmour*> armourList;
 		armour.GenerateValueArray(armourList);
 		return armourList;
 	}
 
-	FORCEINLINE	TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*>& GetArmour() {
+	FORCEINLINE	TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*>& GetArmour()
+	{
 		return armour;
 	}
 
@@ -418,22 +398,26 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		FORCEINLINE UAbility* GetCurrentAbility() {
+		FORCEINLINE UAbility* GetCurrentAbility()
+	{
 		return currentAbility;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
-		void SetCurrentAbility(UAbility* inAbility) {
+		void SetCurrentAbility(UAbility* inAbility)
+	{
 		currentAbility = inAbility;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		FORCEINLINE float GetHealth() {
+		FORCEINLINE float GetHealth()
+	{
 		return health;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		void SetHealth(float newVal) {
+		void SetHealth(float newVal)
+	{
 		health = newVal;
 	}
 
@@ -444,7 +428,8 @@ public:
 		AItem* CalucluateItemDrop(UGroup * inGroup, ItemEnumns::ItemType type = ItemEnumns::Weapon);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		FORCEINLINE	bool IsDead() {
+		FORCEINLINE	bool IsDead()
+	{
 		return isDead;
 	}
 
@@ -452,7 +437,8 @@ public:
 		virtual void SetDead(bool newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		FORCEINLINE AWeapon* GetCurrentWeapon() {
+		FORCEINLINE AWeapon* GetCurrentWeapon()
+	{
 		return currentWeapon;
 	}
 
@@ -460,7 +446,8 @@ public:
 		void SetCurrentWeapon(AWeapon* newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
-		FORCEINLINE	UGroup* GetGroup() {
+		FORCEINLINE	UGroup* GetGroup()
+	{
 		return group;
 	}
 
@@ -475,13 +462,17 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void UpdateHealthBarRot();
+
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-		FORCEINLINE TArray<UAbility*>& GetAbilities() {
+		FORCEINLINE TArray<UAbility*>& GetAbilities()
+	{
 		return abilities;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-		void SetAbilities(TArray<UAbility*> newVal) {
+		void SetAbilities(TArray<UAbility*> newVal)
+	{
 		abilities = newVal;
 	}
 
@@ -497,109 +488,132 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Role")
 		void SetupWithLoadout();
 
-	float GetModifierForDifficulty(TEnumAsByte<GameEnums::Difficulty> difficulty);
-
-	FORCEINLINE AController* GetDemandedController() {
+	FORCEINLINE AController* GetDemandedController()
+	{
 		return demandedController;
 	}
 
-	FORCEINLINE void SetDemandedController(AController* newVal) {
+	FORCEINLINE void SetDemandedController(AController* newVal)
+	{
 		demandedController = newVal;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		FORCEINLINE	float GetMaxHealth() {
+		FORCEINLINE	float GetMaxHealth()
+	{
 		return maxHealth;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		void SetMaxHealth(float newVal) {
+		void SetMaxHealth(float newVal)
+	{
 		maxHealth = newVal;
 	}
 
-	FORCEINLINE	int32 GetID() {
+	FORCEINLINE	int32 GetID()
+	{
 		return id;
 	}
 
-	FORCEINLINE void SetID(int32 newVal) {
+	FORCEINLINE void SetID(int32 newVal)
+	{
 		id = newVal;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		FORCEINLINE	float GetHealthRegen() {
+		FORCEINLINE	float GetHealthRegen()
+	{
 		return healthRegen;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		void SetHealthRegen(float newVal) {
+		void SetHealthRegen(float newVal)
+	{
 		healthRegen = newVal;
 	}
 
-	FORCEINLINE bool CanAttack() {
+	FORCEINLINE bool CanAttack()
+	{
 		return canAttack == 0;
 	}
 
-	FORCEINLINE bool CanMove() {
+	FORCEINLINE bool CanMove()
+	{
 		return canMove == 0;
 	}
 
-	FORCEINLINE bool CanCast() {
+	FORCEINLINE bool CanCast()
+	{
 		return canUseAbilities == 0;
 	}
 
-	FORCEINLINE int32& GetCanAttack() {
+	FORCEINLINE int32& GetCanAttack()
+	{
 		return canAttack;
 	}
 
-	FORCEINLINE int32& GetCanMove() {
+	FORCEINLINE int32& GetCanMove()
+	{
 		return canMove;
 	}
 
-	FORCEINLINE float GetHealthChangeModifier() {
+	FORCEINLINE float GetHealthChangeModifier()
+	{
 		return MAX(healthChangeModifier, 0.01F);
 	}
 
-	FORCEINLINE float GetDefenceModifier() {
+	FORCEINLINE float GetDefenceModifier()
+	{
 		return MIN(defenceModifier, 0.99F);
 	}
 
-	FORCEINLINE void SetCanAttack(int32 newVal) {
+	FORCEINLINE void SetCanAttack(int32 newVal)
+	{
 		canAttack = newVal;
 	}
 
-	FORCEINLINE void SetCanMove(int32 newVal) {
+	FORCEINLINE void SetCanMove(int32 newVal)
+	{
 		canMove = newVal;
 	}
 
-	FORCEINLINE void SetHealthChangeModifier(float newVal) {
+	FORCEINLINE void SetHealthChangeModifier(float newVal)
+	{
 		healthChangeModifier = newVal;
 	}
 
-	FORCEINLINE void SetDefenceModifier(float newVal) {
+	FORCEINLINE void SetDefenceModifier(float newVal)
+	{
 		defenceModifier = newVal;
 	}
 
-	FORCEINLINE bool GetCanBeDamaged() {
+	FORCEINLINE bool GetCanBeDamaged()
+	{
 		return canBeDamaged == 0;
 	}
 
-	FORCEINLINE void SetCanBeDamaged(int32 newVal) {
+	FORCEINLINE void SetCanBeDamaged(int32 newVal)
+	{
 		canBeDamaged = newVal;
 	}
 
-	FORCEINLINE float GetSpeedModifier() {
+	FORCEINLINE float GetSpeedModifier()
+	{
 		return speedModifier;
 	}
 
-	FORCEINLINE void SetSpeedModifier(float newVal) {
+	FORCEINLINE void SetSpeedModifier(float newVal)
+	{
 		speedModifier = newVal;
 	}
 
-	FORCEINLINE float GetSpeed() {
+	FORCEINLINE float GetSpeed()
+	{
 		return speed;
 	}
 
-	FORCEINLINE void SetSpeed(float newVal) {
+	FORCEINLINE void SetSpeed(float newVal)
+	{
 		speed = newVal;
 	}
 	FORCEINLINE class UCharacterStats* GetCharacterStats() const { return characterStats; }

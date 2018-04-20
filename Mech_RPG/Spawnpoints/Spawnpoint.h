@@ -33,6 +33,12 @@ public:
 		int32 spawnAmount = 3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+		int32 bonusGrade = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+		int32 bonusQuality = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 		TSubclassOf<class AMech_RPGCharacter> classToSpawn;
 
 	static TArray<ASpawnpoint*>* GetSpawnpoints(UClass* classToFind);

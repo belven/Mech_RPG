@@ -6,7 +6,8 @@
 #include "OverHeatWeapon.generated.h"
 
 USTRUCT(BlueprintType)
-struct FOverheatWeaponParams : public FWeaponParams {
+struct FOverheatWeaponParams : public FWeaponParams
+{
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
@@ -16,7 +17,8 @@ public:
 };
 
 UCLASS()
-class MECH_RPG_API AOverHeatWeapon : public AWeapon {
+class MECH_RPG_API AOverHeatWeapon : public AWeapon
+{
 	GENERATED_BODY()
 
 protected:
@@ -26,19 +28,26 @@ protected:
 	float heatGenerated = 0;
 
 public:
-	virtual void Fire(class AMech_RPGCharacter* target) override;
+	virtual void UseWeapon(class AMech_RPGCharacter* target) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual bool CanFire() override;
 	virtual	void SetItemOwner(AMech_RPGCharacter* inOwner) override;
-	
-	UFUNCTION(BlueprintCallable, Category = "OverHeatWeapon")
-	void Cooldown();
 
 	UFUNCTION(BlueprintCallable, Category = "OverHeatWeapon")
-	float GetHeatLevel();
+		void Cooldown();
+
+	UFUNCTION(BlueprintCallable, Category = "OverHeatWeapon")
+		float GetHeatLevel();
 
 	static AOverHeatWeapon* CreateOverHeatWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		virtual FLinearColor GetProgressBarColour() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		virtual float GetChangeAmount() override;
+
 };
