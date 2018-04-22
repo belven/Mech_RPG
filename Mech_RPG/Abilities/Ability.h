@@ -1,17 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 UENUM(BlueprintType)
-namespace AbilityEnums {
-	enum Ability {
+namespace AbilityEnums
+{
+	enum Ability
+	{
 		AoEHeal,
 		CritBoost,
-		Disable,
 		DefenceBoost,
+		Disable,
 		Grenade,
 		Heal,
-		Snipe,
+		Immobilise,
 		Shield,
+		Snipe,
 		Stun,
+		SummonDrone,
 		Taunt,
 		End
 	};
@@ -23,7 +27,8 @@ namespace AbilityEnums {
 #include "Ability.generated.h"
 
 UCLASS(Blueprintable)
-class UAbility : public UObject {
+class UAbility : public UObject
+{
 	GENERATED_BODY()
 
 protected:
@@ -33,6 +38,8 @@ private:
 	float cooldown = 1.0F;
 	bool onCooldown = false;
 	float currentTime = 0.0F;
+
+	UParticleSystem* partclSystem;
 protected:
 	EAffectedTeam affectedTeam = EAffectedTeam::Enemy;
 	TArray<FTag> tags;
@@ -80,7 +87,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		virtual bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) { check(0 && "You must override this") return false; };
 
-
 	FTimerHandle TimerHandle_AbilityOffCooldown;
 
 	EAffectedTeam GetAffectedTeam();
@@ -95,4 +101,9 @@ public:
 
 	static TArray<TEnumAsByte<AbilityEnums::Ability>> CreateDefensiveAbilityList();
 
+	UFUNCTION(BlueprintCallable, Category = "EDITME")
+		UParticleSystem* GetParticleSystem() { return partclSystem; }
+
+	UFUNCTION(BlueprintCallable, Category = "EDITME")
+		void SetParticleSystem(UParticleSystem* val) { partclSystem = val; }
 };

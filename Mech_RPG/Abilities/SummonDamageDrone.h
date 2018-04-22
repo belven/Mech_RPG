@@ -16,7 +16,6 @@ private:
 	class ADrone* droneSummoned;
 
 public:
-
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
 
@@ -25,5 +24,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		virtual FString GetTooltipText() override;
-	
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+		virtual bool OnCooldown() override;	
 };

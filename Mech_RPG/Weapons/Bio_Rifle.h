@@ -20,6 +20,6 @@ public:
 		static ABio_Rifle* CreateBioRifle(UWorld* world, AMech_RPGCharacter* inOwner);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		virtual AItem* Copy();
+		AItem* Copy() override;
 
 };

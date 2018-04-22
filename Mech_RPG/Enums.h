@@ -62,6 +62,7 @@ namespace WeaponEnums
 	{
 		Sniper,
 		Bio_Repair,
+		Drone_Weapon,
 		SMG,
 		Shotgun,
 		RPG,

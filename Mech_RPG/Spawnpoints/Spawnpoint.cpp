@@ -11,45 +11,32 @@
 TMap<UClass*, TArray<ASpawnpoint*>> ASpawnpoint::spawnPoints;
 float ASpawnpoint::defaultSpawnRadius = 200;
 
-ASpawnpoint::ASpawnpoint() {
+ASpawnpoint::ASpawnpoint()
+{
 	static ConstructorHelpers::FClassFinder<AMech_RPGCharacter> AIClass(TEXT("/Game/TopDown/Blueprints/AI/AI"));
-	if (AIClass.Succeeded()) {
+	if (AIClass.Succeeded())
+	{
 		classToSpawn = AIClass.Class;
-	}
-
-	TArray<ASpawnpoint*>* spawnPointsFound = spawnPoints.Find(GetClass());
-
-	if (spawnPointsFound != nullptr) {
-		spawnPointsFound->Add(this);
-	}
-	else {
-		spawnPointsFound = new TArray<ASpawnpoint *>();
-		spawnPointsFound->Add(this);
-		spawnPoints.Add(GetClass(), *spawnPointsFound);
 	}
 }
 
-AMech_RPGCharacter* ASpawnpoint::SpawnCharacter(TSubclassOf<class AMech_RPGCharacter> spawnClass, int spawnRadius) {
+AMech_RPGCharacter* ASpawnpoint::SpawnCharacter(TSubclassOf<class AMech_RPGCharacter> spawnClass, int spawnRadius)
+{
 	FNavLocation nav;
 	AMech_RPGCharacter* character = nullptr;
 	int count = 0;
 
-	while (count < 10 && character == nullptr) {
+	while (count < 10 && character == nullptr)
+	{
 		character = mSpawnCharacter(GetWorld(), mFindNavLocation(spawnRadius), GetActorRotation(), spawnClass);
-		count++;
-	}
-
-	count = 0;
-
-	while(count < 10 && !UMiscLibrary::CanSee(GetWorld(), GetActorLocation(), character->GetActorLocation())) {
-		character->SetActorLocation(mFindNavLocation(spawnRadius));
 		count++;
 	}
 
 	return character;
 }
 
-void ASpawnpoint::SetUpCharacter(AMech_RPGCharacter* character, UGroup* group, GroupEnums::Role role) {
+void ASpawnpoint::SetUpCharacter(AMech_RPGCharacter* character, UGroup* group, GroupEnums::Role role)
+{
 	character->SetTeam(team);
 	AdjustCharacterLocationByCapsule(character);
 	character->SetGroup(group);
@@ -64,23 +51,31 @@ void ASpawnpoint::AdjustCharacterLocationByCapsule(AMech_RPGCharacter* character
 	character->SetActorLocation(loc);
 }
 
-void ASpawnpoint::BeginPlay() {
+void ASpawnpoint::BeginPlay()
+{
 	Super::BeginPlay();
 	bool healerSpawned = false;
 	UGroup* group = UGroup::CreateGroup(team);
 
-	for (int i = 0; i < spawnAmount; i++) {
-		if (GetWorld() != nullptr) {
+	for (int i = 0; i < spawnAmount; i++)
+	{
+		if (GetWorld() != nullptr)
+		{
 			AMech_RPGCharacter* character = SpawnCharacter(classToSpawn, ASpawnpoint::defaultSpawnRadius);
 			GroupEnums::Role role = UGroup::GetRandomRole();
 
-			if (character != nullptr) {
-				if (role == GroupEnums::Healer) {
-					if (!healerSpawned) {
+			if (character != nullptr)
+			{
+				if (role == GroupEnums::Healer)
+				{
+					if (!healerSpawned)
+					{
 						healerSpawned = true;
 					}
-					else {
-						while (role == GroupEnums::Healer) {
+					else
+					{
+						while (role == GroupEnums::Healer)
+						{
 							role = UGroup::GetRandomRole();
 						}
 					}

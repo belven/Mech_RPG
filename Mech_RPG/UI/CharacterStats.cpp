@@ -21,7 +21,8 @@ FString UCharacterStats::GetHealthText()
 {
 	FString healthtext("");
 
-	if (owner != nullptr) {
+	if (owner != nullptr)
+	{
 		float health = round(owner->GetHealth());
 		float maxHealth = round(owner->GetMaxHealth());
 		FString healthString = FString::FromInt(health);
@@ -29,8 +30,10 @@ FString UCharacterStats::GetHealthText()
 
 		float healthLen = MIN(maxHealthString.Len(), 4);
 
-		if (healthString.Len() < healthLen) {
-			for (int i = 0; i < healthLen - healthString.Len(); i++) {
+		if (healthString.Len() < healthLen)
+		{
+			for (int i = 0; i < healthLen - healthString.Len(); i++)
+			{
 				healthtext += "0";
 			}
 		}
@@ -47,7 +50,8 @@ FString UCharacterStats::GetArmourText(EDamageType damageType)
 {
 	FString ArmourText("");
 
-	if (owner != nullptr) {
+	if (owner != nullptr)
+	{
 		float armour = round(owner->GetTotalResistance(damageType)* owner->GetDefenceModifier());
 		ArmourText += FString::FromInt(armour);
 	}
@@ -59,7 +63,8 @@ FString UCharacterStats::GetDPSText()
 {
 	FString DPSText("");
 
-	if (owner != nullptr && owner->GetCurrentWeapon() != nullptr) {
+	if (owner != nullptr && owner->GetCurrentWeapon() != nullptr)
+	{
 		float dps = round(owner->GetCurrentWeapon()->GetChangeAmount() * owner->GetHealthChangeModifier());
 		DPSText += FString::FromInt(dps);
 	}
@@ -92,7 +97,8 @@ FString UCharacterStats::GetMovementSpeedText()
 {
 	FString MovementText("");
 
-	if (owner != nullptr) {
+	if (owner != nullptr)
+	{
 		float movement = round(owner->GetCharacterMovement()->MaxWalkSpeed * owner->GetSpeedModifier());
 		MovementText += FString::FromInt(movement);
 	}
@@ -102,8 +108,10 @@ FString UCharacterStats::GetMovementSpeedText()
 
 float UCharacterStats::GetCastBarPercent()
 {
-	if (UMiscLibrary::IsCharacterAlive(owner) && owner->Channelling()) {
-		if (owner->GetCurrentAbility() != nullptr && owner->GetCurrentAbility()->GetClass()->IsChildOf(UChannelledAbility::StaticClass())) {
+	if (UMiscLibrary::IsCharacterAlive(owner) && owner->Channelling())
+	{
+		if (owner->GetCurrentAbility() != nullptr && owner->GetCurrentAbility()->GetClass()->IsChildOf(UChannelledAbility::StaticClass()))
+		{
 			return UMiscLibrary::GetAbilityChannelPercent(Cast<UChannelledAbility>(owner->GetCurrentAbility()));
 		}
 	}
@@ -114,18 +122,22 @@ float UCharacterStats::GetCastBarPercent()
 FLinearColor UCharacterStats::GetColour()
 {
 	if (owner->GetController() != nullptr
-		&& mIsChildOf(owner->GetController(), AMech_RPGPlayerController::StaticClass())) {
+		&& mIsChildOf(owner->GetController(), AMech_RPGPlayerController::StaticClass()))
+	{
 		return FLinearColor(0.01, 0.3, 0); //Green
 	}
-	else {
+	else
+	{
 		return FLinearColor(0.3, 0, 0.01); // Red
 	}
 }
 
 float UCharacterStats::GetAbilityPercent()
 {
-	if (UMiscLibrary::IsCharacterAlive(owner)) {
-		if (owner->GetCurrentAbility() != nullptr) {
+	if (UMiscLibrary::IsCharacterAlive(owner))
+	{
+		if (owner->GetCurrentAbility() != nullptr)
+		{
 			return UMiscLibrary::GetAbilityCooldownPercent(owner->GetCurrentAbility());
 		}
 	}
@@ -135,7 +147,8 @@ float UCharacterStats::GetAbilityPercent()
 
 ESlateVisibility UCharacterStats::GetChannelBarVis()
 {
-	if (owner != nullptr && owner->Channelling()) {
+	if (owner != nullptr && owner->Channelling())
+	{
 		return ESlateVisibility::Visible;
 	}
 
@@ -144,8 +157,10 @@ ESlateVisibility UCharacterStats::GetChannelBarVis()
 
 float UCharacterStats::GetAbilityTimeRemaining()
 {
-	if (UMiscLibrary::IsCharacterAlive(owner)) {
-		if (owner->GetCurrentAbility() != nullptr) {
+	if (UMiscLibrary::IsCharacterAlive(owner))
+	{
+		if (owner->GetCurrentAbility() != nullptr)
+		{
 			return owner->GetCurrentAbility()->GetCurrentTimeRemaining();
 		}
 	}
@@ -162,7 +177,8 @@ void UCharacterStats::SetOwner(AMech_RPGCharacter* newOwner)
 {
 	owner = newOwner;
 
-	if(newOwner != nullptr) {
+	if (newOwner != nullptr)
+	{
 		newOwner->SetCharacterStats(this);
 	}
 }

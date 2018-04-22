@@ -3,16 +3,20 @@
 #include "Mech_RPG.h"
 #include "SMG.h"
 
-ASMG::ASMG() : Super() {
+ASMG::ASMG() : Super()
+{
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> smg(TEXT("/Game/TopDown/Meshes/Weapons/SMG"));
-	if (smg.Succeeded()) {
+	if (smg.Succeeded())
+	{
 		mesh = smg.Object;
 	}
 }
 
 
-ASMG* ASMG::CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner) {
-	if (world != nullptr) {
+ASMG* ASMG::CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner)
+{
+	if (world != nullptr)
+	{
 		FMagazineWeaponParams magSettings;
 		magSettings.healthChange = 40;
 		magSettings.range = 1000;

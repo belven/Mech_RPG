@@ -19,8 +19,7 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 
 	StartingRole(inRole);
 
-	Reset();
-	ApplyCrowdControl(EffectEnums::Cast, false); //Default to not casting
+	ResetCharacter();
 
 	FWeaponParams params;
 	params.critChance = 0;
@@ -33,9 +32,8 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 	params.healthChange = 400;
 
 	SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
-	AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 4.5F), 6, true, false));
 	SetHealthChangeModifier(1.0F);
-	SetMaxHealth(newHealth );
+	SetMaxHealth(newHealth);
 	SetDefenceModifier(0.0F);
 
 	SetHealth(GetMaxHealth());
@@ -55,22 +53,29 @@ void ATestBoss::SetPhase(int32 val)
 {
 	Super::SetPhase(val);
 
-	if (GetPhase() == 1) {
-		ApplyCrowdControl(EffectEnums::Cast, true); // Set can cast
-		ApplyCrowdControl(EffectEnums::Attack, false);
+	// Orbital Bombardment
+	if (GetPhase() == 1)
+	{
+		// Disable attack so we only use ability
+		ApplyCrowdControl(EffectEnums::Attack, false); // Set can't attack
+
+		AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 4.5F), 6, false, false));
 		SetHealth(GetMaxHealth());
 		SetDefenceModifier(0.1);
 	}
-	else if (GetPhase() == 2) {
-		//ApplyCrowdControl(EffectEnums::Cast, false);
-		ApplyCrowdControl(EffectEnums::Attack, true);
+	else if (GetPhase() == 2)
+	{
+		ApplyCrowdControl(EffectEnums::Attack, true); // Set can attack
 		RemoveAbility(GetAbilities()[0]);
-		AddAbility(mCreateTimedHealthChange(10.0F, 1.0F, 2.0F, 16.0F, false));
+
+		// Create Heal over time
+		AddAbility(mCreateTimedHealthChange(3, 10, 4, 1, true));
 
 		SetHealth(GetMaxHealth());
 		SetDefenceModifier(0.2);
 	}
-	else if (GetPhase() == 3) {
+	else if (GetPhase() == 3)
+	{
 		FWeaponParams params;
 		params.critChance = 40;
 		params.damageType = EDamageType::Physical;
@@ -81,11 +86,10 @@ void ATestBoss::SetPhase(int32 val)
 		params.healthChange = 600;
 
 		SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
-
+		
 		GetAbilities().Empty();
-		AddAbility(mCreateChannelledAbility(UImmobilise::CreateAbility(10, this, 5), 3, false, true));
+		AddAbility(mCreateChannelledAbility(mCreatePresetAbility(AbilityEnums::Immobilise), 3, false, true));
 
-		ApplyCrowdControl(EffectEnums::Cast, true);
 		SetHealth(GetMaxHealth());
 		SetSpeedModifier(0.8);
 		SetDefenceModifier(0.3);

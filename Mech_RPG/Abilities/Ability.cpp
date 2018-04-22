@@ -45,7 +45,8 @@ TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::CreateDefensiveAbilityList(
 
 bool UAbility::HasTag(FString name)
 {
-	for (FTag tag : GetTags()) {
+	for (FTag tag : GetTags())
+	{
 		if (tag.name.Equals(name)) return true;
 	}
 
@@ -59,7 +60,8 @@ TArray<FTag>& UAbility::GetTags()
 
 FTag UAbility::GetTag(FString name)
 {
-	for (FTag tag : GetTags()) {
+	for (FTag tag : GetTags())
+	{
 		if (tag.name.Equals(name)) return tag;
 	}
 
@@ -83,7 +85,8 @@ float UAbility::GetTagValue(FString name)
 
 bool UAbility::GetTagTrue(FString name)
 {
-	if (HasTag(name)) {
+	if (HasTag(name))
+	{
 		return GetTag(name).value >= 1;
 	}
 	return true;
@@ -94,26 +97,31 @@ float UAbility::GetWeaponHealthChange()
 	return UMiscLibrary::IsCharacterAlive(owner) && owner->GetCurrentWeapon() != nullptr ? owner->GetCurrentWeapon()->GetDPS() : 100;
 }
 
-void UAbility::SetOnCooldown(UWorld* const World) {
+void UAbility::SetOnCooldown(UWorld* const World)
+{
 	onCooldown = true;
 	currentTime = GetCooldown() - 0.1;
 	World->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UAbility::ResetOnCooldown, 0.1F);
 }
 
-float UAbility::GetCooldown() {
+float UAbility::GetCooldown()
+{
 	float percentChange = 1 - (owner->GetSpeedModifier() - 1);
 	return cooldown  * percentChange;
 }
 
-float UAbility::GetCurrentTimeRemaining() {
+float UAbility::GetCurrentTimeRemaining()
+{
 	return currentTime;
 }
 
-bool UAbility::OnCooldown() {
+bool UAbility::OnCooldown()
+{
 	return onCooldown;
 }
 
-void UAbility::SetCooldown(float newCooldown) {
+void UAbility::SetCooldown(float newCooldown)
+{
 	cooldown = newCooldown;
 }
 
@@ -122,18 +130,22 @@ FString UAbility::GetTooltipText()
 	return "";
 }
 
-void UAbility::ResetOnCooldown() {
-	if (GetCurrentTimeRemaining() <= 0) {
+void UAbility::ResetOnCooldown()
+{
+	if (GetCurrentTimeRemaining() <= 0)
+	{
 		onCooldown = false;
 		currentTime = 0;
 	}
-	else {
+	else
+	{
 		currentTime -= 0.1;
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_AbilityOffCooldown, this, &UAbility::ResetOnCooldown, 0.1F);
 	}
 }
 
-EAffectedTeam UAbility::GetAffectedTeam() {
+EAffectedTeam UAbility::GetAffectedTeam()
+{
 	return affectedTeam;
 }
 
@@ -144,27 +156,34 @@ UAbility* UAbility::CreateChannelledPresetAbility(AMech_RPGCharacter * owner, Ab
 
 UAbility* UAbility::CreatePresetAbility(AMech_RPGCharacter* owner, AbilityEnums::Ability abilityToCreate)
 {
-	switch (abilityToCreate) {
+	switch (abilityToCreate)
+	{
 	case AbilityEnums::Heal:
-		return UHeal::CreateAbility(15.0F, owner, 15.0F);
+		return UHeal::CreateAbility(15, owner, 15);
 	case AbilityEnums::AoEHeal:
-		return UAoEHeal::CreateAbility(20.0F, owner, 2.0F);
+		return UAoEHeal::CreateAbility(20, owner, 1);
 	case AbilityEnums::Stun:
-		return UStun::CreateAbility(15.0F, owner, 4);
+		return UStun::CreateAbility(15, owner, 4);
 	case AbilityEnums::Disable:
-		return UDisable::CreateDisable(10.0F, owner, 4.0F);
+		return UDisable::CreateDisable(10, owner, 4);
 	case AbilityEnums::Taunt:
-		return UTaunt::CreateAbility(5.0F, owner);
+		return UTaunt::CreateAbility(5, owner);
 	case AbilityEnums::Grenade:
-		return UGrenade::CreateAbility(15.0F, owner, 3.0F);
+		return UGrenade::CreateAbility(15, owner, 3);
 	case AbilityEnums::CritBoost:
-		return UCritBoost::CreateCritBoost(6, owner, 55.0F);
+		return UCritBoost::CreateCritBoost(6, owner, 55);
 	case AbilityEnums::Snipe:
-		return USnipe::CreateAbility(15.0F, owner);
+		return USnipe::CreateAbility(15, owner);
 	case AbilityEnums::DefenceBoost:
-		return UDefenceBoost::CreateAbility(7.0F, owner, 0.25F);
+		return UDefenceBoost::CreateAbility(7, owner, 0.25F);
 	case AbilityEnums::Shield:
-		return UShield::CreateShield(20, owner, 40.0F);
+		return UShield::CreateShield(20, owner, 40);
+	case AbilityEnums::Immobilise:
+		return UImmobilise::CreateAbility(15, owner, 5);
+	case AbilityEnums::SummonDrone:
+		return USummonDamageDrone::CreateAbility(15, owner);
+	default:
+		break;
 	}
 
 	return nullptr;

@@ -25,9 +25,12 @@ UEffectTimer* UEffectTimer::CreateEffectTimer(AMech_RPGCharacter* inTarget, floa
 	return timer;
 }
 
-void UEffectTimer::Activate() {
-	if (UMiscLibrary::IsCharacterAlive(target)) {
-		for (EffectEnums::CrowdControl effect : effects) {
+void UEffectTimer::Activate()
+{
+	if (UMiscLibrary::IsCharacterAlive(target))
+	{
+		for (EffectEnums::CrowdControl effect : effects)
+		{
 			target->ApplyCrowdControl(effect, remove);
 		}
 
@@ -37,11 +40,13 @@ void UEffectTimer::Activate() {
 
 void UEffectTimer::Complete()
 {
-	if (!isComplete && target->IsValidLowLevel()) {
+	if (!isComplete && UMiscLibrary::IsCharacterAlive(target))
+	{
 		isComplete = true;
-		
+
 		target->GetWorld()->GetTimerManager().ClearTimer(TimerHandle_EffectEnds);
-		for (EffectEnums::CrowdControl effect : effects) {
+		for (EffectEnums::CrowdControl effect : effects)
+		{
 			target->ApplyCrowdControl(effect, !remove);
 		}
 

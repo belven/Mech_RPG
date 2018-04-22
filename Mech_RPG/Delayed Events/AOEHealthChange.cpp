@@ -7,25 +7,23 @@
 
 AAOEHealthChange::AAOEHealthChange()
 	: currentLifetime(0),
-	Super() {
-	partclSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("AoEParticleSystem"));
-
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystemClass(TEXT("/Game/TopDown/Particle_Effects/AoE"));
-	if (ParticleSystemClass.Succeeded()) {
-		partclSystem->Template = ParticleSystemClass.Object;
-		partclSystem->bAutoActivate = false;
-		//partclSystem->SetWorldRotation(FRotator(0, 0, 0));
-		//partclSystem->SetRelativeRotation(FRotator(0, 0, 0));
-		SetRootComponent(partclSystem);
-	}
-
+	Super()
+{
+	particleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("AoEParticleSystem"));
+	SetRootComponent(particleSystem);
 	SetActorHiddenInGame(false);
 }
 
-AAOEHealthChange* AAOEHealthChange::CreateAOEHealthChange(FTempAOESettings inSettings) {
+AAOEHealthChange* AAOEHealthChange::CreateAOEHealthChange(FTempAOESettings inSettings)
+{
 	AAOEHealthChange* tempAOE = inSettings.world->SpawnActor<AAOEHealthChange>(StaticClass(), GetLocationToUse(inSettings), FRotator(0, 0, 0));
 	tempAOE->settings = inSettings;
 	tempAOE->Activate();
+
+	if (inSettings.particleSystem != nullptr)
+	{
+		tempAOE->particleSystem->Template = inSettings.particleSystem;
+	}
 	return tempAOE;
 }
 
@@ -33,11 +31,13 @@ FVector AAOEHealthChange::GetLocationToUse(FTempAOESettings inSettings)
 {
 	FVector locationToUse;
 
-	if (inSettings.usesTarget && inSettings.target != nullptr) {
+	if (inSettings.usesTarget && inSettings.target != nullptr)
+	{
 		locationToUse = inSettings.target->GetActorLocation();
 		locationToUse.Z -= inSettings.target->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	}
-	else {
+	else
+	{
 		locationToUse = inSettings.location;
 	}
 	return locationToUse;
@@ -48,41 +48,56 @@ bool AAOEHealthChange::CanAffect(AMech_RPGCharacter* character)
 	return UMiscLibrary::IsTargetValid(settings.owner, character, settings.affectedTeam);
 }
 
-float AAOEHealthChange::GetHealthChange(AMech_RPGCharacter* character) {
+float AAOEHealthChange::GetHealthChange(AMech_RPGCharacter* character)
+{
 	if (settings.healthChange < UMiscLibrary::MAX_HEALTH_CHANGE
-		&& UMiscLibrary::IsCharacterAlive(character)) {
+		&& UMiscLibrary::IsCharacterAlive(character))
+	{
 		return character->GetMaxHealth() * settings.healthChange;
 	}
 	return settings.healthChange;
 }
 
-void AAOEHealthChange::CreateDebugSphere(FVector locationToUse) {
-	DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, UMiscLibrary::GetRelativeColour(settings.owner), false, settings.rate, 0);
+void AAOEHealthChange::CreateDebugSphere(FVector locationToUse)
+{
+	FColor relativeColour = UMiscLibrary::GetRelativeColour(settings.owner);
+
+	DrawDebugCircle(settings.world, locationToUse, settings.radius, 40, relativeColour, false, settings.duration, 0, 5, FVector(0, 1, 0), FVector(1, 0, 0));
+	//DrawDebugSphere(settings.world, locationToUse, settings.radius, 10, UMiscLibrary::GetRelativeColour(settings.owner), false, settings.rate, 0);
 }
 
 
-void  AAOEHealthChange::Activate() {
-	if (currentLifetime <= settings.duration) {
+void  AAOEHealthChange::Activate()
+{
+	if (currentLifetime <= settings.duration)
+	{
 		currentLifetime += settings.rate;
 
 		FVector locationToUse = GetLocationToUse(settings);
-		CreateDebugSphere(locationToUse);
 
-		/*	if (!partclSystem->IsActive()) {
-				partclSystem->SetVectorParameter(FName(TEXT("Size")), FVector(settings.radius * 2));
-				partclSystem->Activate(true);
-			}*/
+		if (particleSystem != nullptr && !particleSystem->IsActive())
+		{
+			particleSystem->SetVectorParameter(FName(TEXT("AOESize")), FVector(settings.radius * 2));
+			particleSystem->Activate(true);
+		}
+		else if (particleSystem == nullptr)
+		{
+			CreateDebugSphere(locationToUse);
+		}
 
-		for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(settings.owner->GetWorld(), settings.radius, locationToUse)) {
-			if (CanAffect(character)) {
+		for (AMech_RPGCharacter* character : UMiscLibrary::GetCharactersInRange(settings.owner->GetWorld(), settings.radius, locationToUse))
+		{
+			if (CanAffect(character))
+			{
 				PerformHealthChange(character);
 			}
 		}
 
 		settings.world->GetTimerManager().SetTimer(TimerHandle_AOERate, this, &AAOEHealthChange::Activate, settings.rate);
 	}
-	else {
-		partclSystem->Deactivate();
+	else
+	{
+		particleSystem->Deactivate();
 		Destroy();
 	}
 }

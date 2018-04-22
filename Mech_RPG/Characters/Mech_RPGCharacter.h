@@ -246,15 +246,11 @@ public:
 		void SetInCombat(AMech_RPGCharacter* attacker = nullptr, AMech_RPGCharacter* damagedMember = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Other")
-		void Reset();
+		void ResetCharacter();
 
 	void MaximiseHealth();
 
-	UFUNCTION(BlueprintCallable, Category = "Other")
-		void ResetInvunrelbility();
-
-	UFUNCTION(BlueprintCallable, Category = "Other")
-		void RemoveFromPlay();
+	void RemoveFromPlay();
 
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void PostHealthChange(FHealthChange healthChange);
@@ -312,13 +308,13 @@ public:
 
 	virtual void OutOfCombat();
 
-	void SetInvunrebleTimer();
+	void SetRemoveFromPlayTimer();
 
 	void Resurrect();
 
 	void FindSpawnpoint();
 
-	FORCEINLINE bool GetInCombat()
+	FORCEINLINE bool IsInCombat()
 	{
 		return inCombat;
 	}
@@ -454,6 +450,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		void SetGroup(UGroup* newVal);
 
+	void CleanExistingGroup();
+
 	// Compares the characters group with another, true if allies, false if enemies
 	bool CompareGroup(UGroup* inGroup);
 
@@ -534,17 +532,17 @@ public:
 
 	FORCEINLINE bool CanAttack()
 	{
-		return canAttack == 0;
+		return canAttack < 1;
 	}
 
 	FORCEINLINE bool CanMove()
 	{
-		return canMove == 0;
+		return canMove < 1;
 	}
 
 	FORCEINLINE bool CanCast()
 	{
-		return canUseAbilities == 0;
+		return canUseAbilities < 1;
 	}
 
 	FORCEINLINE int32& GetCanAttack()
@@ -589,7 +587,7 @@ public:
 
 	FORCEINLINE bool GetCanBeDamaged()
 	{
-		return canBeDamaged == 0;
+		return canBeDamaged < 1;
 	}
 
 	FORCEINLINE void SetCanBeDamaged(int32 newVal)

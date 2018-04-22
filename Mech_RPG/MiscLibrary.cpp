@@ -29,31 +29,49 @@ float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character)
 
 AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality)
 {
-	FMagazineWeaponParams magSettings;
 	AWeapon* weapon = nullptr;
 
 	switch (weaponType)
 	{
-	case WeaponEnums::SMG:
+	case WeaponEnums::SMG: {
 		weapon = ASMG::CreateSMG(world, inOwner);
 		break;
-	case WeaponEnums::Bio_Repair:
+	}
+	case WeaponEnums::Drone_Weapon: {
+		FOverheatWeaponParams overheatSettings;
+		overheatSettings.healthChange = 20;
+		overheatSettings.range = 1400;
+		overheatSettings.fireRate = 0.3;
+		overheatSettings.heals = false;
+		overheatSettings.heatLosePerTick = 0.05;
+		overheatSettings.heatGenerated = 0.05;
+
+		weapon = ABio_Rifle::CreateBioRifle(world, inOwner);
+		Cast<ABio_Rifle>(weapon)->SetSettings(overheatSettings);
+		break;
+	}
+	case WeaponEnums::Bio_Repair: {
 		weapon = ABio_Rifle::CreateBioRifle(world, inOwner);
 		break;
-	case WeaponEnums::RPG:
+	}
+	case WeaponEnums::RPG: {
+		FMagazineWeaponParams magSettings;
 		magSettings.healthChange = 500;
 		magSettings.range = 1300;
 		magSettings.fireRate = 2.5;
 		magSettings.heals = false;
 		weapon = AWeapon::CreateWeapon(world, inOwner, magSettings);
 		break;
-	case WeaponEnums::Shotgun:
+	}
+	case WeaponEnums::Shotgun: {
 		weapon = AShotgun::CreateShotgun(world, inOwner);
 		break;
-	case WeaponEnums::Sniper:
+	}
+	case WeaponEnums::Sniper: {
 		weapon = ASniper::CreateSniper(world, inOwner);
 		break;
-	case WeaponEnums::Sword:
+	}
+	case WeaponEnums::Sword: {
 		FWeaponParams swordPrams;
 		swordPrams.fireRate = 1.25;
 		swordPrams.critChance = 70;
@@ -63,6 +81,7 @@ AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inO
 
 		weapon = AWeapon::CreateWeapon(world, inOwner, swordPrams);
 		break;
+	}
 	}
 
 	weapon->SetGrade(weaponGrade);
@@ -175,6 +194,11 @@ float UMiscLibrary::GetAbilityChannelPercent(UChannelledAbility* ability)
 bool UMiscLibrary::IsCharacterAlive(AMech_RPGCharacter* character)
 {
 	return character != nullptr && !character->IsDead();
+}
+
+bool UMiscLibrary::IsCharacterDead(AMech_RPGCharacter* character)
+{
+	return character != nullptr && character->IsDead();
 }
 
 AMech_RPGPlayerController* UMiscLibrary::GetPlayerController()
@@ -294,7 +318,14 @@ bool UMiscLibrary::IsTargetValid(AMech_RPGCharacter* character, AMech_RPGCharact
 		{
 			return character->IsAlly(inTarget);
 		}
-		return character->IsEnemy(inTarget);
+		else if (affectedTeam == EAffectedTeam::Enemy)
+		{
+			return character->IsEnemy(inTarget);
+		}
+		else if (affectedTeam == EAffectedTeam::Both)
+		{
+			return character->IsEnemy(inTarget) || character->IsAlly(inTarget);
+		}
 	}
 	return false;
 }

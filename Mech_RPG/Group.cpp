@@ -8,45 +8,67 @@
 #include "Interactable.h"
 #include "Quests/Quest.h"
 
-UGroup::UGroup() : Super() {
+UGroup::UGroup() : Super()
+{
 
 }
 
-UGroup* UGroup::CreateGroup(int32 inID) {
+UGroup* UGroup::CreateGroup(int32 inID)
+{
 	UGroup* newGroup = NewObject<UGroup>(UGroup::StaticClass());
 	newGroup->SetID(inID);
 	return newGroup;
 }
 
-int32 UGroup::GetID() {
+int32 UGroup::GetID()
+{
 	return id;
 }
 
-TArray<AMech_RPGCharacter*>& UGroup::GetMembers() {
+TArray<AMech_RPGCharacter*>& UGroup::GetMembers()
+{
 	return members;
 }
 
-void UGroup::SetID(int32 newVal) {
+void UGroup::SetID(int32 newVal)
+{
 	id = newVal;
 }
 
-void UGroup::SetMembers(TArray<AMech_RPGCharacter*> newVal) {
+void UGroup::SetMembers(TArray<AMech_RPGCharacter*> newVal)
+{
 	members = newVal;
 }
 
-void UGroup::AddMemeber(AMech_RPGCharacter* memberToAdd) {
+void UGroup::AddMemeber(AMech_RPGCharacter* memberToAdd)
+{
 	members.Add(memberToAdd);
 }
 
-void UGroup::RemoveMember(AMech_RPGCharacter* memberToRemove) {
+void UGroup::RemoveMember(AMech_RPGCharacter* memberToRemove)
+{
 	members.Remove(memberToRemove);
 }
 
-bool UGroup::Compare(UGroup* inGroup) {
+bool UGroup::Compare(UGroup* inGroup)
+{
 	return inGroup && this ? inGroup->GetID() == this->GetID() : true;
 }
 
-AMech_RPGCharacter* UGroup::GetMember(int32 index) {
+bool UGroup::IsGroupdInCombat()
+{
+	for (AMech_RPGCharacter* member : members)
+	{
+		if (UMiscLibrary::IsCharacterAlive(member) && member->IsInCombat())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+AMech_RPGCharacter* UGroup::GetMember(int32 index)
+{
 	return members.IsValidIndex(index - 1) ? members[index - 1] : nullptr;
 }
 
@@ -54,19 +76,24 @@ AMech_RPGCharacter* UGroup::GetRandomMember()
 {
 	TArray<AMech_RPGCharacter*> aliveMembers;
 
-	for (AMech_RPGCharacter* member : members) {
-		if (UMiscLibrary::IsCharacterAlive(member)) {
+	for (AMech_RPGCharacter* member : members)
+	{
+		if (UMiscLibrary::IsCharacterAlive(member))
+		{
 			aliveMembers.Add(member);
 		}
 	}
 
-	if (aliveMembers.Num() == 0) {
+	if (aliveMembers.Num() == 0)
+	{
 		return nullptr;
 	}
-	else if (aliveMembers.Num() == 1) {
+	else if (aliveMembers.Num() == 1)
+	{
 		return aliveMembers[0];
 	}
-	else {
+	else
+	{
 		return aliveMembers[rand() % (aliveMembers.Num() - 1)];
 	}
 }
@@ -74,12 +101,16 @@ AMech_RPGCharacter* UGroup::GetRandomMember()
 AMech_RPGCharacter* UGroup::GetLowHealthMember()
 {
 	AMech_RPGCharacter* lowestHealthMember = nullptr;
-	for (AMech_RPGCharacter* member : members) {
-		if (UMiscLibrary::IsCharacterAlive(member) && UMiscLibrary::GetMissingHealth(member) > 1) {
-			if (lowestHealthMember != nullptr && UMiscLibrary::GetMissingHealth(lowestHealthMember) < UMiscLibrary::GetMissingHealth(member)) {
+	for (AMech_RPGCharacter* member : members)
+	{
+		if (UMiscLibrary::IsCharacterAlive(member) && UMiscLibrary::GetMissingHealth(member) > 1)
+		{
+			if (lowestHealthMember != nullptr && UMiscLibrary::GetMissingHealth(lowestHealthMember) < UMiscLibrary::GetMissingHealth(member))
+			{
 				lowestHealthMember = member;
 			}
-			else {
+			else
+			{
 				lowestHealthMember = member;
 			}
 		}
@@ -87,12 +118,16 @@ AMech_RPGCharacter* UGroup::GetLowHealthMember()
 	return lowestHealthMember;
 }
 
-AMech_RPGCharacter* UGroup::GetPlayer() {
-	if (HasMemebers()) {
-		for (AMech_RPGCharacter* character : members) {
+AMech_RPGCharacter* UGroup::GetPlayer()
+{
+	if (HasMemebers())
+	{
+		for (AMech_RPGCharacter* character : members)
+		{
 			if (character != nullptr
 				&& character->GetController() != nullptr
-				&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass())) {
+				&& mIsChildOf(character->GetController(), AMech_RPGPlayerController::StaticClass()))
+			{
 				return character;
 			}
 		}
@@ -102,13 +137,16 @@ AMech_RPGCharacter* UGroup::GetPlayer() {
 }
 
 
-void UGroup::GroupMemberHit(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember) {
-	if (OnMemberDamageEvent.IsBound() && attacker != nullptr && !attacker->IsDead()) {
+void UGroup::GroupMemberHit(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember)
+{
+	if (OnMemberDamageEvent.IsBound() && attacker != nullptr && !attacker->IsDead())
+	{
 		OnMemberDamageEvent.Broadcast(attacker, damagedMember);
 	}
 }
 
-bool UGroup::HasMemebers() {
+bool UGroup::HasMemebers()
+{
 	return members.Num() > 0;
 }
 
@@ -122,36 +160,42 @@ void UGroup::GroupMemberKilled(AMech_RPGCharacter* character)
 	if (OnGroupMemberKilled.IsBound()) OnGroupMemberKilled.Broadcast(character);
 }
 
-TEnumAsByte<GroupEnums::Role> UGroup::GetRandomRole() {
+TEnumAsByte<GroupEnums::Role> UGroup::GetRandomRole()
+{
 	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
 }
 
 void UGroup::Interact(AInteractable * interactable)
 {
-	if (OnInteractEvent.IsBound()) {
+	if (OnInteractEvent.IsBound())
+	{
 		OnInteractEvent.Broadcast(interactable);
 	}
 }
 
 void UGroup::ItemPickup(AItem* item)
 {
-	if (OnItemPickUpEvent.IsBound()) {
+	if (OnItemPickUpEvent.IsBound())
+	{
 		OnItemPickUpEvent.Broadcast(item);
 	}
 }
 
 void UGroup::NPCInteract(AMech_RPGCharacter * character)
 {
-	if (OnNPCInteractEvent.IsBound()) {
+	if (OnNPCInteractEvent.IsBound())
+	{
 		OnNPCInteractEvent.Broadcast(character);
 	}
 }
 
-void UGroup::AddQuest(UQuest* newQuest) {
+void UGroup::AddQuest(UQuest* newQuest)
+{
 	quests.Add(newQuest);
 }
 
-void UGroup::RemoveQuest(UQuest* questToRemove) {
+void UGroup::RemoveQuest(UQuest* questToRemove)
+{
 	quests.Remove(questToRemove);
 }
 
@@ -160,11 +204,14 @@ TArray<UQuest*>& UGroup::GetQuests()
 	return quests;
 }
 
-TArray<UQuest*> UGroup::GetCompletedQuests() {
+TArray<UQuest*> UGroup::GetCompletedQuests()
+{
 	TArray<UQuest*> completedQuests;
 
-	for (UQuest* quest : quests) {
-		if (quest->IsComplete()) {
+	for (UQuest* quest : quests)
+	{
+		if (quest->IsComplete())
+		{
 			completedQuests.Add(quest);
 		}
 	}
@@ -172,11 +219,14 @@ TArray<UQuest*> UGroup::GetCompletedQuests() {
 	return completedQuests;
 }
 
-TArray<UQuest*> UGroup::GetActiveQuests() {
+TArray<UQuest*> UGroup::GetActiveQuests()
+{
 	TArray<UQuest*> activeQuests;
 
-	for (UQuest* quest : quests) {
-		if (!quest->IsComplete()) {
+	for (UQuest* quest : quests)
+	{
+		if (!quest->IsComplete())
+		{
 			activeQuests.Add(quest);
 		}
 	}

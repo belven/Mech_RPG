@@ -67,6 +67,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static bool IsCharacterAlive(AMech_RPGCharacter* character);
 
+	UFUNCTION(BlueprintCallable, Category = "Character")
+		static bool IsCharacterDead(AMech_RPGCharacter* character);
+
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		static float GetAbilityCooldownPercent(UAbility* ability);
 

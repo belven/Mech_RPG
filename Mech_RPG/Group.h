@@ -1,14 +1,17 @@
 
 UENUM(BlueprintType)
-namespace GroupEnums {
-	enum Role {
+namespace GroupEnums
+{
+	enum Role
+	{
 		None,
 		DPS,
+		Drone,
 		Healer,
-		Tank,
-		Sniper,
 		RPG,
+		Sniper,
 		Support,
+		Tank,
 		End
 	};
 }
@@ -31,7 +34,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupItemPickUpEvent, AItem*, item)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupInteractEvent, AInteractable*, interactable);
 
 UCLASS(Blueprintable)
-class MECH_RPG_API UGroup : public UObject {
+class MECH_RPG_API UGroup : public UObject
+{
 	GENERATED_BODY()
 private:
 	int32 id;
@@ -67,7 +71,8 @@ public:
 		bool Compare(UGroup* inGroup);
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
-		AMech_RPGCharacter* GetMember(int32 index);
+		bool IsGroupdInCombat();
+	AMech_RPGCharacter* GetMember(int32 index);
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		AMech_RPGCharacter* GetRandomMember();
@@ -93,7 +98,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void GroupMemberKilled(AMech_RPGCharacter* character);
-	
+
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FMemberDamageEvent OnMemberDamageEvent;
 
@@ -108,7 +113,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		static TEnumAsByte<GroupEnums::Role> GetRandomRole();
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void Interact(AInteractable * interactable);
 

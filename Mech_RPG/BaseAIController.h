@@ -6,13 +6,14 @@
 #include "Delayed Events/AOEHealthChange.h"
 #include "BaseAIController.generated.h"
 
-#define mCanSee(actorB) UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), actorB->GetActorLocation())
-#define mLostHealth(character) UMiscLibrary::GetMissingHealth(character) > 0
+#define mCanSeeLocation(actorB) UMiscLibrary::CanSee(GetWorld(), GetAIOwner()->GetActorLocation(), actorB->GetActorLocation())
+#define mLostHealth(character) UMiscLibrary::GetMissingHealth(character) > 0 && UMiscLibrary::IsCharacterAlive(character)
 
 class AMech_RPGCharacter;
 
 UCLASS()
-class MECH_RPG_API ABaseAIController : public AAIController {
+class MECH_RPG_API ABaseAIController : public AAIController
+{
 	GENERATED_BODY()
 
 protected:
@@ -27,16 +28,19 @@ public:
 	void Possess(APawn* InPawn) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
-	virtual void OwnerPostBeginPlay(AMech_RPGCharacter* mech);
+		virtual void OwnerPostBeginPlay(AMech_RPGCharacter* mech);
 	void FindTarget(EAffectedTeam affectedTeam = EAffectedTeam::Enemy);
 
+	void FindAllyTarget(float range);
+
+	void FindEnemyTarget(float range);
 
 	bool PerformAbility(UAbility* ability);
 	void UseWeapon(AActor* hit);
 	bool ShouldHeal(UAbility* ability);
 
 	UAbility* GetOwnerAbilityByTag(FString tag);
-	
+
 	AMech_RPGCharacter* GetAIOwner();
 	AMech_RPGCharacter* GetTarget();
 
@@ -49,7 +53,7 @@ public:
 	void MoveToLocation(FVector location);
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
-	void GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
+		void GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember);
 
 	TArray<AMech_RPGCharacter*> GetCharactersInRange(float range);
 

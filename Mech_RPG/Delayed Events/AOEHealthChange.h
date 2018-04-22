@@ -29,6 +29,8 @@ public:
 	bool usesTarget = false;
 	bool heals = false;
 	bool ignoresArmour = false;
+
+	UParticleSystem* particleSystem = nullptr;
 };
 
 UCLASS()
@@ -44,7 +46,7 @@ public:
 	AAOEHealthChange();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Particles)
-		UParticleSystemComponent* partclSystem;
+		UParticleSystemComponent* particleSystem;
 
 	static AAOEHealthChange* CreateAOEHealthChange(FTempAOESettings inSettings);
 	void Activate();

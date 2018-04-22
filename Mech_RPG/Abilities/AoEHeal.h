@@ -18,6 +18,7 @@ private:
 
 	static const int radius;
 public:
+	UAoEHeal();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;

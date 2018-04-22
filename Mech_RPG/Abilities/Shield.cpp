@@ -6,7 +6,7 @@
 
 bool UShield::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
 {
-	if (target != nullptr)
+	if (UMiscLibrary::IsCharacterAlive(target))
 	{
 		shieldHealth = GetWeaponHealthChange() * shieldAmount;
 		shieldTarget = target;
@@ -37,7 +37,7 @@ FString UShield::GetTooltipText()
 
 void UShield::ChangeHealth(FHealthChange& healthChange)
 {
-	if (healthChange.heals)
+	if (healthChange.heals || !UMiscLibrary::IsCharacterAlive(shieldTarget))
 	{
 		return;
 	}

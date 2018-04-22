@@ -22,6 +22,7 @@
 #include <limits>
 #include "Delayed Events/EffectTimer.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Mech_RPGCharacter.h"
 
 bool AMech_RPGCharacter::settingUpGroups = false;
 const float AMech_RPGCharacter::lowHealth = 2000;
@@ -392,12 +393,16 @@ void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 		SetDead(true);
 		SetActorHiddenInGame(true);
 
-		if (GetCurrentWeapon() != nullptr) GetCurrentWeapon()->SetActorHiddenInGame(true);
+		if (GetCurrentWeapon() != nullptr)
+		{
+			GetCurrentWeapon()->SetActorHiddenInGame(true);
+		}
+
 		OnStopFiring.Broadcast();
 		healthChange.manipulator->EnemyKilled(this);
 
 		//UQuestManager::EntityKilled(healthChange);
-		SpawnItem(healthChange.manipulator);
+		//SpawnItem(healthChange.manipulator);
 	}
 
 	UpdateStats();
@@ -551,21 +556,30 @@ void AMech_RPGCharacter::SetInCombat(AMech_RPGCharacter* attacker, AMech_RPGChar
 	if (!inCombat)
 	{
 		inCombat = true;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, 1.0F, true);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_OutOfCombat, this, &AMech_RPGCharacter::OutOfCombat, .2F, true);
 		stats->SetVisibility(true, true);
 	}
 }
 
-void AMech_RPGCharacter::Reset()
+void AMech_RPGCharacter::ResetCharacter()
 {
-	if (GetCurrentWeapon() != nullptr)
-	{
-		GetCurrentWeapon()->Destroy();
-		SetCurrentWeapon(nullptr);
-	}
+	MaximiseHealth();
+
+	channeling = false;
+	inCombat = false;
+
+	canAttack = 0;
+	canMove = 0;
+	canBeDamaged = 0;
 
 	abilities.Empty();
 	armour.Empty();
+
+	if (GetCurrentWeapon() != nullptr)
+	{
+		SetCurrentWeapon(nullptr);
+		GetCurrentWeapon()->Destroy();
+	}
 
 	if (GetInventory() != nullptr)
 	{
@@ -575,25 +589,11 @@ void AMech_RPGCharacter::Reset()
 	{
 		inventory = NewObject<UInventory>(UInventory::StaticClass());
 	}
-
-	MaximiseHealth();
-
-	channeling = false;
-	inCombat = false;
-
-	canAttack = 0;
-	canMove = 0;
-	canBeDamaged = 0;
 }
 
 void AMech_RPGCharacter::MaximiseHealth()
 {
 	SetHealth(GetMaxHealth());
-}
-
-void AMech_RPGCharacter::ResetInvunrelbility()
-{
-	ApplyCrowdControl(EffectEnums::Damage, true);
 }
 
 AItem* AMech_RPGCharacter::AddItem(AItem* itemToAdd)
@@ -664,28 +664,31 @@ void AMech_RPGCharacter::OutOfCombat()
 		}
 	}
 
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_OutOfCombat);
-
 	inCombat = false;
 	OnStopFiring.Broadcast();
-
-	if (OnOutOfCombat.IsBound()) OnOutOfCombat.Broadcast();
-
 	stats->SetVisibility(false, true);
 
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_OutOfCombat);
+
+	if (OnOutOfCombat.IsBound())
+	{
+		OnOutOfCombat.Broadcast();
+	}
+
+	// If we're dead and we're in the players group, we can resurrect
 	if (IsDead() && GetGroup()->GetPlayer() != nullptr)
 	{
 		Resurrect();
 	}
+	// Otherwise we're just NPCs, so remove us
 	else if (IsDead())
 	{
-		Reset();
-		SetInvunrebleTimer();
-
+		SetRemoveFromPlayTimer();
 	}
+
 }
 
-void AMech_RPGCharacter::SetInvunrebleTimer()
+void AMech_RPGCharacter::SetRemoveFromPlayTimer()
 {
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::RemoveFromPlay, 6.0F);
 }
@@ -707,10 +710,7 @@ void AMech_RPGCharacter::Resurrect()
 	effects.Add(EffectEnums::Damage);
 
 	UEffectTimer::CreateEffectTimer(this, 3.0F, effects);
-	ApplyCrowdControl(EffectEnums::Damage, false);
 	//FindSpawnpoint();
-
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Invunrelbility, this, &AMech_RPGCharacter::ResetInvunrelbility, 3.0F);
 }
 
 void AMech_RPGCharacter::FindSpawnpoint()
@@ -748,14 +748,14 @@ void AMech_RPGCharacter::FindSpawnpoint()
 
 void AMech_RPGCharacter::RemoveFromPlay()
 {
-	stats->DestroyComponent();
+	//stats->DestroyComponent();
 	group->RemoveMember(this);
 	//inventory->BeginDestroy();
 
-	if (GetCurrentWeapon() != nullptr)
-	{
-		GetCurrentWeapon()->Destroy();
-	}
+	//if (GetCurrentWeapon() != nullptr)
+	//{
+	//	GetCurrentWeapon()->Destroy();
+	//}
 	Destroy();
 }
 
@@ -772,7 +772,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	float phsyicalResistance = 5;
 	float energyResistance = 5;
 
-	Reset();
+	ResetCharacter();
 
 	StartingRole(inRole);
 
@@ -782,19 +782,28 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	{
 	case GroupEnums::DPS:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, quaility));
-		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, true));
+		//AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, true));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Snipe));
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		SetMaxHealth(lowHealth);
 		break;
 
+	case GroupEnums::Drone:
+		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Drone_Weapon, grade, quaility));
+		AddAbility(mCreateTimedHealthChange(1.0F, 20.0F, 2.0F, 0.5F, true));
+		blastResistance = mGetDefaultArmourValue(ArmourGrades::MediumHeavy);
+		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::MediumHeavy);
+		energyResistance = mGetDefaultArmourValue(ArmourGrades::MediumHeavy);
+		SetMaxHealth(lowHealth);
+		break;
+
 	case GroupEnums::Healer:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Bio_Repair, grade, quaility));
-		//AddAbility(mCreatePresetAbility(AbilityEnums::Heal));
 		AddAbility(mCreatePresetAbility(AbilityEnums::AoEHeal));
-		AddAbility(mCreateTimedHealthChange(10.0F, 1.0F, 2.0F, 16.0F, false));
+		AddAbility(mCreatePresetAbility(AbilityEnums::SummonDrone));
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
@@ -803,11 +812,11 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 
 	case GroupEnums::Tank:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Sword, grade, quaility));
-		AddAbility(mCreatePresetAbility(AbilityEnums::Taunt));
-		AddAbility(mCreatePresetAbility(AbilityEnums::Shield));
-		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
-		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
-		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		AddAbility(UBindLife::CreateBindLife(10, this, 0.5F, 0.25F));
+		AddAbility(mCreatePresetAbility(AbilityEnums::DefenceBoost));
+		blastResistance = mGetDefaultArmourValue(ArmourGrades::Medium);
+		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Medium);
+		energyResistance = mGetDefaultArmourValue(ArmourGrades::Medium);
 		SetMaxHealth(lowHealth);
 		break;
 
@@ -823,8 +832,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 
 	case GroupEnums::Support:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
-		AddAbility(USummonDamageDrone::CreateAbility(20, this));
-		AddAbility(mCreatePresetAbility(AbilityEnums::Shield));
+		AddAbility(mCreatePresetAbility(AbilityEnums::DefenceBoost));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Disable));
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
@@ -902,34 +910,23 @@ void AMech_RPGCharacter::SetGroup(UGroup* newVal)
 {
 	if (newVal != nullptr)
 	{
-		ABaseAIController* con = Cast<ABaseAIController>(Controller);
-		if (group != nullptr)
-		{
-			group->RemoveMember(this);
-			group->OnMemberDamageEvent.RemoveAll(this);
-
-			if (con != nullptr)
-			{
-				group->OnMemberDamageEvent.RemoveAll(con);
-			}
-
-			if (!group->HasMemebers())
-			{
-				group->ConditionalBeginDestroy();
-			}
-		}
-
+		CleanExistingGroup();
 		group = newVal;
 		group->AddMemeber(this);
+		group->OnMemberDamageEvent.AddUniqueDynamic(this, &AMech_RPGCharacter::SetInCombat);
+	}
+}
 
-		if (group != nullptr)
+void AMech_RPGCharacter::CleanExistingGroup()
+{
+	if (group != nullptr)
+	{
+		group->RemoveMember(this);
+		group->OnMemberDamageEvent.RemoveAll(this);
+
+		if (!group->HasMemebers())
 		{
-			group->OnMemberDamageEvent.AddUniqueDynamic(this, &AMech_RPGCharacter::SetInCombat);
-
-			if (con != nullptr)
-			{
-				group->OnMemberDamageEvent.AddUniqueDynamic(con, &ABaseAIController::GroupMemberDamaged);
-			}
+			group->ConditionalBeginDestroy();
 		}
 	}
 }

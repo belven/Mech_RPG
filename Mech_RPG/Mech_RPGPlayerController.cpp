@@ -10,7 +10,7 @@
 #include "Weapons.h"
 #include "Quests/QuestManager.h"
 
-#define mCanSee(location) UMiscLibrary::CanSee(GetPlayerControllerOwner()->GetWorld(), GetPlayerControllerOwner()->GetActorLocation(), location)
+#define mCanSeeLocation(location) UMiscLibrary::CanSee(GetPlayerControllerOwner()->GetWorld(), GetPlayerControllerOwner()->GetActorLocation(), location)
 
 AMech_RPGPlayerController::~AMech_RPGPlayerController()
 {
@@ -142,7 +142,7 @@ void AMech_RPGPlayerController::CalculateActions(float DeltaTime)
 {
 	// Are we trying to interact with an Interactable
 	if (lastAction == PlayerControllerEnums::Interactable) {
-		if (mCanSee(lastTargetInteractable->GetActorLocation())
+		if (mCanSeeLocation(lastTargetInteractable->GetActorLocation())
 			&& GetPlayerControllerOwner()->GetDistanceTo(lastTargetInteractable) <= interactionRange) {
 			lastAction = PlayerControllerEnums::None;
 			GetPlayerControllerOwner()->Interact(lastTargetInteractable);
@@ -206,7 +206,7 @@ void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
 		GetPlayerControllerOwner()->LookAt(target);
 	}
 	// Have we traced to another character or cover
-	else if (mCanSee(target->GetActorLocation())) {
+	else if (mCanSeeLocation(target->GetActorLocation())) {
 		FireWeapon(target);
 		GetPlayerControllerOwner()->LookAt(target);
 	}
@@ -707,7 +707,7 @@ void AMech_RPGPlayerController::ActivateAbility() {
 bool AMech_RPGPlayerController::usedAbility(UAbility* ability, FVector location, AMech_RPGCharacter* tempCharacter)
 {
 	//Only use an ability if we have LoS to our target/location
-	if (!mCanSee(location)) {
+	if (!mCanSeeLocation(location)) {
 		MoveToLocation(location);
 		lastUsedAbility = ability;
 		lastCharacterTarget = tempCharacter;

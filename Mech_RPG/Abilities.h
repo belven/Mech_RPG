@@ -16,6 +16,7 @@
 #include "Abilities/ParticleBomb.h"
 #include "Abilities/SummonDamageDrone.h"
 #include "Abilities/Shield.h"
+#include "Abilities/BindLife.h"
 
 #include "Abilities/ChannelledAbility.h"
 #include "Delayed Events/AOEHealthChange.h"

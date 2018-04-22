@@ -21,7 +21,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 	int32 newQuality = quaility;
 
 	StartingRole(inRole);
-	Reset();
+	ResetCharacter();
 
 	switch (inRole) {
 	case GroupEnums::DPS:

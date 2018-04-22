@@ -88,7 +88,7 @@ void ABaseAIController::UseWeaponOnTarget(float DeltaTime)
 		SetFocus(targetCharacter);
 	}
 	// Have we traced to another character or cover
-	else if (mCanSee(targetCharacter))
+	else if (mCanSeeLocation(targetCharacter))
 	{
 		UseWeapon(targetCharacter);
 		SetFocus(targetCharacter);
@@ -186,63 +186,94 @@ void ABaseAIController::MoveToLocation(FVector location)
 
 void ABaseAIController::FindTarget(EAffectedTeam affectedTeam)
 {
-	float range = GetAIOwner()->GetCurrentWeapon()->GetRange();
-	bool isAffectedTeamEnemy = affectedTeam == EAffectedTeam::Enemy;
+	float range = 2000.0F;
+	bool targetsEnemies = affectedTeam == EAffectedTeam::Enemy;
 
-	// Is the target
-	if (IsTargetValid(targetCharacter, affectedTeam)
+	// Is the target valid
+	if (IsTargetValid(GetTarget(), affectedTeam)
 
 		// If they're an enemy then we can carry on, or only affect allies that have lost health
-		&& (isAffectedTeamEnemy || mLostHealth(targetCharacter)))
+		&& (targetsEnemies || mLostHealth(GetTarget())))
 	{
 		return;
 	}
-	// Otherwise remove the target character and find a new one
+
+	// Otherwise find a new one
+	if (targetsEnemies)
+	{
+		FindEnemyTarget(range);
+	}
 	else
 	{
-		targetCharacter = nullptr;
+		FindAllyTarget(range);
 	}
+}
 
-	if (isAffectedTeamEnemy)
+void ABaseAIController::FindAllyTarget(float range)
+{
+	// Will only return a member if their health lost is 1 or more
+	AMech_RPGCharacter* lowHealthCharacter = GetAIOwner()->GetGroup()->GetLowHealthMember();
+	bool targetFound = false;
+
+	// Did we find a group member to heal
+	if (lowHealthCharacter != nullptr)
 	{
+		SetTarget(lowHealthCharacter);
+		targetFound = true;
+	}
+	else
+	{
+		// Search for allies outside of the group within range
 		for (AMech_RPGCharacter* character : GetCharactersInRange(range))
 		{
-			if (IsTargetValid(character, affectedTeam) && mCanSee(character))
+			// Is the target valid
+			if (IsTargetValid(character, EAffectedTeam::Ally))
 			{
-				SetTarget(character);
-				break;
-			}
-		}
-	}
-	else
-	{
-		// Will only return a member if their health lost is 1 or more
-		AMech_RPGCharacter* lowHealthCharacter = GetAIOwner()->GetGroup()->GetLowHealthMember();
-
-		// Did we find a group member to heal
-		if (lowHealthCharacter != nullptr)
-		{
-			SetTarget(lowHealthCharacter);
-		}
-		else
-		{
-			// Search for allies outside of the group within range
-			for (AMech_RPGCharacter* character : GetCharactersInRange(range))
-			{
-
-				// Is the target valid
-				if (IsTargetValid(character, affectedTeam))
+				// Have they lost health
+				if (mLostHealth(character))
 				{
-
-					// Have they lost health
-					if (mLostHealth(character))
-					{
-						SetTarget(character);
-						break;
-					}
+					SetTarget(character);
+					targetFound = true;
+					break;
 				}
 			}
 		}
+	}
+	
+	if (!targetFound)
+	{
+		SetTarget(nullptr);
+	}
+}
+
+void ABaseAIController::FindEnemyTarget(float range)
+{
+	bool targetFound = false;
+
+	// Look for a new target in the same group
+	if (UMiscLibrary::IsCharacterDead(GetTarget()))
+	{
+		SetTarget(GetTarget()->GetGroup()->GetLowHealthMember());
+
+		if (IsTargetValid(GetTarget(), EAffectedTeam::Enemy))
+		{
+			targetFound = true;
+		}
+	}
+
+	for (AMech_RPGCharacter* character : GetCharactersInRange(range))
+	{
+		if (IsTargetValid(character, EAffectedTeam::Enemy) && mCanSeeLocation(character))
+		{
+			SetTarget(character);
+			targetFound = true;
+			break;
+		}
+	}
+
+	if (!targetFound)
+	{
+		SetTarget(nullptr);
 	}
 }
 
@@ -293,7 +324,7 @@ void ABaseAIController::SetTarget(AMech_RPGCharacter* newVal)
 
 void ABaseAIController::GroupMemberDamaged(AMech_RPGCharacter* attacker, AMech_RPGCharacter* damagedMember)
 {
-	if (!UMiscLibrary::IsCharacterAlive(GetTarget()))
+	if (GetTarget() == nullptr && IsTargetValid(attacker, EAffectedTeam::Enemy))
 	{
 		SetTarget(attacker);
 	}

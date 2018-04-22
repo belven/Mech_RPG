@@ -5,8 +5,10 @@
 #include "Characters/Mech_RPGCharacter.h"
 
 
-bool UImmobilise::Activate(class AMech_RPGCharacter* target, FVector targetLocation) {
-	if (UMiscLibrary::IsCharacterAlive(target) && target->GetController()) {
+bool UImmobilise::Activate(class AMech_RPGCharacter* target, FVector targetLocation)
+{
+	if (UMiscLibrary::IsCharacterAlive(target) && target->GetController())
+	{
 		SetOnCooldown(owner->GetWorld());
 		owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle_ImmobiliseEnded, this, &UImmobilise::ResetImmobilise, duration);
 		target->GetCanMove()++;
@@ -18,11 +20,13 @@ bool UImmobilise::Activate(class AMech_RPGCharacter* target, FVector targetLocat
 	return false;
 }
 
-UImmobilise* UImmobilise::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float duration) {
+UImmobilise* UImmobilise::CreateAbility(float cooldown, AMech_RPGCharacter* owner, float duration)
+{
 	UImmobilise* ability = NewObject<UImmobilise>(StaticClass());
 	ability->SetCooldown(cooldown);
 	ability->duration = duration;
 	ability->owner = owner;
+	ability->affectedTeam = EAffectedTeam::Enemy;
 	ability->AddTag(debuffTag, duration);
 	return ability;
 }
@@ -32,8 +36,10 @@ FString UImmobilise::GetTooltipText()
 	return "Immobilise" + UMiscLibrary::lnBreak + "Prevents target from using moving for " + FString::SanitizeFloat(duration) + " seconds" + UMiscLibrary::lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
 }
 
-void UImmobilise::ResetImmobilise() {
-	if (lastTarget != NULL) {
+void UImmobilise::ResetImmobilise()
+{
+	if (lastTarget != nullptr)
+	{
 		lastTarget->ApplyCrowdControl(EffectEnums::Move, true);
 	}
 }

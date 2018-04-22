@@ -9,17 +9,18 @@
  *
  */
 UCLASS()
-class MECH_RPG_API AAllyAIController : public ABaseAIController {
+class MECH_RPG_API AAllyAIController : public ABaseAIController
+{
 	GENERATED_BODY()
 protected:
 	FVector playerControlledLocation;
 public:
 	AAllyAIController();
+
+	virtual	void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
 	bool ShouldMoveToPlayer(AMech_RPGCharacter* player);
-
-	virtual	void BeginPlay() override;
 	FVector GetPlayerControlledLocation();
 	void SetPlayerControlledLocation(FVector newVal);
 };
