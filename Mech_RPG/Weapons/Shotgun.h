@@ -9,15 +9,15 @@
  *
  */
 UCLASS()
-class MECH_RPG_API AShotgun : public AMagazineWeapon
+class MECH_RPG_API UShotgun : public UMagazineWeapon
 {
 	GENERATED_BODY()
 public:
-	AShotgun();
+	UShotgun();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AShotgun* CreateShotgun(UWorld* world, AMech_RPGCharacter* inOwner);
+		static UShotgun* CreateShotgun(AMech_RPGCharacter* inOwner);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		virtual AItem* Copy();
+		virtual UItem* Copy();
 };

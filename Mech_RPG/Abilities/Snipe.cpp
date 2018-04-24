@@ -18,5 +18,5 @@ FString USnipe::GetTooltipText()
 {
 	FString lnBreak = " \n";
 	FString damageString = FString::SanitizeFloat(GetWeaponHealthChange() * changeAmount);
-	return "Snipe" + lnBreak + "Damages target enemy for " + damageString + "% health." + lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
+	return "Snipe" + lnBreak + "Deals  " + damageString + " damage to target enemy." + lnBreak + "Cooldown: " + FString::SanitizeFloat(GetCooldown());
 }

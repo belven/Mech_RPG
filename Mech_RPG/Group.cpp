@@ -173,7 +173,7 @@ void UGroup::Interact(AInteractable * interactable)
 	}
 }
 
-void UGroup::ItemPickup(AItem* item)
+void UGroup::ItemPickup(UItem* item)
 {
 	if (OnItemPickUpEvent.IsBound())
 	{

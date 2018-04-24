@@ -3,7 +3,7 @@
 #include "Mech_RPG.h"
 #include "SMG.h"
 
-ASMG::ASMG() : Super()
+USMG::USMG() : Super()
 {
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> smg(TEXT("/Game/TopDown/Meshes/Weapons/SMG"));
 	if (smg.Succeeded())
@@ -13,33 +13,29 @@ ASMG::ASMG() : Super()
 }
 
 
-ASMG* ASMG::CreateSMG(UWorld* world, AMech_RPGCharacter* inOwner)
+USMG* USMG::CreateSMG(AMech_RPGCharacter* inOwner)
 {
-	if (world != nullptr)
-	{
-		FMagazineWeaponParams magSettings;
-		magSettings.healthChange = 40;
-		magSettings.range = 1000;
-		magSettings.fireRate = 0.1F;
-		magSettings.heals = false;
-		magSettings.magazineSize = 60;
-		magSettings.reloadAmount = 15;
+	FMagazineWeaponParams magSettings;
+	magSettings.healthChange = 40;
+	magSettings.range = 1000;
+	magSettings.fireRate = 0.1F;
+	magSettings.heals = false;
+	magSettings.magazineSize = 60;
+	magSettings.reloadAmount = 15;
 
-		ASMG* weapon = world->SpawnActor<ASMG>(ASMG::StaticClass());
-		weapon->SetSettings(magSettings);
-		weapon->SetItemOwner(inOwner);
-		weapon->SetName("SMG");
-		weapon->magazineSize = magSettings.magazineSize;
-		weapon->reloadAmount = magSettings.reloadAmount;
-		weapon->ammo = magSettings.magazineSize;
-		return weapon;
-	}
-	return nullptr;
+	USMG* weapon = NewObject<USMG>(StaticClass());
+	weapon->SetSettings(magSettings);
+	weapon->SetItemOwner(inOwner);
+	weapon->SetName("SMG");
+	weapon->magazineSize = magSettings.magazineSize;
+	weapon->reloadAmount = magSettings.reloadAmount;
+	weapon->ammo = magSettings.magazineSize;
+	return weapon;
 }
 
-AItem* ASMG::Copy()
+UItem* USMG::Copy()
 {
-	ASMG* weapon = GetWorld()->SpawnActor<ASMG>(ASMG::StaticClass());
+	USMG* weapon = NewObject<USMG>(StaticClass());
 	weapon->SetSettings(settings);
 	weapon->magazineSize = magazineSize;
 	weapon->reloadAmount = reloadAmount;

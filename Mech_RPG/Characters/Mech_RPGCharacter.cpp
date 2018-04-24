@@ -124,7 +124,6 @@ AMech_RPGCharacter::~AMech_RPGCharacter()
 
 	if (GetCurrentWeapon() != nullptr)
 	{
-		GetCurrentWeapon()->Destroy();
 		SetCurrentWeapon(nullptr);
 	}
 
@@ -160,6 +159,11 @@ void AMech_RPGCharacter::Tick(float DeltaTime)
 	}
 
 	CLAMP(health, GetMaxHealth(), 0);
+
+	if (currentWeapon != nullptr)
+	{
+		currentWeapon->Tick(DeltaTime);
+	}
 }
 
 void AMech_RPGCharacter::BeginPlay()
@@ -254,7 +258,7 @@ void AMech_RPGCharacter::SetCharacterStats(class UCharacterStats* val)
 	}
 }
 
-AArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos)
+UArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos)
 {
 	return *GetArmour().Find(pos);
 }
@@ -426,12 +430,12 @@ void AMech_RPGCharacter::SpawnItem(AMech_RPGCharacter* character)
 	if (GetGroup()->GetPlayer() == nullptr)
 	{
 		ItemEnumns::ItemType type = UMiscLibrary::GetRandomEnum(ItemEnumns::Resource);
-		AItem* newItem = CalucluateItemDrop(character->GetGroup(), type);
+		UItem* newItem = CalucluateItemDrop(character->GetGroup(), type);
 		AItemPickup::CreateItemPickup(newItem)->SetActorLocation(GetActorLocation());
 	}
 }
 
-AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemType type)
+UItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemType type)
 {
 	TMultiMap<int32, int32> gradeMap;
 
@@ -442,7 +446,7 @@ AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemT
 	bool upgradeQuality = UMiscLibrary::IsSuccess(70); //upgradeQualityChance;
 
 	float totalItems = 0;
-	float lowestGrade = AItem::HighestItemLevel;
+	float lowestGrade = UItem::HighestItemLevel;
 	float totalGrade = 0;
 	float meanGrade = 0;
 	int32 modeGrade = 0;
@@ -455,7 +459,7 @@ AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemT
 	for (AMech_RPGCharacter* member : inGroup->GetMembers())
 	{
 		//for (AItem* item : member->GetInventory()->GetItems()) {
-		AItem* item = member->GetCurrentWeapon();
+		UItem* item = member->GetCurrentWeapon();
 		if (item != nullptr && item->GetType() == type)
 		{
 			totalItems++;
@@ -514,7 +518,7 @@ AItem* AMech_RPGCharacter::CalucluateItemDrop(UGroup* inGroup, ItemEnumns::ItemT
 	outputGrade = FMath::RoundHalfToEven(MAX(meanGrade, heighestValue.Key));
 	outputQuality = FMath::RoundHalfToEven(meanQuality);
 
-	AItem* newItem = AItem::CreateItemByType(type, GetWorld(), outputGrade, outputQuality);
+	UItem* newItem = UItem::CreateItemByType(this, type, outputGrade, outputQuality);
 
 	if (newItem != nullptr)
 	{
@@ -578,7 +582,6 @@ void AMech_RPGCharacter::ResetCharacter()
 	if (GetCurrentWeapon() != nullptr)
 	{
 		SetCurrentWeapon(nullptr);
-		GetCurrentWeapon()->Destroy();
 	}
 
 	if (GetInventory() != nullptr)
@@ -596,9 +599,9 @@ void AMech_RPGCharacter::MaximiseHealth()
 	SetHealth(GetMaxHealth());
 }
 
-AItem* AMech_RPGCharacter::AddItem(AItem* itemToAdd)
+UItem* AMech_RPGCharacter::AddItem(UItem* itemToAdd)
 {
-	AItem* item = GetInventory()->AddItem(itemToAdd);
+	UItem* item = GetInventory()->AddItem(itemToAdd);
 	itemToAdd->SetItemOwner(this);
 
 	if (GetGroup() != nullptr)
@@ -821,7 +824,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		break;
 
 	case GroupEnums::Sniper:
-		SetCurrentWeapon(ALaserSniper::CreateLaserSniper(GetWorld(), this));
+		SetCurrentWeapon(ULaserSniper::CreateLaserSniper(this));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Snipe, 2.5F, false, true));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
@@ -855,7 +858,7 @@ void AMech_RPGCharacter::CreateArmour(float phsyicalResistance, float blastResis
 	for (int i = 0; i < ArmourEnums::End; i++)
 	{
 		ArmourEnums::ArmourPosition pos = (ArmourEnums::ArmourPosition)i;
-		AArmour* newArmour = AArmour::CreateArmour(GetWorld(), "Test", phsyicalResistance, blastResistance, energyResistance, pos, this, grade, quaility);
+		UArmour* newArmour = UArmour::CreateArmour("Test", phsyicalResistance, blastResistance, energyResistance, pos, this, grade, quaility);
 		GetArmour().Add(pos, newArmour);
 		AddItem(newArmour);
 	}
@@ -881,7 +884,7 @@ void AMech_RPGCharacter::SetDead(bool newVal)
 	isDead = newVal;
 }
 
-void AMech_RPGCharacter::SetCurrentWeapon(AWeapon* newVal)
+void AMech_RPGCharacter::SetCurrentWeapon(UWeapon* newVal)
 {
 	if (newVal != nullptr && currentWeapon != newVal)
 	{

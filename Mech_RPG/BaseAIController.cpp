@@ -115,7 +115,7 @@ UAbility* ABaseAIController::GetOwnerAbilityByTag(FString tag)
 
 void ABaseAIController::UseWeapon(AActor* hit)
 {
-	AWeapon* weapon = GetAIOwner()->GetCurrentWeapon();
+	UWeapon* weapon = GetAIOwner()->GetCurrentWeapon();
 	float distToTarget = GetAIOwner()->GetDistanceTo(targetCharacter);
 
 	// Are we in weapons range

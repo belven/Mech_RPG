@@ -31,24 +31,26 @@ public:
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFired);
 
 UCLASS(Blueprintable)
-class MECH_RPG_API AWeapon : public AEquipable
+class MECH_RPG_API UWeapon : public UEquipable
 {
 	GENERATED_BODY()
 protected:
 	FWeaponParams settings;
 	bool canFire = true;
 	float lastTime = 0;
+
+	UPROPERTY()
 	UAudioComponent* audioComp = nullptr;
 
 public:
-	AWeapon();
+	UWeapon();
 	virtual float GetChangeAmount();
 
 	float GetRange();
 	float GetDPS();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		virtual AItem* Copy();
+		virtual UItem* Copy();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Particles)
 		UParticleSystemComponent* partclSystem;
@@ -66,7 +68,7 @@ public:
 		virtual void StopFire();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AWeapon* CreateWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FWeaponParams inSettings);
+		static UWeapon* CreateWeapon(AMech_RPGCharacter* inOwner, FWeaponParams inSettings);
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FFired OnFire;
@@ -77,7 +79,7 @@ public:
 	float GetCritChance();
 	void SetCritChance(float newVal);
 
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime);
 	bool Heals();
 	void SetHeals(bool newVal);
 
@@ -95,5 +97,5 @@ public:
 		virtual FString GetTooltipText() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static AWeapon* CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType = WeaponEnums::SMG, int32 weaponGrade = 0, int32 weaponQuality = 0);
+		static UWeapon* CreatePresetWeapon(AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType = WeaponEnums::SMG, int32 weaponGrade = 0, int32 weaponQuality = 0);
 };

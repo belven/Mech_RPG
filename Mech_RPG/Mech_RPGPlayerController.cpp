@@ -235,12 +235,12 @@ void AMech_RPGPlayerController::AddQuest(UQuest * newQuest)
 	}
 }
 
-void AMech_RPGPlayerController::PlayerItemPickup(AItem* item)
+void AMech_RPGPlayerController::PlayerItemPickup(UItem* item)
 {
 	inventory->GenerateInventory();
 }
 
-void AMech_RPGPlayerController::PlayerSwappedWeapons(AWeapon* oldWeapon, AWeapon* newWeapon)
+void AMech_RPGPlayerController::PlayerSwappedWeapons(UWeapon* oldWeapon, UWeapon* newWeapon)
 {
 	//characterPane->UpdateWeaponBar();
 }
@@ -250,7 +250,7 @@ TArray<AMech_RPGCharacter*> AMech_RPGPlayerController::GetCharactersInRange(floa
 }
 
 void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
-	AWeapon* weapon = GetPlayerControllerOwner()->GetCurrentWeapon();
+	UWeapon* weapon = GetPlayerControllerOwner()->GetCurrentWeapon();
 	float distToTarget = FVector::Dist(GetPlayerControllerOwner()->GetActorLocation(), target->GetActorLocation());
 
 	// Are we in weapons range
@@ -323,11 +323,11 @@ void AMech_RPGPlayerController::Reload()
 	if (UMiscLibrary::IsCharacterAlive(GetPlayerControllerOwner()) 
 		&& GetPlayerControllerOwner()->GetCurrentWeapon() != nullptr)
 	{
-		AWeapon* weapon = GetPlayerControllerOwner()->GetCurrentWeapon();
+		UWeapon* weapon = GetPlayerControllerOwner()->GetCurrentWeapon();
 
-		if (mIsChildOf(weapon, AMagazineWeapon::StaticClass()))
+		if (mIsChildOf(weapon, UMagazineWeapon::StaticClass()))
 		{
-			AMagazineWeapon* mWeapon = Cast<AMagazineWeapon>(weapon);
+			UMagazineWeapon* mWeapon = Cast<UMagazineWeapon>(weapon);
 			mWeapon->Reload();
 		}
 	}

@@ -5,7 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ItemUI.generated.h"
 
-class AItem;
+class UItem;
 class UInventoryUI;
 
 UCLASS()
@@ -13,15 +13,15 @@ class MECH_RPG_API UItemUI : public UUserWidget
 {
 	GENERATED_BODY()
 protected:
-	AItem* owner;
+	UItem* owner;
 	UInventoryUI* inventory;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		void SetItem(AItem* inItem);
+		void SetItem(UItem* inItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		AItem* GetItem();
+		UItem* GetItem();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		UInventoryUI* GetInventory();

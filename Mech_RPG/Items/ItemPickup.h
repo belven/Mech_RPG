@@ -15,13 +15,13 @@ class MECH_RPG_API AItemPickup : public AInteractable
 	GENERATED_BODY()
 private:
 	UPROPERTY(EditAnywhere, Category = "PickUp")
-		AItem* item;
+		UItem* item;
 public:
 	AItemPickup();
 	
 	virtual void Interact_Implementation(class AMech_RPGCharacter* character);
 
-	static AItemPickup* CreateItemPickup(AItem* item);
+	static AItemPickup* CreateItemPickup(UItem* item);
 
 	virtual void NotifyActorBeginCursorOver() override;
 	

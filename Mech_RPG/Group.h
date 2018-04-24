@@ -22,7 +22,7 @@ namespace GroupEnums
 #include "Group.generated.h"
 
 class AMech_RPGCharacter;
-class AItem;
+class UItem;
 class AInteractable;
 class UQuest;
 
@@ -30,7 +30,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMemberDamageEvent, AMech_RPGCharac
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupEnemyKilled, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupMemberKilled, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupNPCInteractEvent, AMech_RPGCharacter*, character);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupItemPickUpEvent, AItem*, item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupItemPickUpEvent, UItem*, item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGroupInteractEvent, AInteractable*, interactable);
 
 UCLASS(Blueprintable)
@@ -121,7 +121,7 @@ public:
 		void NPCInteract(AMech_RPGCharacter * character);
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
-		void ItemPickup(AItem* item);
+		void ItemPickup(UItem* item);
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 		void AddQuest(UQuest* newQuest);

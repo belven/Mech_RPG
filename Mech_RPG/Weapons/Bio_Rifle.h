@@ -9,17 +9,17 @@
  *
  */
 UCLASS()
-class MECH_RPG_API ABio_Rifle : public AOverHeatWeapon
+class MECH_RPG_API UBio_Rifle : public UOverHeatWeapon
 {
 	GENERATED_BODY()
 
 public:
-	ABio_Rifle();
+	UBio_Rifle();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static ABio_Rifle* CreateBioRifle(UWorld* world, AMech_RPGCharacter* inOwner);
+		static UBio_Rifle* CreateBioRifle(AMech_RPGCharacter* inOwner);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		AItem* Copy() override;
+		UItem* Copy() override;
 
 };

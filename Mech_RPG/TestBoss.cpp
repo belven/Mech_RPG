@@ -31,7 +31,7 @@ void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 gra
 	params.range = 5000;
 	params.healthChange = 400;
 
-	SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
+	SetCurrentWeapon(UWeapon::CreateWeapon(this, params));
 	SetHealthChangeModifier(1.0F);
 	SetMaxHealth(newHealth);
 	SetDefenceModifier(0.0F);
@@ -85,7 +85,7 @@ void ATestBoss::SetPhase(int32 val)
 		params.range = mGetMeleeRange;
 		params.healthChange = 600;
 
-		SetCurrentWeapon(AWeapon::CreateWeapon(GetWorld(), this, params));
+		SetCurrentWeapon(UWeapon::CreateWeapon(this, params));
 		
 		GetAbilities().Empty();
 		AddAbility(mCreateChannelledAbility(mCreatePresetAbility(AbilityEnums::Immobilise), 3, false, true));

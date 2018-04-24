@@ -5,7 +5,7 @@
 #include "QuestObjective.h"
 #include "ItemObjective.generated.h"
 
-class AItem;
+class UItem;
 
 UCLASS()
 class MECH_RPG_API UItemObjective : public UQuestObjective
@@ -14,7 +14,7 @@ class MECH_RPG_API UItemObjective : public UQuestObjective
 
 private:
 	UPROPERTY()
-		AItem* item;
+		UItem* item;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Interactive Quest Objective")
@@ -27,8 +27,8 @@ public:
 		virtual FString GetObjectiveText();
 
 	UFUNCTION(BlueprintCallable, Category = "Interactive Quest Objective")
-		void PlayerItemPickup(AItem* inItem);
+		void PlayerItemPickup(UItem* inItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Interactive Quest Objective")
-		static UItemObjective* CreateItemObjective(FString name, AItem* inItem);
+		static UItemObjective* CreateItemObjective(FString name, UItem* inItem);
 };

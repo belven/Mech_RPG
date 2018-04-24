@@ -15,7 +15,7 @@ class MECH_RPG_API UCritBoost : public UAbility
 		
 private:
 	float critMultiplier;
-	class AWeapon* weaponAffected;
+	class UWeapon* weaponAffected;
 	int count;
 public:
 

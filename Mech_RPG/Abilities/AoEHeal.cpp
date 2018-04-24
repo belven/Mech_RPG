@@ -26,11 +26,11 @@ bool UAoEHeal::Activate(class AMech_RPGCharacter* target, FVector targetLocation
 		settings.healthChange = GetWeaponHealthChange() * healAmount;
 		settings.owner = owner;
 		settings.world = owner->GetWorld();
-		settings.rate = 0.5F;
+		settings.rate = 1;
 		settings.radius = radius;
 		settings.location = targetLocation;
 		settings.damageType = EDamageType::Blast;
-		settings.duration = 3.0F;
+		settings.duration = 6;
 		settings.usesTarget = false;
 		settings.heals = true;
 		settings.particleSystem = GetParticleSystem();

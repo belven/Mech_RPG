@@ -17,7 +17,7 @@ public:
 };
 
 UCLASS()
-class MECH_RPG_API AOverHeatWeapon : public AWeapon
+class MECH_RPG_API UOverHeatWeapon : public UWeapon
 {
 	GENERATED_BODY()
 
@@ -39,7 +39,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "OverHeatWeapon")
 		float GetHeatLevel();
 
-	static AOverHeatWeapon* CreateOverHeatWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings);
+	static UOverHeatWeapon* CreateOverHeatWeapon(AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent() override;

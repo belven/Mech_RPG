@@ -17,7 +17,7 @@ public:
 };
 
 UCLASS()
-class MECH_RPG_API AMagazineWeapon : public AWeapon
+class MECH_RPG_API UMagazineWeapon : public UWeapon
 {
 	GENERATED_BODY()
 
@@ -47,7 +47,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MagazineWeapon")
 		float GetAmmo();
 
-	static AMagazineWeapon* CreateMagazineWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings);
+	static UMagazineWeapon* CreateMagazineWeapon(AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		virtual float GetProgressBarPercent() override;

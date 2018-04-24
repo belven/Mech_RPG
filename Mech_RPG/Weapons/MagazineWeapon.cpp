@@ -4,21 +4,26 @@
 #include "Characters/Mech_RPGCharacter.h"
 #include "MagazineWeapon.h"
 
-void AMagazineWeapon::Tick(float DeltaTime) {
+void UMagazineWeapon::Tick(float DeltaTime)
+{
 	Super::Tick(DeltaTime);
-	if (ammo <= 0) {
+	if (ammo <= 0)
+	{
 		Reload();
 	}
 
-	if (reloading) {
+	if (reloading)
+	{
 		lastTime += DeltaTime;
 
-		if (lastTime >= 1) {
+		if (lastTime >= 1)
+		{
 			lastTime = 0;
 
 			ammo += reloadAmount;
 
-			if (ammo >= magazineSize) {
+			if (ammo >= magazineSize)
+			{
 				reloading = false;
 				ammo = magazineSize;
 			}
@@ -26,35 +31,43 @@ void AMagazineWeapon::Tick(float DeltaTime) {
 	}
 }
 
-void AMagazineWeapon::Reload()
+void UMagazineWeapon::Reload()
 {
 	reloading = true;
 	StopFire();
 }
 
-void AMagazineWeapon::SetItemOwner(AMech_RPGCharacter* inOwner) {
+void UMagazineWeapon::SetItemOwner(AMech_RPGCharacter* inOwner)
+{
 	Super::SetItemOwner(inOwner);
-	if (inOwner != nullptr) { inOwner->OnOutOfCombat.AddUniqueDynamic(this, &AMagazineWeapon::FullReload); }
+	if (inOwner != nullptr)
+	{
+		inOwner->OnOutOfCombat.AddUniqueDynamic(this, &UMagazineWeapon::FullReload);
+	}
 }
 
-void AMagazineWeapon::FullReload() {
+void UMagazineWeapon::FullReload()
+{
 	reloading = false;
 	ammo = magazineSize;
 }
 
-bool AMagazineWeapon::CanFire() {
+bool UMagazineWeapon::CanFire()
+{
 	return !reloading && Super::CanFire();
 }
 
-float AMagazineWeapon::GetMagazineSize() {
+float UMagazineWeapon::GetMagazineSize()
+{
 	return magazineSize;
 }
 
-float AMagazineWeapon::GetProgressBarPercent() {
+float UMagazineWeapon::GetProgressBarPercent()
+{
 	return ammo / magazineSize;
 }
 
-FLinearColor AMagazineWeapon::GetProgressBarColour()
+FLinearColor UMagazineWeapon::GetProgressBarColour()
 {
 	if (reloading)
 	{
@@ -66,25 +79,25 @@ FLinearColor AMagazineWeapon::GetProgressBarColour()
 	}
 }
 
-float AMagazineWeapon::GetAmmo() {
+float UMagazineWeapon::GetAmmo()
+{
 	return ammo;
 }
 
-void AMagazineWeapon::UseWeapon(AMech_RPGCharacter* target) {
+void UMagazineWeapon::UseWeapon(AMech_RPGCharacter* target)
+{
 	Super::UseWeapon(target);
 	ammo--;
 }
 
 
-AMagazineWeapon* AMagazineWeapon::CreateMagazineWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings) {
-	if (world != nullptr) {
-		AMagazineWeapon* weapon = world->SpawnActor<AMagazineWeapon>(AMagazineWeapon::StaticClass());
-		weapon->SetSettings(inSettings);
-		weapon->magazineSize = inSettings.magazineSize;
-		weapon->reloadAmount = inSettings.reloadAmount;
-		weapon->ammo = inSettings.magazineSize;
-		weapon->SetItemOwner(inOwner);
-		return weapon;
-	}
-	return NULL;
+UMagazineWeapon* UMagazineWeapon::CreateMagazineWeapon(AMech_RPGCharacter* inOwner, FMagazineWeaponParams inSettings)
+{
+	UMagazineWeapon* weapon = NewObject<UMagazineWeapon>(StaticClass());
+	weapon->SetSettings(inSettings);
+	weapon->magazineSize = inSettings.magazineSize;
+	weapon->reloadAmount = inSettings.reloadAmount;
+	weapon->ammo = inSettings.magazineSize;
+	weapon->SetItemOwner(inOwner);
+	return weapon;
 }

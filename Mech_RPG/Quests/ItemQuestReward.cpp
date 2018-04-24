@@ -7,14 +7,14 @@
 
 void UItemQuestReward::GiveReward(AMech_RPGCharacter* questOwner)
 {
-	for (AItem* item : rewards) {
+	for (UItem* item : rewards) {
 		questOwner->AddItem(item);
 	}
 
 	Super::GiveReward(questOwner);
 }
 
-UItemQuestReward* UItemQuestReward::CreateItemQuestReward(TArray<AItem*> inRewards, UQuest* inQuestChain)
+UItemQuestReward* UItemQuestReward::CreateItemQuestReward(TArray<UItem*> inRewards, UQuest* inQuestChain)
 {
 	UItemQuestReward* reward = NewObject<UItemQuestReward>(StaticClass());
 	reward->SetRewards(inRewards);

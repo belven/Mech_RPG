@@ -9,10 +9,13 @@
 #include "Weapons/Weapon.h"
 #include "Armour.h"
 #include "Characters/Mech_RPGCharacter.h"
+#include "MiscLibrary.h"
 
-int32 AItem::HighestItemLevel = 100;
+int32 UItem::HighestItemLevel = 100;
 
-void AItem::CloneItemSettings(AItem* cloneFromItem)
+#define mGetRandomEnum(end) UMiscLibrary::GetRandomEnum(end)
+
+void UItem::CloneItemSettings(UItem* cloneFromItem)
 {
 	SetName(cloneFromItem->GetName());
 	SetGrade(cloneFromItem->GetGrade());
@@ -21,123 +24,139 @@ void AItem::CloneItemSettings(AItem* cloneFromItem)
 	SetItemOwner(cloneFromItem->GetItemOwner());
 }
 
-AItem::AItem() : Super() {
-	SetActorEnableCollision(false);
+UItem::UItem() : Super()
+{
 	SetGrade(1);
 }
 
-AItem* AItem::CreateItemByType(ItemEnumns::ItemType type, UWorld* world, int32 grade, int32 quality) {
-	switch (type) {
+UItem* UItem::CreateItemByType(AMech_RPGCharacter* inOwner, ItemEnumns::ItemType type, int32 grade, int32 quality)
+{
+	switch (type)
+	{
 	case ItemEnumns::Weapon:
-		return AWeapon::CreatePresetWeapon(world, nullptr, UMiscLibrary::GetRandomEnum(WeaponEnums::End), grade, quality);
+		return UWeapon::CreatePresetWeapon(inOwner, mGetRandomEnum(WeaponEnums::End), grade, quality);
 	case ItemEnumns::Armour:
-		return AArmour::CreateArmour(world, "Test", AArmour::GetDeafultValue(UMiscLibrary::GetRandomEnum(ArmourGrades::End)), UMiscLibrary::GetRandomEnum(ArmourEnums::End), nullptr, grade, quality);
+		return UArmour::CreateArmour("Test", UArmour::GetDeafultValue(mGetRandomEnum(ArmourGrades::End)), mGetRandomEnum(ArmourEnums::End), inOwner, grade, quality);
 	}
 	return nullptr;
 }
 
 
-ItemEnumns::ItemType AItem::GetType() {
+ItemEnumns::ItemType UItem::GetType()
+{
 	return type;
 }
 
-void AItem::SetType(ItemEnumns::ItemType newVal) {
+void UItem::SetType(ItemEnumns::ItemType newVal)
+{
 	type = newVal;
 }
 
-FString AItem::GetName() {
+FString UItem::GetName()
+{
 	return name;
 }
 
-void AItem::SetName(FString newVal) {
+void UItem::SetName(FString newVal)
+{
 	name = newVal;
 }
 
-void AItem::TakeFrom(AItem* otherItem) {
+void UItem::TakeFrom(UItem* otherItem)
+{
 	// Get the amount of items needed to add
 	int amountToAdd = otherItem->GetAmount();
 
 	// Can we just add to this item
-	if (GetRemainingSpace() >= amountToAdd) {
+	if (GetRemainingSpace() >= amountToAdd)
+	{
 		SetAmount(GetAmount() + otherItem->GetAmount());
 		otherItem->SetAmount(0);
 	}
-	else {
+	else
+	{
 		// If we're greater than stack size just set the amount to max size
 		otherItem->SetAmount(otherItem->GetAmount() - GetRemainingSpace());
 		SetAmount(GetStackSize());
 	}
 }
 
-int32 AItem::GetGrade() {
+int32 UItem::GetGrade()
+{
 	return grade;
 }
 
-void AItem::SetGrade(int32 newVal) {
+void UItem::SetGrade(int32 newVal)
+{
 	grade = newVal;
 }
 
-AMech_RPGCharacter* AItem::GetItemOwner() {
+AMech_RPGCharacter* UItem::GetItemOwner()
+{
 	return itemOwner;
 }
 
-int32 AItem::GetQuality()
+int32 UItem::GetQuality()
 {
 	return quality;
 }
 
-void AItem::SetQuality(int32 newQuality)
+void UItem::SetQuality(int32 newQuality)
 {
 	quality = newQuality;
 }
 
-void AItem::SetItemOwner(AMech_RPGCharacter* newVal) {
+void UItem::SetItemOwner(AMech_RPGCharacter* newVal)
+{
 	itemOwner = newVal;
 }
 
-bool AItem::HasSpace() {
+bool UItem::HasSpace()
+{
 	return GetAmount() < GetStackSize();
 }
 
-int32 AItem::GetRemainingSpace() {
+int32 UItem::GetRemainingSpace()
+{
 	return GetStackSize() - GetAmount();
 }
 
-int32 AItem::GetAmount() {
+int32 UItem::GetAmount()
+{
 	return amount;
 }
 
-void AItem::SetAmount(int32 newVal) {
+void UItem::SetAmount(int32 newVal)
+{
 	amount = newVal;
 }
 
-int32 AItem::GetStackSize() {
+int32 UItem::GetStackSize()
+{
 	return stackSize;
 }
 
-void AItem::SetStackSize(int32 newVal) {
+void UItem::SetStackSize(int32 newVal)
+{
 	stackSize = newVal;
 }
 
-AItem* AItem::Copy() {
-	return CreateItem(GetWorld(), GetItemOwner(), GetName(), GetAmount(), GetGrade(), GetQuality(), GetStackSize());
+UItem* UItem::Copy()
+{
+	return CreateItem(GetItemOwner(), GetName(), GetAmount(), GetGrade(), GetQuality(), GetStackSize());
 }
 
-FString AItem::GetTooltipText()
+FString UItem::GetTooltipText()
 {
 	return "";
 }
 
-AItem * AItem::CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString inName, int32 inAmount, int32 inGrade, int32 inQuality, int32 inStackSize)
+UItem* UItem::CreateItem(AMech_RPGCharacter* inOwner, FString inName /*= "Test"*/, int32 inAmount /*= 1*/, int32 inGrade /*= 0*/, int32 inQuality /*= 0*/, int32 inStackSize /*= 3*/)
 {
-	FActorSpawnParameters params;
-	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	AItem* newItem = world->SpawnActor<AItem>(AItem::StaticClass(), inOwner->GetTransform(), params);
+	UItem* newItem = NewObject<UItem>(StaticClass());
 	newItem->SetName(inName);
 	newItem->SetAmount(inAmount);
 	newItem->SetStackSize(inStackSize);
-	//SetType(GetType());
 	newItem->SetGrade(inGrade);
 	newItem->SetItemOwner(inOwner);
 	newItem->SetQuality(inQuality);

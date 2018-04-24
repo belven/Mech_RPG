@@ -33,14 +33,14 @@ void AItemPickup::Interact_Implementation(class AMech_RPGCharacter* character)
 	}
 }
 
-AItemPickup* AItemPickup::CreateItemPickup(AItem* item)
+AItemPickup* AItemPickup::CreateItemPickup(UItem* item)
 {
 	AItemPickup* newItem = item->GetItemOwner()->GetWorld()->SpawnActor<AItemPickup>(AItemPickup::StaticClass());
 	newItem->item = item;
 
-	if (item->GetClass()->IsChildOf(AMechPart::StaticClass()))
+	if (item->GetClass()->IsChildOf(UMechPart::StaticClass()))
 	{
-		newItem->GetStaticMeshComponent()->SetStaticMesh(Cast<AMechPart>(item)->mesh);
+		newItem->GetStaticMeshComponent()->SetStaticMesh(Cast<UMechPart>(item)->mesh);
 	}
 	return newItem;
 }

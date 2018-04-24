@@ -27,7 +27,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 		static float GetMissingHealth(AMech_RPGCharacter* character);
 
-	static class AWeapon* CreatePresetWeapon(class UWorld* world, class AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality);
+	static class UWeapon* CreatePresetWeapon(class AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality);
 
 	static TEnumAsByte<GameEnums::Difficulty> GetDifficulty();
 

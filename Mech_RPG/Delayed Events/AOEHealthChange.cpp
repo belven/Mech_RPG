@@ -39,6 +39,8 @@ FVector AAOEHealthChange::GetLocationToUse(FTempAOESettings inSettings)
 	else
 	{
 		locationToUse = inSettings.location;
+		locationToUse.Z = inSettings.owner->GetActorLocation().Z - inSettings.owner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
 	}
 	return locationToUse;
 }
@@ -75,9 +77,17 @@ void  AAOEHealthChange::Activate()
 
 		FVector locationToUse = GetLocationToUse(settings);
 
+		SetActorLocation(locationToUse);
+
 		if (particleSystem != nullptr && !particleSystem->IsActive())
 		{
+			FColor relativeColour = UMiscLibrary::GetRelativeColour(settings.owner);
+			particleSystem->SetColorParameter(FName(TEXT("AOEColour")), relativeColour);
 			particleSystem->SetVectorParameter(FName(TEXT("AOESize")), FVector(settings.radius * 2));
+
+			float partRad = settings.radius * .65;
+			particleSystem->SetVectorRandParameter(FName(TEXT("AOEDistribution")), FVector(partRad, partRad, 0.0F), FVector(-partRad, -partRad, 0.0F));
+			
 			particleSystem->Activate(true);
 		}
 		else if (particleSystem == nullptr)

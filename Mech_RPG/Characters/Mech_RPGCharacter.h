@@ -36,14 +36,14 @@ namespace EffectEnums
 
 #define MIN(a,b) (a < b) ? (a) : (b)
 #define MAX(a,b) (a > b) ? (a) : (b)
-#define mCreatePresetWeapon(type, grade, quailty) AWeapon::CreatePresetWeapon(GetWorld(), this, type, grade, quailty)
+#define mCreatePresetWeapon(type, grade, quailty) UWeapon::CreatePresetWeapon(this, type, grade, quailty)
 #define mCreatePresetAbility(type) UAbility::CreatePresetAbility(this,type)
 #define mCreateChannelledAbility(ability, Duration, loc, trace) UChannelledAbility::CreateChannelledAbility(this, ability, Duration, loc, trace)
 #define mCreatePresetRole(role) AMech_RPGCharacter::CreatePresetRole(role)
-#define mGetDefaultArmourValue(grade) AArmour::GetDeafultValue(grade)
+#define mGetDefaultArmourValue(grade) UArmour::GetDeafultValue(grade)
 #define mCreateTimedHealthChange(changeAmount, cooldown, duration, rate, heals) UTimedHealthChange::CreateTimedHealthChange(this, cooldown, changeAmount, rate, duration, heals)
 
-#define ArmourMap TPair<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*>
+#define ArmourMap TPair<TEnumAsByte<ArmourEnums::ArmourPosition>, class UArmour*>
 
 USTRUCT(BlueprintType)
 struct FLoadout
@@ -90,12 +90,12 @@ public:
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPostBeginPlay, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, AMech_RPGCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNPCInteractEvent, AMech_RPGCharacter*, character);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemPickUpEvent, AItem*, item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemPickUpEvent, UItem*, item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractEvent, AInteractable*, interactable);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestAdded, UQuest*, quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopFiring);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfCombat);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSwappedWeapons, AWeapon*, oldWeapon, AWeapon*, newWeapon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSwappedWeapons, UWeapon*, oldWeapon, UWeapon*, newWeapon);
 
 class UQuest;
 class AInteractable;
@@ -162,7 +162,7 @@ private:
 		float speedModifier;
 
 	UPROPERTY()
-		AWeapon* currentWeapon = nullptr;
+		UWeapon* currentWeapon = nullptr;
 
 	UPROPERTY()
 		UInventory* inventory = nullptr;
@@ -177,7 +177,7 @@ private:
 		TArray<UAbility*> abilities;
 
 	UPROPERTY()
-		TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*> armour;
+		TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class UArmour*> armour;
 
 	UPROPERTY()
 		TArray<UQuest*> quests;
@@ -260,7 +260,7 @@ public:
 	void SpawnItem(AMech_RPGCharacter* character);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		AItem* AddItem(AItem* itemToAdd);
+		UItem* AddItem(UItem* itemToAdd);
 
 	UPROPERTY()
 		FPreHealthChangeEvent OnPreHealthChange;
@@ -368,20 +368,20 @@ public:
 	void SetUpWidgets();
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		FORCEINLINE	TArray<AArmour*> GetArmourList()
+		FORCEINLINE	TArray<UArmour*> GetArmourList()
 	{
-		TArray<AArmour*> armourList;
+		TArray<UArmour*> armourList;
 		armour.GenerateValueArray(armourList);
 		return armourList;
 	}
 
-	FORCEINLINE	TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class AArmour*>& GetArmour()
+	FORCEINLINE	TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class UArmour*>& GetArmour()
 	{
 		return armour;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		AArmour* GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
+		UArmour* GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
 
 	// if remove is false then it will apply the effect, if it's true it will remove it
 	UFUNCTION(BlueprintCallable, Category = "CrowdControl")
@@ -421,7 +421,7 @@ public:
 		virtual void ChangeHealth(FHealthChange healthChange);
 
 	UFUNCTION(BlueprintCallable, Category = "Items")
-		AItem* CalucluateItemDrop(UGroup * inGroup, ItemEnumns::ItemType type = ItemEnumns::Weapon);
+		UItem* CalucluateItemDrop(UGroup * inGroup, ItemEnumns::ItemType type = ItemEnumns::Weapon);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		FORCEINLINE	bool IsDead()
@@ -433,13 +433,13 @@ public:
 		virtual void SetDead(bool newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		FORCEINLINE AWeapon* GetCurrentWeapon()
+		FORCEINLINE UWeapon* GetCurrentWeapon()
 	{
 		return currentWeapon;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Weapons")
-		void SetCurrentWeapon(AWeapon* newVal);
+		void SetCurrentWeapon(UWeapon* newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
 		FORCEINLINE	UGroup* GetGroup()

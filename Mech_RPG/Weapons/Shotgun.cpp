@@ -4,38 +4,38 @@
 #include "Shotgun.h"
 #include "Characters/Mech_RPGCharacter.h"
 
-AShotgun::AShotgun() : Super() {
+UShotgun::UShotgun() : Super()
+{
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> Shotgun(TEXT("/Game/TopDown/Meshes/Weapons/Shotgun"));
-	if (Shotgun.Succeeded()) {
+	if (Shotgun.Succeeded())
+	{
 		mesh = Shotgun.Object;
 	}
 }
 
-AShotgun* AShotgun::CreateShotgun(UWorld* world, AMech_RPGCharacter* inOwner) {
-	if (world != nullptr) {
-		FMagazineWeaponParams magSettings;
-		magSettings.healthChange = 150;
-		magSettings.range = 400;
-		magSettings.fireRate = 0.8;
-		magSettings.heals = false;
-		magSettings.magazineSize = 5;
-		magSettings.reloadAmount = 1;
+UShotgun* UShotgun::CreateShotgun(AMech_RPGCharacter* inOwner)
+{
+	FMagazineWeaponParams magSettings;
+	magSettings.healthChange = 150;
+	magSettings.range = 400;
+	magSettings.fireRate = 0.8;
+	magSettings.heals = false;
+	magSettings.magazineSize = 5;
+	magSettings.reloadAmount = 1;
 
-		AShotgun* weapon = world->SpawnActor<AShotgun>(AShotgun::StaticClass());
-		weapon->SetSettings(magSettings);
-		weapon->SetItemOwner(inOwner);
-		weapon->SetName("Shotgun");
-		weapon->magazineSize = magSettings.magazineSize;
-		weapon->reloadAmount = magSettings.reloadAmount;
-		weapon->ammo = magSettings.magazineSize;
-		return weapon;
-	}
-	return NULL;
+	UShotgun* weapon = NewObject<UShotgun>(StaticClass());
+	weapon->SetSettings(magSettings);
+	weapon->SetItemOwner(inOwner);
+	weapon->SetName("Shotgun");
+	weapon->magazineSize = magSettings.magazineSize;
+	weapon->reloadAmount = magSettings.reloadAmount;
+	weapon->ammo = magSettings.magazineSize;
+	return weapon;
 }
 
-AItem* AShotgun::Copy()
+UItem* UShotgun::Copy()
 {
-	AShotgun* weapon = GetWorld()->SpawnActor<AShotgun>(AShotgun::StaticClass());
+	UShotgun* weapon = NewObject<UShotgun>(StaticClass());
 	weapon->SetSettings(settings);
 	weapon->magazineSize = magazineSize;
 	weapon->reloadAmount = reloadAmount;

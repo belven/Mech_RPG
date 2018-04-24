@@ -6,7 +6,7 @@
 #include "ItemQuestReward.generated.h"
 
 
-class AItem;
+class UItem;
 
 UCLASS()
 class MECH_RPG_API UItemQuestReward : public UQuestReward
@@ -15,22 +15,22 @@ class MECH_RPG_API UItemQuestReward : public UQuestReward
 private:
 	
 	UPROPERTY()
-		TArray<AItem*> rewards;
+		TArray<UItem*> rewards;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 		virtual	void GiveReward(AMech_RPGCharacter* questOwner);
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
-	static UItemQuestReward* CreateItemQuestReward(TArray<AItem*> inRewards, UQuest* inQuestChain = nullptr);
+	static UItemQuestReward* CreateItemQuestReward(TArray<UItem*> inRewards, UQuest* inQuestChain = nullptr);
 		
 	UFUNCTION(BlueprintCallable, Category = "Quest")
-		TArray<AItem*> GetRewards() {
+		TArray<UItem*> GetRewards() {
 		return rewards;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
-		void SetRewards(TArray<AItem*> newVal) {
+		void SetRewards(TArray<UItem*> newVal) {
 		rewards = newVal;
 	}
 

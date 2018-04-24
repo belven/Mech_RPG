@@ -53,7 +53,7 @@ private:
 	// The last character we targeted with an ability or weapon, used so we can move to it if we can't see it
 	class AMech_RPGCharacter* lastCharacterTarget;
 	UAbility* lastUsedAbility;
-	AItem* selectedItem;
+	UItem* selectedItem;
 
 	PlayerControllerEnums::LastUsed lastAction;
 
@@ -162,10 +162,10 @@ public:
 	virtual void NotifyActorBeginCursorOver() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
-		AItem* GetSelectedItem() { return selectedItem; }
+		UItem* GetSelectedItem() { return selectedItem; }
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
-		void SelectedItem(AItem* val) { selectedItem = val; }
+		void SelectedItem(UItem* val) { selectedItem = val; }
 protected:
 	/**
 	 * True if the controlled character should navigate to the mouse cursor.
@@ -225,8 +225,8 @@ protected:
 		void AddQuest(UQuest * newQuest);
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
-		void PlayerItemPickup(AItem* item);
+		void PlayerItemPickup(UItem* item);
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
-		void PlayerSwappedWeapons(AWeapon* oldWeapon, AWeapon* newWeapon);
+		void PlayerSwappedWeapons(UWeapon* oldWeapon, UWeapon* newWeapon);
 };

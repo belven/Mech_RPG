@@ -4,8 +4,10 @@
 #include "Armour.h"
 #include "Characters/Mech_RPGCharacter.h"
 
-float AArmour::GetResistance(EDamageType damageType) {
-	switch (damageType) {
+float UArmour::GetResistance(EDamageType damageType)
+{
+	switch (damageType)
+	{
 	case EDamageType::Physical:
 		return physicalResistance;
 	case EDamageType::Energy:
@@ -16,8 +18,10 @@ float AArmour::GetResistance(EDamageType damageType) {
 	return 0;
 }
 
-FString AArmour::GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
-	switch (pos) {
+FString UArmour::GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos)
+{
+	switch (pos)
+	{
 	case ArmourEnums::Chest:
 		return "Chest";
 	case ArmourEnums::Right_Arm:
@@ -32,8 +36,10 @@ FString AArmour::GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos) {
 	return "Not Found";
 }
 
-float AArmour::GetDeafultValue(ArmourGrades::ArmourGrade armourGrade) {
-	switch (armourGrade) {
+float UArmour::GetDeafultValue(ArmourGrades::ArmourGrade armourGrade)
+{
+	switch (armourGrade)
+	{
 	case ArmourGrades::Light:
 		return 4.0F;
 	case ArmourGrades::MediumLight:
@@ -49,7 +55,7 @@ float AArmour::GetDeafultValue(ArmourGrades::ArmourGrade armourGrade) {
 	}
 }
 
-FString AArmour::GetTooltipText()
+FString UArmour::GetTooltipText()
 {
 	FString output = GetName() + UMiscLibrary::lnBreak;
 	output += FindObject<UEnum>(ANY_PACKAGE, TEXT("ArmourEnums"), true)->GetDisplayNameTextByValue(GetArmourPosition()).ToString() + UMiscLibrary::lnBreak;
@@ -59,32 +65,35 @@ FString AArmour::GetTooltipText()
 	return output;
 }
 
-AItem* AArmour::Copy()
+UItem* UArmour::Copy()
 {
-	AArmour* armour = CreateArmour(GetWorld(), GetName(), physicalResistance, 
+	UArmour* armour = CreateArmour(GetName(), physicalResistance,
 		blastResistance, energyResistance, armourPosition, GetItemOwner(), GetGrade(), GetQuality());
 	armour->CloneItemSettings(this);
 	return armour;
 }
 
-float AArmour::GetPhysicalResistance() {
+float UArmour::GetPhysicalResistance()
+{
 	return physicalResistance;
 }
 
-float AArmour::GetBlastResistance() {
+float UArmour::GetBlastResistance()
+{
 	return blastResistance;
 }
 
-float AArmour::GetEnergyResistance() {
+float UArmour::GetEnergyResistance()
+{
 	return energyResistance;
 }
 
-TEnumAsByte<ArmourEnums::ArmourPosition> AArmour::GetArmourPosition() {
+TEnumAsByte<ArmourEnums::ArmourPosition> UArmour::GetArmourPosition()
+{
 	return armourPosition;
 }
 
-AArmour* AArmour::CreateArmour(UWorld* world,
-	FString armourName,
+UArmour* UArmour::CreateArmour(FString armourName,
 	float inPhysicalResistance,
 	float inBlastResistance,
 	float inEnergyResistance,
@@ -93,10 +102,7 @@ AArmour* AArmour::CreateArmour(UWorld* world,
 	int32 armourGrade,
 	int32 armourQuality)
 {
-	FActorSpawnParameters params;
-	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	AArmour* tempArmour = world->SpawnActor<AArmour>(StaticClass(), params);
+	UArmour* tempArmour = NewObject<UArmour>(StaticClass());
 	tempArmour->armourPosition = inArmourPosition;
 	tempArmour->physicalResistance = inPhysicalResistance;
 	tempArmour->blastResistance = inBlastResistance;
@@ -105,15 +111,10 @@ AArmour* AArmour::CreateArmour(UWorld* world,
 	tempArmour->SetQuality(armourQuality);
 	tempArmour->SetItemOwner(armourOwner);
 	tempArmour->SetName(armourName);
-	
-	if (armourOwner != nullptr) {
-		tempArmour->AttachToComponent(armourOwner->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
-	}
-
 	return tempArmour;
 }
 
-AArmour* AArmour::CreateArmour(UWorld* world,
+UArmour* UArmour::CreateArmour(
 	FString armourName,
 	float inResistance,
 	ArmourEnums::ArmourPosition inArmourPosition,
@@ -121,5 +122,5 @@ AArmour* AArmour::CreateArmour(UWorld* world,
 	int32 armourGrade,
 	int32 armourQuality)
 {
-	return CreateArmour(world, armourName, inResistance, inResistance, inResistance, inArmourPosition, armourOwner, armourGrade, armourQuality);
+	return CreateArmour(armourName, inResistance, inResistance, inResistance, inArmourPosition, armourOwner, armourGrade, armourQuality);
 }

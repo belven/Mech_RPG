@@ -33,7 +33,7 @@ FString UItemObjective::GetObjectiveText()
 	return text;
 }
 
-void UItemObjective::PlayerItemPickup(AItem* inItem)
+void UItemObjective::PlayerItemPickup(UItem* inItem)
 {
 	if (IsComplete()) {
 		// Remove before notifying to avoid loops due to item adding from quest
@@ -42,7 +42,7 @@ void UItemObjective::PlayerItemPickup(AItem* inItem)
 	}
 }
 
-UItemObjective* UItemObjective::CreateItemObjective(FString name, AItem* inItem)
+UItemObjective* UItemObjective::CreateItemObjective(FString name, UItem* inItem)
 {
 	UItemObjective* Objective = NewObject<UItemObjective>(UItemObjective::StaticClass());
 	Objective->item = inItem;

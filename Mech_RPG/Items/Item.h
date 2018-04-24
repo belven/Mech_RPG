@@ -18,8 +18,10 @@ namespace ItemEnumns
 }
 
 UENUM(BlueprintType)
-namespace QualityEnums {
-	enum Quality {
+namespace QualityEnums
+{
+	enum Quality
+	{
 		Base,
 		Iron,
 		Steel,
@@ -31,20 +33,21 @@ namespace QualityEnums {
 
 #pragma once
 #include "UnrealString.h"
+#include "Object.h"
 #include "Item.generated.h"
 
 class AMech_RPGCharacter;
 
 UCLASS(Blueprintable)
-class AItem : public AActor
+class UItem : public UObject
 {
 	GENERATED_BODY()
 public:
-	AItem();
+	UItem();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		static AItem* CreateItemByType(ItemEnumns::ItemType type, UWorld* world, int32 grade, int32 quality);
-	
+		static UItem* CreateItemByType(AMech_RPGCharacter* inOwner, ItemEnumns::ItemType type, int32 grade, int32 quality);
+
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		ItemEnumns::ItemType GetType();
 
@@ -63,7 +66,7 @@ public:
 		void SetName(FString newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		void TakeFrom(AItem* otherItem);
+		void TakeFrom(UItem* otherItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		int32 GetGrade();
@@ -96,35 +99,35 @@ public:
 		void SetStackSize(int32 newVal);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		virtual AItem* Copy();
+		virtual UItem* Copy();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-	virtual FString GetTooltipText();
+		virtual FString GetTooltipText();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		static AItem* CreateItem(UWorld* world, AMech_RPGCharacter* inOwner, FString inName = "Test", int32 inAmount = 1, int32 inGrade = 0, int32 inQuality = 0, int32 inStackSize = 3);
+		static UItem* CreateItem(AMech_RPGCharacter* inOwner, FString inName = "Test", int32 inAmount = 1, int32 inGrade = 0, int32 inQuality = 0, int32 inStackSize = 3);
 
-	FORCEINLINE AItem& operator+(AItem &aitem)
+	FORCEINLINE UItem& operator+(UItem &aitem)
 	{
-		AItem* nitem = aitem.Copy();
+		UItem* nitem = aitem.Copy();
 		nitem->amount = aitem.amount + amount;
 		return *nitem;
 	}
 
-	FORCEINLINE AItem& operator+=(AItem &aitem)
+	FORCEINLINE UItem& operator+=(UItem &aitem)
 	{
 		amount += aitem.amount;
 		return *this;
 	}
 
-	FORCEINLINE AItem& operator-(AItem &aitem)
+	FORCEINLINE UItem& operator-(UItem &aitem)
 	{
-		AItem* nitem = aitem.Copy();
+		UItem* nitem = aitem.Copy();
 		nitem->amount = aitem.amount - amount;
 		return *nitem;
 	}
 
-	FORCEINLINE AItem& operator-=(AItem &aitem)
+	FORCEINLINE UItem& operator-=(UItem &aitem)
 	{
 		amount -= aitem.amount;
 		return *this;
@@ -132,7 +135,7 @@ public:
 
 	static int32 HighestItemLevel;
 
-	void CloneItemSettings(AItem* cloneFromItem);
+	void CloneItemSettings(UItem* cloneFromItem);
 protected:
 	UPROPERTY()
 		TEnumAsByte<ItemEnumns::ItemType> type;

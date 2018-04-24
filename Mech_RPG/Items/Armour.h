@@ -7,7 +7,8 @@
 #include "Armour.generated.h"
 
 UCLASS(BlueprintType)
-class MECH_RPG_API AArmour : public AItem {
+class MECH_RPG_API UArmour : public UItem
+{
 	GENERATED_BODY()
 private:
 	TEnumAsByte<ArmourEnums::ArmourPosition> armourPosition;
@@ -42,11 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Armour")
 		virtual FString GetTooltipText() override;
 
-	virtual AItem* Copy() override;
+	virtual UItem* Copy() override;
 
-	static AArmour* CreateArmour(UWorld* world,
-		FString armourName, float inResistance, ArmourEnums::ArmourPosition inArmourPosition, AMech_RPGCharacter* armourOwner = nullptr, int32 armourGrade = 1, int32 armourQuality = 1);
+	static UArmour* CreateArmour(FString armourName, float inResistance, ArmourEnums::ArmourPosition inArmourPosition, AMech_RPGCharacter* armourOwner = nullptr, int32 armourGrade = 1, int32 armourQuality = 1);
 
-	static AArmour* CreateArmour(UWorld* world,
-		FString armourName, float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition, AMech_RPGCharacter* armourOwner = nullptr, int32 armourGrade = 1, int32 armourQuality = 1);
+	static UArmour* CreateArmour(FString armourName, float inPhysicalResistance, float inBlastResistance, float inEnergyResistance, ArmourEnums::ArmourPosition inArmourPosition, AMech_RPGCharacter* armourOwner = nullptr, int32 armourGrade = 1, int32 armourQuality = 1);
 };

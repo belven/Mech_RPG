@@ -27,14 +27,14 @@ float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character)
 	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;
 }
 
-AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality)
+class UWeapon* UMiscLibrary::CreatePresetWeapon(class AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality)
 {
-	AWeapon* weapon = nullptr;
+	UWeapon* weapon = nullptr;
 
 	switch (weaponType)
 	{
 	case WeaponEnums::SMG: {
-		weapon = ASMG::CreateSMG(world, inOwner);
+		weapon = USMG::CreateSMG(inOwner);
 		break;
 	}
 	case WeaponEnums::Drone_Weapon: {
@@ -46,12 +46,12 @@ AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inO
 		overheatSettings.heatLosePerTick = 0.05;
 		overheatSettings.heatGenerated = 0.05;
 
-		weapon = ABio_Rifle::CreateBioRifle(world, inOwner);
-		Cast<ABio_Rifle>(weapon)->SetSettings(overheatSettings);
+		weapon = UBio_Rifle::CreateBioRifle(inOwner);
+		Cast<UBio_Rifle>(weapon)->SetSettings(overheatSettings);
 		break;
 	}
 	case WeaponEnums::Bio_Repair: {
-		weapon = ABio_Rifle::CreateBioRifle(world, inOwner);
+		weapon = UBio_Rifle::CreateBioRifle(inOwner);
 		break;
 	}
 	case WeaponEnums::RPG: {
@@ -60,15 +60,15 @@ AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inO
 		magSettings.range = 1300;
 		magSettings.fireRate = 2.5;
 		magSettings.heals = false;
-		weapon = AWeapon::CreateWeapon(world, inOwner, magSettings);
+		weapon = UWeapon::CreateWeapon(inOwner, magSettings);
 		break;
 	}
 	case WeaponEnums::Shotgun: {
-		weapon = AShotgun::CreateShotgun(world, inOwner);
+		weapon = UShotgun::CreateShotgun(inOwner);
 		break;
 	}
 	case WeaponEnums::Sniper: {
-		weapon = ASniper::CreateSniper(world, inOwner);
+		weapon = USniper::CreateSniper(inOwner);
 		break;
 	}
 	case WeaponEnums::Sword: {
@@ -79,7 +79,7 @@ AWeapon* UMiscLibrary::CreatePresetWeapon(UWorld* world, AMech_RPGCharacter* inO
 		swordPrams.healthChange = 100;
 		swordPrams.range = UMiscLibrary::GetMeleeRange(inOwner);
 
-		weapon = AWeapon::CreateWeapon(world, inOwner, swordPrams);
+		weapon = UWeapon::CreateWeapon(inOwner, swordPrams);
 		break;
 	}
 	}

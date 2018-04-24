@@ -58,9 +58,9 @@ void UInventoryUI::DeselectItem(UItemUI* item)
 void UInventoryUI::EquipItems()
 {
 	for (UItemUI* itemUI : GetSelectedItems()) {
-		AItem* item = itemUI->GetItem();
-		if (item != nullptr && item->GetClass()->IsChildOf(AWeapon::StaticClass())) {
-			GetOwner()->SetCurrentWeapon(Cast<AWeapon>(item));
+		UItem* item = itemUI->GetItem();
+		if (item != nullptr && item->GetClass()->IsChildOf(UWeapon::StaticClass())) {
+			GetOwner()->SetCurrentWeapon(Cast<UWeapon>(item));
 		}
 		/*else if (item->GetClass()->IsChildOf(UArmour::StaticClass())) {
 			GetOwner()->AddArmour(Cast<UArmour>(item));

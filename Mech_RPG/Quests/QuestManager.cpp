@@ -23,7 +23,7 @@ UQuestManager* UQuestManager::INSTANCE = nullptr;
 //	}*/
 //}
 
-void UQuestManager::ItemAquired(AItem* item) {
+void UQuestManager::ItemAquired(UItem* item) {
 	/*if (OnItemPickUpEvent.IsBound()) {
 		OnItemPickUpEvent.Broadcast(item);
 	}*/

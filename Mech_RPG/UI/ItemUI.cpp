@@ -6,12 +6,12 @@
 #include "InventoryUI.h"
 
 
-void UItemUI::SetItem(AItem* inItem)
+void UItemUI::SetItem(UItem* inItem)
 {
 	owner = inItem;
 }
 
-AItem* UItemUI::GetItem()
+UItem* UItemUI::GetItem()
 {
 	return owner;
 }

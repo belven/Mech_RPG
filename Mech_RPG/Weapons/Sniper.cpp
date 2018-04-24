@@ -3,7 +3,7 @@
 #include "Mech_RPG.h"
 #include "Sniper.h"
 
-ASniper::ASniper() : Super() {
+USniper::USniper() : Super() {
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> sniper(TEXT("/Game/TopDown/Meshes/Weapons/Sniper"));
 	if (sniper.Succeeded()) {
 		mesh = sniper.Object;
@@ -16,8 +16,7 @@ ASniper::ASniper() : Super() {
 	}
 }
 
-ASniper* ASniper::CreateSniper(UWorld* world, AMech_RPGCharacter* inOwner) {
-	if (world != nullptr) {
+USniper* USniper::CreateSniper(AMech_RPGCharacter* inOwner) {
 		FMagazineWeaponParams magSettings;
 		magSettings.healthChange = 300;
 		magSettings.range = 1500;
@@ -27,7 +26,7 @@ ASniper* ASniper::CreateSniper(UWorld* world, AMech_RPGCharacter* inOwner) {
 		magSettings.reloadAmount = 1;
 		magSettings.critChance = 45;
 
-		ASniper* weapon = world->SpawnActor<ASniper>(ASniper::StaticClass());
+		USniper* weapon = NewObject<USniper>(StaticClass());
 		weapon->SetSettings(magSettings);
 		weapon->SetItemOwner(inOwner);
 		weapon->SetName("Sniper");
@@ -35,13 +34,11 @@ ASniper* ASniper::CreateSniper(UWorld* world, AMech_RPGCharacter* inOwner) {
 		weapon->reloadAmount = magSettings.reloadAmount;
 		weapon->ammo = magSettings.magazineSize;
 		return weapon;
-	}
-	return NULL;
 }
 
-AItem* ASniper::Copy()
+UItem* USniper::Copy()
 {
-	ASniper* weapon = GetWorld()->SpawnActor<ASniper>(ASniper::StaticClass());
+	USniper* weapon = NewObject<USniper>(StaticClass());
 	weapon->SetSettings(settings);
 	weapon->CloneItemSettings(this);
 	weapon->magazineSize = magazineSize;

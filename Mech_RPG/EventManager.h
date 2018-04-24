@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Weapons/Weapon.h"
 #include "EventManager.generated.h"
 
 class AMech_RPGCharacter;
-class AWeapon;
+class UWeapon;
 
 USTRUCT(BlueprintType)
 struct FHealthChange
@@ -21,7 +22,7 @@ public:
 		AMech_RPGCharacter* manipulator = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		AWeapon* weaponUsed = nullptr;
+		UWeapon* weaponUsed = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float changeAmount = 0;

@@ -9,18 +9,18 @@
  *
  */
 UCLASS()
-class MECH_RPG_API ASniper : public AMagazineWeapon
+class MECH_RPG_API USniper : public UMagazineWeapon
 {
 	GENERATED_BODY()
 
 
 public:
-	ASniper();
+	USniper();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		static ASniper* CreateSniper(UWorld* world, AMech_RPGCharacter* inOwner);
+		static USniper* CreateSniper(AMech_RPGCharacter* inOwner);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		virtual AItem* Copy();
+		virtual UItem* Copy();
 
 };

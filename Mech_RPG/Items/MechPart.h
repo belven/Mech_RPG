@@ -6,25 +6,21 @@
 #include "MechPart.generated.h"
 
 UCLASS(Blueprintable)
-class MECH_RPG_API AMechPart : public AItem
+class MECH_RPG_API UMechPart : public UItem
 {
 	GENERATED_BODY()
 private:
 
-public:	
+public:
 	// Sets default values for this actor's properties
-	AMechPart();
-	~AMechPart();
+	UMechPart();
 
-	virtual	void SetItemOwner(AMech_RPGCharacter* inOwner);
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
+	void SetItemOwner(AMech_RPGCharacter* inOwner) override;
 
-	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	virtual void SetActorHiddenInGame(bool bNewHidden);
 	UStaticMesh* mesh = nullptr;
 protected:
 	UStaticMeshComponent* meshComponent = nullptr;
 	TSubclassOf<UStaticMesh> meshClass = nullptr;
-	
+
 };

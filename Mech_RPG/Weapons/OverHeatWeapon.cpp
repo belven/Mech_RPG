@@ -4,7 +4,7 @@
 #include "Characters/Mech_RPGCharacter.h"
 #include "OverHeatWeapon.h"
 
-void AOverHeatWeapon::Tick(float DeltaTime)
+void UOverHeatWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -41,12 +41,12 @@ void AOverHeatWeapon::Tick(float DeltaTime)
 	}
 }
 
-float AOverHeatWeapon::GetProgressBarPercent()
+float UOverHeatWeapon::GetProgressBarPercent()
 {
 	return heatLevel;
 }
 
-FLinearColor AOverHeatWeapon::GetProgressBarColour()
+FLinearColor UOverHeatWeapon::GetProgressBarColour()
 {
 	if (overHeated)
 	{
@@ -66,38 +66,38 @@ FLinearColor AOverHeatWeapon::GetProgressBarColour()
 	}
 }
 
-float AOverHeatWeapon::GetChangeAmount()
+float UOverHeatWeapon::GetChangeAmount()
 {
-	return AWeapon::GetChangeAmount() * (1 + heatLevel);
+	return UWeapon::GetChangeAmount() * (1 + heatLevel);
 }
 
-void AOverHeatWeapon::SetItemOwner(AMech_RPGCharacter* inOwner)
+void UOverHeatWeapon::SetItemOwner(AMech_RPGCharacter* inOwner)
 {
 	Super::SetItemOwner(inOwner);
 	if (inOwner != nullptr)
 	{
-		inOwner->OnOutOfCombat.AddUniqueDynamic(this, &AOverHeatWeapon::Cooldown);
+		inOwner->OnOutOfCombat.AddUniqueDynamic(this, &UOverHeatWeapon::Cooldown);
 	}
 }
 
-void AOverHeatWeapon::Cooldown()
+void UOverHeatWeapon::Cooldown()
 {
 	heatLevel = 0;
 	overHeated = false;
 }
 
-bool AOverHeatWeapon::CanFire()
+bool UOverHeatWeapon::CanFire()
 {
 	return !overHeated && Super::CanFire();
 }
 
-float AOverHeatWeapon::GetHeatLevel()
+float UOverHeatWeapon::GetHeatLevel()
 {
 	return heatLevel;
 }
 
 // Only generate heat if we damage or heal
-void AOverHeatWeapon::UseWeapon(AMech_RPGCharacter* target)
+void UOverHeatWeapon::UseWeapon(AMech_RPGCharacter* target)
 {
 	bool isHealing = Heals() && UMiscLibrary::GetMissingHealth(target) > 0;
 	bool isDamaging = !Heals() && target->GetHealth() > 0;
@@ -110,16 +110,12 @@ void AOverHeatWeapon::UseWeapon(AMech_RPGCharacter* target)
 	Super::UseWeapon(target);
 }
 
-AOverHeatWeapon* AOverHeatWeapon::CreateOverHeatWeapon(UWorld* world, AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings)
+UOverHeatWeapon* UOverHeatWeapon::CreateOverHeatWeapon(AMech_RPGCharacter* inOwner, FOverheatWeaponParams inSettings)
 {
-	if (world != nullptr)
-	{
-		AOverHeatWeapon* weapon = world->SpawnActor<AOverHeatWeapon>(AOverHeatWeapon::StaticClass());
-		weapon->SetSettings(inSettings);
-		weapon->heatLosePerTick = inSettings.heatLosePerTick;
-		weapon->heatGenerated = inSettings.heatGenerated;
-		weapon->SetItemOwner(inOwner);
-		return weapon;
-	}
-	return NULL;
+	UOverHeatWeapon* weapon = NewObject<UOverHeatWeapon>(StaticClass());
+	weapon->SetSettings(inSettings);
+	weapon->heatLosePerTick = inSettings.heatLosePerTick;
+	weapon->heatGenerated = inSettings.heatGenerated;
+	weapon->SetItemOwner(inOwner);
+	return weapon;
 }

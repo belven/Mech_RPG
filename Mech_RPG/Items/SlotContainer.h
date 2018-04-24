@@ -18,18 +18,18 @@ class USlotContainer : public UObject
 public:
 	USlotContainer();
 	UFUNCTION(BlueprintCallable, Category = "Slot Container")
-		TArray<AItem*>& GetItems();
+		TArray<UItem*>& GetItems();
 
 	UFUNCTION(BlueprintCallable, Category = "Slot Container")
-		void SetItems(TArray<AItem*> newVal);
+		void SetItems(TArray<UItem*> newVal);
 
-	AItem * GetExistingItemWithSpace(AItem* inItem);
-
-	UFUNCTION(BlueprintCallable, Category = "Slot Container")
-		AItem* AddItem(AItem* itemToAdd);
+	UItem * GetExistingItemWithSpace(UItem* inItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Slot Container")
-		bool RemoveItem(AItem* itemToRemove);
+		UItem* AddItem(UItem* itemToAdd);
+
+	UFUNCTION(BlueprintCallable, Category = "Slot Container")
+		bool RemoveItem(UItem* itemToRemove);
 
 	UFUNCTION(BlueprintCallable, Category = "Slot Container")
 		int32 GetItemAmount(FString name);
@@ -45,7 +45,7 @@ public:
 
 private:
 	UPROPERTY()
-		TArray<AItem*> items;
+		TArray<UItem*> items;
 
 	UPROPERTY()
 		int32 maxItemCount = 20;

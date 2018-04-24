@@ -11,7 +11,7 @@
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityUsedEvent, UAbility*, ability);
 
 class AMech_RPGCharacter;
-class AItem;
+class UItem;
 class AInteractable;
 class UQuest;
 
@@ -30,7 +30,7 @@ public:
 	//UFUNCTION(BlueprintCallable, Category = "Quest")
 	//	static void EntityKilled(FHealthChange healthChange);
 
-	static void ItemAquired(AItem* item);
+	static void ItemAquired(UItem* item);
 
 	static void AbilityUsed(UAbility* abilityUsed);
 

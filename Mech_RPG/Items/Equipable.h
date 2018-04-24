@@ -9,7 +9,7 @@
  * 
  */
 UCLASS()
-class MECH_RPG_API AEquipable : public AMechPart
+class MECH_RPG_API UEquipable : public UMechPart
 {
 	GENERATED_BODY()
 private:
