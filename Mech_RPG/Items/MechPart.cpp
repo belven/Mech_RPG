@@ -13,16 +13,14 @@ UMechPart::UMechPart() : Super()
 
 void UMechPart::SetItemOwner(AMech_RPGCharacter* inOwner)
 {
-	if (mesh == nullptr && meshClass != nullptr)
-	{
-		mesh = inOwner->GetWorld()->SpawnActor<UStaticMesh>(meshClass);
-	}
+	UItem::SetItemOwner(inOwner);
 
 	if (mesh != nullptr)
 	{
 		meshComponent->SetStaticMesh(mesh);
 		meshComponent->SetMobility(EComponentMobility::Movable);
 		meshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		meshComponent->AttachToComponent(inOwner->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), FName(TEXT("RightHand")));
 	}
 }
 

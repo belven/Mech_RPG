@@ -787,7 +787,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, quaility));
 		//AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, true));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
-		AddAbility(mCreatePresetAbility(AbilityEnums::Snipe));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Immobilise));
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
@@ -797,9 +797,9 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	case GroupEnums::Drone:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Drone_Weapon, grade, quaility));
 		AddAbility(mCreateTimedHealthChange(1.0F, 20.0F, 2.0F, 0.5F, true));
-		blastResistance = mGetDefaultArmourValue(ArmourGrades::MediumHeavy);
-		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::MediumHeavy);
-		energyResistance = mGetDefaultArmourValue(ArmourGrades::MediumHeavy);
+		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
+		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		SetMaxHealth(lowHealth);
 		break;
 
@@ -836,7 +836,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 	case GroupEnums::Support:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
 		AddAbility(mCreatePresetAbility(AbilityEnums::DefenceBoost));
-		AddAbility(mCreatePresetAbility(AbilityEnums::Disable));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Heal));
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Light);

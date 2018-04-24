@@ -6,18 +6,14 @@
 
 void UEquipable::Equip()
 {
-	if (GetItemOwner() != nullptr && GetItemOwner()->GetMesh() != nullptr)
-	{
-		meshComponent->AttachToComponent(GetItemOwner()->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), "RightHand");
-	}
-
+	//meshComponent->AttachToComponent(GetItemOwner()->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), "RightHand");
 	SetActorHiddenInGame(false);
 	SetEquipped(true);
 }
 
 void UEquipable::Unequip()
 {
-	meshComponent->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepRelative, true));
+	//meshComponent->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepRelative, true));
 	SetActorHiddenInGame(true);
 	SetEquipped(false);
 }

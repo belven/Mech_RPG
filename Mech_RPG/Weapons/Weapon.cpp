@@ -71,7 +71,7 @@ UWeapon* UWeapon::CreateWeapon(AMech_RPGCharacter* inOwner, FWeaponParams inSett
 
 void UWeapon::SetItemOwner(AMech_RPGCharacter* inOwner)
 {
-	UItem::SetItemOwner(inOwner);
+	UMechPart::SetItemOwner(inOwner);
 
 	if (inOwner != nullptr)
 	{

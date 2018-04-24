@@ -60,7 +60,6 @@ UAoEHeal* UAoEHeal::CreateAbility(float cooldown, AMech_RPGCharacter* owner, flo
 	ability->owner = owner;
 	ability->AddTag(healTag, inHealAmount);
 	ability->AddTag(aoeTag, radius);
-	//ability->GetParticleSystem()->SetVectorParameter(FName(TEXT("AOESize")), FVector(radius, radius, 0));
 	return ability;
 }
 

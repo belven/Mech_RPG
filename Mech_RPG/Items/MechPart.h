@@ -21,6 +21,5 @@ public:
 	UStaticMesh* mesh = nullptr;
 protected:
 	UStaticMeshComponent* meshComponent = nullptr;
-	TSubclassOf<UStaticMesh> meshClass = nullptr;
 
 };
