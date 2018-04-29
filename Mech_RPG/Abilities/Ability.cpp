@@ -11,6 +11,7 @@ const FString UAbility::buffTag = "Buff";
 const FString UAbility::debuffTag = "Debuff";
 const FString UAbility::aoeTag = "AoE";
 const FString UAbility::needsTargetTag = "Needs Target";
+const FString UAbility::selfTargetted = "Self Target";
 
 
 TArray<TEnumAsByte<AbilityEnums::Ability>> UAbility::supportAbilities = CreateSupportAbilityList();
@@ -89,7 +90,7 @@ bool UAbility::GetTagTrue(FString name)
 	{
 		return GetTag(name).value >= 1;
 	}
-	return true;
+	return false;
 }
 
 float UAbility::GetWeaponHealthChange()

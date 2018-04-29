@@ -45,7 +45,7 @@ USummonDamageDrone* USummonDamageDrone::CreateAbility(float cooldown, AMech_RPGC
 	USummonDamageDrone* ability = NewObject<USummonDamageDrone>(StaticClass());
 	ability->SetCooldown(cooldown);
 	ability->owner = owner;
-	ability->AddTag(needsTargetTag, 0);
+	ability->AddTag(selfTargetted, 1);
 	return ability;
 }
 

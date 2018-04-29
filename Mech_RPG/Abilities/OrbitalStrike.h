@@ -14,6 +14,8 @@ class MECH_RPG_API UOrbitalStrike : public UAbility
 	GENERATED_BODY()
 		float damage;
 public:
+	UOrbitalStrike();
+
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 		bool Activate(class AMech_RPGCharacter* target, FVector targetLocation = FVector::ZeroVector) override;
 

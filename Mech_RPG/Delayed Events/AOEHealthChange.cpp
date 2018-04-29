@@ -18,12 +18,13 @@ AAOEHealthChange* AAOEHealthChange::CreateAOEHealthChange(FTempAOESettings inSet
 {
 	AAOEHealthChange* tempAOE = inSettings.world->SpawnActor<AAOEHealthChange>(StaticClass(), GetLocationToUse(inSettings), FRotator(0, 0, 0));
 	tempAOE->settings = inSettings;
-	tempAOE->Activate();
 
 	if (inSettings.particleSystem != nullptr)
 	{
 		tempAOE->particleSystem->Template = inSettings.particleSystem;
 	}
+
+	tempAOE->Activate();
 	return tempAOE;
 }
 
@@ -83,6 +84,7 @@ void  AAOEHealthChange::Activate()
 		{
 			FColor relativeColour = UMiscLibrary::GetRelativeColour(settings.owner);
 			particleSystem->SetColorParameter(FName(TEXT("AOEColour")), relativeColour);
+			particleSystem->SetFloatParameter(FName(TEXT("AOERate")), 1 / settings.rate);
 			particleSystem->SetVectorParameter(FName(TEXT("AOESize")), FVector(settings.radius * 2));
 
 			float partRad = settings.radius * .65;

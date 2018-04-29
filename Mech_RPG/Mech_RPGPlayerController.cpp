@@ -17,7 +17,8 @@ AMech_RPGPlayerController::~AMech_RPGPlayerController()
 	UMiscLibrary::SetPlayerGroup(nullptr);
 }
 
-AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
+AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
 	bShowMouseCursor = true;
 	bAttackTarget = false;
 	DefaultMouseCursor = EMouseCursor::Hand;
@@ -26,19 +27,22 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> characterPaneClass(TEXT("/Game/TopDown/Blueprints/UI/CharacterUI/Character_Pane.Character_Pane_C"));
 
-	if (characterPaneClass.Class != nullptr) {
+	if (characterPaneClass.Class != nullptr)
+	{
 		characterPaneTemplate = characterPaneClass.Class;
 	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryClass(TEXT("/Game/TopDown/Blueprints/UI/ItemsUI/Inventory.Inventory_C"));
 
-	if (inventoryClass.Class != nullptr) {
+	if (inventoryClass.Class != nullptr)
+	{
 		inventoryTemplate = inventoryClass.Class;
 	}
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> questListClass(TEXT("/Game/TopDown/Blueprints/UI/QuestList.QuestList_C"));
 
-	if (questListClass.Class != nullptr) {
+	if (questListClass.Class != nullptr)
+	{
 		questListTemplate = questListClass.Class;
 	}
 
@@ -48,22 +52,26 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 
 }
 
-void AMech_RPGPlayerController::BeginPlay() {
+void AMech_RPGPlayerController::BeginPlay()
+{
 	Super::BeginPlay();
-	if (characterPaneTemplate != nullptr) {
+	if (characterPaneTemplate != nullptr)
+	{
 		characterPane = CreateWidget<UUserWidget>(this, characterPaneTemplate);
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
 	}
 
-	if (inventoryTemplate != nullptr) {
+	if (inventoryTemplate != nullptr)
+	{
 		inventory = CreateWidget<UInventoryUI>(this, inventoryTemplate);
 		inventory->AddToViewport();
 		inventory->SetVisibility(ESlateVisibility::Hidden);
 		inventory->SetPositionInViewport(FVector2D(600, 100));
 	}
 
-	if (questListTemplate != nullptr) {
+	if (questListTemplate != nullptr)
+	{
 		questList = CreateWidget<UQuestDisplayUI>(this, questListTemplate);
 		questList->AddToViewport();
 		questList->SetVisibility(ESlateVisibility::Visible);
@@ -73,25 +81,29 @@ void AMech_RPGPlayerController::BeginPlay() {
 
 void  AMech_RPGPlayerController::PerformPanning()
 {
-	if (panLeft || panRight) {
+	if (panLeft || panRight)
+	{
 		FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
 		rot.Yaw += panLeft ? -1 : 1;
 		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
 		GetPlayerControllerOwner()->UpdateHealthBarRot();
 	}
 
-	if (panUp || panDown) {
+	if (panUp || panDown)
+	{
 		FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
 		rot.Pitch += panUp ? -1 : 1;
 
-		if (rot.Pitch < -85) {
+		if (rot.Pitch < -85)
+		{
 			rot.Pitch = -85;
 		}
-		else if (rot.Pitch > 0) {
+		else if (rot.Pitch > 0)
+		{
 			rot.Pitch = 0;
 		}
 
-		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot); 
+		GetPlayerControllerOwner()->CameraBoom->SetRelativeRotation(rot);
 		GetPlayerControllerOwner()->UpdateHealthBarRot();
 	}
 }
@@ -99,27 +111,32 @@ void  AMech_RPGPlayerController::PerformPanning()
 /**
  * Begin PlayerController interface
  */
-void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
+void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
+{
 	Super::PlayerTick(DeltaTime);
 
 	//Do we have an owner
-	if (GetPlayerControllerOwner()) {
+	if (GetPlayerControllerOwner())
+	{
 
 		// Is our owner demanding a character change
-		if (GetPlayerControllerOwner()->GetDemandedController() != nullptr) {
+		if (GetPlayerControllerOwner()->GetDemandedController() != nullptr)
+		{
 			SwapCharacter();
 		}
 
 		PerformPanning();
 
 		// Is our owner is still alive
-		if (!GetPlayerControllerOwner()->IsDead()) {
+		if (!GetPlayerControllerOwner()->IsDead())
+		{
 			cursorTarget = GetTargetUnderCursor();
 
 			SetCursorType();
 			CalculateActions(DeltaTime);
 		}
-		else {
+		else
+		{
 			PlayerDied();
 		}
 	}
@@ -127,13 +144,16 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime) {
 
 void AMech_RPGPlayerController::SetCursorType()
 {
-	if (cursorTarget != nullptr && !cursorTarget->IsDead()) {
+	if (cursorTarget != nullptr && !cursorTarget->IsDead())
+	{
 		CurrentMouseCursor = EMouseCursor::Crosshairs;
 	}
-	else if (GetInteractableUnderCursor() != nullptr) {
+	else if (GetInteractableUnderCursor() != nullptr)
+	{
 		CurrentMouseCursor = EMouseCursor::GrabHand;
 	}
-	else {
+	else
+	{
 		CurrentMouseCursor = EMouseCursor::Hand;
 	}
 }
@@ -141,34 +161,42 @@ void AMech_RPGPlayerController::SetCursorType()
 void AMech_RPGPlayerController::CalculateActions(float DeltaTime)
 {
 	// Are we trying to interact with an Interactable
-	if (lastAction == PlayerControllerEnums::Interactable) {
+	if (lastAction == PlayerControllerEnums::Interactable)
+	{
 		if (mCanSeeLocation(lastTargetInteractable->GetActorLocation())
-			&& GetPlayerControllerOwner()->GetDistanceTo(lastTargetInteractable) <= interactionRange) {
+			&& GetPlayerControllerOwner()->GetDistanceTo(lastTargetInteractable) <= interactionRange)
+		{
 			lastAction = PlayerControllerEnums::None;
 			GetPlayerControllerOwner()->Interact(lastTargetInteractable);
 			inventory->GenerateInventory();
 		}
-		else {
+		else
+		{
 			MoveToActor(lastTargetInteractable);
 		}
 	}
 	// Are we trying to use an ability
-	else if (lastAction == PlayerControllerEnums::Ability && lastUsedAbility != nullptr) {
+	else if (lastAction == PlayerControllerEnums::Ability && lastUsedAbility != nullptr)
+	{
 		ActivateAbility();
 	}
 	// Are we trying to interact with a character
-	else if (lastAction == PlayerControllerEnums::NPCInteract) {
+	else if (lastAction == PlayerControllerEnums::NPCInteract)
+	{
 		// Are we requesting a new target to attack			
-		if (bAttackTarget && IsTargetValid(cursorTarget)) {
+		if (bAttackTarget && IsTargetValid(cursorTarget))
+		{
 			target = cursorTarget;
 			AttackTarget(DeltaTime);
 		}
 		// Is our current target valid
-		else if (IsTargetValid(target)) {
+		else if (IsTargetValid(target))
+		{
 			AttackTarget(DeltaTime);
 		}
 		// No valid target so stop firing
-		else {
+		else
+		{
 			GetPlayerControllerOwner()->OnStopFiring.Broadcast();
 		}
 
@@ -185,43 +213,55 @@ void AMech_RPGPlayerController::CalculateActions(float DeltaTime)
 	}
 }
 
-void AMech_RPGPlayerController::MoveToActor(AActor* targetActor) {
-	if (GetPlayerControllerOwner()->CanMove()) {
+void AMech_RPGPlayerController::MoveToActor(AActor* targetActor)
+{
+	if (GetPlayerControllerOwner()->CanMove())
+	{
 		GetPlayerControllerOwner()->OnStopFiring.Broadcast();
 		GetWorld()->GetNavigationSystem()->SimpleMoveToActor(this, targetActor);
 	}
 }
 
-void AMech_RPGPlayerController::MoveToLocation(FVector location) {
-	if (GetPlayerControllerOwner()->CanMove()) {
+void AMech_RPGPlayerController::MoveToLocation(FVector location)
+{
+	if (GetPlayerControllerOwner()->CanMove())
+	{
 		GetPlayerControllerOwner()->OnStopFiring.Broadcast();
 		GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(this, location);
 	}
 }
 
-void AMech_RPGPlayerController::AttackTarget(float DeltaTime) {
+void AMech_RPGPlayerController::AttackTarget(float DeltaTime)
+{
 	// Are we targeting ourselves
-	if (target == GetPlayerControllerOwner()) {
+	if (target == GetPlayerControllerOwner())
+	{
 		FireWeapon(nullptr);
 		GetPlayerControllerOwner()->LookAt(target);
 	}
 	// Have we traced to another character or cover
-	else if (mCanSeeLocation(target->GetActorLocation())) {
+	else if (mCanSeeLocation(target->GetActorLocation()))
+	{
 		FireWeapon(target);
 		GetPlayerControllerOwner()->LookAt(target);
 	}
 	// We've hit some scenery so move towards the target
-	else if (GetWorld()->GetNavigationSystem()) {
+	else if (GetWorld()->GetNavigationSystem())
+	{
 		MoveToLocation(target->GetActorLocation());
 	}
 }
 
-void AMech_RPGPlayerController::SetupCollision() {
+void AMech_RPGPlayerController::SetupCollision()
+{
 	collision.ClearIgnoredComponents();
 
-	if (owner->GetGroup() != nullptr && owner->GetGroup()->HasMemebers()) {
-		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers()) {
-			if (member != target && member != cursorTarget) {
+	if (owner->GetGroup() != nullptr && owner->GetGroup()->HasMemebers())
+	{
+		for (AMech_RPGCharacter* member : owner->GetGroup()->GetMembers())
+		{
+			if (member != target && member != cursorTarget)
+			{
 				collision.AddIgnoredActor(member);
 			}
 		}
@@ -230,7 +270,8 @@ void AMech_RPGPlayerController::SetupCollision() {
 
 void AMech_RPGPlayerController::AddQuest(UQuest * newQuest)
 {
-	if (questList != nullptr) {
+	if (questList != nullptr)
+	{
 		questList->GenerateQuests();
 	}
 }
@@ -245,17 +286,21 @@ void AMech_RPGPlayerController::PlayerSwappedWeapons(UWeapon* oldWeapon, UWeapon
 	//characterPane->UpdateWeaponBar();
 }
 
-TArray<AMech_RPGCharacter*> AMech_RPGPlayerController::GetCharactersInRange(float range) {
+TArray<AMech_RPGCharacter*> AMech_RPGPlayerController::GetCharactersInRange(float range)
+{
 	return UMiscLibrary::GetCharactersInRange(range, GetPlayerControllerOwner());
 }
 
-void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
+void AMech_RPGPlayerController::FireWeapon(AActor* hit)
+{
 	UWeapon* weapon = GetPlayerControllerOwner()->GetCurrentWeapon();
 	float distToTarget = FVector::Dist(GetPlayerControllerOwner()->GetActorLocation(), target->GetActorLocation());
 
 	// Are we in weapons range
-	if (weapon != nullptr && distToTarget <= weapon->GetRange()) {
-		if (GetPlayerControllerOwner()->CanAttack() && weapon->CanFire()) {
+	if (weapon != nullptr && distToTarget <= weapon->GetRange())
+	{
+		if (GetPlayerControllerOwner()->CanAttack() && weapon->CanFire())
+		{
 			weapon->UseWeapon(target);
 		}
 
@@ -263,12 +308,14 @@ void AMech_RPGPlayerController::FireWeapon(AActor* hit) {
 		StopMovement();
 	}
 	// We're out of range so move closer
-	else if (GetWorld()->GetNavigationSystem()) {
+	else if (GetWorld()->GetNavigationSystem())
+	{
 		MoveToLocation(target->GetActorLocation());
 	}
 }
 
-void AMech_RPGPlayerController::SetupInputComponent() {
+void AMech_RPGPlayerController::SetupInputComponent()
+{
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AMech_RPGPlayerController::OnSetDestinationPressed);
@@ -320,7 +367,7 @@ void AMech_RPGPlayerController::SetupInputComponent() {
 
 void AMech_RPGPlayerController::Reload()
 {
-	if (UMiscLibrary::IsCharacterAlive(GetPlayerControllerOwner()) 
+	if (UMiscLibrary::IsCharacterAlive(GetPlayerControllerOwner())
 		&& GetPlayerControllerOwner()->GetCurrentWeapon() != nullptr)
 	{
 		UWeapon* weapon = GetPlayerControllerOwner()->GetCurrentWeapon();
@@ -333,15 +380,18 @@ void AMech_RPGPlayerController::Reload()
 	}
 }
 
-void AMech_RPGPlayerController::OpenCharacterPane() {
-	if (characterPane->GetVisibility() == ESlateVisibility::Visible) {
+void AMech_RPGPlayerController::OpenCharacterPane()
+{
+	if (characterPane->GetVisibility() == ESlateVisibility::Visible)
+	{
 		//FInputModeGameAndUI data;
 		//SetInputMode(data);
 		//SetPause(false);
 		characterPaneOpen = false;
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else {
+	else
+	{
 		//FInputModeUIOnly data;
 		//SetInputMode(data);
 		//SetPause(true);
@@ -352,14 +402,16 @@ void AMech_RPGPlayerController::OpenCharacterPane() {
 
 void AMech_RPGPlayerController::OpenInventory()
 {
-	if (inventory->GetVisibility() == ESlateVisibility::Visible) {
+	if (inventory->GetVisibility() == ESlateVisibility::Visible)
+	{
 		//FInputModeGameAndUI data;
 		//SetInputMode(data);
 		//SetPause(false);
 		inventoryOpen = false;
 		inventory->SetVisibility(ESlateVisibility::Hidden);
 	}
-	else {
+	else
+	{
 		//FInputModeUIOnly data;
 		//SetInputMode(data);
 		//SetPause(true);
@@ -400,7 +452,8 @@ void AMech_RPGPlayerController::NotifyActorBeginCursorOver()
 /**
  * Navigate player to the current mouse cursor location.
  */
-void AMech_RPGPlayerController::MoveToMouseCursor() {
+void AMech_RPGPlayerController::MoveToMouseCursor()
+{
 	FHitResult Hit;
 
 	GetHitResultUnderCursor(mWorldCollision, false, Hit);
@@ -413,10 +466,12 @@ void AMech_RPGPlayerController::MoveToMouseCursor() {
 /**
  * Navigate player to the given world location.
  */
-void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation) {
+void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation)
+{
 	UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
 
-	if (UMiscLibrary::IsCharacterAlive(GetPlayerControllerOwner()) && NavSys != nullptr) {
+	if (UMiscLibrary::IsCharacterAlive(GetPlayerControllerOwner()) && NavSys != nullptr)
+	{
 		MoveToLocation(DestLocation);
 	}
 }
@@ -424,7 +479,8 @@ void AMech_RPGPlayerController::SetNewMoveDestination(const FVector DestLocation
 /**
  * Input handlers for SetDestination action.
  */
-void AMech_RPGPlayerController::OnSetDestinationPressed() {
+void AMech_RPGPlayerController::OnSetDestinationPressed()
+{
 	bMoveToMouseCursor = true;
 
 	target = nullptr;
@@ -436,20 +492,25 @@ void AMech_RPGPlayerController::OnSetDestinationPressed() {
 	MoveToMouseCursor();
 }
 
-void AMech_RPGPlayerController::OnSetDestinationReleased() {
+void AMech_RPGPlayerController::OnSetDestinationReleased()
+{
 	bMoveToMouseCursor = false;
 }
 
-void AMech_RPGPlayerController::ZoomIn() {
+void AMech_RPGPlayerController::ZoomIn()
+{
 	if (GetPlayerControllerOwner() != nullptr) GetPlayerControllerOwner()->CameraBoom->TargetArmLength += 100;
 }
 
-void AMech_RPGPlayerController::ZoomOut() {
+void AMech_RPGPlayerController::ZoomOut()
+{
 	if (GetPlayerControllerOwner() != nullptr) GetPlayerControllerOwner()->CameraBoom->TargetArmLength -= 100;
 }
 
-void AMech_RPGPlayerController::ResetZoom() {
-	if (GetPlayerControllerOwner() != nullptr) {
+void AMech_RPGPlayerController::ResetZoom()
+{
+	if (GetPlayerControllerOwner() != nullptr)
+	{
 		GetPlayerControllerOwner()->CameraBoom->TargetArmLength = 1700;
 		FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
 		rot.Yaw = GetPlayerControllerOwner()->GetViewRotation().Yaw;
@@ -460,7 +521,8 @@ void AMech_RPGPlayerController::ResetZoom() {
 
 void AMech_RPGPlayerController::PanLeft()
 {
-	if (GetPlayerControllerOwner() != nullptr) {
+	if (GetPlayerControllerOwner() != nullptr)
+	{
 		panLeft = true;
 		FRotator rot = GetPlayerControllerOwner()->CameraBoom->RelativeRotation;
 		rot.Yaw -= 18;
@@ -503,64 +565,81 @@ void AMech_RPGPlayerController::PanDownReleased()
 	panDown = false;
 }
 
-void AMech_RPGPlayerController::OnRightClickPressed() {
-	if (GetInteractableUnderCursor() != nullptr) {
+void AMech_RPGPlayerController::OnRightClickPressed()
+{
+	if (GetInteractableUnderCursor() != nullptr)
+	{
 		lastAction = PlayerControllerEnums::Interactable;
 		lastTargetInteractable = GetInteractableUnderCursor();
 	}
-	else {
+	else
+	{
 		bAttackTarget = true;
 		lastAction = PlayerControllerEnums::NPCInteract;
 	}
 }
 
-void AMech_RPGPlayerController::OnRightClickReleased() {
+void AMech_RPGPlayerController::OnRightClickReleased()
+{
 	bAttackTarget = false;
 }
 
-AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor() {
+AMech_RPGCharacter* AMech_RPGPlayerController::GetTargetUnderCursor()
+{
 	FHitResult Hit;
 	Hit = GetHitFromCursor();
 
-	if (Hit.bBlockingHit) {
+	if (Hit.bBlockingHit)
+	{
 		AActor* targetFound = Hit.GetActor();
 
-		if (targetFound != nullptr && IsMechCharacter(targetFound)) {
+		if (targetFound != nullptr && IsMechCharacter(targetFound))
+		{
 			return Cast<AMech_RPGCharacter>(targetFound);
 		}
 	}
 	return nullptr;
 }
 
-AInteractable* AMech_RPGPlayerController::GetInteractableUnderCursor() {
+AInteractable* AMech_RPGPlayerController::GetInteractableUnderCursor()
+{
 	FHitResult Hit;
 	Hit = GetHitFromCursor();
 
-	if (Hit.bBlockingHit || (Hit = GetHitFromCursor(mItemCollision)).bBlockingHit) {
+	if (Hit.bBlockingHit || (Hit = GetHitFromCursor(mItemCollision)).bBlockingHit)
+	{
 		AActor* targetFound = Hit.GetActor();
 
-		if (targetFound != nullptr && IsInteractable(targetFound)) {
+		if (targetFound != nullptr && IsInteractable(targetFound))
+		{
 			return Cast<AInteractable>(targetFound);
 		}
 	}
 	return nullptr;
 }
 
-bool AMech_RPGPlayerController::IsMechCharacter(AActor* character) {
+bool AMech_RPGPlayerController::IsMechCharacter(AActor* character)
+{
 	return character->GetClass()->IsChildOf(AMech_RPGCharacter::StaticClass());
 }
 
-bool AMech_RPGPlayerController::IsInteractable(AActor* character) {
+bool AMech_RPGPlayerController::IsInteractable(AActor* character)
+{
 	return character->GetClass()->IsChildOf(AInteractable::StaticClass());
 }
 
-bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
-	if (inTarget != nullptr && !inTarget->IsDead()) {
-		if (GetPlayerControllerOwner()->GetCurrentWeapon()) {
-			if (GetPlayerControllerOwner()->GetCurrentWeapon()->Heals()) {
+bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget)
+{
+	if (inTarget != nullptr && !inTarget->IsDead())
+	{
+		if (GetPlayerControllerOwner()->GetCurrentWeapon())
+		{
+			if (GetPlayerControllerOwner()->GetCurrentWeapon()->Heals())
+			{
 				return inTarget->CompareGroup(owner);
 			}
-			else {
+			else
+			{
 				return !inTarget->CompareGroup(owner);
 			}
 		}
@@ -568,20 +647,25 @@ bool AMech_RPGPlayerController::IsTargetValid(AMech_RPGCharacter* inTarget) {
 	return false;
 }
 
-void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
+void AMech_RPGPlayerController::DemandSwapCharacter(int index)
+{
 	// Do we have an owner
-	if (GetPlayerControllerOwner() != nullptr) {
+	if (GetPlayerControllerOwner() != nullptr)
+	{
 		UGroup* group = GetPlayerControllerOwner()->GetGroup();
 
 		// Does the owner have a group and is there more than 1 other person
-		if (group != nullptr && group->GetMembers().Num() > 1) {
+		if (group != nullptr && group->GetMembers().Num() > 1)
+		{
 
 			// Does the character we want to swap to exist
-			if (group->GetMembers().Num() > index - 1) {
+			if (group->GetMembers().Num() > index - 1)
+			{
 				AMech_RPGCharacter* character = group->GetMembers()[index - 1];
 
 				// Are we swapping to ourselves
-				if (character != nullptr && GetPlayerControllerOwner() != character && !character->IsDead()) {
+				if (character != nullptr && GetPlayerControllerOwner() != character && !character->IsDead())
+				{
 					character->SetDemandedController(this);
 
 					GetPlayerControllerOwner()->SetDemandedController(character->GetController());
@@ -591,17 +675,20 @@ void AMech_RPGPlayerController::DemandSwapCharacter(int index) {
 	}
 }
 
-FHitResult AMech_RPGPlayerController::GetHitFromCursor(ECollisionChannel channel) {
+FHitResult AMech_RPGPlayerController::GetHitFromCursor(ECollisionChannel channel)
+{
 	static FHitResult Hit;
 	GetHitResultUnderCursor(channel, true, Hit);
 	return Hit;
 }
 
-AMech_RPGCharacter* AMech_RPGPlayerController::GetPlayerControllerOwner() {
+AMech_RPGCharacter* AMech_RPGPlayerController::GetPlayerControllerOwner()
+{
 	return owner;
 }
 
-void AMech_RPGPlayerController::SetPlayerControllerOwner(AMech_RPGCharacter* newVal) {
+void AMech_RPGPlayerController::SetPlayerControllerOwner(AMech_RPGCharacter* newVal)
+{
 	owner = newVal;
 	inventory->SetOwner(owner);
 	questList->SetCharacter(owner);
@@ -610,7 +697,8 @@ void AMech_RPGPlayerController::SetPlayerControllerOwner(AMech_RPGCharacter* new
 	owner->OnItemPickUpEvent.AddUniqueDynamic(this, &AMech_RPGPlayerController::PlayerItemPickup);
 	inventory->GenerateInventory();
 
-	for (UItemUI* item : inventory->GetSelectedItems()) {
+	for (UItemUI* item : inventory->GetSelectedItems())
+	{
 		item->DeselectItem();
 	}
 	inventory->GetSelectedItems().Empty();
@@ -620,49 +708,62 @@ void AMech_RPGPlayerController::SetPlayerControllerOwner(AMech_RPGCharacter* new
 void AMech_RPGPlayerController::Possess(APawn* InPawn)
 {
 	Super::Possess(InPawn);
-	if (IsMechCharacter(InPawn)) {
+	if (IsMechCharacter(InPawn))
+	{
 		SetPlayerControllerOwner(Cast<AMech_RPGCharacter>(InPawn));
 		UMiscLibrary::SetPlayerController(this);
 	}
 }
 
-void AMech_RPGPlayerController::CharacterFive() {
+void AMech_RPGPlayerController::CharacterFive()
+{
 	PerformAllyCommand(5);
 }
 
-void AMech_RPGPlayerController::CharacterFour() {
+void AMech_RPGPlayerController::CharacterFour()
+{
 	PerformAllyCommand(4);
 }
 
-void AMech_RPGPlayerController::CharacterOne() {
+void AMech_RPGPlayerController::CharacterOne()
+{
 	PerformAllyCommand(1);
 }
 
-void AMech_RPGPlayerController::CharacterThree() {
+void AMech_RPGPlayerController::CharacterThree()
+{
 	PerformAllyCommand(3);
 }
 
-void AMech_RPGPlayerController::CharacterTwo() {
+void AMech_RPGPlayerController::CharacterTwo()
+{
 	PerformAllyCommand(2);
 }
 
-void AMech_RPGPlayerController::PerformAllyCommand(int index) {
-	if (shiftPressed) {
+void AMech_RPGPlayerController::PerformAllyCommand(int index)
+{
+	if (shiftPressed)
+	{
 		AllyMove(index);
 	}
-	else if (altPressed) {
+	else if (altPressed)
+	{
 		AllyAbility(index);
 	}
-	else if (ctrlPressed) {
+	else if (ctrlPressed)
+	{
 		AllyAttack(index);
 	}
-	else {
+	else
+	{
 		DemandSwapCharacter(index);
 	}
 }
 
-void AMech_RPGPlayerController::SwapWeapons() {
-	if (IsOwnerValid()) {
+void AMech_RPGPlayerController::SwapWeapons()
+{
+	if (IsOwnerValid())
+	{
 		swapWeapons = true;
 	}
 }
@@ -671,34 +772,42 @@ FVector AMech_RPGPlayerController::GetCharacterLocation(AMech_RPGCharacter* temp
 {
 	FVector location;
 
-	if (!UMiscLibrary::IsCharacterAlive(tempCharacter)) {
+	if (!UMiscLibrary::IsCharacterAlive(tempCharacter))
+	{
 		location = GetHitFromCursor().ImpactPoint;
 	}
-	else if (UMiscLibrary::IsCharacterAlive(tempCharacter)) {
+	else if (UMiscLibrary::IsCharacterAlive(tempCharacter))
+	{
 		location = tempCharacter->GetActorLocation();
 	}
 	return location;
 }
 
-void AMech_RPGPlayerController::ActivateAbility() {
+void AMech_RPGPlayerController::ActivateAbility()
+{
 	AMech_RPGCharacter* tempCharacter = cursorTarget;
 
 	if (IsOwnerValid()
 		&& GetPlayerControllerOwner()->HasAbilities()
 		&& !GetPlayerControllerOwner()->Channelling()
-		&& GetPlayerControllerOwner()->CanCast()) {
+		&& GetPlayerControllerOwner()->CanCast())
+	{
 
 		//SetupCollision();
 
 		// Check if we've already tried to use an ability and we can use it, or try to use another one
-		if (lastUsedAbility == nullptr) {
-			for (UAbility* ability : GetPlayerControllerOwner()->GetAbilities()) {
-				if (usedAbility(ability, GetCharacterLocation(tempCharacter), tempCharacter)) {
+		if (lastUsedAbility == nullptr)
+		{
+			for (UAbility* ability : GetPlayerControllerOwner()->GetAbilities())
+			{
+				if (usedAbility(ability, GetCharacterLocation(tempCharacter), tempCharacter))
+				{
 					break;
 				}
 			}
 		}
-		else {
+		else
+		{
 			usedAbility(lastUsedAbility, lastTargetLocation, lastCharacterTarget);
 		}
 	}
@@ -707,7 +816,9 @@ void AMech_RPGPlayerController::ActivateAbility() {
 bool AMech_RPGPlayerController::usedAbility(UAbility* ability, FVector location, AMech_RPGCharacter* tempCharacter)
 {
 	//Only use an ability if we have LoS to our target/location
-	if (!mCanSeeLocation(location)) {
+	// and if the ability needs a target
+	if (!ability->GetTagTrue(UAbility::selfTargetted) && !mCanSeeLocation(location))
+	{
 		MoveToLocation(location);
 		lastUsedAbility = ability;
 		lastCharacterTarget = tempCharacter;
@@ -720,18 +831,22 @@ bool AMech_RPGPlayerController::usedAbility(UAbility* ability, FVector location,
 	if (ability != nullptr
 		&& !ability->OnCooldown()
 		// Check if there is a target, is it valid for the attack?
-		&& (tempCharacter == nullptr || UMiscLibrary::IsTargetValid(GetPlayerControllerOwner(), tempCharacter, ability->GetAffectedTeam()))) {
+		&& (tempCharacter == nullptr || UMiscLibrary::IsTargetValid(GetPlayerControllerOwner(), tempCharacter, ability->GetAffectedTeam())))
+	{
 
 		// If the ability doesn't need a target or we can see the location, try to use it 
-		if (ability->Activate(tempCharacter, location)) {
+		if (ability->Activate(tempCharacter, location))
+		{
 			GetPlayerControllerOwner()->SetCurrentAbility(ability);
 			UQuestManager::AbilityUsed(ability);
 			StopMovement();
 
-			if (IsTargetValid(target)) {
+			if (IsTargetValid(target))
+			{
 				lastAction = PlayerControllerEnums::NPCInteract;
 			}
-			else {
+			else
+			{
 				lastAction = PlayerControllerEnums::None;
 			}
 
@@ -745,18 +860,22 @@ bool AMech_RPGPlayerController::usedAbility(UAbility* ability, FVector location,
 	return false;
 }
 
-void AMech_RPGPlayerController::PlayerDied() {
-	for (int i = 0; i < GetPlayerControllerOwner()->GetGroup()->GetMembers().Num(); i++) {
+void AMech_RPGPlayerController::PlayerDied()
+{
+	for (int i = 0; i < GetPlayerControllerOwner()->GetGroup()->GetMembers().Num(); i++)
+	{
 		AMech_RPGCharacter* character = GetPlayerControllerOwner()->GetGroup()->GetMembers()[i];
 
-		if (UMiscLibrary::IsCharacterAlive(character)) {
+		if (UMiscLibrary::IsCharacterAlive(character))
+		{
 			DemandSwapCharacter(i + 1);
 			break;
 		}
 	}
 }
 
-void AMech_RPGPlayerController::SwapCharacter() {
+void AMech_RPGPlayerController::SwapCharacter()
+{
 	AAllyAIController* aiCon = Cast<AAllyAIController>(GetPlayerControllerOwner()->GetDemandedController());
 	AMech_RPGCharacter* aiOwner = aiCon->GetAIOwner();
 	AMech_RPGCharacter* aiTarget = aiCon->GetTarget();
@@ -764,7 +883,8 @@ void AMech_RPGPlayerController::SwapCharacter() {
 	GetPlayerControllerOwner()->SetDemandedController(nullptr);
 	aiOwner->SetDemandedController(nullptr);
 
-	if (aiCon != nullptr) {
+	if (aiCon != nullptr)
+	{
 		aiCon->SetTarget(GetTarget());
 		aiCon->SetPlayerControlledLocation(FVector::ZeroVector);
 		aiCon->Possess(GetPlayerControllerOwner());
@@ -773,23 +893,29 @@ void AMech_RPGPlayerController::SwapCharacter() {
 	}
 }
 
-bool AMech_RPGPlayerController::IsOwnerValid() {
+bool AMech_RPGPlayerController::IsOwnerValid()
+{
 	return GetPlayerControllerOwner() != nullptr && !GetPlayerControllerOwner()->IsDead();
 }
 
-void AMech_RPGPlayerController::AllyAbility(int index) {
+void AMech_RPGPlayerController::AllyAbility(int index)
+{
 
 }
 
-void AMech_RPGPlayerController::AllyAttack(int index) {
+void AMech_RPGPlayerController::AllyAttack(int index)
+{
 	UGroup* group = GetPlayerControllerOwner()->GetGroup();
 
-	if (group != nullptr) {
+	if (group != nullptr)
+	{
 		AMech_RPGCharacter* character = group->GetMember(index);
-		if (UMiscLibrary::IsCharacterAlive(character) && character != GetPlayerControllerOwner()) {
+		if (UMiscLibrary::IsCharacterAlive(character) && character != GetPlayerControllerOwner())
+		{
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 
-			if (con->IsTargetValid(cursorTarget)) {
+			if (con->IsTargetValid(cursorTarget))
+			{
 				con->SetPlayerControlledLocation(FVector::ZeroVector);
 				con->SetTarget(cursorTarget);
 			}
@@ -797,15 +923,20 @@ void AMech_RPGPlayerController::AllyAttack(int index) {
 	}
 }
 
-void AMech_RPGPlayerController::GroupAttack() {
+void AMech_RPGPlayerController::GroupAttack()
+{
 	UGroup* group = GetPlayerControllerOwner()->GetGroup();
 
-	if (group != nullptr) {
-		for (AMech_RPGCharacter* character : group->GetMembers()) {
-			if (UMiscLibrary::IsCharacterAlive(character) && character != GetPlayerControllerOwner()) {
+	if (group != nullptr)
+	{
+		for (AMech_RPGCharacter* character : group->GetMembers())
+		{
+			if (UMiscLibrary::IsCharacterAlive(character) && character != GetPlayerControllerOwner())
+			{
 				AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 
-				if (con->IsTargetValid(cursorTarget)) {
+				if (con->IsTargetValid(cursorTarget))
+				{
 					con->SetPlayerControlledLocation(FVector::ZeroVector);
 					con->SetTarget(cursorTarget);
 				}
@@ -814,51 +945,63 @@ void AMech_RPGPlayerController::GroupAttack() {
 	}
 }
 
-void AMech_RPGPlayerController::AllyMove(int index) {
+void AMech_RPGPlayerController::AllyMove(int index)
+{
 	UGroup* group = GetPlayerControllerOwner()->GetGroup();
-	if (group != nullptr) {
+	if (group != nullptr)
+	{
 		AMech_RPGCharacter* character = group->GetMember(index);
-		if (UMiscLibrary::IsCharacterAlive(character) && character != GetPlayerControllerOwner()) {
+		if (UMiscLibrary::IsCharacterAlive(character) && character != GetPlayerControllerOwner())
+		{
 			AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 			static FHitResult Hit;
 
 			GetHitResultUnderCursor(mWorldCollision, false, Hit);
 
-			if (con != nullptr && Hit.bBlockingHit) {
+			if (con != nullptr && Hit.bBlockingHit)
+			{
 				con->SetPlayerControlledLocation(Hit.ImpactPoint);
 			}
 		}
 	}
 }
 
-void AMech_RPGPlayerController::AltPressed() {
+void AMech_RPGPlayerController::AltPressed()
+{
 	altPressed = true;
 }
 
-void AMech_RPGPlayerController::AltReleased() {
+void AMech_RPGPlayerController::AltReleased()
+{
 	altPressed = false;
 }
 
-void AMech_RPGPlayerController::CtrlPressed() {
+void AMech_RPGPlayerController::CtrlPressed()
+{
 	ctrlPressed = true;
 }
 
-void AMech_RPGPlayerController::CtrlReleased() {
+void AMech_RPGPlayerController::CtrlReleased()
+{
 	ctrlPressed = false;
 }
 
-void AMech_RPGPlayerController::ShiftPressed() {
+void AMech_RPGPlayerController::ShiftPressed()
+{
 	shiftPressed = true;
 }
 
-void AMech_RPGPlayerController::ShiftReleased() {
+void AMech_RPGPlayerController::ShiftReleased()
+{
 	shiftPressed = false;
 }
 
-AMech_RPGCharacter* AMech_RPGPlayerController::GetTarget() {
+AMech_RPGCharacter* AMech_RPGPlayerController::GetTarget()
+{
 	return target;
 }
 
-void AMech_RPGPlayerController::SetTarget(AMech_RPGCharacter* newVal) {
+void AMech_RPGPlayerController::SetTarget(AMech_RPGCharacter* newVal)
+{
 	target = newVal;
 }

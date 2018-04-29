@@ -39,6 +39,7 @@ UGrenade* UGrenade::CreateAbility(float cooldown, AMech_RPGCharacter* owner, flo
 	ability->owner = owner;
 	ability->AddTag(damageTag, inDamage);
 	ability->AddTag(aoeTag, 450);
+	ability->AddTag(needsTargetTag, 0);
 	return ability;
 }
 

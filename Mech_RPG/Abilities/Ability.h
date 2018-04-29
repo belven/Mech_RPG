@@ -53,7 +53,8 @@ public:
 	static const FString debuffTag;
 	static const FString aoeTag;
 	static const FString needsTargetTag;
-
+	static const FString selfTargetted;
+	
 	virtual bool HasTag(FString name);
 	virtual TArray<FTag>& GetTags();
 	virtual FTag GetTag(FString name);

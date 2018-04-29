@@ -20,7 +20,7 @@ UDefenceBoost* UDefenceBoost::CreateAbility(float cooldown, AMech_RPGCharacter* 
 	ability->owner = owner;
 	ability->affectedTeam = EAffectedTeam::Ally;
 	ability->AddTag(buffTag, inDefenceMultiplier);
-	ability->AddTag(needsTargetTag, 0);
+	ability->AddTag(selfTargetted, 1);
 	return ability;
 }
 

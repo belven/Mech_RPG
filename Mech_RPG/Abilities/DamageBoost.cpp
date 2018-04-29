@@ -21,7 +21,7 @@ UDamageBoost* UDamageBoost::CreateAbility(float cooldown, AMech_RPGCharacter* ow
 	ability->damageMultiplier = inDamageMultiplier;
 	ability->owner = owner;
 	ability->AddTag(buffTag, inDamageMultiplier);
-	ability->AddTag(needsTargetTag, 0);
+	ability->AddTag(selfTargetted, 1);
 	return ability;
 }
 

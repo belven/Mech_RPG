@@ -45,7 +45,7 @@ UCritBoost * UCritBoost::CreateCritBoost(float cooldown, AMech_RPGCharacter * ow
 	ability->critMultiplier = inCritMultiplier;
 	ability->owner = owner;
 	ability->AddTag(buffTag, inCritMultiplier);
-	ability->AddTag(needsTargetTag, 0);
+	ability->AddTag(selfTargetted, 1);
 	return ability;
 }
 

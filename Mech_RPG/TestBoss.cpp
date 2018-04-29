@@ -59,7 +59,7 @@ void ATestBoss::SetPhase(int32 val)
 		// Disable attack so we only use ability
 		ApplyCrowdControl(EffectEnums::Attack, false); // Set can't attack
 
-		AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 4.5F), 6, false, false));
+		AddAbility(mCreateChannelledAbility(UOrbitalStrike::CreateAbility(0.1, this, 0.5F), 6, false, false));
 		SetHealth(GetMaxHealth());
 		SetDefenceModifier(0.1);
 	}

@@ -149,8 +149,14 @@ bool ABaseAIController::PerformAbility(UAbility* ability)
 {
 	FindTarget(ability->GetAffectedTeam());
 
-	if (targetCharacter != nullptr
-		&& ability->Activate(targetCharacter, targetCharacter->GetActorLocation()))
+	// Either we don't need a target or we have a valid target
+	bool selfTargetted = ability->GetTagTrue(UAbility::selfTargetted)
+		&& ability->Activate(GetAIOwner(), GetAIOwner()->GetActorLocation());
+
+	bool usedOnTarget = targetCharacter != nullptr
+		&& ability->Activate(targetCharacter, targetCharacter->GetActorLocation());
+
+	if (selfTargetted || usedOnTarget)
 	{
 		GetAIOwner()->SetCurrentAbility(ability);
 		StopMovement();
@@ -239,7 +245,7 @@ void ABaseAIController::FindAllyTarget(float range)
 			}
 		}
 	}
-	
+
 	if (!targetFound)
 	{
 		SetTarget(nullptr);

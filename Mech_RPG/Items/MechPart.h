@@ -18,8 +18,10 @@ public:
 	void SetItemOwner(AMech_RPGCharacter* inOwner) override;
 
 	virtual void SetActorHiddenInGame(bool bNewHidden);
-	UStaticMesh* mesh = nullptr;
+	UPROPERTY()
+		UStaticMesh* mesh = nullptr;
 protected:
-	UStaticMeshComponent* meshComponent = nullptr;
+	UPROPERTY()
+		UStaticMeshComponent* meshComponent = nullptr;
 
 };
