@@ -55,22 +55,27 @@ AMech_RPGPlayerController::AMech_RPGPlayerController(const FObjectInitializer& O
 void AMech_RPGPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	if (characterPaneTemplate != nullptr)
+	GenerateUI();
+}
+
+void AMech_RPGPlayerController::GenerateUI()
+{
+	if (characterPaneTemplate != nullptr && characterPane == nullptr)
 	{
 		characterPane = CreateWidget<UUserWidget>(this, characterPaneTemplate);
 		characterPane->AddToViewport();
 		characterPane->SetVisibility(ESlateVisibility::Hidden);
 	}
 
-	if (inventoryTemplate != nullptr)
+	if (inventoryTemplate != nullptr && inventoryUI == nullptr)
 	{
-		inventory = CreateWidget<UInventoryUI>(this, inventoryTemplate);
-		inventory->AddToViewport();
-		inventory->SetVisibility(ESlateVisibility::Hidden);
-		inventory->SetPositionInViewport(FVector2D(600, 100));
+		inventoryUI = CreateWidget<UInventoryUI>(this, inventoryTemplate);
+		inventoryUI->AddToViewport();
+		inventoryUI->SetVisibility(ESlateVisibility::Hidden);
+		inventoryUI->SetPositionInViewport(FVector2D(600, 100));
 	}
 
-	if (questListTemplate != nullptr)
+	if (questListTemplate != nullptr && questList == nullptr)
 	{
 		questList = CreateWidget<UQuestDisplayUI>(this, questListTemplate);
 		questList->AddToViewport();
@@ -126,7 +131,7 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 		}
 
 		PerformPanning();
-
+		
 		// Is our owner is still alive
 		if (!GetPlayerControllerOwner()->IsDead())
 		{
@@ -134,6 +139,11 @@ void AMech_RPGPlayerController::PlayerTick(float DeltaTime)
 
 			SetCursorType();
 			CalculateActions(DeltaTime);
+			
+			if (GetInputKeyTimeDown(FKey("RightMouseButton")) > 0.75)
+			{
+				Pause();
+			}
 		}
 		else
 		{
@@ -168,7 +178,7 @@ void AMech_RPGPlayerController::CalculateActions(float DeltaTime)
 		{
 			lastAction = PlayerControllerEnums::None;
 			GetPlayerControllerOwner()->Interact(lastTargetInteractable);
-			inventory->GenerateInventory();
+			inventoryUI->GenerateInventory();
 		}
 		else
 		{
@@ -278,7 +288,7 @@ void AMech_RPGPlayerController::AddQuest(UQuest * newQuest)
 
 void AMech_RPGPlayerController::PlayerItemPickup(UItem* item)
 {
-	inventory->GenerateInventory();
+	inventoryUI->GenerateInventory();
 }
 
 void AMech_RPGPlayerController::PlayerSwappedWeapons(UWeapon* oldWeapon, UWeapon* newWeapon)
@@ -317,14 +327,14 @@ void AMech_RPGPlayerController::FireWeapon(AActor* hit)
 void AMech_RPGPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AMech_RPGPlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AMech_RPGPlayerController::OnSetDestinationReleased);
 
 	InputComponent->BindAction("Attack", IE_Pressed, this, &AMech_RPGPlayerController::OnRightClickPressed);
 	InputComponent->BindAction("Attack", IE_Released, this, &AMech_RPGPlayerController::OnRightClickReleased);
-
+	
 	InputComponent->BindAction("GroupAttack", IE_Pressed, this, &AMech_RPGPlayerController::GroupAttack);
+	InputComponent->BindAction("Pause", IE_Pressed, this, &AMech_RPGPlayerController::PauseToggle);
 
 	InputComponent->BindAction("One", IE_Released, this, &AMech_RPGPlayerController::CharacterOne);
 	InputComponent->BindAction("Two", IE_Released, this, &AMech_RPGPlayerController::CharacterTwo);
@@ -380,6 +390,20 @@ void AMech_RPGPlayerController::Reload()
 	}
 }
 
+void AMech_RPGPlayerController::PauseToggle()
+{
+	SetPause(!IsPaused());
+
+	if (IsPaused())
+	{
+		SetInputMode(FInputModeUIOnly());
+	}
+	else
+	{
+		SetInputMode(FInputModeGameAndUI());
+	}
+}
+
 void AMech_RPGPlayerController::OpenCharacterPane()
 {
 	if (characterPane->GetVisibility() == ESlateVisibility::Visible)
@@ -402,13 +426,13 @@ void AMech_RPGPlayerController::OpenCharacterPane()
 
 void AMech_RPGPlayerController::OpenInventory()
 {
-	if (inventory->GetVisibility() == ESlateVisibility::Visible)
+	if (inventoryUI->GetVisibility() == ESlateVisibility::Visible)
 	{
 		//FInputModeGameAndUI data;
 		//SetInputMode(data);
 		//SetPause(false);
 		inventoryOpen = false;
-		inventory->SetVisibility(ESlateVisibility::Hidden);
+		inventoryUI->SetVisibility(ESlateVisibility::Hidden);
 	}
 	else
 	{
@@ -416,7 +440,7 @@ void AMech_RPGPlayerController::OpenInventory()
 		//SetInputMode(data);
 		//SetPause(true);
 		inventoryOpen = true;
-		inventory->SetVisibility(ESlateVisibility::Visible);
+		inventoryUI->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
@@ -690,18 +714,22 @@ AMech_RPGCharacter* AMech_RPGPlayerController::GetPlayerControllerOwner()
 void AMech_RPGPlayerController::SetPlayerControllerOwner(AMech_RPGCharacter* newVal)
 {
 	owner = newVal;
-	inventory->SetOwner(owner);
-	questList->SetCharacter(owner);
-	questList->GenerateQuests();
-	owner->OnQuestAdded.AddUniqueDynamic(this, &AMech_RPGPlayerController::AddQuest);
-	owner->OnItemPickUpEvent.AddUniqueDynamic(this, &AMech_RPGPlayerController::PlayerItemPickup);
-	inventory->GenerateInventory();
 
-	for (UItemUI* item : inventory->GetSelectedItems())
+	GenerateUI();
+
+	inventoryUI->SetOwner(owner);
+	questList->SetCharacter(owner);
+	inventoryUI->GenerateInventory();
+
+	for (UItemUI* item : inventoryUI->GetSelectedItems())
 	{
 		item->DeselectItem();
 	}
-	inventory->GetSelectedItems().Empty();
+	inventoryUI->GetSelectedItems().Empty();
+
+	questList->GenerateQuests();
+	owner->OnQuestAdded.AddUniqueDynamic(this, &AMech_RPGPlayerController::AddQuest);
+	owner->OnItemPickUpEvent.AddUniqueDynamic(this, &AMech_RPGPlayerController::PlayerItemPickup);
 
 }
 

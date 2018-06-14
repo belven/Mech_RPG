@@ -764,7 +764,8 @@ void AMech_RPGCharacter::RemoveFromPlay()
 
 void AMech_RPGCharacter::LookAt(AMech_RPGCharacter * other)
 {
-	FRotator rotation = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), other->GetActorLocation());
+	FRotator rotation = GetActorRotation();
+	rotation.Yaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), other->GetActorLocation()).Yaw;
 
 	SetActorRotation(rotation);
 }

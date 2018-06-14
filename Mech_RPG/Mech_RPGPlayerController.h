@@ -85,6 +85,8 @@ public:
 
 	virtual	void BeginPlay() override;
 
+	void GenerateUI();
+
 	void CharacterFive();
 	void CharacterFour();
 	void CharacterOne();
@@ -151,7 +153,7 @@ public:
 	TSubclassOf<UUserWidget> questListTemplate;
 	
 	UUserWidget* characterPane;
-	UInventoryUI* inventory;
+	UInventoryUI* inventoryUI;
 	UQuestDisplayUI* questList;
 
 	void OpenCharacterPane();
@@ -195,6 +197,7 @@ protected:
 
 	void Reload();
 
+	void PauseToggle();
 	/**
 	 * Navigate player to the current mouse cursor location.
 	 */

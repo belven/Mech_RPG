@@ -136,6 +136,7 @@ void ABaseAIController::UseWeapon(AActor* hit)
 		}
 
 		SetFocus(targetCharacter);
+		GetAIOwner()->LookAt(targetCharacter);
 		StopMovement();
 	}
 	// We're out of range so move closer
@@ -158,6 +159,11 @@ bool ABaseAIController::PerformAbility(UAbility* ability)
 
 	if (selfTargetted || usedOnTarget)
 	{
+		if (GetTarget() != nullptr)
+		{
+			GetAIOwner()->LookAt(targetCharacter);
+		}
+
 		GetAIOwner()->SetCurrentAbility(ability);
 		StopMovement();
 		GetAIOwner()->OnStopFiring.Broadcast();
