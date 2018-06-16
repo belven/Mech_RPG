@@ -2,30 +2,49 @@
 #include "Mech_RPG.h"
 #include "Abilities.h"
 #include "Weapons.h"
+#include "Enums.h"
 
+// Items
 #include "Items/ItemPickup.h"
 #include "Items/Armour.h"
-#include "BaseAIController.h"
+#include "Items/Inventory.h"
+
+// UI
 #include "Blueprint/UserWidget.h"
-#include "Mech_RPGPlayerController.h"
 #include "UI/FloatingTextUI.h"
 #include "UI/CharacterStats.h"
-#include "Group.h"
-#include "Abilities/Ability.h"
-#include "Abilities/ChannelledAbility.h"
-#include "Interactable.h"
+
+// Controllers
+#include "BaseAIController.h"
+#include "Mech_RPGPlayerController.h"
+
+// Quests
 #include "Quests/Quest.h"
 #include "Quests/QuestManager.h"
-#include "Math/UnrealMathUtility.h"
+
+//Spawning
 #include "Spawnpoints/Spawnpoint.h"
 #include "Spawnpoints/PlayerSpawnpoint.h"
-#include <limits>
+
+// Events
 #include "Delayed Events/EffectTimer.h"
+
+//Skills
+#include "SkillTree/SkillTree.h"
+
+// Other
+#include "Group.h"
+#include "Interactable.h"
+#include "Math/UnrealMathUtility.h"
 #include "Kismet/KismetMathLibrary.h"
+#include <limits>
+
 #include "Mech_RPGCharacter.h"
 
 bool AMech_RPGCharacter::settingUpGroups = false;
+
 const float AMech_RPGCharacter::lowHealth = 2000;
+
 const float AMech_RPGCharacter::mediumHealth = AMech_RPGCharacter::lowHealth * 1.25;
 const float AMech_RPGCharacter::highHealth = AMech_RPGCharacter::mediumHealth * 1.25;
 
@@ -106,15 +125,9 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GetCapsuleComponent()->SetCollisionObjectType(mCharacterCollision);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(mItemCollision, ECollisionResponse::ECR_Ignore);
-	//GetCapsuleComponent()->SetCollisionResponseToChannel(mCharacterCollision, ECollisionResponse::ECR_Ignore);
-
-	//radiusDection = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
-	//radiusDection->InitSphereRadius(1500.0f);
-	//radiusDection->SetCollisionProfileName(TEXT("Pawn"));
-	//radiusDection->AttachTo(this->RootComponent);
-	//radiusDection->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	UpdateHealthBarRot();
+
 }
 
 AMech_RPGCharacter::~AMech_RPGCharacter()
@@ -132,6 +145,14 @@ AMech_RPGCharacter::~AMech_RPGCharacter()
 		//GetGroup()->RemoveMember(this);
 	}
 
+}
+
+void AMech_RPGCharacter::CreateSkillTrees()
+{
+	skillTrees.Add(USkillTree::CreateSkillTree(this, ESpecialisation::Pacifier));
+	skillTrees.Add(USkillTree::CreateSkillTree(this, ESpecialisation::Havoc));
+	skillTrees.Add(USkillTree::CreateSkillTree(this, ESpecialisation::Invigorator));
+	skillTrees.Add(USkillTree::CreateSkillTree(this, ESpecialisation::Defiler));
 }
 
 void AMech_RPGCharacter::Tick(float DeltaTime)
@@ -191,6 +212,7 @@ void AMech_RPGCharacter::BeginPlay()
 
 	//SetUpGroup();
 	SetUpWidgets();
+	CreateSkillTrees();
 
 	if (OnPostBeginPlay.IsBound())
 	{
@@ -248,6 +270,11 @@ void AMech_RPGCharacter::UpdateHealthBarRot()
 	}
 }
 
+float AMech_RPGCharacter::GetHealthChangeModifier()
+{
+	return MAX(healthChangeModifier + GetStatBonus(EStatEnum::Damage), 0.01F);
+}
+
 void AMech_RPGCharacter::SetCharacterStats(class UCharacterStats* val)
 {
 	characterStats = val;
@@ -256,6 +283,17 @@ void AMech_RPGCharacter::SetCharacterStats(class UCharacterStats* val)
 	{
 		GetCharacterStats()->UpdateHealthBar();
 	}
+}
+
+USkillTree * AMech_RPGCharacter::GetSkillTreeBySpec(ESpecialisation spec)
+{
+	for (USkillTree* tree : GetSkillTrees())
+	{
+		if (tree->GetSpec() == spec) {
+			return tree;
+		}
+	}
+	return nullptr;
 }
 
 UArmour* AMech_RPGCharacter::GetArmourByPosition(EArmourPosition pos)
@@ -304,6 +342,16 @@ void AMech_RPGCharacter::ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl
 		canMove += amount;
 		break;
 	}
+}
+
+float AMech_RPGCharacter::GetStatBonus(EStatEnum statType)
+{
+	float total = 0.0;
+	for (USkillTree* tree : GetSkillTrees())
+	{
+		total += tree->GetStatBonus(statType);
+	}
+	return total;
 }
 
 bool AMech_RPGCharacter::IsAlly(AMech_RPGCharacter * other)

@@ -4,17 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "SkillTree/SkillTreeNode.h"
-#include "CriticalStrikeSkill.generated.h"
+#include "DamageIncreaseSkill.generated.h"
 
 /**
- *
+ * 
  */
 UCLASS()
-class MECH_RPG_API UCriticalStrikeSkill : public USkillTreeNode
+class MECH_RPG_API UDamageIncreaseSkill : public USkillTreeNode
 {
 	GENERATED_BODY()
-
 public:
 	float GetStatBonus(EStatEnum statType) override;
-	static UCriticalStrikeSkill* CreateCriticalStrikeSkill();
+	
+	static UDamageIncreaseSkill* CreateDamageIncreaseSkill();
+	
+	
 };

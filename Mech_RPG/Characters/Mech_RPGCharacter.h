@@ -24,11 +24,8 @@ namespace EffectEnums
 #pragma once
 #include "GameFramework/Character.h"
 #include "Tag.h"
-#include "Weapons/Weapon.h"
 #include "Group.h"
 #include "Array.h"
-#include "Abilities/Ability.h"
-#include "Items/Inventory.h"
 #include "UI/FloatingStats_BP.h"
 #include "Delegates/DelegateCombinations.h"
 #include "EventManager.h"
@@ -99,6 +96,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSwappedWeapons, UWeapon*, oldWeapo
 
 class UQuest;
 class AInteractable;
+class USkillTree;
+class UAbility;
+class UInventory;
+class UWeapon;
 
 UCLASS(Blueprintable)
 class AMech_RPGCharacter : public ACharacter
@@ -189,6 +190,9 @@ private:
 		TArray<UQuest*> quests;
 
 	UPROPERTY()
+		TArray<USkillTree*> skillTrees;
+
+	UPROPERTY()
 		UAbility* currentAbility = nullptr;
 
 	UPROPERTY()
@@ -204,6 +208,7 @@ private:
 	TSubclassOf<class UFloatingTextUI> floatingTextClass = nullptr;
 
 	USphereComponent* radiusDection;
+	void CreateSkillTrees();
 protected:
 	virtual ~AMech_RPGCharacter();
 public:
@@ -233,6 +238,9 @@ public:
 		CameraBoom->TargetArmLength = other->CameraBoom->TargetArmLength;
 		CameraBoom->SetRelativeRotation(other->CameraBoom->RelativeRotation);
 	}
+
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
+		float GetStatBonus(EStatEnum statType);
 
 	bool IsAlly(AMech_RPGCharacter* other);
 	bool IsEnemy(AMech_RPGCharacter* other);
@@ -581,10 +589,7 @@ public:
 		healthChangeModifier = newVal;
 	}
 
-	FORCEINLINE float GetHealthChangeModifier()
-	{
-		return MAX(healthChangeModifier, 0.01F);
-	}
+	float GetHealthChangeModifier();
 
 	void SetDefenceModifier(float newVal)
 	{
@@ -634,14 +639,23 @@ public:
 	void StartingRole(ERole val) { startingRole = val; }
 
 	UFUNCTION(BlueprintCallable, Category = "Attack Speed")
-	FORCEINLINE float GetAttackSpeedModifier() { return attackSpeedModifier; }
+		FORCEINLINE float GetAttackSpeedModifier() { return attackSpeedModifier; }
 
 	UFUNCTION(BlueprintCallable, Category = "Attack Speed")
-	void SetAttackSpeedModifier(float val) { attackSpeedModifier = val; }
+		void SetAttackSpeedModifier(float val) { attackSpeedModifier = val; }
 
 	UFUNCTION(BlueprintCallable, Category = "Crit Chance")
-	FORCEINLINE float GetCritChanceModifier() { return critChanceModifier; }
+		FORCEINLINE float GetCritChanceModifier() { return critChanceModifier; }
 
 	UFUNCTION(BlueprintCallable, Category = "Crit Chance")
-	void SetCritChanceModifier(float val) { critChanceModifier = val; }
+		void SetCritChanceModifier(float val) { critChanceModifier = val; }
+
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
+		TArray<USkillTree *>& GetSkillTrees() { return skillTrees; }
+
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
+		USkillTree * GetSkillTreeBySpec(ESpecialisation spec);
+
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
+		void SetSkillTrees(TArray<USkillTree *> val) { skillTrees = val; }
 };

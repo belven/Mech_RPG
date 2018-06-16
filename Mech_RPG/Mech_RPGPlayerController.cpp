@@ -963,7 +963,7 @@ void AMech_RPGPlayerController::GroupAttack()
 			{
 				AAllyAIController* con = Cast<AAllyAIController>(character->GetController());
 
-				if (con->IsTargetValid(cursorTarget))
+				if (con != nullptr && con->IsTargetValid(cursorTarget))
 				{
 					con->SetPlayerControlledLocation(FVector::ZeroVector);
 					con->SetTarget(cursorTarget);
