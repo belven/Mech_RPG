@@ -17,9 +17,9 @@ ADrone::ADrone() : Super()
 	AIControllerClass = AAllyAIController::StaticClass();
 }
 
-void ADrone::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility)
+void ADrone::CreatePresetRole(ERole inRole, int32 grade, int32 quaility)
 {
-	Super::CreatePresetRole(GroupEnums::Drone, grade, quaility);
+	Super::CreatePresetRole(ERole::Drone, grade, quaility);
 }
 
 void ADrone::OutOfCombat()

@@ -25,7 +25,7 @@ void APlayerSpawnpoint::BeginPlay() {
 			SetUpCharacter(character, group, playerRole);
 		}
 
-		for (GroupEnums::Role role : allyRoles) {
+		for (ERole role : allyRoles) {
 			character = SpawnCharacter(classToSpawn, 400);
 			if (character != nullptr) {
 				SetUpCharacter(character, group, role);

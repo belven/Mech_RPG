@@ -46,7 +46,7 @@ void AAddSpawningMechanic::TriggerSpawn() {
 		AMech_RPGCharacter* character = UMiscLibrary::SpawnCharacter<AMech_RPGCharacter>(GetWorld(), nav.Location, GetActorRotation(), classToSpawn);
 		if (character != nullptr) {
 			character->SpawnDefaultController();
-			character->CreatePresetRole((GroupEnums::Role)UMiscLibrary::GetRandomEnum(GroupEnums::End));
+			character->CreatePresetRole((ERole)UMiscLibrary::GetRandomEnum(ERole::End));
 			character->SetGroup(GetGroup());
 			character->SetTeam(GetTeam());
 			spawnAmount--;

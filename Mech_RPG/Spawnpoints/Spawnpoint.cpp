@@ -35,7 +35,7 @@ AMech_RPGCharacter* ASpawnpoint::SpawnCharacter(TSubclassOf<class AMech_RPGChara
 	return character;
 }
 
-void ASpawnpoint::SetUpCharacter(AMech_RPGCharacter* character, UGroup* group, GroupEnums::Role role)
+void ASpawnpoint::SetUpCharacter(AMech_RPGCharacter* character, UGroup* group, ERole role)
 {
 	character->SetTeam(team);
 	AdjustCharacterLocationByCapsule(character);
@@ -62,11 +62,11 @@ void ASpawnpoint::BeginPlay()
 		if (GetWorld() != nullptr)
 		{
 			AMech_RPGCharacter* character = SpawnCharacter(classToSpawn, ASpawnpoint::defaultSpawnRadius);
-			GroupEnums::Role role = UGroup::GetRandomRole();
+			ERole role = UGroup::GetRandomRole();
 
 			if (character != nullptr)
 			{
-				if (role == GroupEnums::Healer)
+				if (role == ERole::Healer)
 				{
 					if (!healerSpawned)
 					{
@@ -74,7 +74,7 @@ void ASpawnpoint::BeginPlay()
 					}
 					else
 					{
-						while (role == GroupEnums::Healer)
+						while (role == ERole::Healer)
 						{
 							role = UGroup::GetRandomRole();
 						}

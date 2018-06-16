@@ -39,7 +39,7 @@ float UChannelledAbility::GetCooldown()
 
 float UChannelledAbility::GetChannelDuration()
 {
-	float percentChange = 1 - (owner->GetSpeedModifier() - 1);
+	float percentChange = 1 - (owner->GetAttackSpeedModifier() - 1);
 	return channelDuration * percentChange;
 }
 

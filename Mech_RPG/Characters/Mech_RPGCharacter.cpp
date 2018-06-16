@@ -34,7 +34,7 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 	inventory(NewObject<UInventory>(UInventory::StaticClass())),
 	defenceModifier(0),
 	speedModifier(1),
-	startingRole(GroupEnums::DPS),
+	startingRole(ERole::DPS),
 	health(2000),
 	maxHealth(2000),
 	channeling(false),
@@ -258,7 +258,7 @@ void AMech_RPGCharacter::SetCharacterStats(class UCharacterStats* val)
 	}
 }
 
-UArmour* AMech_RPGCharacter::GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos)
+UArmour* AMech_RPGCharacter::GetArmourByPosition(EArmourPosition pos)
 {
 	return *GetArmour().Find(pos);
 }
@@ -770,7 +770,7 @@ void AMech_RPGCharacter::LookAt(AMech_RPGCharacter * other)
 	SetActorRotation(rotation);
 }
 
-void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility)
+void AMech_RPGCharacter::CreatePresetRole(ERole inRole, int32 grade, int32 quaility)
 {
 	float blastResistance = 5;
 	float phsyicalResistance = 5;
@@ -784,7 +784,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 
 	switch (inRole)
 	{
-	case GroupEnums::DPS:
+	case ERole::DPS:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, quaility));
 		//AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Grenade, 1.75F, true, true));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
@@ -795,7 +795,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetMaxHealth(lowHealth);
 		break;
 
-	case GroupEnums::Drone:
+	case ERole::Drone:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Drone_Weapon, grade, quaility));
 		AddAbility(mCreateTimedHealthChange(1.0F, 20.0F, 2.0F, 0.5F, true));
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Light);
@@ -804,7 +804,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetMaxHealth(lowHealth);
 		break;
 
-	case GroupEnums::Healer:
+	case ERole::Healer:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Bio_Repair, grade, quaility));
 		AddAbility(mCreatePresetAbility(AbilityEnums::AoEHeal));
 		AddAbility(mCreatePresetAbility(AbilityEnums::SummonDrone));
@@ -814,7 +814,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetMaxHealth(lowHealth);
 		break;
 
-	case GroupEnums::Tank:
+	case ERole::Tank:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Sword, grade, quaility));
 		AddAbility(UBindLife::CreateBindLife(10, this, 0.5F, 0.25F));
 		AddAbility(mCreatePresetAbility(AbilityEnums::DefenceBoost));
@@ -824,7 +824,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetMaxHealth(lowHealth);
 		break;
 
-	case GroupEnums::Sniper:
+	case ERole::Sniper:
 		SetCurrentWeapon(ULaserSniper::CreateLaserSniper(this));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Snipe, 2.5F, false, true));
 		AddAbility(mCreatePresetAbility(AbilityEnums::CritBoost));
@@ -834,7 +834,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		SetMaxHealth(lowHealth);
 		break;
 
-	case GroupEnums::Support:
+	case ERole::Support:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
 		AddAbility(mCreatePresetAbility(AbilityEnums::DefenceBoost));
 		AddAbility(mCreatePresetAbility(AbilityEnums::Heal));
@@ -845,7 +845,7 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 		break;
 
 	default:
-		CreatePresetRole(GroupEnums::DPS);
+		CreatePresetRole(ERole::DPS);
 		break;
 	}
 
@@ -856,9 +856,9 @@ void AMech_RPGCharacter::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, 
 
 void AMech_RPGCharacter::CreateArmour(float phsyicalResistance, float blastResistance, float energyResistance, int32 grade, int32 quaility)
 {
-	for (int i = 0; i < ArmourEnums::End; i++)
+	for (int i = 0; i < (int)EArmourPosition::End; i++)
 	{
-		ArmourEnums::ArmourPosition pos = (ArmourEnums::ArmourPosition)i;
+		EArmourPosition pos = (EArmourPosition)i;
 		UArmour* newArmour = UArmour::CreateArmour("Test", phsyicalResistance, blastResistance, energyResistance, pos, this, grade, quaility);
 		GetArmour().Add(pos, newArmour);
 		AddItem(newArmour);

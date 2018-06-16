@@ -2,6 +2,7 @@
 
 #include "Mech_RPG.h"
 #include "Armour.h"
+#include "Enums.h"
 #include "Characters/Mech_RPGCharacter.h"
 
 float UArmour::GetResistance(EDamageType damageType)
@@ -18,19 +19,19 @@ float UArmour::GetResistance(EDamageType damageType)
 	return 0;
 }
 
-FString UArmour::GetPositionName(TEnumAsByte<ArmourEnums::ArmourPosition> pos)
+FString UArmour::GetPositionName(EArmourPosition pos)
 {
 	switch (pos)
 	{
-	case ArmourEnums::Chest:
+	case EArmourPosition::Chest:
 		return "Chest";
-	case ArmourEnums::Right_Arm:
+	case EArmourPosition::Right_Arm:
 		return "Right Arm";
-	case ArmourEnums::Right_Leg:
+	case EArmourPosition::Right_Leg:
 		return "Right Leg";
-	case ArmourEnums::Left_Arm:
+	case EArmourPosition::Left_Arm:
 		return "Left Arm";
-	case ArmourEnums::Left_Leg:
+	case EArmourPosition::Left_Leg:
 		return "Left Leg";
 	}
 	return "Not Found";
@@ -58,7 +59,7 @@ float UArmour::GetDeafultValue(ArmourGrades::ArmourGrade armourGrade)
 FString UArmour::GetTooltipText()
 {
 	FString output = GetName() + UMiscLibrary::lnBreak;
-	output += FindObject<UEnum>(ANY_PACKAGE, TEXT("ArmourEnums"), true)->GetDisplayNameTextByValue(GetArmourPosition()).ToString() + UMiscLibrary::lnBreak;
+	output += FindObject<UEnum>(ANY_PACKAGE, TEXT("EArmourEnum"), true)->GetDisplayNameTextByValue((int)GetArmourPosition()).ToString() + UMiscLibrary::lnBreak;
 	output += "Physical Resistance: " + FString::SanitizeFloat(GetPhysicalResistance()) + UMiscLibrary::lnBreak;
 	output += "Blast Resistance: " + FString::SanitizeFloat(GetBlastResistance()) + UMiscLibrary::lnBreak;
 	output += "Energy Resistance: " + FString::SanitizeFloat(GetEnergyResistance());
@@ -88,7 +89,7 @@ float UArmour::GetEnergyResistance()
 	return energyResistance;
 }
 
-TEnumAsByte<ArmourEnums::ArmourPosition> UArmour::GetArmourPosition()
+EArmourPosition UArmour::GetArmourPosition()
 {
 	return armourPosition;
 }
@@ -97,7 +98,7 @@ UArmour* UArmour::CreateArmour(FString armourName,
 	float inPhysicalResistance,
 	float inBlastResistance,
 	float inEnergyResistance,
-	ArmourEnums::ArmourPosition inArmourPosition,
+	EArmourPosition inArmourPosition,
 	AMech_RPGCharacter* armourOwner,
 	int32 armourGrade,
 	int32 armourQuality)
@@ -117,7 +118,7 @@ UArmour* UArmour::CreateArmour(FString armourName,
 UArmour* UArmour::CreateArmour(
 	FString armourName,
 	float inResistance,
-	ArmourEnums::ArmourPosition inArmourPosition,
+	EArmourPosition inArmourPosition,
 	AMech_RPGCharacter* armourOwner,
 	int32 armourGrade,
 	int32 armourQuality)

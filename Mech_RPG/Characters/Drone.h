@@ -19,6 +19,6 @@ public:
 	virtual void SetDead(bool newVal) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
-		virtual void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS, int32 grade = 0, int32 quaility = 0) override;
+		virtual void CreatePresetRole(ERole inRole = ERole::DPS, int32 grade = 0, int32 quaility = 0) override;
 	
 };

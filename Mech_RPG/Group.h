@@ -1,23 +1,9 @@
 
-UENUM(BlueprintType)
-namespace GroupEnums
-{
-	enum Role
-	{
-		None,
-		DPS,
-		Drone,
-		Healer,
-		RPG,
-		Sniper,
-		Support,
-		Tank,
-		End
-	};
-}
+
 #pragma once
 
 #include "Object.h"
+#include "Enums.h"
 #include "Array.h"
 #include "Group.generated.h"
 
@@ -112,7 +98,7 @@ public:
 		FGroupInteractEvent OnInteractEvent;
 
 	UFUNCTION(BlueprintCallable, Category = "Group")
-		static TEnumAsByte<GroupEnums::Role> GetRandomRole();
+		static ERole GetRandomRole();
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
 		void Interact(AInteractable * interactable);

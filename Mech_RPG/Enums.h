@@ -6,21 +6,53 @@ enum class EAffectedTeam : uint8
 	Ally,
 	Enemy,
 	Both
+}; 
+
+UENUM(BlueprintType)
+enum class  ERole : uint8
+{
+	None,
+	DPS,
+	Drone,
+	Healer,
+	RPG,
+	Sniper,
+	Support,
+	Tank,
+	End
 };
 
 UENUM(BlueprintType)
-namespace ArmourEnums
+enum class ESpecialisation : uint8
 {
-	enum ArmourPosition
-	{
-		Left_Leg,
-		Right_Leg,
-		Chest,
-		Left_Arm,
-		Right_Arm,
-		End
-	};
-}
+	Pacifier,
+	Havoc,
+	Defiler,
+	Invigorator
+};
+
+UENUM(BlueprintType)
+enum class EStatEnum : uint8
+{
+	Health,
+	Damage,
+	Defence,
+	MovementSpeed,
+	CastSpeed,
+	AttackSpeed,
+	CritChance
+};
+
+UENUM(BlueprintType)
+enum class EArmourPosition : uint8
+{
+	Left_Leg,
+	Right_Leg,
+	Chest,
+	Left_Arm,
+	Right_Arm,
+	End
+};
 
 UENUM(BlueprintType)
 namespace ArmourGrades

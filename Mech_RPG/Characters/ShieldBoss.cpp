@@ -7,7 +7,7 @@
 #define mGetMeleeRange UMiscLibrary::GetMeleeRange(this)
 
 
-void AShieldBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole /*= GroupEnums::DPS*/, int32 grade /*= 0*/, int32 quaility /*= 0*/)
+void AShieldBoss::CreatePresetRole(ERole inRole /*= DPS*/, int32 grade /*= 0*/, int32 quaility /*= 0*/)
 {
 	static float newHealth = 20000;
 

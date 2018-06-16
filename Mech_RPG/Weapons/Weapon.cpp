@@ -164,7 +164,8 @@ void UWeapon::StopFire()
 
 float UWeapon::GetFireRate()
 {
-	return settings.fireRate;
+	float percentChange = 1 - (GetItemOwner()->GetAttackSpeedModifier() - 1);
+	return settings.fireRate * percentChange;
 }
 
 void UWeapon::SetFireRate(float newVal)
@@ -174,7 +175,7 @@ void UWeapon::SetFireRate(float newVal)
 
 float UWeapon::GetCritChance()
 {
-	return settings.critChance;
+	return settings.critChance + GetItemOwner()->GetCritChanceModifier();
 }
 
 void UWeapon::SetCritChance(float newVal)

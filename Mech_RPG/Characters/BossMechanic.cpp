@@ -27,7 +27,7 @@ void ABossMechanic::SetBoss(ABoss* newVal) {
 	boss = newVal;
 }
 
-void ABossMechanic::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility)
+void ABossMechanic::CreatePresetRole(ERole inRole, int32 grade, int32 quaility)
 {
 	AMech_RPGCharacter::CreatePresetRole(inRole, grade, quaility);
 

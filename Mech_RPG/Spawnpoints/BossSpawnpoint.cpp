@@ -27,15 +27,15 @@ ABossSpawnpoint::ABossSpawnpoint() {
 
 void ABossSpawnpoint::BeginPlay() {
 	int i;
-	GroupEnums::Role role = UGroup::GetRandomRole();
-	GroupEnums::Role bossRole = ABoss::GetRandomRole();
+	ERole role = UGroup::GetRandomRole();
+	ERole bossRole = ABoss::GetRandomRole();
 	UGroup* group = UGroup::CreateGroup(team);
 
 	bool healerSpawned = false;
 
 	ABoss* boss = dynamic_cast<ABoss*>(SpawnCharacter(bossClass, 400));
 
-	if (bossRole == GroupEnums::Healer) {
+	if (bossRole == ERole::Healer) {
 		if (!healerSpawned) {
 			healerSpawned = true;
 		}
@@ -47,12 +47,12 @@ void ABossSpawnpoint::BeginPlay() {
 		ABossMechanic* bossMechanic = dynamic_cast<ABossMechanic*>(SpawnCharacter(mechanicClass, 400)) ;
 
 		if (bossMechanic != nullptr) {
-			if (role == GroupEnums::Healer) {
+			if (role == ERole::Healer) {
 				if (!healerSpawned) {
 					healerSpawned = true;
 				}
 				else {
-					while (role == GroupEnums::Healer) {
+					while (role == ERole::Healer) {
 						role = UGroup::GetRandomRole();
 					}
 				}

@@ -22,13 +22,11 @@ public:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
-		TArray<TEnumAsByte<GroupEnums::Role>> allyRoles;
+		TArray<ERole> allyRoles;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 		TSubclassOf<class AMech_RPGCharacter> playerClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Role")
-		TEnumAsByte<GroupEnums::Role> playerRole;
-
-
+		ERole playerRole;
 };

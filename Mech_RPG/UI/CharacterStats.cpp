@@ -14,7 +14,7 @@ float UCharacterStats::GetHealthBarPercent()
 
 FText UCharacterStats::GetRoleText()
 {
-	return owner != nullptr ? FindObject<UEnum>(ANY_PACKAGE, TEXT("GroupEnums"), true)->GetDisplayNameTextByValue(owner->GetRole()) : FText();
+	return owner != nullptr ? FindObject<UEnum>(ANY_PACKAGE, TEXT("ERole"), true)->GetDisplayNameTextByValue((int)owner->GetRole()) : FText();
 }
 
 FString UCharacterStats::GetHealthText()

@@ -36,7 +36,7 @@ UItem* UItem::CreateItemByType(AMech_RPGCharacter* inOwner, ItemEnumns::ItemType
 	case ItemEnumns::Weapon:
 		return UWeapon::CreatePresetWeapon(inOwner, mGetRandomEnum(WeaponEnums::End), grade, quality);
 	case ItemEnumns::Armour:
-		return UArmour::CreateArmour("Test", UArmour::GetDeafultValue(mGetRandomEnum(ArmourGrades::End)), mGetRandomEnum(ArmourEnums::End), inOwner, grade, quality);
+		return UArmour::CreateArmour("Test", UArmour::GetDeafultValue(mGetRandomEnum(ArmourGrades::End)), mGetRandomEnum(EArmourPosition::End), inOwner, grade, quality);
 	}
 	return nullptr;
 }

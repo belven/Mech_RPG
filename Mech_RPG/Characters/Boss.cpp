@@ -5,8 +5,8 @@
 #include "Abilities.h"
 #include "Delayed Events/PhaseTrigger.h"
 
-TEnumAsByte<GroupEnums::Role> ABoss::GetRandomRole() {
-	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
+ERole ABoss::GetRandomRole() {
+	return (ERole)(UMiscLibrary::GetRandomEnum(ERole::End));
 }
 
 void ABoss::SetPhase(int32 val)
@@ -14,7 +14,7 @@ void ABoss::SetPhase(int32 val)
 	phase = val;
 }
 
-void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility) {
+void ABoss::CreatePresetRole(ERole inRole, int32 grade, int32 quaility) {
 	float blastResistance = 5;
 	float phsyicalResistance = 5;
 	float energyResistance = 5;
@@ -24,7 +24,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 	ResetCharacter();
 
 	switch (inRole) {
-	case GroupEnums::DPS:
+	case ERole::DPS:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::SMG, grade, newQuality));
 		AddAbility(UDamageBoost::CreateAbility(7, this, 0.5));
 		AddAbility(UChannelledAbility::CreateChannelledAbility(this, UParticleBomb::CreateAbility(12.0F, this, 20.0F), 5.0F, false, true));
@@ -33,7 +33,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::MediumLight);
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Medium);
 		break;
-	case GroupEnums::Tank:
+	case ERole::Tank:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Sword, grade, newQuality));
 		AddAbility(UAbility::CreatePresetAbility(this, AbilityEnums::Taunt));
 		AddAbility(UAbility::CreateChannelledPresetAbility(this, AbilityEnums::Stun, 2.5, false, true));
@@ -42,7 +42,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Heavy);
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Heavy);
 		break;
-	case GroupEnums::Sniper:
+	case ERole::Sniper:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Sniper, grade, newQuality));
 		AddAbility(UChannelledAbility::CreateChannelledAbility(this, USnipe::CreateAbility(7, this), 2.5F, false, true));
 		SetMaxHealth(lowHealth);
@@ -50,7 +50,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Light);
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Medium);
 		break;
-	case GroupEnums::Healer:
+	case ERole::Healer:
 		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Bio_Repair, grade, newQuality));
 		AddAbility(UHeal::CreateAbility(5, this, 12.0F));
 		AddAbility(UDisable::CreateDisable(10, this, 5));
@@ -60,7 +60,7 @@ void ABoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, 
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Medium);
 		break;
 	default:
-		CreatePresetRole(GroupEnums::DPS);
+		CreatePresetRole(ERole::DPS);
 		break;
 	}
 	SetHealth(GetMaxHealth());

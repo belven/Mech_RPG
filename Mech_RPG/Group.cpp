@@ -160,9 +160,9 @@ void UGroup::GroupMemberKilled(AMech_RPGCharacter* character)
 	if (OnGroupMemberKilled.IsBound()) OnGroupMemberKilled.Broadcast(character);
 }
 
-TEnumAsByte<GroupEnums::Role> UGroup::GetRandomRole()
+ERole UGroup::GetRandomRole()
 {
-	return (GroupEnums::Role)(UMiscLibrary::GetRandomEnum(GroupEnums::End));
+	return (ERole)(UMiscLibrary::GetRandomEnum(ERole::End));
 }
 
 void UGroup::Interact(AInteractable * interactable)

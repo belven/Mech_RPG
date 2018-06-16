@@ -28,9 +28,9 @@ protected:
 	TArray<class UPhaseTrigger*> triggers;
 
 public:
-	virtual void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS, int32 grade = 0, int32 quaility = 0) override;
+	virtual void CreatePresetRole(ERole inRole = ERole::DPS, int32 grade = 0, int32 quaility = 0) override;
 
-	static TEnumAsByte<GroupEnums::Role> GetRandomRole();
+	static ERole GetRandomRole();
 
 	int32 GetPhase() const { return phase; }
 

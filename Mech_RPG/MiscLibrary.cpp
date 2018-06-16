@@ -339,5 +339,5 @@ bool UMiscLibrary::IsChildOf(UObject* object, UClass* inClass)
 template<class T>
 T UMiscLibrary::GetRandomEnum(T end)
 {
-	return static_cast<T>(rand() % (end - 1));
+	return static_cast<T>(rand() % ((int)end - 1));
 }

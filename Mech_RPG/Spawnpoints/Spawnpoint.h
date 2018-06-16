@@ -20,7 +20,7 @@ public:
 	static float defaultSpawnRadius;
 
 	AMech_RPGCharacter* SpawnCharacter(TSubclassOf<class AMech_RPGCharacter> spawnClass, int spawnRadius);
-	void SetUpCharacter(AMech_RPGCharacter * character, UGroup * group, GroupEnums::Role role);
+	void SetUpCharacter(AMech_RPGCharacter * character, UGroup * group, ERole role);
 
 	static void AdjustCharacterLocationByCapsule(AMech_RPGCharacter* character);
 

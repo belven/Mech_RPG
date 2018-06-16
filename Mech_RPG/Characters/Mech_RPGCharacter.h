@@ -43,7 +43,7 @@ namespace EffectEnums
 #define mGetDefaultArmourValue(grade) UArmour::GetDeafultValue(grade)
 #define mCreateTimedHealthChange(changeAmount, cooldown, duration, rate, heals) UTimedHealthChange::CreateTimedHealthChange(this, cooldown, changeAmount, rate, duration, heals)
 
-#define ArmourMap TPair<TEnumAsByte<ArmourEnums::ArmourPosition>, class UArmour*>
+#define ArmourMap TPair<EArmourPosition, class UArmour*>
 
 USTRUCT(BlueprintType)
 struct FLoadout
@@ -141,7 +141,7 @@ private:
 		bool UseLoadout = false;
 
 	UPROPERTY(EditAnywhere, Category = "Role")
-		TEnumAsByte<GroupEnums::Role> startingRole;
+		ERole startingRole;
 
 	UPROPERTY(EditAnywhere, Category = "Group")
 		TEnumAsByte<TeamEnums::Team> team;
@@ -161,6 +161,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Speed")
 		float speedModifier;
 
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float critChanceModifier;
+
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float attackSpeedModifier;
+
 	UPROPERTY()
 		UWeapon* currentWeapon = nullptr;
 
@@ -177,7 +183,7 @@ private:
 		TArray<UAbility*> abilities;
 
 	UPROPERTY()
-		TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class UArmour*> armour;
+		TMap<EArmourPosition, class UArmour*> armour;
 
 	UPROPERTY()
 		TArray<UQuest*> quests;
@@ -375,20 +381,20 @@ public:
 		return armourList;
 	}
 
-	FORCEINLINE	TMap<TEnumAsByte<ArmourEnums::ArmourPosition>, class UArmour*>& GetArmour()
+	FORCEINLINE	TMap<EArmourPosition, class UArmour*>& GetArmour()
 	{
 		return armour;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Armour")
-		UArmour* GetArmourByPosition(TEnumAsByte<ArmourEnums::ArmourPosition> pos);
+		UArmour* GetArmourByPosition(EArmourPosition pos);
 
 	// if remove is false then it will apply the effect, if it's true it will remove it
 	UFUNCTION(BlueprintCallable, Category = "CrowdControl")
 		void ApplyCrowdControl(TEnumAsByte<EffectEnums::CrowdControl> controlModifications, bool remove);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
-		FORCEINLINE TEnumAsByte<GroupEnums::Role> GetRole()
+		FORCEINLINE ERole GetRole()
 	{
 		return StartingRole();
 	}
@@ -481,7 +487,7 @@ public:
 		void RemoveAbility(UAbility* newAbility);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
-		virtual void CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole = GroupEnums::DPS, int32 grade = 1, int32 quaility = 0);
+		virtual void CreatePresetRole(ERole inRole = ERole::DPS, int32 grade = 1, int32 quaility = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Role")
 		void SetupWithLoadout();
@@ -491,7 +497,7 @@ public:
 		return demandedController;
 	}
 
-	FORCEINLINE void SetDemandedController(AController* newVal)
+	void SetDemandedController(AController* newVal)
 	{
 		demandedController = newVal;
 	}
@@ -513,7 +519,7 @@ public:
 		return id;
 	}
 
-	FORCEINLINE void SetID(int32 newVal)
+	void SetID(int32 newVal)
 	{
 		id = newVal;
 	}
@@ -555,32 +561,32 @@ public:
 		return canMove;
 	}
 
-	FORCEINLINE float GetHealthChangeModifier()
-	{
-		return MAX(healthChangeModifier, 0.01F);
-	}
-
 	FORCEINLINE float GetDefenceModifier()
 	{
 		return MIN(defenceModifier, 0.99F);
 	}
 
-	FORCEINLINE void SetCanAttack(int32 newVal)
+	void SetCanAttack(int32 newVal)
 	{
 		canAttack = newVal;
 	}
 
-	FORCEINLINE void SetCanMove(int32 newVal)
+	void SetCanMove(int32 newVal)
 	{
 		canMove = newVal;
 	}
 
-	FORCEINLINE void SetHealthChangeModifier(float newVal)
+	void SetHealthChangeModifier(float newVal)
 	{
 		healthChangeModifier = newVal;
 	}
 
-	FORCEINLINE void SetDefenceModifier(float newVal)
+	FORCEINLINE float GetHealthChangeModifier()
+	{
+		return MAX(healthChangeModifier, 0.01F);
+	}
+
+	void SetDefenceModifier(float newVal)
 	{
 		defenceModifier = newVal;
 	}
@@ -590,7 +596,7 @@ public:
 		return canBeDamaged < 1;
 	}
 
-	FORCEINLINE void SetCanBeDamaged(int32 newVal)
+	void SetCanBeDamaged(int32 newVal)
 	{
 		canBeDamaged = newVal;
 	}
@@ -600,7 +606,7 @@ public:
 		return speedModifier;
 	}
 
-	FORCEINLINE void SetSpeedModifier(float newVal)
+	void SetSpeedModifier(float newVal)
 	{
 		speedModifier = newVal;
 	}
@@ -610,14 +616,32 @@ public:
 		return speed;
 	}
 
-	FORCEINLINE void SetSpeed(float newVal)
+	void SetSpeed(float newVal)
 	{
 		speed = newVal;
 	}
+
 	FORCEINLINE class UCharacterStats* GetCharacterStats() const { return characterStats; }
+
 	void SetCharacterStats(class UCharacterStats* val);
-	TEnumAsByte<TeamEnums::Team> GetTeam() const { return team; }
+
+	FORCEINLINE TEnumAsByte<TeamEnums::Team> GetTeam() const { return team; }
+
 	void SetTeam(TEnumAsByte<TeamEnums::Team> val) { team = val; }
-	TEnumAsByte<GroupEnums::Role> StartingRole() const { return startingRole; }
-	void StartingRole(TEnumAsByte<GroupEnums::Role> val) { startingRole = val; }
+
+	FORCEINLINE ERole StartingRole() const { return startingRole; }
+
+	void StartingRole(ERole val) { startingRole = val; }
+
+	UFUNCTION(BlueprintCallable, Category = "Attack Speed")
+	FORCEINLINE float GetAttackSpeedModifier() { return attackSpeedModifier; }
+
+	UFUNCTION(BlueprintCallable, Category = "Attack Speed")
+	void SetAttackSpeedModifier(float val) { attackSpeedModifier = val; }
+
+	UFUNCTION(BlueprintCallable, Category = "Crit Chance")
+	FORCEINLINE float GetCritChanceModifier() { return critChanceModifier; }
+
+	UFUNCTION(BlueprintCallable, Category = "Crit Chance")
+	void SetCritChanceModifier(float val) { critChanceModifier = val; }
 };

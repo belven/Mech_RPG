@@ -13,7 +13,7 @@
 #define mCreateHealthChangePhaseTrigger(health, phase) UHealthChangePhaseTrigger::CreateHealthChangePhaseTrigger(this, health, phase)
 #define mGetMeleeRange UMiscLibrary::GetMeleeRange(this)
 
-void ATestBoss::CreatePresetRole(TEnumAsByte<GroupEnums::Role> inRole, int32 grade, int32 quaility)
+void ATestBoss::CreatePresetRole(ERole inRole, int32 grade, int32 quaility)
 {
 	static float newHealth = 20000;
 
