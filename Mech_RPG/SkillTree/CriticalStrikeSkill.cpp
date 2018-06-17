@@ -21,6 +21,14 @@ UCriticalStrikeSkill* UCriticalStrikeSkill::CreateCriticalStrikeSkill()
 	skill->SetName("Precision Scanner");
 	skill->SetStartLevel(0);
 	skill->SetMaxLevel(20);
-	skill->SetCurrentLevel(1);
+	skill->SetCurrentLevel(0);
 	return skill;
+}
+
+FString UCriticalStrikeSkill::GetTooltipText()
+{
+	FString tooltip = "Increases critical chance by ";
+	tooltip += FString::SanitizeFloat(GetCurrentLevel() * 0.1 * 100);
+	tooltip += "%";
+	return tooltip;
 }

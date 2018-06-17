@@ -513,10 +513,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		FORCEINLINE	float GetMaxHealth()
-	{
-		return maxHealth;
-	}
+		float GetMaxHealth();
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		void SetMaxHealth(float newVal)
@@ -641,7 +638,7 @@ public:
 	void StartingRole(ERole val) { startingRole = val; }
 
 	UFUNCTION(BlueprintCallable, Category = "Attack Speed")
-		FORCEINLINE float GetAttackSpeedModifier() { return attackSpeedModifier; }
+		float GetAttackSpeedModifier();
 
 	UFUNCTION(BlueprintCallable, Category = "Attack Speed")
 		void SetAttackSpeedModifier(float val) { attackSpeedModifier = val; }

@@ -119,27 +119,20 @@ USkillTree* USkillTree::CreateSkillTree(AMech_RPGCharacter * newOwner, ESpeciali
 	switch (specialisation)
 	{
 	case ESpecialisation::Pacifier:
-		newTree->AddNode(UDamageIncreaseSkill::CreateDamageIncreaseSkill());
-		newTree->AddNode(UCriticalStrikeSkill::CreateCriticalStrikeSkill());
+		newTree->AddNode(UMaxHealthSkill::CreateMaxHealthSkill());
 		break;
 
 	case ESpecialisation::Havoc:
-		newTree->AddNode(UDamageIncreaseSkill::CreateDamageIncreaseSkill());
+		newTree->AddNode(UAttackSpeedSkill::CreateAttackSpeedSkill());
 		newTree->AddNode(UCriticalStrikeSkill::CreateCriticalStrikeSkill());
 		break;
 
 	case ESpecialisation::Invigorator:
-		newTree->AddNode(UDamageIncreaseSkill::CreateDamageIncreaseSkill());
-		newTree->AddNode(UCriticalStrikeSkill::CreateCriticalStrikeSkill());
 		break;
 
 	case ESpecialisation::Defiler:
-		newTree->AddNode(UDamageIncreaseSkill::CreateDamageIncreaseSkill());
-		newTree->AddNode(UCriticalStrikeSkill::CreateCriticalStrikeSkill());
 		break;
 	default:
-		newTree->AddNode(UDamageIncreaseSkill::CreateDamageIncreaseSkill());
-		newTree->AddNode(UCriticalStrikeSkill::CreateCriticalStrikeSkill());
 		break;
 	}
 

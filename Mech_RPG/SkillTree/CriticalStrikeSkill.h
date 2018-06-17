@@ -17,4 +17,7 @@ class MECH_RPG_API UCriticalStrikeSkill : public USkillTreeNode
 public:
 	float GetStatBonus(EStatEnum statType) override;
 	static UCriticalStrikeSkill* CreateCriticalStrikeSkill();
+
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree Node")
+		FString GetTooltipText() override;
 };

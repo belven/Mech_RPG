@@ -6,10 +6,15 @@
 
 int USkillTreeUI::GetLevel()
 {
-	return skillTree->GetLevel();
+	return GetSkillTree()->GetLevel();
 }
 
 ESpecialisation USkillTreeUI::GetSpec()
 {
-	return skillTree->GetSpec();
+	return GetSkillTree()->GetSpec();
+}
+
+TArray<USkillTreeNode *>& USkillTreeUI::GetNodes()
+{
+	return GetSkillTree()->GetNodes();
 }

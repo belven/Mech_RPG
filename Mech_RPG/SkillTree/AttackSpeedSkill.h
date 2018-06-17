@@ -4,22 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "SkillTree/SkillTreeNode.h"
-#include "DamageIncreaseSkill.generated.h"
+#include "AttackSpeedSkill.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MECH_RPG_API UDamageIncreaseSkill : public USkillTreeNode
+class MECH_RPG_API UAttackSpeedSkill : public USkillTreeNode
 {
 	GENERATED_BODY()
 public:
 	float GetStatBonus(EStatEnum statType) override;
-	
-	static UDamageIncreaseSkill* CreateDamageIncreaseSkill();
+
+	static UAttackSpeedSkill* CreateAttackSpeedSkill();
 
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree Node")
-		FString GetTooltipText() override;
-	
-	
+		FString GetTooltipText() override;	
 };

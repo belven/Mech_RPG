@@ -59,7 +59,7 @@ float UArmour::GetDeafultValue(ArmourGrades::ArmourGrade armourGrade)
 FString UArmour::GetTooltipText()
 {
 	FString output = GetName() + UMiscLibrary::lnBreak;
-	output += FindObject<UEnum>(ANY_PACKAGE, TEXT("EArmourEnum"), true)->GetDisplayNameTextByValue((int)GetArmourPosition()).ToString() + UMiscLibrary::lnBreak;
+	output += UMiscLibrary::GetEnumString("EArmourPosition", (int32)GetArmourPosition()) + UMiscLibrary::lnBreak;
 	output += "Physical Resistance: " + FString::SanitizeFloat(GetPhysicalResistance()) + UMiscLibrary::lnBreak;
 	output += "Blast Resistance: " + FString::SanitizeFloat(GetBlastResistance()) + UMiscLibrary::lnBreak;
 	output += "Energy Resistance: " + FString::SanitizeFloat(GetEnergyResistance());

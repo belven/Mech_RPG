@@ -25,6 +25,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
 		ESpecialisation GetSpec();
+	
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree Nodes")
+		TArray<USkillTreeNode *>& GetNodes();
 
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
+		USkillTree * GetSkillTree() { return skillTree; }
 
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
+		void SetSkillTree(USkillTree * val) { skillTree = val; }
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Skill Tree")
+		void GenerateNodes();
 };

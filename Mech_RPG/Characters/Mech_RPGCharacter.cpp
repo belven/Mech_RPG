@@ -272,6 +272,11 @@ void AMech_RPGCharacter::SetCharacterStats(class UCharacterStats* val)
 	}
 }
 
+float AMech_RPGCharacter::GetAttackSpeedModifier()
+{
+	return attackSpeedModifier + GetStatBonus(EStatEnum::AttackSpeed);
+}
+
 USkillTree * AMech_RPGCharacter::GetSkillTreeBySpec(ESpecialisation spec)
 {
 	for (USkillTree* tree : GetSkillTrees())
@@ -933,6 +938,11 @@ void AMech_RPGCharacter::SetupWithLoadout()
 	SetTeam(startingLoadout.team);
 	SetSpeedModifier(startingLoadout.movementModifier);
 	SetSpeed(startingLoadout.speed);
+}
+
+float AMech_RPGCharacter::GetMaxHealth()
+{
+	return maxHealth * (1 + GetStatBonus(EStatEnum::Health));
 }
 
 void AMech_RPGCharacter::SetDead(bool newVal)

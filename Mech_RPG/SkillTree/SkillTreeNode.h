@@ -10,7 +10,7 @@
 /**
  *
  */
-UCLASS()
+UCLASS(Blueprintable)
 class MECH_RPG_API USkillTreeNode : public UObject
 {
 	GENERATED_BODY()
@@ -57,4 +57,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree Node")
 		void SetMaxLevel(int val) { maxLevel = val; }
+
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree Node")
+		virtual FString GetTooltipText();
 };

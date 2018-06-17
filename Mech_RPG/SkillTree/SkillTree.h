@@ -10,7 +10,7 @@
 class USkillTreeNode;
 class AMech_RPGCharacter;
 
-UCLASS()
+UCLASS(Blueprintable)
 class MECH_RPG_API USkillTree : public UObject
 {
 	GENERATED_BODY()
