@@ -5,4 +5,5 @@
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Mech_RPG, "Mech_RPG" );
 
 DEFINE_LOG_CATEGORY(AbilitiesLog);
+DEFINE_LOG_CATEGORY(SkillTreeLog);
  

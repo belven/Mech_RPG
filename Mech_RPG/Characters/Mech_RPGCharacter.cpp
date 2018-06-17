@@ -91,7 +91,6 @@ AMech_RPGCharacter::AMech_RPGCharacter() :
 	GetCharacterMovement()->SetWalkableFloorAngle(90);
 	GetCharacterMovement()->SetAvoidanceGroup(0);
 	GetCharacterMovement()->SetGroupsToAvoid(0);
-	//GetCharacterMovement()->SetGroupsToIgnore(0);
 
 	speed = GetCharacterMovement()->MaxWalkSpeed;
 
@@ -139,12 +138,6 @@ AMech_RPGCharacter::~AMech_RPGCharacter()
 	{
 		SetCurrentWeapon(nullptr);
 	}
-
-	if (GetGroup() != nullptr)
-	{
-		//GetGroup()->RemoveMember(this);
-	}
-
 }
 
 void AMech_RPGCharacter::CreateSkillTrees()
@@ -210,7 +203,6 @@ void AMech_RPGCharacter::BeginPlay()
 		SetCurrentAbility(abilities[0]);
 	}
 
-	//SetUpGroup();
 	SetUpWidgets();
 	CreateSkillTrees();
 
@@ -244,11 +236,6 @@ void AMech_RPGCharacter::SetUpWidgets()
 	{
 		int invSize = 20;
 		inventory->SetMaxItemCount(invSize);
-		/*inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
-		inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 1", 3, 0, 0, 5));
-		inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 2", 4, 0, 0, 2));
-		inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 3", 0, 0, 0, 2));
-		inventory->AddItem(AItem::CreateItem(GetWorld(), this, "Item 4", 3, 0, 0, 1));*/
 	}
 
 	GetFloatingStats()->UpdateHealthBar();
@@ -294,6 +281,14 @@ USkillTree * AMech_RPGCharacter::GetSkillTreeBySpec(ESpecialisation spec)
 		}
 	}
 	return nullptr;
+}
+
+void AMech_RPGCharacter::ChangedOthersHealth(FHealthChange healthChange)
+{
+	for (USkillTree* tree : GetSkillTrees())
+	{
+		tree->OwnerChangedOthersHealth(healthChange);
+	}
 }
 
 UArmour* AMech_RPGCharacter::GetArmourByPosition(EArmourPosition pos)
@@ -430,37 +425,49 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange)
 
 void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 {
-	CLAMP(health, GetMaxHealth(), 0);
-
 	if (OnPostHealthChange.IsBound())
 	{
 		OnPostHealthChange.Broadcast(healthChange);
 	}
 
-	UFloatingTextUI::CreateFloatingText(floatingTextClass, healthChange);
+	// Inform the manipulator that they have successfully changed our health
+	healthChange.manipulator->ChangedOthersHealth(healthChange);
 
+	// Check if we are dead
 	if (health <= 0)
 	{
-		health = 0;
-		SetDead(true);
-		SetActorHiddenInGame(true);
-
-		if (GetCurrentWeapon() != nullptr)
-		{
-			GetCurrentWeapon()->SetActorHiddenInGame(true);
-		}
-
-		OnStopFiring.Broadcast();
-		healthChange.manipulator->EnemyKilled(this);
-
-		//UQuestManager::EntityKilled(healthChange);
-		//SpawnItem(healthChange.manipulator);
+		CharacterDied(healthChange);
 	}
 
-	UpdateStats();
+	// Clamp health between 0 and Max Health
+	CLAMP(health, GetMaxHealth(), 0);
+
+	// Update the health stats on the UI
+	UpdateStatsUI();
+
+	// Create damage numbers in game
+	UFloatingTextUI::CreateFloatingText(floatingTextClass, healthChange);
 }
 
-void AMech_RPGCharacter::UpdateStats()
+void AMech_RPGCharacter::CharacterDied(FHealthChange &healthChange)
+{
+	health = 0;
+	SetDead(true);
+	SetActorHiddenInGame(true);
+
+	if (GetCurrentWeapon() != nullptr)
+	{
+		GetCurrentWeapon()->SetActorHiddenInGame(true);
+	}
+
+	OnStopFiring.Broadcast();
+	healthChange.manipulator->EnemyKilled(this);
+
+	//UQuestManager::EntityKilled(healthChange);
+	//SpawnItem(healthChange.manipulator);	
+}
+
+void AMech_RPGCharacter::UpdateStatsUI()
 {
 	if (GetFloatingStats() != nullptr)
 	{

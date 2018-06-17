@@ -27,6 +27,11 @@ float UMiscLibrary::GetMissingHealth(AMech_RPGCharacter* character)
 	return character != nullptr ? character->GetMaxHealth() - character->GetHealth() : 0.0;
 }
 
+FString UMiscLibrary::GetEnumString(FString name, int32 value)
+{
+	return FindObject<UEnum>(ANY_PACKAGE, *name, true)->GetDisplayNameTextByValue(value).ToString();
+}
+
 class UWeapon* UMiscLibrary::CreatePresetWeapon(class AMech_RPGCharacter* inOwner, TEnumAsByte<WeaponEnums::WeaponType> weaponType, int32 weaponGrade, int32 weaponQuality)
 {
 	UWeapon* weapon = nullptr;

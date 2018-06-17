@@ -269,7 +269,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Other")
 		void PostHealthChange(FHealthChange healthChange);
 
-	void UpdateStats();
+	void CharacterDied(FHealthChange &healthChange);
+
+	void UpdateStatsUI();
 
 	void SpawnItem(AMech_RPGCharacter* character);
 
@@ -658,4 +660,5 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
 		void SetSkillTrees(TArray<USkillTree *> val) { skillTrees = val; }
+	void ChangedOthersHealth(FHealthChange healthChange);
 };

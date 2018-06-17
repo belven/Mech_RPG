@@ -38,6 +38,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		bool ignoresArmour = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		UAbility* abilityUsed = nullptr;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPreHealthChangeEvent, FHealthChange&, healthChange);

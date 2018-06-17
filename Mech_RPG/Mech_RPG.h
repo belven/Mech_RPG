@@ -20,4 +20,5 @@
 #include "Runtime/UMG/Public/Components/WidgetComponent.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(AbilitiesLog, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(SkillTreeLog, Log, All);
 #endif

@@ -46,14 +46,18 @@ FString UBindLife::GetTooltipText()
 
 void UBindLife::ChangeHealth(FHealthChange& healthChange)
 {
-	UE_LOG(AbilitiesLog, Log, TEXT("Life absorbed %d"), healthChange.changeAmount * (1 - absorbPercent));
+	if (!mIsChildOf(healthChange.abilityUsed, UBindLife::StaticClass()))
+	{
+		//UE_LOG(AbilitiesLog, Log, TEXT("Life absorbed %d"), healthChange.changeAmount * (1 - absorbPercent));
 
-	healthChange.changeAmount *= (1 - absorbPercent);
+		healthChange.changeAmount *= (1 - absorbPercent);
 
-	FHealthChange change;
-	change.heals = false;
-	change.changeAmount = healthChange.changeAmount * (1 - damageReduction);
-	change.manipulator = healthChange.target;
-	change.target = owner;
-	owner->ChangeHealth(change);
+		FHealthChange change;
+		change.heals = false;
+		change.changeAmount = healthChange.changeAmount * (1 - damageReduction);
+		change.manipulator = healthChange.target;
+		change.target = owner;
+		change.abilityUsed = this;
+		owner->ChangeHealth(change);
+	}
 }

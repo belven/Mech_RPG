@@ -24,8 +24,26 @@ private:
 	UPROPERTY()
 		TArray<USkillTreeNode*> nodes;
 
+	UPROPERTY()
+		float experience;
+
+	void GainExpereince(float gainedExperience);
+
+	float CheckForInvigoratorExperience(FHealthChange &healthChange);
+
+	float CheckForDefilerExperience(FHealthChange &healthChange);
+
+	float CheckForHavocExperience(FHealthChange &healthChange);
+
+	float CheckForPacifierExperience(FHealthChange &healthChange);
 public:
-	float GetStatBonus(EStatEnum statType);
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
+		int GetLevel();
+
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
+		float GetStatBonus(EStatEnum statType);
+
+	void OwnerChangedOthersHealth(FHealthChange& healthChange);
 
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
 		AMech_RPGCharacter * GetTreeOwner() { return owner; }
