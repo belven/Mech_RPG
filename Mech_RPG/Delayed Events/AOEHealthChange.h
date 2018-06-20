@@ -31,6 +31,12 @@ public:
 	bool ignoresArmour = false;
 
 	UParticleSystem* particleSystem = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		UAbility* abilityUsed = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		UWeapon* weaponUsed = nullptr;
 };
 
 UCLASS()

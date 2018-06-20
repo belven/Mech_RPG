@@ -34,6 +34,7 @@ bool UAoEHeal::Activate(class AMech_RPGCharacter* target, FVector targetLocation
 		settings.usesTarget = false;
 		settings.heals = true;
 		settings.particleSystem = GetParticleSystem();
+		settings.abilityUsed = this;
 		AAOEHealthChange::CreateAOEHealthChange(settings);
 		SetOnCooldown(owner->GetWorld());
 

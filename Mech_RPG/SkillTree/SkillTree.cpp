@@ -5,6 +5,7 @@
 #include "Abilities.h"
 #include "SkillTree.h"
 
+
 void USkillTree::GainExpereince(float gainedExperience)
 {
 	this->experience += gainedExperience;
@@ -14,7 +15,7 @@ void USkillTree::GainExpereince(float gainedExperience)
 
 int USkillTree::GetLevel()
 {
-	return  round(experience / 200.0);
+	return round(experience / 200.0);
 }
 
 float USkillTree::GetStatBonus(EStatEnum statType)
@@ -27,10 +28,15 @@ float USkillTree::GetStatBonus(EStatEnum statType)
 	return total;
 }
 
-void USkillTree::OwnerChangedOthersHealth(FHealthChange& healthChange)
+void USkillTree::OwnerPreChangedOthersHealth(FHealthChange& healthChange)
 {
 	float gainedExperience = 0;
 
+	for (USkillTreeNode* node : GetNodes())
+	{
+		node->OwnerPreChangedOthersHealth(healthChange);
+	}
+	
 	switch (GetSpec())
 	{
 	case ESpecialisation::Pacifier:
@@ -54,7 +60,7 @@ void USkillTree::OwnerChangedOthersHealth(FHealthChange& healthChange)
 
 float USkillTree::CheckForInvigoratorExperience(FHealthChange &healthChange)
 {
-	if (healthChange.weaponUsed != nullptr && mIsChildOf(healthChange.weaponUsed, UBio_Rifle::StaticClass()))
+	if (healthChange.weaponUsed != nullptr && mCheckWeaponUsed(healthChange, UBio_Rifle))
 	{
 		return healthChange.changeAmount;
 	}
@@ -70,13 +76,13 @@ float USkillTree::CheckForInvigoratorExperience(FHealthChange &healthChange)
 float USkillTree::CheckForDefilerExperience(FHealthChange &healthChange)
 {
 	if (healthChange.weaponUsed != nullptr
-		&& (mIsChildOf(healthChange.weaponUsed, USniper::StaticClass())
-			|| mIsChildOf(healthChange.weaponUsed, ULaserSniper::StaticClass()))
+		&& (mCheckWeaponUsed(healthChange, USniper)
+			|| mCheckWeaponUsed(healthChange, ULaserSniper))
 		)
 	{
 		return healthChange.changeAmount;
 	}
-	else if (healthChange.abilityUsed != nullptr &&  mIsChildOf(healthChange.abilityUsed, USnipe::StaticClass()))
+	else if (healthChange.abilityUsed != nullptr && mCheckAbilityUsed(healthChange, USnipe))
 	{
 		return healthChange.changeAmount;
 	}
@@ -85,11 +91,11 @@ float USkillTree::CheckForDefilerExperience(FHealthChange &healthChange)
 
 float USkillTree::CheckForHavocExperience(FHealthChange &healthChange)
 {
-	if (healthChange.weaponUsed != nullptr && mIsChildOf(healthChange.weaponUsed, USMG::StaticClass()))
+	if (healthChange.weaponUsed != nullptr && mCheckWeaponUsed(healthChange, USMG))
 	{
 		return healthChange.changeAmount;
 	}
-	else if (healthChange.abilityUsed != nullptr &&  mIsChildOf(healthChange.abilityUsed, UGrenade::StaticClass()))
+	else if (healthChange.abilityUsed != nullptr && mCheckAbilityUsed(healthChange, UGrenade))
 	{
 		return healthChange.changeAmount;
 	}
@@ -98,11 +104,11 @@ float USkillTree::CheckForHavocExperience(FHealthChange &healthChange)
 
 float USkillTree::CheckForPacifierExperience(FHealthChange &healthChange)
 {
-	if (healthChange.weaponUsed != nullptr && mIsChildOf(healthChange.weaponUsed, UShotgun::StaticClass()))
+	if (healthChange.weaponUsed != nullptr && mCheckWeaponUsed(healthChange, UShotgun))
 	{
 		return healthChange.changeAmount;
 	}
-	else if (healthChange.abilityUsed != nullptr &&  mIsChildOf(healthChange.abilityUsed, UBindLife::StaticClass()))
+	else if (healthChange.abilityUsed != nullptr && mCheckAbilityUsed(healthChange, UBindLife))
 	{
 		return healthChange.changeAmount;
 	}
@@ -120,6 +126,10 @@ USkillTree* USkillTree::CreateSkillTree(AMech_RPGCharacter * newOwner, ESpeciali
 	{
 	case ESpecialisation::Pacifier:
 		newTree->AddNode(UMaxHealthSkill::CreateMaxHealthSkill());
+		newTree->AddNode(UResistanceBoostSkill::CreateResistanceBoostSkill());
+		newTree->AddNode(UHealingReceivedSkill::CreateHealingRecievedSkill());
+		newTree->AddNode(UShotgunDamageSkill::CreateShotgunDamageSkill());
+		newTree->AddNode(UReflectDamageSkill::CreateReflectDamageSkill());
 		break;
 
 	case ESpecialisation::Havoc:
@@ -147,4 +157,12 @@ void USkillTree::AddNode(USkillTreeNode* newNode)
 void USkillTree::RemoveNode(USkillTreeNode* nodeToRemove)
 {
 	nodes.Remove(nodeToRemove);
+}
+
+void USkillTree::PreHealthChanged(FHealthChange& healthChange)
+{
+	for (USkillTreeNode* node : GetNodes())
+	{
+		node->PreHealthChanged(healthChange);
+	}
 }

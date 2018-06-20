@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Enums.h"
+#include "EventManager.h"
 #include "SkillTreeNode.generated.h"
 
 /**
@@ -60,4 +61,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree Node")
 		virtual FString GetTooltipText();
+
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree Node")
+		virtual void OwnerPreChangedOthersHealth(FHealthChange& healthChange);
+
+	UFUNCTION(BlueprintCallable, Category = "Skill Tree Node")
+		virtual void PreHealthChanged(FHealthChange& healthChange);
 };

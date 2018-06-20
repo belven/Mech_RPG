@@ -8,7 +8,9 @@
 #include "EventManager.generated.h"
 
 class AMech_RPGCharacter;
+class UAbility;
 class UWeapon;
+class USkillTreeNode;
 
 USTRUCT(BlueprintType)
 struct FHealthChange
@@ -41,6 +43,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		UAbility* abilityUsed = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		USkillTreeNode* skillNode = nullptr;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPreHealthChangeEvent, FHealthChange&, healthChange);

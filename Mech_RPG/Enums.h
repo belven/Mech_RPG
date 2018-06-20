@@ -36,11 +36,14 @@ enum class EStatEnum : uint8
 {
 	Health,
 	Damage,
-	Defence,
+	Defense,
 	MovementSpeed,
 	CastSpeed,
 	AttackSpeed,
-	CritChance
+	CritChance,
+	DroneHealth,
+	DroneDamage,
+	DroneDefence
 };
 
 UENUM(BlueprintType)

@@ -11,6 +11,8 @@
 #define mIsChildOf(inUObject, checkClass) UMiscLibrary::IsChildOf(inUObject, checkClass)
 #define CLAMP(value, max, min) (value = (MAX(MIN(value, max), min)))
 
+#define mCheckAbilityUsed(healthChange, classUsed) mIsChildOf(healthChange.abilityUsed, classUsed::StaticClass())
+#define mCheckWeaponUsed(healthChange, classUsed) mIsChildOf(healthChange.weaponUsed, classUsed::StaticClass())
 
 UCLASS()
 class MECH_RPG_API UMiscLibrary : public UObject

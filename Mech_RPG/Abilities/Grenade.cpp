@@ -17,6 +17,7 @@ bool UGrenade::Activate(class AMech_RPGCharacter* target, FVector targetLocation
 		settings.damageType = EDamageType::Blast;
 		settings.duration = 1;
 		settings.usesTarget = false;
+		settings.abilityUsed = this;
 		AAOEHealthChange::CreateAOEHealthChange(settings);
 		SetOnCooldown(owner->GetWorld());
 		

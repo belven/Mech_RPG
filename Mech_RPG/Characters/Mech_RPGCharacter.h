@@ -147,27 +147,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Group")
 		TEnumAsByte<TeamEnums::Team> team;
 
-	UPROPERTY(EditAnywhere, Category = "Damage")
-		float healthChangeModifier;
-
-	UPROPERTY(EditAnywhere, Category = "Damage")
-		float defenceModifier;
-
-	UPROPERTY(EditAnywhere, Category = "Damage")
-		float maxHealth;
-
-	UPROPERTY(EditAnywhere, Category = "Speed")
-		float speed;
-
-	UPROPERTY(EditAnywhere, Category = "Speed")
-		float speedModifier;
-
-	UPROPERTY(EditAnywhere, Category = "Speed")
-		float critChanceModifier;
-
-	UPROPERTY(EditAnywhere, Category = "Speed")
-		float attackSpeedModifier;
-
 	UPROPERTY()
 		UWeapon* currentWeapon = nullptr;
 
@@ -211,6 +190,27 @@ private:
 	void CreateSkillTrees();
 protected:
 	virtual ~AMech_RPGCharacter();
+
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float healthChangeModifier;
+
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float defenceModifier;
+
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float maxHealth;
+
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float speed;
+
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float speedModifier;
+
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float critChanceModifier;
+
+	UPROPERTY(EditAnywhere, Category = "Speed")
+		float attackSpeedModifier;
 public:
 	AMech_RPGCharacter();
 	bool isPlayer;
@@ -434,7 +434,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		virtual void ChangeHealth(FHealthChange healthChange);
+		virtual void ChangeHealth(FHealthChange& healthChange);
 
 	UFUNCTION(BlueprintCallable, Category = "Items")
 		UItem* CalucluateItemDrop(UGroup * inGroup, ItemEnumns::ItemType type = ItemEnumns::Weapon);
@@ -513,7 +513,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		float GetMaxHealth();
+		virtual float GetMaxHealth();
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		void SetMaxHealth(float newVal)
@@ -568,10 +568,7 @@ public:
 		return canMove;
 	}
 
-	FORCEINLINE float GetDefenceModifier()
-	{
-		return MIN(defenceModifier, 0.99F);
-	}
+	virtual float GetDefenceModifier();
 
 	void SetCanAttack(int32 newVal)
 	{
@@ -588,7 +585,7 @@ public:
 		healthChangeModifier = newVal;
 	}
 
-	float GetHealthChangeModifier();
+	virtual float GetHealthChangeModifier();
 
 	void SetDefenceModifier(float newVal)
 	{
@@ -656,6 +653,8 @@ public:
 		USkillTree * GetSkillTreeBySpec(ESpecialisation spec);
 
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
-		void SetSkillTrees(TArray<USkillTree *> val) { skillTrees = val; }
-	void ChangedOthersHealth(FHealthChange healthChange);
+		void PreHealthChanged(FHealthChange& healthChange);
+	void SetSkillTrees(TArray<USkillTree *> val) { skillTrees = val; }
+	void PreChangedOthersHealth(FHealthChange& healthChange);
+	void PostChangedOthersHealth(FHealthChange& healthChange);
 };

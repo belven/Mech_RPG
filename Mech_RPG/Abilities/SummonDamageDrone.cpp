@@ -24,6 +24,7 @@ bool USummonDamageDrone::Activate(class AMech_RPGCharacter* target, FVector targ
 
 		if (droneSummoned != nullptr)
 		{
+			droneSummoned->SetDroneOwner(owner);
 			droneSummoned->SetGroup(owner->GetGroup());
 			droneSummoned->CreatePresetRole(ERole::DPS);
 			droneSummoned->SetTeam(owner->GetTeam());

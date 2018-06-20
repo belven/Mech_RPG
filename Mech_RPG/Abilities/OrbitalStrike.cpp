@@ -30,6 +30,7 @@ bool UOrbitalStrike::Activate(class AMech_RPGCharacter* target, FVector targetLo
 	settings.location = targetLocation;
 	settings.ignoresArmour = true;
 	settings.particleSystem = GetParticleSystem();
+	settings.abilityUsed = this;
 	AAOEHealthChange::CreateAOEHealthChange(settings);
 	SetOnCooldown(owner->GetWorld());
 

@@ -66,10 +66,10 @@ void UShieldBomb::ChangeHealth(FHealthChange& healthChange)
 			reflection.heals = false;
 			reflection.manipulator = owner;
 			reflection.target = healthChange.manipulator;
-			reflection.weaponUsed = nullptr;
 			reflection.changeAmount = healthChange.changeAmount * 0.3;
 			reflection.damageType = EDamageType::Energy;
 			reflection.ignoresArmour = true;
+			reflection.abilityUsed = this;
 
 			healthChange.manipulator->ChangeHealth(reflection);
 
@@ -94,6 +94,7 @@ void UShieldBomb::ChangeHealth(FHealthChange& healthChange)
 				explosion.target = character;
 				explosion.changeAmount = shieldAmount;
 				explosion.damageType = EDamageType::Blast;
+				explosion.abilityUsed = this;
 				character->ChangeHealth(explosion);
 			}
 		}

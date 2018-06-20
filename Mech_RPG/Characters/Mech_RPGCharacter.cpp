@@ -31,6 +31,7 @@
 
 //Skills
 #include "SkillTree/SkillTree.h"
+#include "SkillTree/SkillTreeNode.h"
 
 // Other
 #include "Group.h"
@@ -257,6 +258,11 @@ void AMech_RPGCharacter::UpdateHealthBarRot()
 	}
 }
 
+float AMech_RPGCharacter::GetDefenceModifier()
+{
+	return MIN(defenceModifier + GetStatBonus(EStatEnum::Defense), 0.99F);
+}
+
 float AMech_RPGCharacter::GetHealthChangeModifier()
 {
 	return MAX(healthChangeModifier + GetStatBonus(EStatEnum::Damage), 0.01F);
@@ -288,12 +294,25 @@ USkillTree * AMech_RPGCharacter::GetSkillTreeBySpec(ESpecialisation spec)
 	return nullptr;
 }
 
-void AMech_RPGCharacter::ChangedOthersHealth(FHealthChange healthChange)
+void AMech_RPGCharacter::PreHealthChanged(FHealthChange& healthChange)
 {
 	for (USkillTree* tree : GetSkillTrees())
 	{
-		tree->OwnerChangedOthersHealth(healthChange);
+		tree->PreHealthChanged(healthChange);
 	}
+}
+
+void AMech_RPGCharacter::PreChangedOthersHealth(FHealthChange& healthChange)
+{
+	for (USkillTree* tree : GetSkillTrees())
+	{
+		tree->OwnerPreChangedOthersHealth(healthChange);
+	}
+}
+
+void AMech_RPGCharacter::PostChangedOthersHealth(FHealthChange& healthChange)
+{
+	// TODO
 }
 
 UArmour* AMech_RPGCharacter::GetArmourByPosition(EArmourPosition pos)
@@ -395,7 +414,7 @@ void AMech_RPGCharacter::RemoveQuest(UQuest* quest)
 	quests.Remove(quest);
 }
 
-void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange)
+void AMech_RPGCharacter::ChangeHealth(FHealthChange& healthChange)
 {
 	if (GetGroup() != nullptr && !CompareGroup(healthChange.manipulator))
 	{
@@ -406,6 +425,10 @@ void AMech_RPGCharacter::ChangeHealth(FHealthChange healthChange)
 	{
 		OnPreHealthChange.Broadcast(healthChange);
 	}
+
+	// Inform the manipulator that they will change our health
+	healthChange.manipulator->PreChangedOthersHealth(healthChange);
+	PreHealthChanged(healthChange);
 
 	if (healthChange.heals)
 	{
@@ -435,9 +458,9 @@ void AMech_RPGCharacter::PostHealthChange(FHealthChange healthChange)
 		OnPostHealthChange.Broadcast(healthChange);
 	}
 
-	// Inform the manipulator that they have successfully changed our health
-	healthChange.manipulator->ChangedOthersHealth(healthChange);
-
+	// Inform the manipulator that they have changed our health
+	healthChange.manipulator->PostChangedOthersHealth(healthChange);
+	
 	// Check if we are dead
 	if (health <= 0)
 	{
@@ -875,9 +898,9 @@ void AMech_RPGCharacter::CreatePresetRole(ERole inRole, int32 grade, int32 quail
 		break;
 
 	case ERole::Tank:
-		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Sword, grade, quaility));
+		SetCurrentWeapon(mCreatePresetWeapon(WeaponEnums::Shotgun, grade, quaility));
 		AddAbility(UBindLife::CreateBindLife(10, this, 0.5F, 0.25F));
-		AddAbility(mCreatePresetAbility(AbilityEnums::DefenceBoost));
+		AddAbility(mCreatePresetAbility(AbilityEnums::Shield));
 		blastResistance = mGetDefaultArmourValue(ArmourGrades::Medium);
 		phsyicalResistance = mGetDefaultArmourValue(ArmourGrades::Medium);
 		energyResistance = mGetDefaultArmourValue(ArmourGrades::Medium);

@@ -11,7 +11,6 @@ ADrone::ADrone() : Super()
 	if (newMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(newMesh.Object);
-		//GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 
 	AIControllerClass = AAllyAIController::StaticClass();
@@ -22,12 +21,27 @@ void ADrone::CreatePresetRole(ERole inRole, int32 grade, int32 quaility)
 	Super::CreatePresetRole(ERole::Drone, grade, quaility);
 }
 
-void ADrone::OutOfCombat()
+float ADrone::GetMaxHealth()
 {
-	Super::OutOfCombat();
+	if (droneOwner != nullptr) {
+		return maxHealth * (1 + droneOwner->GetStatBonus(EStatEnum::DroneHealth));
+	}
+	else return maxHealth;
 }
 
-void ADrone::SetDead(bool newVal)
+float ADrone::GetHealthChangeModifier()
 {
-	Super::SetDead(newVal);
+	if (droneOwner != nullptr) {
+		return healthChangeModifier * (1 + droneOwner->GetStatBonus(EStatEnum::DroneDamage));
+	}
+	else return healthChangeModifier;
 }
+
+float ADrone::GetDefenceModifier()
+{
+	if (droneOwner != nullptr) {
+		return MIN(defenceModifier + droneOwner->GetStatBonus(EStatEnum::DroneDefence), 0.99F);
+	}
+	else return defenceModifier;
+}
+

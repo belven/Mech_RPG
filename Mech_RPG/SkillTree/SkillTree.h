@@ -43,7 +43,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
 		float GetStatBonus(EStatEnum statType);
 
-	void OwnerChangedOthersHealth(FHealthChange& healthChange);
+	void OwnerPreChangedOthersHealth(FHealthChange& healthChange);
 
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree")
 		AMech_RPGCharacter * GetTreeOwner() { return owner; }
@@ -71,4 +71,5 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Skill Tree Nodes")
 		void RemoveNode(USkillTreeNode* nodeToRemove);
+	void PreHealthChanged(FHealthChange& healthChange);
 };
